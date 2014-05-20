@@ -1,0 +1,51 @@
+Fetal Brain - MeDIP vs MethylCRF vs WGBS
+========================================================
+
+Gloria Li         
+`r date()` 
+<!-- re-knit after modify compare_bin200.R WGBS.R and MeDIP.R -->
+
+## WGBS   
+* Is methylation on two strands symmetric?   
+    Seems the differences between strands are most likely result from technical variations.          
+<img src="../WGBS/strand.symmetry.cortex02.png" height="400px" width="400px" />
+<img src="../WGBS/strand.symmetry.distribution.png" height="400px" width="400px" />    
+* Take the weighted average on coverage for fractional calls on both strand.     
+
+## MeDIP
+* MeDIP fractional calls for 28M CpGs generated for 6 brain (brain, cortex, GE) samples from HuFNSC01 and HuFNSC02 with Misha's algorithm.   
+
+## MeDIP vs MethylCRF vs WGBS  
+### Distribution and global patterns
+* WGBS fractional calls from different samples seem more stable after taking the weighted average.     
+* MeDIP calls vary more between different samples than other two methods. (not observed in breast datasets) 
+  * Possible reason: sequencing fragment length in the brain samples varies more. But wig files are generated with average fragment length, so regional coverage calculated from the wig files are more unstable. -- Misha is looking into this.   
+<img src="../MeDIP/ECDF.MeDIP.MethylCRF.WGBS.png" height="400px" width="400px" />          
+<img src="../MeDIP/cortex02.3methods_boxplot.png" height="200px" width="600px" />            
+<img src="../MeDIP/ge02.3methods_boxplot.png" height="200px" width="600px" />            
+
+### 200bp bins   
+* Global correlation of mean methylation level of each bin.         
+<img src="../MeDIP/bin200.3methods.correlation.cortex02.png" height="600px" width="600px" />          
+<img src="../MeDIP/bin200.3methods.correlation.ge02.png" height="600px" width="600px" />          
+
+```{r, echo=FALSE}
+setwd("~/FetalBrain/MeDIP/")
+load("DMR_3methods_bin200.Rdata")
+```
+
+* DMRs: paired t-test within each bin + FDR cutoff `r cutoff`.             
+```{r DMR, echo=FALSE}
+library(xtable)
+summary <- xtable(summary)
+align(summary) <- 'lccc'
+print(summary, , type = "html", include.rownames = T)
+common <- merge(cortex02_ge02_MeDIP_dmr, merge(cortex02_ge02_MethylCRF_dmr, cortex02_ge02_WGBS_28M_dmr, by = "bin"), by = "bin")
+common$chr <- gsub(":[0-9-]+", "", common$bin)
+common$start <- gsub("-[0-9]+", "", gsub("chr[0-9X]+:", "", common$bin))
+common$end <- gsub("chr[0-9X:]+-", "", common$bin)
+write.table(common[,c("chr", "start", "end", "bin")], file = "DMR_common_3methods.bed", sep = "\t", quote = F, row.names = F, col.names = F)
+```
+
+No. of common DMRs identified by all 3 methods: `r nrow(common)`.     
+

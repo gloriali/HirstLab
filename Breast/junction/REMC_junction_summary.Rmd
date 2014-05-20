@@ -1,0 +1,155 @@
+REMC isoform analysis - junctions
+========================================================
+
+Gloria Li         
+`r date()` 
+<!-- re-knit after modify junction.R script -->
+
+```{r, echo=F}
+setwd("~/快盘/REMC/junction/")
+load("junction_summary_tables.Rdata")
+load("lum_myo_stem_084_validate.Rdata")
+```
+## Junction coverage and RPKM distribution
+<img src="readCount_distribution.png" height="400px" width="400px" />
+<img src="RPKM_distribution.png" height="400px" width="400px" />
+
+## Validate previously identified isoform genes with junctions
+
+* Approach: For each AS gene in the previous pairwise comparison
+  * Junction coverage cutoff: sum of junction coverage of two samples > 3
+  * Find junctions associated with this gene with enough coverage
+  * Calculate junction RPKM fold change between the 2 samples
+  * The highest junction fold change > 2 
+  
+* Results:  
+
+  * About __60%__ persent of the genes have junctions with enough coverage for validation. Among them, __> 90%__ have junctions with more than 2-fold change in RPKM.             
+  
+```{r validate, echo=F, results='asis'}
+library(xtable)
+junction_valid <- xtable(junction_valid)
+align(junction_valid) <- "lccc"
+print(junction_valid, type = "html", include.rownames = T)
+```
+  
+  * Enrichment of validated genes       
+  
+```{r DAVID, echo = F, results = 'asis', message = F, fig.width=10, fig.height=5}
+library(ggplot2)
+lum084_myo084_DAVID <- read.delim("./DAVID/lum084_myo084_gene_valid_DAVID.txt", as.is=T)
+lum084_myo084_DAVID <- lum084_myo084_DAVID[lum084_myo084_DAVID$FDR <= 0.01, ]
+lum084_myo084_DAVID$Term <- gsub("GO:[0-9]+~", "", lum084_myo084_DAVID$Term)
+lum084_myo084_DAVID$Term <- gsub("IPR[0-9]+:", "", lum084_myo084_DAVID$Term)
+lum084_myo084_DAVID$Term <- gsub("hsa[0-9]+:", "", lum084_myo084_DAVID$Term)
+lum084_myo084_DAVID$Term <- gsub("SM[0-9]+:", "", lum084_myo084_DAVID$Term)
+lum084_myo084_DAVID$Term <- factor(lum084_myo084_DAVID$Term, levels = lum084_myo084_DAVID[order(lum084_myo084_DAVID$Category, lum084_myo084_DAVID$Benjamini, decreasing = T),]$Term)
+(DAVID_lum084_myo084 <- ggplot(data = lum084_myo084_DAVID, aes(Term, -log10(Benjamini))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Benjamini), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for validated lum084 vs myo084 isoforms") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(DAVID_lum084_myo084, file = "./DAVID/DAVID_lum084_myo084.pdf")
+
+lum084_stem084_DAVID <- read.delim("./DAVID/lum084_stem084_gene_valid_DAVID.txt", as.is=T)
+lum084_stem084_DAVID <- lum084_stem084_DAVID[lum084_stem084_DAVID$FDR <= 0.01, ]
+lum084_stem084_DAVID$Term <- gsub("GO:[0-9]+~", "", lum084_stem084_DAVID$Term)
+lum084_stem084_DAVID$Term <- gsub("IPR[0-9]+:", "", lum084_stem084_DAVID$Term)
+lum084_stem084_DAVID$Term <- gsub("hsa[0-9]+:", "", lum084_stem084_DAVID$Term)
+lum084_stem084_DAVID$Term <- gsub("SM[0-9]+:", "", lum084_stem084_DAVID$Term)
+lum084_stem084_DAVID$Term <- factor(lum084_stem084_DAVID$Term, levels = lum084_stem084_DAVID[order(lum084_stem084_DAVID$Category, lum084_stem084_DAVID$Benjamini, decreasing = T),]$Term)
+(DAVID_lum084_stem084 <- ggplot(data = lum084_stem084_DAVID, aes(Term, -log10(Benjamini))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Benjamini), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for validated lum084 vs stem084 isoforms") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(DAVID_lum084_stem084, file = "./DAVID/DAVID_lum084_stem084.pdf")
+
+myo084_stem084_DAVID <- read.delim("./DAVID/myo084_stem084_gene_valid_DAVID.txt", as.is=T)
+myo084_stem084_DAVID <- myo084_stem084_DAVID[myo084_stem084_DAVID$FDR <= 0.01, ]
+myo084_stem084_DAVID$Term <- gsub("GO:[0-9]+~", "", myo084_stem084_DAVID$Term)
+myo084_stem084_DAVID$Term <- gsub("IPR[0-9]+:", "", myo084_stem084_DAVID$Term)
+myo084_stem084_DAVID$Term <- gsub("hsa[0-9]+:", "", myo084_stem084_DAVID$Term)
+myo084_stem084_DAVID$Term <- gsub("SM[0-9]+:", "", myo084_stem084_DAVID$Term)
+myo084_stem084_DAVID$Term <- factor(myo084_stem084_DAVID$Term, levels = myo084_stem084_DAVID[order(myo084_stem084_DAVID$Category, myo084_stem084_DAVID$Benjamini, decreasing = T),]$Term)
+(DAVID_myo084_stem084 <- ggplot(data = myo084_stem084_DAVID, aes(Term, -log10(Benjamini))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Benjamini), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for validated myo084 vs stem084 isoforms") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(DAVID_myo084_stem084, file = "./DAVID/DAVID_myo084_stem084.pdf")
+```
+  
+  * Some screenshot examples.       
+    * ENSG00000170312: CDK1 (Cyclin-Dependent Kinase 1) play important regulatory roles in cell cycle control, is essential for G1/S and G2/M phase transitions of eukaryotic cell cycle.            
+    <img src="./browser/ENSG00000170312.png" height="200px" width="400px" />
+    * ENSG00000196208: GREB1 (Growth Regulation By Estrogen In Breast Cancer 1) an estrogen-responsive gene, that is an early response gene in the estrogen receptor-regulated pathway. It is thought to play an important role in hormone-responsive tissues and cancer. 
+    <img src="./browser/ENSG00000196208.png" height="300px" width="400px" />
+    
+## Identify isoforms with junctions
+Results from all below approaches __do not correlate well__ with previously identified isoforms from exon analysis. Problem with junction alignment resulting in no coverage for many junctions? 
+### Fold change + junction RPKM cutoff
+* Approach: 
+  * junction RPKM fold change > 4 
+  * one sample junction RPKM > 0.5, the other < 0.5 
+  * exclude DE genes identified by DEfine (FRD = 0.015)
+* Results: too many __false positive__ resulting from differential expression of the entire gene.         
+
+```{r fold, echo=F, results='asis'}
+library(xtable)
+junction_fold <- xtable(junction_fold)
+align(junction_fold) <- "lcccccc"
+print(junction_fold, type = "html", include.rownames = T)
+```
+
+### DEfine + junction RPKM cutoff
+* Approach: 
+  * DEfine on junction RPKM (FDR = 0.015)
+  * one sample junction RPKM > 0.5, the other < 0.5 
+  * exclude DE genes identified by DEfine (FRD = 0.015)
+* Results: seems too __stringent__  
+
+```{r DEfine, echo=F, results='asis'}
+library(xtable)
+junction_DEfine <- xtable(junction_DEfine)
+align(junction_DEfine) <- "lcccccc"
+print(junction_DEfine, type = "html", include.rownames = T)
+```
+
+### Relative junction expression
+* Approach: 
+  * calculate relative junction expression levels: junction RPKM / gene RPKM
+  * fold change in relative junction expression > 4
+  * relative junction expression > 0.5 in at least one sample 
+  * gene RPKM > 0.1 in both samples
+  * exclude DE genes identified by DEfine (FRD = 0.015)             
+  <img src="relative_junctionExpression.png" height="400px" width="400px" />
+* Results: in general __better__ than other approaches, but very sensitive to __genes with small RPKM__.    
+
+```{r relative, echo=F, results='asis'}
+library(xtable)
+junction_relative <- xtable(junction_relative)
+align(junction_relative) <- "lccccccc"
+print(junction_relative, type = "html", include.rownames = T)
+```
+
+### Combine exons and juntions
+* Approach: 
+  * exon DE identified by DEfine (FDR = 0.015)
+  * exon with at least one junction identified by DEfine (FDR = 0.03)
+  * the exon and the junction change in the same direction
+  * exclude DE genes identified by DEfine (FRD = 0.015)
+* Results: still too __stringent__ even with a more relaxed FDR cutoff 
+
+```{r combine, echo=F, results='asis'}
+library(xtable)
+junction_combined <- xtable(junction_combined, digits = 0)
+align(junction_combined) <- "lcccc"
+print(junction_combined, type = "html", include.rownames = T)
+```

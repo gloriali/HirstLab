@@ -1,0 +1,575 @@
+# Epigenetic analysis of fetail brain from human monozygotic twins
+Gloria Li    
+`r date()`
+
+## Neuroshpere cortex derived VS neuroshpere ganglionic eminence derived 
+### Differential expression analysis
+RNA-seq of Neuroshpere cortex derived VS neuroshpere ganglionic eminence derived from HuFNSC01, 02, 03, 04.   
+Use DEfine (FDR cutoff = 0.01) on normalized RPKMs of each gene to idetify DE genes between cortex and GE.  
+
+**No. of DE genes**    
+```{r cortexGE_DE_input, echo=F, message = F, results='asis'}
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge")
+cortexge01up <- read.delim("UP.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge02up <- read.delim("UP.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge03up <- read.delim("UP.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge04up <- read.delim("UP.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge01dn <- read.delim("DN.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge02dn <- read.delim("DN.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge03dn <- read.delim("DN.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge04dn <- read.delim("DN.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortexge_dup_up <- read.csv("cortexge_up_duplicate.csv")
+cortexge_dup_dn <- read.csv("cortexge_dn_duplicate.csv")
+
+NtissueDE <- data.frame(Sample = c("HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04","2 or more"), Cortex.Overexpression = c(nrow(cortexge01up), nrow(cortexge02up), nrow(cortexge03up), nrow(cortexge04up), nrow(cortexge_dup_up)), GE.Overexpression = c(nrow(cortexge01dn), nrow(cortexge02dn), nrow(cortexge03dn), nrow(cortexge04dn), nrow(cortexge_dup_dn)))
+library(xtable)
+NtissueDE <- xtable(NtissueDE)
+print(NtissueDE, type = "html", include.rownames = FALSE)
+
+library(VennDiagram)
+cortexge_up <- list(HuFNSC01 = cortexge01up$V1, HuFNSC02 = cortexge02up$V1, HuFNSC03 = cortexge03up$V1, HuFNSC04 = cortexge04up$V1)
+cortexge_dn <- list(HuFNSC01 = cortexge01dn$V1, HuFNSC02 = cortexge02dn$V1, HuFNSC03 = cortexge03dn$V1, HuFNSC04 = cortexge04dn$V1)
+# pdf("venn_cortex_overexpressed.pdf")
+plot.new()
+venn_cortexge_up <- venn.diagram(cortexge_up, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex overexpressed genes", main.cex = 2)
+grid.draw(venn_cortexge_up)
+# dev.off()
+# pdf("venn_ge_overexpressed.pdf")
+plot.new()
+venn_cortexge_dn <- venn.diagram(cortexge_dn, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GE overexpressed genes", main.cex = 2)
+grid.draw(venn_cortexge_dn)
+# dev.off()
+```
+**Functional enrichment**:     
+Both cortex overexpressed and GE overexpressed genes are enriched in brain development related terms.  
+GE overexpressed genes are enriched in EGF-like protein domain.  
+```{r cortexGE_DE_DAVID, echo=FALSE, message=F, fig.width=10}
+library(ggplot2)
+cortexge_dup_up_DAVID <- read.delim("cortexge_up_duplicate.txt", as.is=T)
+cortexge_dup_up_erminej_BP <- read.delim("cortexge_up_duplicate_erminej_GOBP.txt", as.is=T, skip = 34, head = F)
+cortexge_dup_up_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = cortexge_dup_up_erminej_BP$V2, FDR = cortexge_dup_up_erminej_BP$V10), data.frame(Category = cortexge_dup_up_DAVID$Category, Term = cortexge_dup_up_DAVID$Term, FDR = cortexge_dup_up_DAVID$FDR)))
+cortexge_dup_up_enrich <- cortexge_dup_up_enrich[cortexge_dup_up_enrich$FDR <= 0.01, ]
+# cortexge_dup_up_enrich$Term <- factor(cortexge_dup_up_enrich$Term, levels = cortexge_dup_up_enrich[order(cortexge_dup_up_enrich$Category, cortexge_dup_up_enrich$FDR, decreasing = T),]$Term)
+# (Enrich_cortexge_up <- ggplot(data = cortexge_dup_up_enrich, aes(Term, -log10(FDR))) +
+#    geom_bar(aes(fill = factor(Category)), width = .5) + 
+#    coord_flip() + 
+#    geom_text(aes(label = round(-log10(FDR), digits=2), hjust = 0)) + 
+#    theme_bw() +
+#    ggtitle("Functional enrichment for cortex overexpressed genes") + 
+#    scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+# ggsave(Enrich_cortexge_up, file = "Enrich_cortexge_up.pdf")
+# No significant enrichment
+
+cortexge_dup_dn_DAVID <- read.delim("cortexge_dn_duplicate.txt", as.is=T)
+cortexge_dup_dn_erminej_BP <- read.delim("cortexge_dn_duplicate_erminej_GOBP.txt", as.is=T, skip = 34, head = F)
+cortexge_dup_dn_erminej_MF <- read.delim("cortexge_dn_duplicate_erminej_GOMF.txt", as.is=T, skip = 34, head = F)
+cortexge_dup_dn_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = cortexge_dup_dn_erminej_BP$V2, FDR = cortexge_dup_dn_erminej_BP$V10), data.frame(Category = "GOMF", Term = cortexge_dup_dn_erminej_MF$V2, FDR = cortexge_dup_dn_erminej_MF$V10), data.frame(Category = cortexge_dup_dn_DAVID$Category, Term = cortexge_dup_dn_DAVID$Term, FDR = cortexge_dup_dn_DAVID$FDR)))
+cortexge_dup_dn_enrich <- cortexge_dup_dn_enrich[cortexge_dup_dn_enrich$FDR <= 0.01, ]
+cortexge_dup_dn_enrich$Term <- gsub("IPR[0-9]+:", "", cortexge_dup_dn_enrich$Term)
+cortexge_dup_dn_enrich$Term <- factor(cortexge_dup_dn_enrich$Term, levels = cortexge_dup_dn_enrich[order(cortexge_dup_dn_enrich$Category, cortexge_dup_dn_enrich$FDR, decreasing = T),]$Term)
+(Enrich_cortexge_dup_dn <- ggplot(data = cortexge_dup_dn_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for GE overexpressed genes") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(Enrich_cortexge_dup_dn, file = "Enrich_cortexge_dn.pdf")
+```
+
+### Isoform analysis
+RNA-seq of Neuroshpere cortex derived VS neuroshpere ganglionic eminence derived from HuFNSC01, 02, 03, 04.   
+Use DEfine (FDR cut-off = 0.01) on normalized RPKMs of each exon to idetify DE exons between cortex and GE. Expressed exons were defined as those with RPKM ≥ 10% of gene RPKM; unexpressed exons were defined as those with RPKM ≤ 1% of gene RPKM; and the exons in between (1~10% gene RPKM) were discarded to filter out most false positives. Isoforms for each pairwise comparison were identified as genes with DE exons expressed in only one of the two samples.  
+
+<!-- Check if current results used double-cutoff -->
+
+### DNA methylation analysis
+MethylCRF of HuFNSC01 and 02.   
+DMRs: calculate average methylation level for 1kB bins. Fold change between two samlpes > 2. And methylCRF value of one sample > 0.5. 
+
+**No. of DMRs**:     
+<!-- lab book 01 P25, 29 ... -->   
+```{r cortexGE_DMR, echo = F, message = F, results = 'asis'}
+setwd("~/FetalBrain/MeDIPMRE/cortexVsGE/")
+DMR_cortexGE <- read.csv("DMR_cortexGE.csv", as.is=T)
+DMR_cortexGE01 <- read.csv("DMR_cortexGE01.csv", as.is=T)
+DMR_cortexGE02 <- read.csv("DMR_cortexGE02.csv", as.is=T)
+DMR_promoter_cortexGE <- read.delim("DMR_promoter_cortexGE.txt", as.is=T, head=F)
+DMR_promoter_cortexGE01 <- read.delim("DMR_promoter_cortexGE01.txt", as.is=T, head=F)
+DMR_promoter_cortexGE02 <- read.delim("DMR_promoter_cortexGE02.txt", as.is=T, head=F)
+DMR_pcpromoter_cortexGE <- read.delim("DMR_pcpromoter_cortexGE.bed", as.is=T, head=F)
+DMR_pcpromoter_cortexGE01 <- read.delim("DMR_pcpromoter_cortexGE01.bed", as.is=T, head=F)
+DMR_pcpromoter_cortexGE02 <- read.delim("DMR_pcpromoter_cortexGE02.bed", as.is=T, head=F)
+DE_pcpromoter_cortexGE <- read.delim("./DAVID/cortexge_promoterDMR_DE_DAVID.txt", as.is=T, head=T)
+DE_pcpromoter_cortexGE01 <- read.delim("./DAVID/cortexge01_promoterDMR_DE_DAVID1.txt", as.is=T, head=T)
+DE_pcpromoter_cortexGE02 <- read.delim("./DAVID/cortexge02_promoterDMR_DE_DAVID1.txt", as.is=T, head=T)
+DMR_CGI_cortexGE <- read.delim("DMR_CGI_cortexGE.txt", as.is=T, head=F)
+DMR_CGI_cortexGE01 <- read.delim("DMR_CGI_cortexGE01.txt", as.is=T, head=F)
+DMR_CGI_cortexGE02 <- read.delim("DMR_CGI_cortexGE02.txt", as.is=T, head=F)
+DMR_genebody_cortexGE <- read.delim("DMR_genebody_cortexGE.txt", as.is=T, head=F)
+DMR_genebody_cortexGE01 <- read.delim("DMR_genebody_cortexGE01.txt", as.is=T, head=F)
+DMR_genebody_cortexGE02 <- read.delim("DMR_genebody_cortexGE02.txt", as.is=T, head=F)
+DMR_pcgenebody_cortexGE <- read.delim("DMR_pcgenebody_cortexGE.txt", as.is=T, head=F)
+DMR_pcgenebody_cortexGE01 <- read.delim("DMR_pcgenebody_cortexGE01.txt", as.is=T, head=F)
+DMR_pcgenebody_cortexGE02 <- read.delim("DMR_pcgenebody_cortexGE02.txt", as.is=T, head=F)
+NtissueDMR <- data.frame(Sample = c("HuFNSC01", "HuFNSC02", "Shared"), 
+                         DMRs = c(nrow(DMR_cortexGE01), nrow(DMR_cortexGE02), nrow(DMR_cortexGE)), 
+                         Promoter = c(nrow(DMR_promoter_cortexGE01), nrow(DMR_promoter_cortexGE02), nrow(DMR_promoter_cortexGE)), 
+                         Promoter.Enrichment = (c(nrow(DMR_promoter_cortexGE01), nrow(DMR_promoter_cortexGE02), nrow(DMR_promoter_cortexGE))/c(nrow(DMR_cortexGE01), nrow(DMR_cortexGE02), nrow(DMR_cortexGE)))/0.0665, 
+                         PC.Promoter = c(nrow(DMR_pcpromoter_cortexGE01), nrow(DMR_pcpromoter_cortexGE02), nrow(DMR_pcpromoter_cortexGE)), 
+                         DE.pcPromoter = c(nrow(DE_pcpromoter_cortexGE01), nrow(DE_pcpromoter_cortexGE02), nrow(DE_pcpromoter_cortexGE)), 
+                         Genebody = c(nrow(DMR_genebody_cortexGE01), nrow(DMR_genebody_cortexGE02), nrow(DMR_genebody_cortexGE)), 
+                         PC.Genebody = c(nrow(DMR_pcgenebody_cortexGE01), nrow(DMR_pcgenebody_cortexGE02), nrow(DMR_pcgenebody_cortexGE)), 
+                         CGI = c(nrow(DMR_CGI_cortexGE01), nrow(DMR_CGI_cortexGE02), nrow(DMR_CGI_cortexGE)), 
+                         CGI.Enrichment = (c(nrow(DMR_CGI_cortexGE01), nrow(DMR_CGI_cortexGE02), nrow(DMR_CGI_cortexGE))/c(nrow(DMR_cortexGE01), nrow(DMR_cortexGE02), nrow(DMR_cortexGE)))/0.01602)
+NtissueDMR <- xtable(NtissueDMR)
+print(NtissueDMR, type = "html", include.rownames = FALSE)
+```
+
+**Global differential methylation trend**    
+```{r cortexge_globalDMR, message = F, echo=F, fig.width=12}
+chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T)[1:23,]
+chrlength$chr <- factor(chrlength$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+
+DMR_cortexGE01[DMR_cortexGE01$chr == "chrY", ] <- NA
+DMR_cortexGE01 <- na.omit(DMR_cortexGE01)
+DMR_cortexGE01$cortex <- NA
+DMR_cortexGE01[DMR_cortexGE01$cortexVsGE01 > 0,]$cortex <- "hyper"
+DMR_cortexGE01[DMR_cortexGE01$cortexVsGE01 < 0,]$cortex <- "hypo"
+DMR_cortexGE01$chr <- factor(DMR_cortexGE01$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+DMR_cortexGE02[DMR_cortexGE02$chr == "chrY", ] <- NA
+DMR_cortexGE02 <- na.omit(DMR_cortexGE02)
+DMR_cortexGE02$cortex <- NA
+DMR_cortexGE02[DMR_cortexGE02$cortexVsGE02 > 0,]$cortex <- "hyper"
+DMR_cortexGE02[DMR_cortexGE02$cortexVsGE02 < 0,]$cortex <- "hypo"
+DMR_cortexGE02$chr <- factor(DMR_cortexGE02$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+DMR_cortexGE[DMR_cortexGE$chr == "chrY", ] <- NA
+DMR_cortexGE <- na.omit(DMR_cortexGE)
+DMR_cortexGE$cortex <- NA
+DMR_cortexGE[DMR_cortexGE$cortexVsGE01 > 0 & DMR_cortexGE$cortexVsGE02 > 0,]$cortex <- "hyper"
+DMR_cortexGE[DMR_cortexGE$cortexVsGE01 < 0 & DMR_cortexGE$cortexVsGE01 < 0,]$cortex <- "hypo"
+DMR_cortexGE[is.na(DMR_cortexGE$cortex),]$cortex <- "inconsistent"
+DMR_cortexGE$chr <- factor(DMR_cortexGE$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+
+DMR_cortexGE_combine <-cbind(rbind(data.frame(DMR_cortexGE01, Individual = rep("HuFNSC01", times = nrow(DMR_cortexGE01))), data.frame(DMR_cortexGE02, Individual = rep("HuFNSC02", times = nrow(DMR_cortexGE02))), data.frame(DMR_cortexGE, Individual = rep("Shared", times = nrow(DMR_cortexGE)))), DMRcount=1)
+DMR_cortexGE_combine$cortex <- as.factor(DMR_cortexGE_combine$cortex)
+DMR_cortexGE_combine$chr <- factor(DMR_cortexGE_combine$chr, levels = levels(DMR_cortexGE_combine$chr)[length(levels(DMR_cortexGE_combine$chr)):1])
+
+DMR_cortexGE_combine_sum <- aggregate(DMRcount ~ cortex*Individual*chr, data = DMR_cortexGE_combine, FUN = sum)
+DMR_cortexGE_combine_sum$chrlen <- unlist(lapply(DMR_cortexGE_combine_sum$chr, function(x) chrlength[chrlength$chr == x, ]$length))
+DMR_cortexGE_combine_sum$DMRnorm <- DMR_cortexGE_combine_sum$DMRcount/DMR_cortexGE_combine_sum$chrlen*10^6
+
+(DMR_cortexGE_combine_asymmetry <- ggplot(DMR_cortexGE_combine_sum, aes(x = chr, y = DMRnorm, fill = factor(cortex))) + 
+   geom_histogram(width = .7) + 
+   facet_grid(. ~ Individual) + 
+   coord_flip() + 
+   ggtitle("Global DNA methylation between cortex and GE") + 
+   ylab("No. of DMRs per MB") +
+   xlab("chr") +
+   theme_bw())
+ggsave(DMR_cortexGE_combine_asymmetry, file = "DMR_cortexGE_combine_asymmetry.pdf", width = 12)
+
+(DMR_cortexGE_combine_coord <- ggplot(DMR_cortexGE_combine) + 
+   geom_linerange(aes(factor(chr, levels = levels(chr)[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
+   geom_point(aes(x = as.numeric(chr) + 0.3*(as.numeric(factor(cortex, levels = c("hyper", "inconsistent", "hypo")))-2), y = start, color = factor(cortex)), position = position_jitter(width = 0.03), size = 1.5, alpha = 0.5) +  
+   facet_grid(. ~ Individual) + 
+   ggtitle("DMR positions on chromosomes") + 
+   ylab("Position of DMRs") +
+   xlab("chr") +
+   coord_flip() + 
+   theme_bw())
+ggsave(DMR_cortexGE_combine_coord, file = "DMR_cortexGE_combine_coord.pdf", width = 12)
+```
+
+**Differential methylated in promoters and differential expressed genes**    
+```{r cortexGE_DMR_DE, echo = F, message = F, results = 'asis'}
+DE_pcpromoter_cortexGE <- DE_pcpromoter_cortexGE[,1:2]
+DE_pcpromoter_cortexGE[,2] <- gsub(";[a-zA-Z()\ ]+", "", DE_pcpromoter_cortexGE[,2])
+DE_pcpromoter_cortexGE01 <- DE_pcpromoter_cortexGE01[,1:2]
+DE_pcpromoter_cortexGE01[,2] <- gsub(";[a-zA-Z()\ ]+", "", DE_pcpromoter_cortexGE01[,2])
+DE_pcpromoter_cortexGE02 <- DE_pcpromoter_cortexGE02[,1:2]
+DE_pcpromoter_cortexGE02[,2] <- gsub(";[a-zA-Z()\ ]+", "", DE_pcpromoter_cortexGE02[,2])
+print("HuFNSC01")
+DE_pcpromoter_cortexGE01 <- xtable(DE_pcpromoter_cortexGE01)
+print(DE_pcpromoter_cortexGE01, type = "html", include.rownames = FALSE)
+print("HuFNSC02")
+DE_pcpromoter_cortexGE02 <- xtable(DE_pcpromoter_cortexGE02)
+print(DE_pcpromoter_cortexGE02, type = "html", include.rownames = FALSE)
+print("Shared")
+DE_pcpromoter_cortexGE <- xtable(DE_pcpromoter_cortexGE)
+print(DE_pcpromoter_cortexGE, type = "html", include.rownames = FALSE)
+```
+
+**GREAT annotation on all DMRs** 
+<!-- lab book 01 P27 ... -->   
+* InterPro of both individuals and their shared DMRs are enriched for Homeobox domain.   
+* GO molecular functions show enrichment related to transciprtion regulation.    
+![GOMF shared all](../MeDIPMRE/cortexVsGE/GREAT/GOMF_DMR_cortexGE.png)   
+* GO biological processes in both individuals show terms in brain and kidney development, but in shared DMRs, only brain development terms are enriched. 
+  * HuFNSC01    
+  ![GOBP HuFNSC01 all](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_cortexGE01.png)   
+  * HuFNSC02    
+  ![GOBP HuFNSC02 all](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_cortexGE02.png)   
+  * Share DMRs    
+  ![GOBP shared all](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_cortexGE.png)
+
+**GREAT annotation on protein-coding promoter DMRs** 
+<!-- lab book 01 P30 -->   
+Protein-coding promoter DMRs from both individuals show significant enrichment for olfactory/sensory related terms, but there is no enrichment for shared pc promoter DMRs. 
+* GO molecular functions      
+  * HuFNSC01    
+  ![GOMF HuFNSC01 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOMF_DMR_pcpromoter_cortexGE01.png)  
+  * HuFNSC02    
+  ![GOMF HuFNSC02 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOMF_DMR_pcpromoter_cortexGE02.png)
+* GO biological processes    
+  * HuFNSC01    
+  ![GOBP HuFNSC01 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_pcpromoter_cortexGE01.png)  
+  * HuFNSC02    
+  ![GOBP HuFNSC02 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_pcpromoter_cortexGE02.png)
+* MSigDB pathway    
+  * HuFNSC01    
+  ![MSigPathway HuFNSC01 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/MSigPathway_DMR_pcpromoter_cortexGE01.png)  
+  * HuFNSC02     
+  ![MSigPathway HuFNSC02 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/MSigPathway_DMR_pcpromoter_cortexGE02.png)
+* InterPro    
+  * HuFNSC01    
+  ![InterPro HuFNSC01 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/InterPro_DMR_pcpromoter_cortexGE01.png)  
+  * HuFNSC02    
+  ![InterPro HuFNSC02 pcpromoter](../MeDIPMRE/cortexVsGE/GREAT/InterPro_DMR_pcpromoter_cortexGE02.png)
+
+**GREAT annotation on non-coding promoter DMRs** 
+<!-- lab book 01 P31 -->   
+Non-coding promoter DMRs from both individuals and their shared DMRs are enriched in terms related to kidney development. Both HuFNSC01 and HuFNSC02 have enriched terms in brain development, but their shared DMRs do not. 
+* GO biological processes    
+  * Shared DMRs    
+  ![GOBP Shared ncpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_ncpromoter_cortexGE.png)  
+  * HuFNSC01    
+  ![GOBP HuFNSC01 ncpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_ncpromoter_cortexGE01.png)
+  * HuFNSC02    
+  ![GOBP HuFNSC02 ncpromoter](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_ncpromoter_cortexGE02.png)  
+
+**GREAT annotation on CGI DMRs** 
+<!-- lab book 01 P36 -->   
+Enrichment in CGI DMRs are highly consistent between HuFNSC01 and HuFNSC02 and their shared DMRs. 
+* GO molecular function show enrichment in DNA-binding and transcription regulation related terms.   
+![GOMF shared CGI](../MeDIPMRE/cortexVsGE/GREAT/GOMF_DMR_CGI_cortexGE.png)
+* GO biological process show enrichment in brain development and expression regulation terms.   
+![GOBP shared CGI](../MeDIPMRE/cortexVsGE/GREAT/GOBP_DMR_CGI_cortexGE.png)
+* InterPro show significant enrichment in Homeobox domain.   
+![InterPro shared CGI](../MeDIPMRE/cortexVsGE/GREAT/InterPro_DMR_CGI_cortexGE.png)
+
+**DAVID annotation on protein-coding genebody DMRs**       
+```{r cortexGE_pcGenebody_DAVID, echo=FALSE, message=F, fig.width=12}
+setwd("~/FetalBrain/MeDIPMRE/cortexVsGE/")
+cortexge_pcgenebody_DAVID <- read.delim("./DAVID/cortexge_pcgenebodyDMR_DAVID.txt", as.is=T)
+cortexge_pcgenebody_DAVID <- cortexge_pcgenebody_DAVID[cortexge_pcgenebody_DAVID$FDR <= 0.05, ]
+cortexge_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", cortexge_pcgenebody_DAVID$Term)
+# cortexge_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", cortexge_pcgenebody_DAVID$Term)
+# cortexge_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", cortexge_pcgenebody_DAVID$Term)
+cortexge_pcgenebody_DAVID$Term <- factor(cortexge_pcgenebody_DAVID$Term, levels = cortexge_pcgenebody_DAVID[order(cortexge_pcgenebody_DAVID$Category, cortexge_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+(cortexge_pcgenebody_DAVIDp <- ggplot(data = cortexge_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for shared genebody DMRs between cortex and GE") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(cortexge_pcgenebody_DAVIDp, file="./DAVID/DMR_pcgenebody_cortexge_DAVID.pdf", width=12)
+
+cortexge01_pcgenebody_DAVID <- read.delim("./DAVID/cortexge01_pcgenebodyDMR_DAVID.txt", as.is=T)
+cortexge01_pcgenebody_DAVID <- cortexge01_pcgenebody_DAVID[cortexge01_pcgenebody_DAVID$FDR <= 0.05, ]
+cortexge01_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", cortexge01_pcgenebody_DAVID$Term)
+cortexge01_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", cortexge01_pcgenebody_DAVID$Term)
+cortexge01_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", cortexge01_pcgenebody_DAVID$Term)
+cortexge01_pcgenebody_DAVID$Term <- factor(cortexge01_pcgenebody_DAVID$Term, levels = cortexge01_pcgenebody_DAVID[order(cortexge01_pcgenebody_DAVID$Category, cortexge01_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+(cortexge01_pcgenebody_DAVIDp <- ggplot(data = cortexge01_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for HuFNSC01 genebody DMRs between cortex and GE") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(cortexge01_pcgenebody_DAVIDp, file="./DAVID/DMR_pcgenebody_cortexge01_DAVID.pdf", width=12)
+
+cortexge02_pcgenebody_DAVID <- read.delim("./DAVID/cortexge02_pcgenebodyDMR_DAVID.txt", as.is=T)
+cortexge02_pcgenebody_DAVID <- cortexge02_pcgenebody_DAVID[cortexge02_pcgenebody_DAVID$FDR <= 0.05, ]
+cortexge02_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", cortexge02_pcgenebody_DAVID$Term)
+cortexge02_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", cortexge02_pcgenebody_DAVID$Term)
+cortexge02_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", cortexge02_pcgenebody_DAVID$Term)
+cortexge02_pcgenebody_DAVID$Term <- factor(cortexge02_pcgenebody_DAVID$Term, levels = cortexge02_pcgenebody_DAVID[order(cortexge02_pcgenebody_DAVID$Category, cortexge02_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+(cortexge02_pcgenebody_DAVIDp <- ggplot(data = cortexge02_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for HuFNSC02 genebody DMRs between cortex and GE") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(cortexge02_pcgenebody_DAVIDp, file="./DAVID/DMR_pcgenebody_cortexge02_DAVID.pdf", width=12)
+```
+
+## Between monozygotic twins
+### Differential expression analysis
+RNA-seq of brain, neuroshpere cortex derived and neuroshpere ganglionic eminence derived from HuFNSC01, 02, 03, 04.   
+Use DEfine (FDR cutoff = 0.01) on normalized RPKMs of each gene to idetify DE genes between cortex and GE.  
+
+**No. of DE genes**    
+```{r individual_DE_input, echo=F, message = F, results='asis'}
+setwd("~/FetalBrain/RNAseq/DEfine/gene/individual/")
+brain12up <- read.delim("UP.Brain-HuFNSC01_Brain-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+brain12dn <- read.delim("DN.Brain-HuFNSC01_Brain-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortex12up <- read.delim("UP.Cortex-HuFNSC01_Cortex-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortex12dn <- read.delim("DN.Cortex-HuFNSC01_Cortex-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+ge12up <- read.delim("UP.GE-HuFNSC01_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+ge12dn <- read.delim("DN.GE-HuFNSC01_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortex34up <- read.delim("UP.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+cortex34dn <- read.delim("DN.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+ge34up <- read.delim("UP.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+ge34dn <- read.delim("DN.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head=F)
+
+NindividualDE <- data.frame(Sample = c("Brain_01vs02", "Cortex_01vs02", "GE_01vs02", "Cortex_03vs04", "GE_03vs04"), 
+                            UP = c(nrow(brain12up), nrow(cortex12up), nrow(ge12up), nrow(cortex34up), nrow(ge34up)), 
+                            DN = c(nrow(brain12dn), nrow(cortex12dn), nrow(ge12dn), nrow(cortex34dn), nrow(ge34dn)))
+NindividualDE <- xtable(NindividualDE)
+print(NindividualDE, type = "html", include.rownames = FALSE)
+```
+
+### Isoform analysis
+Use DEfine (FDR cut-off = 0.01) on normalized RPKMs of each exon to idetify DE exons between cortex and GE. Expressed exons were defined as those with RPKM ≥ 10% of gene RPKM; unexpressed exons were defined as those with RPKM ≤ 1% of gene RPKM; and the exons in between (1~10% gene RPKM) were discarded to filter out most false positives. Isoforms for each pairwise comparison were identified as genes with DE exons expressed in only one of the two samples.  
+
+<!-- Check if current results used double-cutoff -->
+
+### DNA methylation analysis
+MethylCRF of HuFNSC01 and 02 on brain, cortex and GE.   
+DMRs: calculate average methylation level for 1kB bins. Fold change between two samlpes > 2. And methylCRF value of one sample > 0.5. 
+
+**No. of DMRs**:    
+```{r individual_DMR, echo = F, message = F, results = 'asis'}
+setwd("~/FetalBrain/MeDIPMRE/individual/DMRs/")
+DMR_brain <- read.csv("diff_brain.csv", as.is=T)
+DMR_cortex <- read.csv("diff_cortex.csv", as.is=T)
+DMR_ge <- read.csv("diff_ge.csv", as.is=T)
+setwd("~/FetalBrain/MeDIPMRE/individual/")
+DE_pcpromoter_brain <- read.delim("brain_promoterDMR_DE.txt", as.is=T)
+DE_pcpromoter_cortex <- read.delim("cortex_promoterDMR_DE.txt", as.is=T)
+DE_pcpromoter_ge <- read.delim("ge_promoterDMR_DE.txt", as.is=T)
+setwd("~/FetalBrain/MeDIPMRE/individual/DMRs/intersect/")
+DMR_promoter_brain <- read.delim("DMRbrain_promoter.txt", as.is=T, head=F)
+DMR_promoter_cortex <- read.delim("DMRcortex_promoter.txt", as.is=T, head=F)
+DMR_promoter_ge <- read.delim("DMRge_promoter.txt", as.is=T, head=F)
+DMR_pcpromoter_brain <- read.delim("DMRbrain_pcpromoter.txt", as.is=T, head=F)
+DMR_pcpromoter_cortex <- read.delim("DMRcortex_pcpromoter.txt", as.is=T, head=F)
+DMR_pcpromoter_ge <- read.delim("DMRge_pcpromoter.txt", as.is=T, head=F)
+# load("~/FetalBrain/RNAseq/isoform/fetalBrain_rpkm.Rdata")
+# DMR_pcpromoter_brain$rpkm <- (fetalBrain_gene[DMR_pcpromoter_brain$V9, "brain01"] + fetalBrain_gene[DMR_pcpromoter_brain$V9, "brain02"])/2
+# DMR_pcpromoter_cortex$rpkm <- (fetalBrain_gene[DMR_pcpromoter_cortex$V9, "cortex01"] + fetalBrain_gene[DMR_pcpromoter_cortex$V9, "cortex02"])/2
+# DMR_pcpromoter_ge$rpkm <- (fetalBrain_gene[DMR_pcpromoter_ge$V9, "ge01"] + fetalBrain_gene[DMR_pcpromoter_ge$V9, "ge02"])/2
+# write.table(DMR_pcpromoter_brain, "DMRbrain_pcpromoter.txt", sep = "\t", col.names = F, row.names = F, quote = F)
+# write.table(DMR_pcpromoter_cortex, "DMRcortex_pcpromoter.txt", sep = "\t", col.names = F, row.names = F, quote = F)
+# write.table(DMR_pcpromoter_ge, "DMRge_pcpromoter.txt", sep = "\t", col.names = F, row.names = F, quote = F)
+DMR_genebody_brain <- read.delim("DMRbrain_genebody_only.txt", as.is=T, head=F)
+DMR_genebody_cortex <- read.delim("DMRcortex_genebody_only.txt", as.is=T, head=F)
+DMR_genebody_ge <- read.delim("DMRge_genebody_only.txt", as.is=T, head=F)
+DMR_pcgenebody_brain <- read.delim("DMRbrain_genebody_pc.txt", as.is=T, head=F)
+DMR_pcgenebody_cortex <- read.delim("DMRcortex_genebody_pc.txt", as.is=T, head=F)
+DMR_pcgenebody_ge <- read.delim("DMRge_genebody_pc.txt", as.is=T, head=F)
+DMR_CGI_brain <- read.delim("DMRbrain_CGI.txt", as.is=T, head=F)
+DMR_CGI_cortex <- read.delim("DMRcortex_CGI.txt", as.is=T, head=F)
+DMR_CGI_ge <- read.delim("DMRge_CGI.txt", as.is=T, head=F)
+setwd("~/FetalBrain/MeDIPMRE/individual/")
+NindividualDMR <- data.frame(Sample = c("Brain", "Cortex", "GE"), 
+                             DMRs = c(nrow(DMR_brain), nrow(DMR_cortex), nrow(DMR_ge)), 
+                             Promoter = c(nrow(DMR_promoter_brain), nrow(DMR_promoter_cortex), nrow(DMR_promoter_ge)), 
+                             Promoter.Enrichment = (c(nrow(DMR_promoter_brain), nrow(DMR_promoter_cortex), nrow(DMR_promoter_ge))/c(nrow(DMR_brain), nrow(DMR_cortex), nrow(DMR_ge)))/0.0665, 
+                             PC.Promoter = c(nrow(DMR_pcpromoter_brain), nrow(DMR_pcpromoter_cortex), nrow(DMR_pcpromoter_ge)), 
+                             Expressed.pcPromoter = c(sum(na.omit(DMR_pcpromoter_brain$V10) > 0.1), sum(na.omit(DMR_pcpromoter_cortex$V10) > 0.1), sum(na.omit(DMR_pcpromoter_ge$V10) > 0.1)), 
+                             DE.pcPromoter = c(nrow(DE_pcpromoter_brain), nrow(DE_pcpromoter_cortex), nrow(DE_pcpromoter_ge)), 
+                             Genebody = c(nrow(DMR_genebody_brain), nrow(DMR_genebody_cortex), nrow(DMR_genebody_ge)), 
+                             PC.Genebody = c(nrow(DMR_pcgenebody_brain), nrow(DMR_pcgenebody_cortex), nrow(DMR_pcgenebody_ge)), 
+                             CGI = c(nrow(DMR_CGI_brain), nrow(DMR_CGI_cortex), nrow(DMR_CGI_ge)), 
+                             CGI.Enrichment = (c(nrow(DMR_CGI_brain), nrow(DMR_CGI_cortex), nrow(DMR_CGI_ge))/c(nrow(DMR_brain), nrow(DMR_cortex), nrow(DMR_ge)))/0.01602)
+NindividualDMR <- xtable(NindividualDMR)
+print(NindividualDMR, type = "html", include.rownames = FALSE)
+```
+
+**Global differential methylation trend**    
+```{r individual_globalDMR, message = F, echo=F, fig.width = 12}
+chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T)[1:23,]
+chrlength$chr <- factor(chrlength$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+
+DMR_brain[DMR_brain$chr == "chrY", ] <- NA
+DMR_brain <- na.omit(DMR_brain)
+DMR_brain$ID = paste0(DMR_brain$chr, ":", DMR_brain$start, "-", DMR_brain$end)
+DMR_brain$HuFNSC01 <- NA
+DMR_brain[DMR_brain$logfold_brain > 0,]$HuFNSC01 <- "hyper"
+DMR_brain[DMR_brain$logfold_brain < 0,]$HuFNSC01 <- "hypo"
+DMR_brain$chr <- factor(DMR_brain$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+DMR_cortex[DMR_cortex$chr == "chrY", ] <- NA
+DMR_cortex <- na.omit(DMR_cortex)
+DMR_cortex$ID = paste0(DMR_cortex$chr, ":", DMR_cortex$start, "-", DMR_cortex$end)
+DMR_cortex$HuFNSC01 <- NA
+DMR_cortex[DMR_cortex$logfold_cortex > 0,]$HuFNSC01 <- "hyper"
+DMR_cortex[DMR_cortex$logfold_cortex < 0,]$HuFNSC01 <- "hypo"
+DMR_cortex$chr <- factor(DMR_cortex$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+DMR_ge[DMR_ge$chr == "chrY", ] <- NA
+DMR_ge <- na.omit(DMR_ge)
+DMR_ge$ID = paste0(DMR_ge$chr, ":", DMR_ge$start, "-", DMR_ge$end)
+DMR_ge$HuFNSC01 <- NA
+DMR_ge[DMR_ge$logfold_ge > 0,]$HuFNSC01 <- "hyper"
+DMR_ge[DMR_ge$logfold_ge < 0,]$HuFNSC01 <- "hypo"
+DMR_ge$chr <- factor(DMR_ge$chr, levels = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX"))
+
+DMR_individual_combine <-cbind(rbind(data.frame(DMR_brain[,c("chr", "start", "end", "ID", "HuFNSC01")], CellType = rep("Brain", times = nrow(DMR_brain))), data.frame(DMR_cortex[,c("chr", "start", "end", "ID", "HuFNSC01")], CellType = rep("Cortex", times = nrow(DMR_cortex))), data.frame(DMR_ge[,c("chr", "start", "end", "ID", "HuFNSC01")], CellType = rep("GE", times = nrow(DMR_ge)))), DMRcount = 1)
+DMR_individual_combine$HuFNSC01 <- as.factor(DMR_individual_combine$HuFNSC01)
+DMR_individual_combine$chr <- factor(DMR_individual_combine$chr, levels = levels(DMR_individual_combine$chr)[length(levels(DMR_individual_combine$chr)):1])
+
+DMR_individual_combine_sum <- aggregate(DMRcount ~ HuFNSC01*CellType*chr, data = DMR_individual_combine, FUN = sum)
+DMR_individual_combine_sum$chrlen <- unlist(lapply(DMR_individual_combine_sum$chr, function(x) chrlength[chrlength$chr == x, ]$length))
+DMR_individual_combine_sum$DMRnorm <- DMR_individual_combine_sum$DMRcount/DMR_individual_combine_sum$chrlen*10^6
+
+(DMR_individual_combine_asymmetry <- ggplot(DMR_individual_combine_sum, aes(x = chr, y = DMRnorm, fill = factor(HuFNSC01))) + 
+   geom_histogram(width = .7) + 
+   facet_grid(. ~ CellType) + 
+   coord_flip() + 
+   ggtitle("Global DNA methylation between MZ twins") + 
+   ylab("No. of DMRs per MB") +
+   xlab("chr") +
+   theme_bw())
+ggsave(DMR_individual_combine_asymmetry, file = "DMR_individual_combine_asymmetry.pdf", width = 12)
+
+# no asymmetry in all regions
+load("~/FetalBrain/MeDIPMRE/crfaverage.Rdata")
+all_individual <- data.frame(CellType = rep(c("Brain", "Cortex", "GE"), each = nrow(crfaverage)), logfold = c(crfaverage$logfold_brain, crfaverage$logfold_cortex, crfaverage$logfold_ge), HuFNSC01 = factor("hyper", levels = c("hyper", "same", "hypo")))
+all_individual[all_individual$logfold < 0, ]$HuFNSC01 <- "hypo"
+all_individual[all_individual$logfold == 0, ]$HuFNSC01 <- "same"
+(all_individual_asymmetry <- ggplot(all_individual, aes(x = "all regions", fill = factor(HuFNSC01))) + 
+   geom_histogram(width = 0.5) + 
+   facet_grid(. ~ CellType) + 
+   coord_flip() + 
+   # ggtitle("Global DNA methylation between MZ twins") + 
+   # ylab("No. of DMRs per MB") +
+   xlab("all regions") +
+   theme_bw() + 
+   scale_fill_manual(values = c("hyper" = hcl(15, 100, 65), "same" = hcl(105, 100, 80), "hypo" = hcl(195, 100, 65))))
+ggsave(all_individual_asymmetry, file = "all_individual_asymmetry.pdf", width = 12, height = 1.5)
+
+(DMR_individual_combine_coord <- ggplot(DMR_individual_combine) + 
+   geom_linerange(aes(factor(chr, levels = levels(chr)[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
+   geom_point(aes(x = as.numeric(chr) + 0.5*(as.numeric(as.factor(HuFNSC01))-1.5), y = start, color = factor(HuFNSC01)), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5) +  
+   facet_grid(. ~ CellType) + 
+   ggtitle("DMR positions on chromosomes") + 
+   ylab("Position of DMRs") +
+   xlab("chr") +
+   coord_flip() + 
+   theme_bw())
+ggsave(DMR_individual_combine_coord, file = "DMR_individual_combine_coord.pdf", width = 12)
+```
+
+**Differential methylated in promoters and differential expressed genes**       
+```{r individual_DMR_DE, echo = F, results = 'asis', message = F, fig.width = 10, fig.height = 2}
+setwd("~/FetalBrain/MeDIPMRE/individual/")
+brain_promoterDE_DAVID <- read.delim("./DAVID/brain_promoterDMR_DE_DAVID.txt", as.is=T)
+brain_promoterDE_DAVID <- brain_promoterDE_DAVID[brain_promoterDE_DAVID$FDR <= 0.05, ]
+brain_promoterDE_DAVID$Term <- gsub("IPR[0-9]+:", "", brain_promoterDE_DAVID$Term)
+brain_promoterDE_DAVID$Term <- gsub("SM[0-9]+:", "", brain_promoterDE_DAVID$Term)
+brain_promoterDE_DAVID$Term <- factor(brain_promoterDE_DAVID$Term, levels = brain_promoterDE_DAVID[order(brain_promoterDE_DAVID$Category),]$Term)
+(brain_promoterDE_DAVIDp <- ggplot(data = brain_promoterDE_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for Brain promoter DMR associated DE genes between twins") + 
+   scale_fill_manual(values = c("blue", "purple")))
+ggsave(brain_promoterDE_DAVIDp, file="DE_promoterDMR_brain_DAVID.pdf", height=2)
+```
+
+**GREAT annotation on all DMRs** 
+<!-- lab book 01 P6 ... -->   
+* Brain: enrichment in biological processes related to brain development and vision development in particular.   
+![GOBP brain all](../MeDIPMRE/Individual/GREAT/GOBP_brain.png)   
+* Cortex: no terms related to brain development, but enriched in limb/kidney development terms.   
+![GOBP cortex all](../MeDIPMRE/Individual/GREAT/GOBP_cortex.png)
+* GE: brain development related terms barely reached significance level. Also show enrichment in kidney development.   
+![GOBP GE all](../MeDIPMRE/Individual/GREAT/GOBP_ge.png)
+
+**GREAT annotation on protein-coding promoter DMRs** 
+<!-- lab book 01 P34 ... -->   
+GO molecular function, GO biological process, MSigDB Pathway and InterPro all show significant enrichment in sensory/olfactory related terms in all 3 cell types. 
+* Brain   
+![GOMF brain pcpromoter](../MeDIPMRE/Individual/GREAT/GOMF_promoter_pc_brain.png)
+![GOBP brain pcpromoter](../MeDIPMRE/Individual/GREAT/GOBP_promoter_pc_brain.png)
+![MSigPathway brain pcpromoter](../MeDIPMRE/Individual/GREAT/MSigPathway_promoter_pc_brain.png)
+![InterPro brain pcpromoter](../MeDIPMRE/Individual/GREAT/InterPro_promoter_pc_brain.png)
+* Cortex   
+![GOMF cortex pcpromoter](../MeDIPMRE/Individual/GREAT/GOMF_promoter_pc_cortex.png)
+![GOBP cortex pcpromoter](../MeDIPMRE/Individual/GREAT/GOBP_promoter_pc_cortex.png)
+![MSigPathway cortex pcpromoter](../MeDIPMRE/Individual/GREAT/MSigPathway_promoter_pc_cortex.png)
+![InterPro cortex pcpromoter](../MeDIPMRE/Individual/GREAT/InterPro_promoter_pc_cortex.png)
+* GE   
+![GOMF ge pcpromoter](../MeDIPMRE/Individual/GREAT/GOMF_promoter_pc_ge.png)
+![GOBP ge pcpromoter](../MeDIPMRE/Individual/GREAT/GOBP_promoter_pc_ge.png)
+![MSigPathway ge pcpromoter](../MeDIPMRE/Individual/GREAT/MSigPathway_promoter_pc_ge.png)
+![InterPro ge pcpromoter](../MeDIPMRE/Individual/GREAT/InterPro_promoter_pc_ge.png)
+
+**GREAT annotation on CGI DMRs** 
+<!-- lab book 01 P16 ... -->   
+* Brain: enriched in terms related to FGF (fibroblast growth factor) signaling pathway. In brain development, FGF pathway is involved in neurogenesis, axon growth and differentiation and it is a major determinant of neuronal survival.      
+![GOMF brain CGI](../MeDIPMRE/Individual/GREAT/GOMF_CGI_brain.png)
+![GOBP brain CGI](../MeDIPMRE/Individual/GREAT/GOBP_CGI_brain.png)
+![PANTHER brain CGI](../MeDIPMRE/Individual/GREAT/PANTHER_CGI_brain.png)
+* Cortex: enriched in olfactory processes.  
+![GOBP cortex CGI](../MeDIPMRE/Individual/GREAT/GOBP_CGI_cortex.png)
+* GE: no enriched terms.     
+
+**DAVID annotation on protein-coding genebody DMRs**        
+```{r individual_pcGenebody_DAVID, echo=FALSE, message=F, fig.width=12, fig.height=10}
+setwd("~/FetalBrain/MeDIPMRE/Individual/DAVID")
+brain_pcgenebody_DAVID <- read.delim("DAVID_genebody_pc_brain.txt", as.is=T)
+brain_pcgenebody_DAVID <- brain_pcgenebody_DAVID[brain_pcgenebody_DAVID$FDR <= 0.05, ]
+brain_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", brain_pcgenebody_DAVID$Term)
+brain_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", brain_pcgenebody_DAVID$Term)
+brain_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", brain_pcgenebody_DAVID$Term)
+brain_pcgenebody_DAVID$Term <- gsub("P[0-9]+:", "", brain_pcgenebody_DAVID$Term)
+brain_pcgenebody_DAVID$Term <- factor(brain_pcgenebody_DAVID$Term, levels = brain_pcgenebody_DAVID[order(brain_pcgenebody_DAVID$Category, brain_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+(brain_pcgenebody_DAVIDp <- ggplot(data = brain_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for brain genebody DMRs between MZ twins") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(brain_pcgenebody_DAVIDp, file="DMR_pcgenebody_brain_DAVID.pdf", width=12, height=12)
+
+cortex_pcgenebody_DAVID <- read.delim("DAVID_genebody_pc_cortex.txt", as.is=T)
+cortex_pcgenebody_DAVID <- cortex_pcgenebody_DAVID[cortex_pcgenebody_DAVID$FDR <= 0.05, ]
+cortex_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", cortex_pcgenebody_DAVID$Term)
+cortex_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", cortex_pcgenebody_DAVID$Term)
+cortex_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", cortex_pcgenebody_DAVID$Term)
+cortex_pcgenebody_DAVID$Term <- gsub("P[0-9]+:", "", cortex_pcgenebody_DAVID$Term)
+cortex_pcgenebody_DAVID$Term <- factor(cortex_pcgenebody_DAVID$Term, levels = cortex_pcgenebody_DAVID[order(cortex_pcgenebody_DAVID$Category, cortex_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+(cortex_pcgenebody_DAVIDp <- ggplot(data = cortex_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+   geom_bar(aes(fill = factor(Category)), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("DAVID enrichment for cortex genebody DMRs between MZ twins") + 
+   scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+ggsave(cortex_pcgenebody_DAVIDp, file="DMR_pcgenebody_cortex_DAVID.pdf", width=12)
+
+# ge_pcgenebody_DAVID <- read.delim("DAVID_genebody_pc_ge.txt", as.is=T)
+# ge_pcgenebody_DAVID <- ge_pcgenebody_DAVID[ge_pcgenebody_DAVID$FDR <= 0.05, ]
+# ge_pcgenebody_DAVID$Term <- gsub("GO:[0-9]+~", "", ge_pcgenebody_DAVID$Term)
+# ge_pcgenebody_DAVID$Term <- gsub("IPR[0-9]+:", "", ge_pcgenebody_DAVID$Term)
+# ge_pcgenebody_DAVID$Term <- gsub("hsa[0-9]+:", "", ge_pcgenebody_DAVID$Term)
+# ge_pcgenebody_DAVID$Term <- gsub("P[0-9]+:", "", ge_pcgenebody_DAVID$Term)
+# ge_pcgenebody_DAVID$Term <- factor(ge_pcgenebody_DAVID$Term, levels = ge_pcgenebody_DAVID[order(ge_pcgenebody_DAVID$Category, ge_pcgenebody_DAVID$Bonferroni, decreasing = T),]$Term)
+# (ge_pcgenebody_DAVIDp <- ggplot(data = ge_pcgenebody_DAVID, aes(Term, -log10(Bonferroni))) +
+#    geom_bar(aes(fill = factor(Category)), width = .5) + 
+#    coord_flip() + 
+#    geom_text(aes(label = round(-log10(Bonferroni), digits=2), hjust = 0)) + 
+#    theme_bw() +
+#    ggtitle("DAVID enrichment for GE genebody DMRs between MZ twins") + 
+#    scale_fill_manual(values = c("blue", "purple", "lightblue", "darkgreen", "darkblue")))
+# ggsave(ge_pcgenebody_DAVIDp, file="DMR_pcgenebody_ge_DAVID.pdf", width=12, height=2)
+```
+
+

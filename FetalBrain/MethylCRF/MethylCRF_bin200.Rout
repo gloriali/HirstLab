@@ -1,0 +1,43 @@
+
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # /gsc/software/linux-x86_64-centos5/R-3.0.2/bin/R CMD BATCH 
+> # install.packages("plyr", lib = "/home/lli/R/")
+> require(plyr, lib.loc = "/home/lli/R/")
+Loading required package: plyr
+Warning message:
+package ‘plyr’ was built under R version 3.0.2 
+> cutoff <- 0.05
+> summary <- matrix(NA, nrow = 3, ncol = 3, dimnames = list(c("MeDIP", "MethylCRF", "WGBS"), c("No.bins", "valid.t.test", "No.DMRs")))
+> 
+> # MethylCRF
+> setwd("~/FetalBrain/MeDIPMRE/")
+> load("MethylCRF.Rdata")
+> MethylCRF <- MethylCRF[MethylCRF$chr %in% paste0("chr", c(as.character(1:22), "X")),]
+> MethylCRF$binstart <- (MethylCRF$start %/% 200) * 200 + 1
+> MethylCRF$binend <- (MethylCRF$start %/% 200 + 1) * 200
+> MethylCRF$bin <- factor(paste0(MethylCRF$chr, ":", MethylCRF$binstart, "-", MethylCRF$binend))
+> (summary["MethylCRF", "No.bins"] <- length(levels(MethylCRF$bin)))
+[1] 10110707
+> MethylCRF <- MethylCRF[, c("brain01", "brain02", "cortex01", "cortex02", "ge01", "ge02", "bin")] 
+> save(MethylCRF, file = "MethylCRF.Rdata")
+> MethylCRF_bin <- ddply(MethylCRF, ~ bin, summarise, brain01 = mean(brain01), brain02 = mean(brain02), cortex01 = mean(cortex01), cortex02 = mean(cortex02), ge01 = mean(ge01), ge02 = mean(ge02))

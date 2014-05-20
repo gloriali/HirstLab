@@ -1,0 +1,88 @@
+# /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/MethylCRF/hg19
+#
+#HuFNSC01
+#
+
+track Brain01 
+shortLabel CRF_Brain01 
+longLabel MethylCRF  HuFNSC01 Brain  
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_brain01.bw 
+color 200,50,0 
+
+track Cortex01 
+shortLabel CRF_Cortex01 
+longLabel MethylCRF  HuFNSC01 Cortex  
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_cortex01.bw 
+color 200,50,0 
+
+track GE01 
+shortLabel CRF_GE01 
+longLabel MethylCRF  HuFNSC01 Ganglionic Eminence  
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_ge01.bw 
+color 200,50,0 
+
+
+#
+#HuFNSC02
+#
+
+track Brain02 
+shortLabel CRF_Brain02 
+longLabel MethylCRF HuFNSC02 Brain 
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_brain02.bw 
+color 50,200,50 
+
+track Cortex02 
+shortLabel CRF_Cortex02 
+longLabel MethylCRF  HuFNSC02 Cortex  
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_cortex02.bw 
+color 50,200,50 
+
+track GE02 
+shortLabel CRF_GE02 
+longLabel MethylCRF  HuFNSC02 Ganglionic Eminence  
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl MethylCRF_ge02.bw 
+color 50,200,50 
+

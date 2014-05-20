@@ -1,0 +1,41 @@
+
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # /gsc/software/linux-x86_64-centos5/R-3.0.2/bin/R CMD BATCH 
+> # install.packages("plyr", lib = "/home/lli/R/")
+> require(plyr, lib.loc = "/home/lli/R/")
+Loading required package: plyr
+Warning message:
+package ‘plyr’ was built under R version 3.0.2 
+> cutoff <- 0.05
+> summary <- matrix(NA, nrow = 3, ncol = 3, dimnames = list(c("MeDIP", "MethylCRF", "WGBS"), c("No.bins", "valid.t.test", "No.DMRs")))
+> 
+> # WGBS_28M
+> setwd("~/FetalBrain/WGBS/")
+> load("WGBS_28M.Rdata")
+> WGBS_28M <- WGBS_28M[WGBS_28M$chr %in% paste0("chr", c(as.character(1:22), "X")),]
+> WGBS_28M$binstart <- (WGBS_28M$start %/% 200) * 200 + 1
+> WGBS_28M$binend <- (WGBS_28M$start %/% 200 + 1) * 200
+> WGBS_28M$bin <- factor(paste0(WGBS_28M$chr, ":", WGBS_28M$binstart, "-", WGBS_28M$binend))
+> (summary["WGBS", "No.bins"] <- length(levels(WGBS_28M$bin)))
+[1] 10149245
+> WGBS_28M <- WGBS_28M[, c("cortex02", "ge02", "cortex04", "ge04", "bin")] 
+> save(WGBS_28M, file = "WGBS_28M.Rdata")
+> WGBS_28M_bin <- ddply(WGBS_28M, ~ bin, summarise, cortex02 = mean(cortex02, na.rm = T), ge02 = mean(ge02, na.rm = T), cortex04 = mean(cortex04, na.rm = T), ge04 = mean(ge04, na.rm = T))

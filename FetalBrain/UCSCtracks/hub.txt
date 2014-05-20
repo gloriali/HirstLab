@@ -1,0 +1,6 @@
+hub BrainHub_MethylCRF
+shortLabel Brain Hub (MethylCRF)
+longLabel Hub to display fetal brain data at UCSC (MethylCRF)
+genomesFile genomes.txt
+email mbilenky@bcgsc.ca
+

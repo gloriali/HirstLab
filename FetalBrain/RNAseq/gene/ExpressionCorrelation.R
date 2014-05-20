@@ -1,0 +1,126 @@
+setwd("/Users/epigenomics_lab_02/FetalBrain/Annotation_hg19")
+annotation<-read.table(file="hg19v65_genes",head=F)
+setwd("/Users/epigenomics_lab_02/FetalBrain/RNAseq/rpkm")
+cortex01<-read.table(file="A03473.G.A.rpkm.pc",row.names=1,head=F)
+cortex02<-read.table(file="A03475.G.A.rpkm.pc",row.names=1,head=F)
+cortex03<-read.table(file="A04599.G.A.rpkm.pc",row.names=1,head=F)
+cortex04<-read.table(file="A15298.G.A.rpkm.pc",row.names=1,head=F)
+ge01<-read.table(file="A03474.G.A.rpkm.pc",row.names=1,head=F)
+ge02<-read.table(file="A03476.G.A.rpkm.pc",row.names=1,head=F)
+ge03<-read.table(file="A15295.G.A.rpkm.pc",row.names=1,head=F)
+ge04<-read.table(file="A15299.G.A.rpkm.pc",row.names=1,head=F)
+brain01<-read.table(file="A03484.G.A.rpkm.pc",row.names=1,head=F)
+brain02<-read.table(file="A07825.G.A.rpkm.pc",row.names=1,head=F)
+
+diff<-setdiff(rownames(cortex04),rownames(cortex03))
+
+rpkm1<-data.frame(cortex01=cortex01[is.element(rownames(cortex01),diff)==F,2],
+                  cortex02=cortex02[is.element(rownames(cortex02),diff)==F,2],
+                  cortex03=cortex03[is.element(rownames(cortex03),diff)==F,2],
+                  cortex04=cortex04[is.element(rownames(cortex04),diff)==F,2],
+                  ge01=ge01[is.element(rownames(ge01),diff)==F,2],
+                  ge02=ge02[is.element(rownames(ge02),diff)==F,2],
+                  ge03=ge03[is.element(rownames(ge03),diff)==F,2],
+                  ge04=ge04[is.element(rownames(ge04),diff)==F,2],
+                  brain01=brain01[is.element(rownames(brain01),diff)==F,2],
+                  brain02=brain02[is.element(rownames(brain02),diff)==F,2])
+rownames(rpkm1)<-rownames(cortex01)[is.element(rownames(cortex01),diff)==F]
+rpkm2<-data.frame(cortex01=cortex01$V4,
+                  cortex02=cortex02$V4,
+                  cortex03=cortex03$V4,
+                  cortex04=cortex04$V4,
+                  ge01=ge01$V4,
+                  ge02=ge02$V4,
+                  ge03=ge03$V4,
+                  ge04=ge04$V4,
+                  brain01=brain01$V4,
+                  brain02=brain02$V4)
+rownames(rpkm2)<-rownames(cortex01)
+logrpkm1<-log2(rpkm1)
+logrpkm2<-log2(rpkm2)
+write.csv(rpkm1,file="rpkm1.csv",quote=F)
+
+pdf(file="ExpressionCorrelation_RPKM1.pdf")
+smoothScatter((logrpkm1$brain01+logrpkm1$brain02)/2,logrpkm1$brain01-logrpkm1$brain02,xlab="A",ylab="M",main="Brain-BetweenTwins-01&02")
+abline(h=1)
+abline(h=-1)
+
+smoothScatter((logrpkm1$cortex01+logrpkm1$cortex02)/2,logrpkm1$cortex01-logrpkm1$cortex02,xlab="A",ylab="M",main="NeuroshpereCortex-BetweenTwins-01&02")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$cortex03+logrpkm1$cortex04)/2,logrpkm1$cortex03-logrpkm1$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-BetweenTwins-03&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$cortex01+logrpkm1$cortex03)/2,logrpkm1$cortex01-logrpkm1$cortex03,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-01&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$cortex01+logrpkm1$cortex04)/2,logrpkm1$cortex01-logrpkm1$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-01&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$cortex02+logrpkm1$cortex03)/2,logrpkm1$cortex02-logrpkm1$cortex03,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-02&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$cortex02+logrpkm1$cortex04)/2,logrpkm1$cortex02-logrpkm1$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-02&04")
+abline(h=1)
+abline(h=-1)
+
+smoothScatter((logrpkm1$ge01+logrpkm1$ge02)/2,logrpkm1$ge01-logrpkm1$ge02,xlab="A",ylab="M",main="NeuroshpereGE-BetweenTwins-01&02")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$ge03+logrpkm1$ge04)/2,logrpkm1$ge03-logrpkm1$ge04,xlab="A",ylab="M",main="NeuroshpereGE-BetweenTwins-03&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$ge01+logrpkm1$ge03)/2,logrpkm1$ge01-logrpkm1$ge03,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-01&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$ge01+logrpkm1$ge04)/2,logrpkm1$ge01-logrpkm1$ge04,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-01&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$ge02+logrpkm1$ge03)/2,logrpkm1$ge02-logrpkm1$ge03,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-02&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm1$ge02+logrpkm1$ge04)/2,logrpkm1$ge02-logrpkm1$ge04,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-02&04")
+abline(h=1)
+abline(h=-1)
+dev.off()
+
+
+#pdf(file="ExpressionCorrelation_RPKM2.pdf")
+smoothScatter((logrpkm2$cortex01+logrpkm2$cortex02)/2,logrpkm2$cortex01-logrpkm2$cortex02,xlab="A",ylab="M",main="NeuroshpereCortex-BetweenTwins-01&02")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$cortex03+logrpkm2$cortex04)/2,logrpkm2$cortex03-logrpkm2$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-BetweenTwins-03&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$cortex01+logrpkm2$cortex03)/2,logrpkm2$cortex01-logrpkm2$cortex03,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-01&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$cortex01+logrpkm2$cortex04)/2,logrpkm2$cortex01-logrpkm2$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-01&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$cortex02+logrpkm2$cortex03)/2,logrpkm2$cortex02-logrpkm2$cortex03,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-02&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$cortex02+logrpkm2$cortex04)/2,logrpkm2$cortex02-logrpkm2$cortex04,xlab="A",ylab="M",main="NeuroshpereCortex-AcrossTwins-02&04")
+abline(h=1)
+abline(h=-1)
+
+smoothScatter((logrpkm2$ge01+logrpkm2$ge02)/2,logrpkm2$ge01-logrpkm2$ge02,xlab="A",ylab="M",main="NeuroshpereGE-BetweenTwins-01&02")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$ge03+logrpkm2$ge04)/2,logrpkm2$ge03-logrpkm2$ge04,xlab="A",ylab="M",main="NeuroshpereGE-BetweenTwins-03&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$ge01+logrpkm2$ge03)/2,logrpkm2$ge01-logrpkm2$ge03,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-01&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$ge01+logrpkm2$ge04)/2,logrpkm2$ge01-logrpkm2$ge04,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-01&04")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$ge02+logrpkm2$ge03)/2,logrpkm2$ge02-logrpkm2$ge03,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-02&03")
+abline(h=1)
+abline(h=-1)
+smoothScatter((logrpkm2$ge02+logrpkm2$ge04)/2,logrpkm2$ge02-logrpkm2$ge04,xlab="A",ylab="M",main="NeuroshpereGE-AcrossTwins-02&04")
+abline(h=1)
+abline(h=-1)
+#dev.off()

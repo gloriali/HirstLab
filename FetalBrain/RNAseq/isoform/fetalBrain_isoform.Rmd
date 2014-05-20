@@ -1,0 +1,206 @@
+Fetal Brain isoform analysis 
+========================================================
+
+Gloria Li         
+`r date()` 
+
+<!-- re-knit after modify isoform2.R script -->
+```{r include = FALSE}
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+```{r data}
+setwd("~/快盘/FetalBrain/RNAseq/isoform/")
+load("fetalBrain_isoform_tissue.Rdata")
+load("fetalBrain_isoform_individual.Rdata")
+library(ggplot2)
+```
+
+## Isoform identification
+  * DEfine on exons: FDR = 0.01     
+  * Exon expressed in one sample ($\ge$ 10% gene RPKM) and not expressed in the other ($\le$ 1% gene RPKM)   
+  * Gene is not DE: DEfine FDR = 0.01
+  * Gene is expressed in both samples: gene RPKM > 0.005         
+
+## Isoform genes between cortex and GE
+
+  * On average, __`r round(mean(isoform_cortexge[, ncol(isoform_cortexge)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r nrow(cortex_ge_isoform_gene)`__ genes are shared in at least two individuals.              
+
+```{r cortex_ge, results='asis'}
+library(xtable)
+isoform_cortexge <- xtable(isoform_cortexge)
+align(isoform_cortexge) <- "lcccccc"
+print(isoform_cortexge, type = "html", include.rownames = T)
+
+library(VennDiagram)
+isoform_gene_tissue <- list(HuFNSC01 = cortex_ge_01_isoform_gene$id, HuFNSC02 = cortex_ge_02_isoform_gene$id, HuFNSC03 = cortex_ge_03_isoform_gene$id, HuFNSC04 = cortex_ge_04_isoform_gene$id)
+plot.new()
+venn_isoform_gene_tissue <- venn.diagram(isoform_gene_tissue, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex vs GE isoforms", main.cex = 2)
+grid.draw(venn_isoform_gene_tissue)
+```
+
+### Functional enrichment analysis 
+  * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
+  * Isoforms shared by at least two individuals are enriched in terms related to __neuronal signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
+
+```{r enrich_cortex_ge, fig.width=10, fig.height = 8}
+cortex_ge_isoform_DAVID <- read.delim("./enrich/cortex_ge_isoform_DAVID.txt", as.is=T)
+cortex_ge_isoform_erminej_BP <- read.delim("./enrich/cortex_ge_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+cortex_ge_isoform_erminej_MF <- read.delim("./enrich/cortex_ge_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+cortex_ge_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = cortex_ge_isoform_erminej_BP$V2, FDR = cortex_ge_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = cortex_ge_isoform_erminej_MF$V2, FDR = cortex_ge_isoform_erminej_MF$V10), data.frame(Category = cortex_ge_isoform_DAVID$Category, Term = cortex_ge_isoform_DAVID$Term, FDR = cortex_ge_isoform_DAVID$FDR)))
+cortex_ge_isoform_enrich <- cortex_ge_isoform_enrich[cortex_ge_isoform_enrich$FDR <= 0.01, ]
+cortex_ge_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", cortex_ge_isoform_enrich$Term)
+cortex_ge_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", cortex_ge_isoform_enrich$Term)
+cortex_ge_isoform_enrich$Term <- gsub("P[0-9]+:", "", cortex_ge_isoform_enrich$Term)
+cortex_ge_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", cortex_ge_isoform_enrich$Term)
+cortex_ge_isoform_enrich$Term <- factor(cortex_ge_isoform_enrich$Term, levels = cortex_ge_isoform_enrich[order(cortex_ge_isoform_enrich$Category, cortex_ge_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_cortex_ge_isoform <- ggplot(data = cortex_ge_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between cortex and GE shared by at least 2 individuals") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_cortex_ge_isoform, file = "./enrich/Enrich_cortex_ge_isoform.pdf")
+```
+
+## Isoform genes between monozygotic twins
+
+  * On average, __`r round(mean(isoform_individual[1:3, ncol(isoform_individual)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r nrow(HuFNSC01_02_isoform_gene)`__ genes are shared by all three cell types.              
+  * On average, __`r round(mean(isoform_individual[4:5, ncol(isoform_individual)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r nrow(HuFNSC03_04_isoform_gene)`__ genes are shared between two cell types.              
+
+```{r individual, results='asis'}
+library(xtable)
+isoform_individual <- xtable(isoform_individual)
+align(isoform_individual) <- "lcccccc"
+print(isoform_individual, type = "html", include.rownames = T)
+
+isoform_gene_individual12 <- list(brain = brain01_02_isoform_gene$id, cortex = cortex01_02_isoform_gene$id, GE = ge01_02_isoform_gene$id)
+isoform_gene_individual34 <- list(cortex = cortex03_04_isoform_gene$id, GE = ge03_04_isoform_gene$id)
+plot.new()
+venn_isoform_gene_individual12 <- venn.diagram(isoform_gene_individual12, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 isoforms")
+grid.draw(venn_isoform_gene_individual12)
+plot.new()
+venn_isoform_gene_individual34 <- venn.diagram(isoform_gene_individual34, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of HuFNSC03 vs HuFNSC04 isoforms")
+grid.draw(venn_isoform_gene_individual34)
+```
+
+### Functional enrichment analysis 
+#### HuFNSC01 vs HuFNSC02
+  * Different regions on the Venn diagram have __no__ significantly enriched terms.     
+  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms.    
+
+```{r enrich_HuFNSC01_02_brain, fig.width=10, fig.height = 4}
+HuFNSC01_02_brain_isoform_DAVID <- read.delim("./enrich/HuFNSC01_02_brain_isoform_DAVID.txt", as.is=T)
+HuFNSC01_02_brain_isoform_erminej_BP <- read.delim("./enrich/HuFNSC01_02_brain_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_brain_isoform_erminej_MF <- read.delim("./enrich/HuFNSC01_02_brain_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_brain_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = HuFNSC01_02_brain_isoform_erminej_BP$V2, FDR = HuFNSC01_02_brain_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = HuFNSC01_02_brain_isoform_erminej_MF$V2, FDR = HuFNSC01_02_brain_isoform_erminej_MF$V10), data.frame(Category = HuFNSC01_02_brain_isoform_DAVID$Category, Term = HuFNSC01_02_brain_isoform_DAVID$Term, FDR = HuFNSC01_02_brain_isoform_DAVID$FDR)))
+HuFNSC01_02_brain_isoform_enrich <- HuFNSC01_02_brain_isoform_enrich[HuFNSC01_02_brain_isoform_enrich$FDR <= 0.01, ]
+HuFNSC01_02_brain_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", HuFNSC01_02_brain_isoform_enrich$Term)
+HuFNSC01_02_brain_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", HuFNSC01_02_brain_isoform_enrich$Term)
+HuFNSC01_02_brain_isoform_enrich$Term <- gsub("P[0-9]+:", "", HuFNSC01_02_brain_isoform_enrich$Term)
+HuFNSC01_02_brain_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", HuFNSC01_02_brain_isoform_enrich$Term)
+HuFNSC01_02_brain_isoform_enrich$Term <- factor(HuFNSC01_02_brain_isoform_enrich$Term, levels = HuFNSC01_02_brain_isoform_enrich[order(HuFNSC01_02_brain_isoform_enrich$Category, HuFNSC01_02_brain_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_HuFNSC01_02_brain_isoform <- ggplot(data = HuFNSC01_02_brain_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between HuFNSC01 and HuFNSC02 in Brain") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_HuFNSC01_02_brain_isoform, file = "./enrich/Enrich_HuFNSC01_02_brain_isoform.pdf")
+```
+
+```{r enrich_HuFNSC01_02_cortex, fig.width=10, fig.height = 6}
+HuFNSC01_02_cortex_isoform_DAVID <- read.delim("./enrich/HuFNSC01_02_cortex_isoform_DAVID.txt", as.is=T)
+HuFNSC01_02_cortex_isoform_erminej_BP <- read.delim("./enrich/HuFNSC01_02_cortex_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_cortex_isoform_erminej_MF <- read.delim("./enrich/HuFNSC01_02_cortex_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_cortex_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = HuFNSC01_02_cortex_isoform_erminej_BP$V2, FDR = HuFNSC01_02_cortex_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = HuFNSC01_02_cortex_isoform_erminej_MF$V2, FDR = HuFNSC01_02_cortex_isoform_erminej_MF$V10), data.frame(Category = HuFNSC01_02_cortex_isoform_DAVID$Category, Term = HuFNSC01_02_cortex_isoform_DAVID$Term, FDR = HuFNSC01_02_cortex_isoform_DAVID$FDR)))
+HuFNSC01_02_cortex_isoform_enrich <- HuFNSC01_02_cortex_isoform_enrich[HuFNSC01_02_cortex_isoform_enrich$FDR <= 0.01, ]
+HuFNSC01_02_cortex_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", HuFNSC01_02_cortex_isoform_enrich$Term)
+HuFNSC01_02_cortex_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", HuFNSC01_02_cortex_isoform_enrich$Term)
+HuFNSC01_02_cortex_isoform_enrich$Term <- gsub("P[0-9]+:", "", HuFNSC01_02_cortex_isoform_enrich$Term)
+HuFNSC01_02_cortex_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", HuFNSC01_02_cortex_isoform_enrich$Term)
+HuFNSC01_02_cortex_isoform_enrich$Term <- factor(HuFNSC01_02_cortex_isoform_enrich$Term, levels = HuFNSC01_02_cortex_isoform_enrich[order(HuFNSC01_02_cortex_isoform_enrich$Category, HuFNSC01_02_cortex_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_HuFNSC01_02_cortex_isoform <- ggplot(data = HuFNSC01_02_cortex_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between HuFNSC01 and HuFNSC02 in cortex") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_HuFNSC01_02_cortex_isoform, file = "./enrich/Enrich_HuFNSC01_02_cortex_isoform.pdf")
+```
+
+```{r enrich_HuFNSC01_02_ge, fig.width=11, fig.height = 6}
+HuFNSC01_02_ge_isoform_DAVID <- read.delim("./enrich/HuFNSC01_02_ge_isoform_DAVID.txt", as.is=T)
+HuFNSC01_02_ge_isoform_erminej_BP <- read.delim("./enrich/HuFNSC01_02_ge_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_ge_isoform_erminej_MF <- read.delim("./enrich/HuFNSC01_02_ge_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+HuFNSC01_02_ge_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = HuFNSC01_02_ge_isoform_erminej_BP$V2, FDR = HuFNSC01_02_ge_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = HuFNSC01_02_ge_isoform_erminej_MF$V2, FDR = HuFNSC01_02_ge_isoform_erminej_MF$V10), data.frame(Category = HuFNSC01_02_ge_isoform_DAVID$Category, Term = HuFNSC01_02_ge_isoform_DAVID$Term, FDR = HuFNSC01_02_ge_isoform_DAVID$FDR)))
+HuFNSC01_02_ge_isoform_enrich <- HuFNSC01_02_ge_isoform_enrich[HuFNSC01_02_ge_isoform_enrich$FDR <= 0.01, ]
+HuFNSC01_02_ge_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", HuFNSC01_02_ge_isoform_enrich$Term)
+HuFNSC01_02_ge_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", HuFNSC01_02_ge_isoform_enrich$Term)
+HuFNSC01_02_ge_isoform_enrich$Term <- gsub("P[0-9]+:", "", HuFNSC01_02_ge_isoform_enrich$Term)
+HuFNSC01_02_ge_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", HuFNSC01_02_ge_isoform_enrich$Term)
+HuFNSC01_02_ge_isoform_enrich$Term <- factor(HuFNSC01_02_ge_isoform_enrich$Term, levels = HuFNSC01_02_ge_isoform_enrich[order(HuFNSC01_02_ge_isoform_enrich$Category, HuFNSC01_02_ge_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_HuFNSC01_02_ge_isoform <- ggplot(data = HuFNSC01_02_ge_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between HuFNSC01 and HuFNSC02 in GE") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_HuFNSC01_02_ge_isoform, file = "./enrich/Enrich_HuFNSC01_02_ge_isoform.pdf")
+```
+
+#### HuFNSC03 vs HuFNSC04
+  * Isoforms shared in cortex and GE are enriched in EGF and Fibronectin domain.     
+  * Isoforms found only in cortex and only in GE both show enrichment in neuroactive ligand-receptor interaction pathway.       
+  * Isoforms between HuFNSC03 and HuFNSC04 in both cortex and GE show enrichment in neuroactive ligand-receptor interaction pathway and Fibronectin. Isoforms in GE are also enriched for EGF protein domain.       
+
+```{r enrich_HuFNSC03_04_cortex, fig.width=10, fig.height = 2}
+HuFNSC03_04_cortex_isoform_DAVID <- read.delim("./enrich/HuFNSC03_04_cortex_isoform_DAVID.txt", as.is=T)
+HuFNSC03_04_cortex_isoform_erminej_BP <- read.delim("./enrich/HuFNSC03_04_cortex_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+HuFNSC03_04_cortex_isoform_erminej_MF <- read.delim("./enrich/HuFNSC03_04_cortex_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+HuFNSC03_04_cortex_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = HuFNSC03_04_cortex_isoform_erminej_BP$V2, FDR = HuFNSC03_04_cortex_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = HuFNSC03_04_cortex_isoform_erminej_MF$V2, FDR = HuFNSC03_04_cortex_isoform_erminej_MF$V10), data.frame(Category = HuFNSC03_04_cortex_isoform_DAVID$Category, Term = HuFNSC03_04_cortex_isoform_DAVID$Term, FDR = HuFNSC03_04_cortex_isoform_DAVID$FDR)))
+HuFNSC03_04_cortex_isoform_enrich <- HuFNSC03_04_cortex_isoform_enrich[HuFNSC03_04_cortex_isoform_enrich$FDR <= 0.01, ]
+HuFNSC03_04_cortex_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", HuFNSC03_04_cortex_isoform_enrich$Term)
+HuFNSC03_04_cortex_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", HuFNSC03_04_cortex_isoform_enrich$Term)
+HuFNSC03_04_cortex_isoform_enrich$Term <- gsub("P[0-9]+:", "", HuFNSC03_04_cortex_isoform_enrich$Term)
+HuFNSC03_04_cortex_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", HuFNSC03_04_cortex_isoform_enrich$Term)
+HuFNSC03_04_cortex_isoform_enrich$Term <- factor(HuFNSC03_04_cortex_isoform_enrich$Term, levels = HuFNSC03_04_cortex_isoform_enrich[order(HuFNSC03_04_cortex_isoform_enrich$Category, HuFNSC03_04_cortex_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_HuFNSC03_04_cortex_isoform <- ggplot(data = HuFNSC03_04_cortex_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between HuFNSC01 and HuFNSC02 in cortex") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_HuFNSC03_04_cortex_isoform, file = "./enrich/Enrich_HuFNSC03_04_cortex_isoform.pdf")
+```
+
+```{r enrich_HuFNSC03_04_ge, fig.width=11, fig.height = 6}
+HuFNSC03_04_ge_isoform_DAVID <- read.delim("./enrich/HuFNSC03_04_ge_isoform_DAVID.txt", as.is=T)
+HuFNSC03_04_ge_isoform_erminej_BP <- read.delim("./enrich/HuFNSC03_04_ge_isoform_erminej_BP.txt", as.is=T, skip = 34, head = F)
+HuFNSC03_04_ge_isoform_erminej_MF <- read.delim("./enrich/HuFNSC03_04_ge_isoform_erminej_MF.txt", as.is=T, skip = 34, head = F)
+HuFNSC03_04_ge_isoform_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = HuFNSC03_04_ge_isoform_erminej_BP$V2, FDR = HuFNSC03_04_ge_isoform_erminej_BP$V10), data.frame(Category = "GOMF", Term = HuFNSC03_04_ge_isoform_erminej_MF$V2, FDR = HuFNSC03_04_ge_isoform_erminej_MF$V10), data.frame(Category = HuFNSC03_04_ge_isoform_DAVID$Category, Term = HuFNSC03_04_ge_isoform_DAVID$Term, FDR = HuFNSC03_04_ge_isoform_DAVID$FDR)))
+HuFNSC03_04_ge_isoform_enrich <- HuFNSC03_04_ge_isoform_enrich[HuFNSC03_04_ge_isoform_enrich$FDR <= 0.01, ]
+HuFNSC03_04_ge_isoform_enrich$Term <- gsub("IPR[0-9]+:", "", HuFNSC03_04_ge_isoform_enrich$Term)
+HuFNSC03_04_ge_isoform_enrich$Term <- gsub("hsa[0-9]+:", "", HuFNSC03_04_ge_isoform_enrich$Term)
+HuFNSC03_04_ge_isoform_enrich$Term <- gsub("P[0-9]+:", "", HuFNSC03_04_ge_isoform_enrich$Term)
+HuFNSC03_04_ge_isoform_enrich$Term <- gsub("REACT_[0-9]+:", "", HuFNSC03_04_ge_isoform_enrich$Term)
+HuFNSC03_04_ge_isoform_enrich$Term <- factor(HuFNSC03_04_ge_isoform_enrich$Term, levels = HuFNSC03_04_ge_isoform_enrich[order(HuFNSC03_04_ge_isoform_enrich$Category, HuFNSC03_04_ge_isoform_enrich$FDR, decreasing = T),]$Term)
+(Enrich_HuFNSC03_04_ge_isoform <- ggplot(data = HuFNSC03_04_ge_isoform_enrich, aes(Term, -log10(FDR))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+   theme_bw() +
+   ggtitle("Functional enrichment for isoforms between HuFNSC01 and HuFNSC02 in GE") + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
+ggsave(Enrich_HuFNSC03_04_ge_isoform, file = "./enrich/Enrich_HuFNSC03_04_ge_isoform.pdf")
+```
+
+
+
+
+
