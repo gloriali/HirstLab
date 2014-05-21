@@ -52,6 +52,7 @@ Nmyo080 <- 58851034
 Nstem080 <- 55793105
 Nlum035 <- 82129610
 Nmyo035 <- 103893357
+# check read length: /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools view /projects/epigenomics/ep50/internal/jqc.1.7.6/A17918/A17918.bam -- 75M
 read_length <- 75
 junction$lum084rpkm <- junction$lum084N*10^3*10^6 / (Nlum084*read_length) 
 junction$myo084rpkm <- junction$myo084N*10^3*10^6 / (Nmyo084*read_length) 
