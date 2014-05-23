@@ -180,7 +180,7 @@ brain01_02_isoform_valid_gene <- brain01_02_isoform_valid[!duplicated(brain01_02
 write.table(brain01_02_isoform_valid_gene, file = "brain_01_02_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 
 # cortex01_02
-cortex01_02_isoform_all <- read.delim("~/Fetalcortex/RNAseq/isoform/cortex01_02_isoform.txt", as.is =T)
+cortex01_02_isoform_all <- read.delim("~/FetalBrain/RNAseq/isoform/cortex01_02_isoform.txt", as.is =T)
 cortex01_02_isoform_valid <- cortex01_02_isoform_all
 (junction_valid_individual["cortex01_02", "No.isoform.exons"] <- nrow(cortex01_02_isoform_valid))
 (junction_valid_individual["cortex01_02", "No.isoform.genes"] <- length(unique(cortex01_02_isoform_valid$id)))
@@ -208,7 +208,7 @@ cortex01_02_isoform_valid_gene <- cortex01_02_isoform_valid[!duplicated(cortex01
 write.table(cortex01_02_isoform_valid_gene, file = "cortex_01_02_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 
 # ge01_02
-ge01_02_isoform_all <- read.delim("~/Fetalge/RNAseq/isoform/ge01_02_isoform.txt", as.is =T)
+ge01_02_isoform_all <- read.delim("~/FetalBrain/RNAseq/isoform/ge01_02_isoform.txt", as.is =T)
 ge01_02_isoform_valid <- ge01_02_isoform_all
 (junction_valid_individual["ge01_02", "No.isoform.exons"] <- nrow(ge01_02_isoform_valid))
 (junction_valid_individual["ge01_02", "No.isoform.genes"] <- length(unique(ge01_02_isoform_valid$id)))
@@ -236,7 +236,7 @@ ge01_02_isoform_valid_gene <- ge01_02_isoform_valid[!duplicated(ge01_02_isoform_
 write.table(ge01_02_isoform_valid_gene, file = "ge_01_02_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 
 # cortex03_04
-cortex03_04_isoform_all <- read.delim("~/Fetalcortex/RNAseq/isoform/cortex03_04_isoform.txt", as.is =T)
+cortex03_04_isoform_all <- read.delim("~/FetalBrain/RNAseq/isoform/cortex03_04_isoform.txt", as.is =T)
 cortex03_04_isoform_valid <- cortex03_04_isoform_all
 (junction_valid_individual["cortex03_04", "No.isoform.exons"] <- nrow(cortex03_04_isoform_valid))
 (junction_valid_individual["cortex03_04", "No.isoform.genes"] <- length(unique(cortex03_04_isoform_valid$id)))
@@ -264,7 +264,7 @@ cortex03_04_isoform_valid_gene <- cortex03_04_isoform_valid[!duplicated(cortex03
 write.table(cortex03_04_isoform_valid_gene, file = "cortex_03_04_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 
 # ge03_04
-ge03_04_isoform_all <- read.delim("~/Fetalge/RNAseq/isoform/ge03_04_isoform.txt", as.is =T)
+ge03_04_isoform_all <- read.delim("~/FetalBrain/RNAseq/isoform/ge03_04_isoform.txt", as.is =T)
 ge03_04_isoform_valid <- ge03_04_isoform_all
 (junction_valid_individual["ge03_04", "No.isoform.exons"] <- nrow(ge03_04_isoform_valid))
 (junction_valid_individual["ge03_04", "No.isoform.genes"] <- length(unique(ge03_04_isoform_valid$id)))
