@@ -9,5 +9,5 @@ for inputWig in *.wig.gz
 do
     echo "Processing $inputWig"
     name=`echo $inputWig | cut -d'.' -f 1`
-    java -jar -Xmx30G /home/mbilenky/bin/Solexa_Java/FindER.jar -chr $chr -i $inputWig -o $out -n $name -v -m $map -print > /home/lli/FetalBrain/HisMod/FindER/$name.log
+    /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx30G /home/mbilenky/bin/Solexa_Java/FindER.jar -chr $chr -i $inputWig -o $out -n $name -v -m $map -print > /home/lli/FetalBrain/HisMod/FindER/$name.log
 done
