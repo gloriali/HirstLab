@@ -146,10 +146,10 @@ HuFNSC04_isoform_valid[,c("coord", "chr", "start", "end", "strand", "type", "nam
 write.table(HuFNSC04_isoform_valid, file = "cortex_ge_04_isoform_valid.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 HuFNSC04_isoform_valid_gene <- HuFNSC04_isoform_valid[!duplicated(HuFNSC04_isoform_valid$gene), ]
 write.table(HuFNSC04_isoform_valid_gene, file = "cortex_ge_04_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
-
+(junction_valid_cortexge)
 
 ## individual: HuFNSC01 vs HuFNSC02
-junction_valid_individual <- matrix(NA, nrow = 3, ncol = 6, dimnames = list(c("brain01_02", "cortex01_02", "ge01_02", "cortex03_04", "ge03_04"), c("No.isoform.exons", "No.isoform.genes", "No.exons.with.junction.cov", "No.genes.with.junction.cov", "No.exons.with.junction.support", "No.genes.with.junction.support")))
+junction_valid_individual <- matrix(NA, nrow = 5, ncol = 6, dimnames = list(c("brain01_02", "cortex01_02", "ge01_02", "cortex03_04", "ge03_04"), c("No.isoform.exons", "No.isoform.genes", "No.exons.with.junction.cov", "No.genes.with.junction.cov", "No.exons.with.junction.support", "No.genes.with.junction.support")))
 
 # brain01_02
 brain01_02_isoform_all <- read.delim("~/FetalBrain/RNAseq/isoform/brain01_02_isoform.txt", as.is =T)
@@ -291,6 +291,7 @@ write.table(ge03_04_isoform_valid, file = "ge_03_04_isoform_valid.txt", sep = "\
 ge03_04_isoform_valid_gene <- ge03_04_isoform_valid[!duplicated(ge03_04_isoform_valid$gene), ]
 write.table(ge03_04_isoform_valid_gene, file = "ge_03_04_isoform_valid_gene.txt", sep = "\t", quote = F, row.names = F, col.names = T)
 
+(junction_valid_individual)
 rm(junction_exon)
 save.image(file = "junction_valid.Rdata")
 ################################################################################################################################################
