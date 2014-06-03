@@ -2,7 +2,7 @@ REMC isoform analysis - junctions
 ========================================================
 
 Gloria Li         
-Wed May  7 10:40:33 2014 
+Tue Jun  3 10:27:53 2014 
 
 <!-- re-knit after modify junction_valid_new.R or junction_other.R script -->
 
@@ -41,7 +41,7 @@ Wed May  7 10:40:33 2014
   * Venn diagram of isoforms between same cell types in different individuals show similar patterns. The __majority__ of isoforms are __shared__ among different individual. However, isoforms in strand specific libraries (RM084) have __much higher__ ratio of being validated.       
   
 <!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
-<!-- Wed May  7 10:41:07 2014 -->
+<!-- Tue Jun  3 10:28:28 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> No.isoform.exons </TH> <TH> No.isoform.genes </TH> <TH> No.exons.with.junction.cov </TH> <TH> No.genes.with.junction.cov </TH> <TH> No.exons.with.junction.support </TH> <TH> No.genes.with.junction.support </TH>  </TR>
   <TR> <TD> lum084_myo084 </TD> <TD align="center"> 8630 </TD> <TD align="center"> 2381 </TD> <TD align="center"> 3618 </TD> <TD align="center"> 1228 </TD> <TD align="center"> 3604 </TD> <TD align="center"> 1217 </TD> </TR>
@@ -81,6 +81,8 @@ Wed May  7 10:40:33 2014
   
 ![plot of chunk exon_pos](figure/exon_pos.png) 
 
+  * Exon usage along the gene for all multi-transcript genes            
+<img src="./figure/exonUsage.png" height="400px" width="400px" />
   
 ### Venn Diagram with average expression level, average No. of exons and average exon length  
   * Common isoforms shared among different comparisons have __much lower ratio of being validated__.        
@@ -127,24 +129,24 @@ Wed May  7 10:40:33 2014
 
 #### RM084 lum vs myo    
   * ENSG00000196208: GREB1, growth regulation by estrogen in breast cancer 1          
-<img src="./browser/wetlab/ENSG00000196208.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000196208.png" height="400px" width="400px" />
   * ENSG00000008853: RHOBTB2, Rho-related BTB domain containing 2          
-<img src="./browser/wetlab/ENSG00000008853.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000008853.png" height="400px" width="400px" />
   * ENSG00000108821: COL1A1, collagen, type I, alpha 1            
-<img src="./browser/wetlab/ENSG00000108821.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000108821.png" height="400px" width="400px" />
   * ENSG00000110195: FOLR1, folate receptor 1 (adult)           
-<img src="./browser/wetlab/ENSG00000110195.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000110195.png" height="400px" width="400px" />
   * ENSG00000138795: LEF1, lymphoid enhancer-binding factor 1             
-<img src="./browser/wetlab/ENSG00000138795.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000138795.png" height="400px" width="400px" />
   * ENSG00000170312: CDK1, cyclin-dependent kinase 1               
-<img src="./browser/wetlab/ENSG00000170312.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000170312.png" height="400px" width="400px" />
 		
 #### RM084 lum vs stem		
   * ENSG00000064787: BCAS1, breast carcinoma amplified sequence 1               
-<img src="./browser/wetlab/ENSG00000064787.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000064787.png" height="400px" width="400px" />
   * ENSG00000127084: FGD3, FYVE RhoGEF and PH domain containing 3             
-<img src="./browser/wetlab/ENSG00000127084.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000127084.png" height="400px" width="400px" />
   * ENSG00000162894: FAIM3, Fas apoptotic inhibitory molecule 3                
-<img src="./browser/wetlab/ENSG00000162894.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000162894.png" height="400px" width="400px" />
   * ENSG00000126217: MCF2L, MCF.2 cell line derived transforming sequence-like             
-<img src="./browser/wetlab/ENSG00000126217.png" height="400px" width="400px" />
+<img src="./figure/ENSG00000126217.png" height="400px" width="400px" />
