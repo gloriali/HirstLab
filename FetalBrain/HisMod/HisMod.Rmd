@@ -1,0 +1,93 @@
+Fetal Brain - Histone Modification
+========================================================
+Gloria Li
+`r date()`
+
+```{r include = FALSE}
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+## FindER results on histone modification libraries
+### Sanity check: No. of peaks, No. of enriched bases, and average peak length identified by FindER in each library   
+
+All summary statistics seem fine except No. of peaks found in input libraries for cortex-HuFNSC01 and GE-HuFNSC01 are much higher than expected. Also, all whole brain tissue libraries, esp. HuFNSC01, have low No. of peaks. May benefit from the new version of FindER.              
+
+```{r stat, results='asis', fig.width=10}
+setwd("~/快盘/FetalBrain/HistoneMods/")
+finder <- read.delim("FindER_peakCheck.txt", head = T)
+library(xtable)
+finder_table <- xtable(finder[, 3:9])
+align(finder_table) <- "rrrrcccc"
+print(finder_table, type = "html", include.rownames = F)
+library(ggplot2)
+finder$sample <- interaction(finder$Donor,finder$Tissue)
+(Npeak <- ggplot(finder, aes(x = sample, y = Npeak, group = factor(Mark))) +
+  geom_line(aes(color = factor(Mark))) +
+  theme_bw() + 
+  ggtitle("No. of peaks for all histone modification libraries"))
+ggsave(Npeak, file = "FindER_Npeak.pdf")
+(Nbase <- ggplot(finder, aes(x = sample, y = Nbase, group = factor(Mark))) +
+  geom_line(aes(color = factor(Mark))) +
+  theme_bw() + 
+  ggtitle("No. of total enriched bases for all histone modification libraries"))
+ggsave(Nbase, file = "FindER_Nbase.pdf")
+(peakLength <- ggplot(finder, aes(x = sample, y = peakLength, group = factor(Mark))) +
+  geom_line(aes(color = factor(Mark))) +
+  theme_bw() + 
+  ggtitle("Average peak length for all histone modification libraries"))
+ggsave(peakLength, file = "FindER_peakLength.pdf")
+```
+
+### Sample clustering on histone modification signals  
+
+* Primary tissue samples (whole brain) and primary cell culture samples (cortex and GE) always form different clusters.    
+* Clustring on input libraries do not have obvious patterns, and present the greatest dissimilarity among all marks.          
+* Clutering within primary cell culture samples are quite different in different marks.     
+* Clustering in protein-coding genes and non-coding genes are generally similar, except in H3K36me3.       
+
+```{r cluster}
+setwd("~/快盘/FetalBrain/HistoneMods/HisMod_cluster/")
+load("cor.Rdata")
+
+# H3K4me1
+dist_H3K4me1_TSS2000_pc <- as.dist(1 - cor_H3K4me1_TSS2000_pc)
+hc_H3K4me1_TSS2000_pc <- as.dendrogram(hclust(dist_H3K4me1_TSS2000_pc, method="complete"))
+plot(hc_H3K4me1_TSS2000_pc, main="H3K4me1 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
+dist_H3K4me1_TSS2000_nc <- as.dist(1 - cor_H3K4me1_TSS2000_nc)
+hc_H3K4me1_TSS2000_nc <- as.dendrogram(hclust(dist_H3K4me1_TSS2000_nc, method="complete"))
+plot(hc_H3K4me1_TSS2000_nc, main="H3K4me1 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+
+# H3K4me3
+dist_H3K4me3_TSS2000_pc <- as.dist(1 - cor_H3K4me3_TSS2000_pc)
+hc_H3K4me3_TSS2000_pc <- as.dendrogram(hclust(dist_H3K4me3_TSS2000_pc, method="complete"))
+plot(hc_H3K4me3_TSS2000_pc, main="H3K4me3 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
+dist_H3K4me3_TSS2000_nc <- as.dist(1 - cor_H3K4me3_TSS2000_nc)
+hc_H3K4me3_TSS2000_nc <- as.dendrogram(hclust(dist_H3K4me3_TSS2000_nc, method="complete"))
+plot(hc_H3K4me3_TSS2000_nc, main="H3K4me3 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+
+# H3K27me3
+dist_H3K27me3_TSS2000_pc <- as.dist(1 - cor_H3K27me3_TSS2000_pc)
+hc_H3K27me3_TSS2000_pc <- as.dendrogram(hclust(dist_H3K27me3_TSS2000_pc, method="complete"))
+plot(hc_H3K27me3_TSS2000_pc, main="H3K27me3 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
+dist_H3K27me3_TSS2000_nc <- as.dist(1 - cor_H3K27me3_TSS2000_nc)
+hc_H3K27me3_TSS2000_nc <- as.dendrogram(hclust(dist_H3K27me3_TSS2000_nc, method="complete"))
+plot(hc_H3K27me3_TSS2000_nc, main="H3K27me3 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+
+# H3K36me3
+dist_H3K36me3_genebody_pc <- as.dist(1 - cor_H3K36me3_genebody_pc)
+hc_H3K36me3_genebody_pc <- as.dendrogram(hclust(dist_H3K36me3_genebody_pc, method="complete"))
+plot(hc_H3K36me3_genebody_pc, main="H3K36me3 genebody clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
+dist_H3K36me3_genebody_nc <- as.dist(1 - cor_H3K36me3_genebody_nc)
+hc_H3K36me3_genebody_nc <- as.dendrogram(hclust(dist_H3K36me3_genebody_nc, method="complete"))
+plot(hc_H3K36me3_genebody_nc, main="H3K36me3 genebody clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+
+# input
+dist_input_TSS2000_pc <- as.dist(1 - cor_input_TSS2000_pc)
+hc_input_TSS2000_pc <- as.dendrogram(hclust(dist_input_TSS2000_pc, method="complete"))
+plot(hc_input_TSS2000_pc, main="input TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
+dist_input_TSS2000_nc <- as.dist(1 - cor_input_TSS2000_nc)
+hc_input_TSS2000_nc <- as.dendrogram(hclust(dist_input_TSS2000_nc, method="complete"))
+plot(hc_input_TSS2000_nc, main="input TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+```
+
+
