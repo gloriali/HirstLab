@@ -1,7 +1,7 @@
 Fetal Brain - Histone Modification
 ========================================================
-Gloria Li
-Tue Jun  3 11:38:34 2014
+Gloria Li          
+Tue Jun  3 11:53:25 2014
 
 
 
@@ -12,7 +12,7 @@ Tue Jun  3 11:38:34 2014
 All summary statistics seem fine except No. of peaks found in input libraries for cortex-HuFNSC01 and GE-HuFNSC01 are much higher than expected. Also, all whole brain tissue libraries, esp. HuFNSC01, have low No. of peaks. May benefit from the new version of FindER.              
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
-<!-- Tue Jun  3 11:38:34 2014 -->
+<!-- Tue Jun  3 11:53:25 2014 -->
 <TABLE border=1>
 <TR> <TH> Npeak </TH> <TH> Nbase </TH> <TH> peakLength </TH> <TH> Library </TH> <TH> Mark </TH> <TH> Tissue </TH> <TH> Donor </TH>  </TR>
   <TR> <TD align="right"> 19245 </TD> <TD align="right"> 16288600 </TD> <TD align="right"> 846.38 </TD> <TD align="center"> A03488 </TD> <TD align="center"> H3K27me3 </TD> <TD align="center"> Brain </TD> <TD align="center"> HuFNSC01 </TD> </TR>

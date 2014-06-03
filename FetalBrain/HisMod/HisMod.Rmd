@@ -1,6 +1,6 @@
 Fetal Brain - Histone Modification
 ========================================================
-Gloria Li
+Gloria Li          
 `r date()`
 
 ```{r include = FALSE}
@@ -22,17 +22,17 @@ print(finder_table, type = "html", include.rownames = F)
 library(ggplot2)
 finder$sample <- interaction(finder$Donor,finder$Tissue)
 (Npeak <- ggplot(finder, aes(x = sample, y = Npeak, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark))) +
+  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
   theme_bw() + 
   ggtitle("No. of peaks for all histone modification libraries"))
 ggsave(Npeak, file = "FindER_Npeak.pdf")
 (Nbase <- ggplot(finder, aes(x = sample, y = Nbase, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark))) +
+  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
   theme_bw() + 
   ggtitle("No. of total enriched bases for all histone modification libraries"))
 ggsave(Nbase, file = "FindER_Nbase.pdf")
 (peakLength <- ggplot(finder, aes(x = sample, y = peakLength, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark))) +
+  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
   theme_bw() + 
   ggtitle("Average peak length for all histone modification libraries"))
 ggsave(peakLength, file = "FindER_peakLength.pdf")
@@ -46,8 +46,7 @@ ggsave(peakLength, file = "FindER_peakLength.pdf")
 * Clustering in protein-coding genes and non-coding genes are generally similar, except in H3K36me3.       
 
 ```{r cluster}
-setwd("~/快盘/FetalBrain/HistoneMods/HisMod_cluster/")
-load("cor.Rdata")
+load("~/快盘/FetalBrain/HistoneMods/HisMod_cluster/cor.Rdata")
 
 # H3K4me1
 dist_H3K4me1_TSS2000_pc <- as.dist(1 - cor_H3K4me1_TSS2000_pc)
