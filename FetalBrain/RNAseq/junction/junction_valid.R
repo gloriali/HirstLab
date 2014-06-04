@@ -295,5 +295,34 @@ write.table(ge03_04_isoform_valid_gene, file = "ge_03_04_isoform_valid_gene.txt"
 rm(junction_exon)
 save.image(file = "junction_valid.Rdata")
 ################################################################################################################################################
+setwd("~/快盘/FetalBrain/RNAseq/junction/")
+load("junction_valid.Rdata")
 
+# DE gene list  
+DE_HuFNSC01up <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/UP.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+DE_HuFNSC01dn <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/DN.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+HuFNSC01_DE <- unique(c(DE_HuFNSC01up$V1, DE_HuFNSC01dn$V1))
+rm(DE_HuFNSC01up, DE_HuFNSC01dn)
+DE_HuFNSC02up <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/UP.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+DE_HuFNSC02dn <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/DN.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+HuFNSC02_DE <- unique(c(DE_HuFNSC02up$V1, DE_HuFNSC02dn$V1))
+rm(DE_HuFNSC02up, DE_HuFNSC02dn)
+DE_HuFNSC03up <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/UP.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+DE_HuFNSC03dn <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/DN.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+HuFNSC03_DE <- unique(c(DE_HuFNSC03up$V1, DE_HuFNSC03dn$V1))
+rm(DE_HuFNSC03up, DE_HuFNSC03dn)
+DE_HuFNSC04up <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/UP.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+DE_HuFNSC04dn <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/DN.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
+HuFNSC04_DE <- unique(c(DE_HuFNSC04up$V1, DE_HuFNSC04dn$V1))
+rm(DE_HuFNSC04up, DE_HuFNSC04dn)
+
+# No. of exons for DE genes / isoform genes: use collapsed exons instead of Ensembl exons
+exon <- read.delim("~/hg19/hg19v65_exons_collapsed.txt", head = F, as.is = T)
+Nexon <- data.frame(id = levels(as.factor(exon$V2)), Nexon = sapply(levels(as.factor(exon$V2)), function(x) sum(exon$V2 == x)))
+HuFNSC01_DE <- data.frame(id = HuFNSC01_DE, Nexon = Nexon[HuFNSC01_DE, ]$Nexon)
+HuFNSC01_isoform_all_gene <- HuFNSC01_isoform_all[!duplicated(HuFNSC01_isoform_all$id), ]
+HuFNSC01_isoform_all_gene$Nexon <- Nexon[HuFNSC01_isoform_all_gene$id, "Nexon"]
+HuFNSC01_isoform_valid_gene$Nexon <- Nexon[as.character(HuFNSC01_isoform_valid_gene$gene), "Nexon"] 
+
+rm(exon)
 
