@@ -29,6 +29,39 @@ library(ggplot2)
     * Junction RPKM > 0.1 in one sample and < 0.1 in the other      
   
 ## Results: 
+### No. of exons for DE genes / isoform genes    
+  * DE genes have roughly the same No. of exons as all expressed genes.             
+  * Identified isoforms have slightly more No. of exons than DE genes and all expressed genes.  
+  * Compared to DE genes, the distribution in No. of exons for isoforms are __much similar__ between different individuals, _not observed in breast libraries_.    
+  
+```{r Nexon}
+plot(c(0, 50), c(0, 0.08), type = "n", main = "No. of exons in DE genes and isoforms", xlab = "No. of exons", ylab = "density")
+lines(density(na.omit(Nexon[Nexon$id %in% geneRPKM[(geneRPKM$cortex01 + geneRPKM$cortex02 + geneRPKM$cortex03 + geneRPKM$cortex04 + geneRPKM$ge01 + geneRPKM$ge02 + geneRPKM$ge03 + geneRPKM$ge04) > 0.05,]$id,]$Nexon)), col = 1, lty = 1, lwd = 5)
+lines(density(na.omit(HuFNSC01_DE$Nexon)), col = 2, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC02_DE$Nexon)), col = 3, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC03_DE$Nexon)), col = 4, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC04_DE$Nexon)), col = 5, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC01_isoform_all_gene$Nexon)), col = 2, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC02_isoform_all_gene$Nexon)), col = 3, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC03_isoform_all_gene$Nexon)), col = 4, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC04_isoform_all_gene$Nexon)), col = 5, lty = 3, lwd = 3)
+legend("topleft", c("all expressed genes", "DE genes", "isoforms"), col = 1, lty = c(1, 1, 3), lwd = 5, cex = 0.8)
+legend("topright", c("all expressed genes", "cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 1:5, lty = 1, lwd = 5, cex = 0.8)
+```
+
+### Position of isoform exons on the gene   
+  * In general, there are more alternative spliced exons at the __two ends__ of genes, _similar to observed in breast libraries_.         
+  
+```{r exon_pos}
+plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
+lines(density(na.omit(HuFNSC01_isoform_all$exon_pos)), col = 2, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC02_isoform_all$exon_pos)), col = 3, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC03_isoform_all$exon_pos)), col = 4, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC04_isoform_all$exon_pos)), col = 5, lty = 1, lwd = 3)
+legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 2:5, lty = 1, lwd = 5)
+```
+
+### Junction validation     
   + For cortex vs GE, on average, __`r round(mean(junction_valid_cortexge[, "No.genes.with.junction.cov"]/junction_valid_cortexge[, "No.isoform.genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(junction_valid_cortexge[, "No.genes.with.junction.support"]/junction_valid_cortexge[, "No.genes.with.junction.cov"])*100, 1)`%__ have support from junction reads.    
   + For comparisons between individuals, on average, __`r round(mean(junction_valid_individual[, "No.genes.with.junction.cov"]/junction_valid_individual[, "No.isoform.genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(junction_valid_individual[, "No.genes.with.junction.support"]/junction_valid_individual[, "No.genes.with.junction.cov"])*100, 1)`%__ have support from junction reads.     
   + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
@@ -65,36 +98,72 @@ venn_01_02_valid <- venn.diagram(isoform_01_02_valid, filename = NULL, fill = c(
 grid.draw(venn_01_02_valid)
 ```
 
-### No. of exons for DE genes / isoform genes    
-  * DE genes have roughly the same No. of exons as all expressed genes.             
-  * Identified isoforms have slightly more No. of exons than DE genes and all expressed genes.  
-  * Compared to DE genes, the distribution in No. of exons for isoforms are __much similar__ between different individuals.    
+### Venn Diagram with average expression level, average No. of exons and average exon length   
+  * Isoforms have __much lower__ expression level than all expressed genes.          
+  * On average, common isoforms between different comparisons have __lower expression level__ than comparison-specific isoforms.                 
+  * In general, compared to all isoforms identified, validated isoforms have __lower__ expression levels, _not observed in breast libraries_.     
+  * Average No. of exons are very __similar__ in different sections of the Venn diagram, between all, validated isoforms and all expressed genes.        
+  * Average length of isoform exons are __shorter__ than all expressed genes. Validated isoform exons are also __shorter__ than all isoforms in general, _not observed in breast libraries_.         
   
-```{r Nexon}
-plot(c(0, 50), c(0, 0.08), type = "n", main = "No. of exons in DE genes and isoforms", xlab = "No. of exons", ylab = "density")
-lines(density(na.omit(Nexon[Nexon$id %in% geneRPKM[(geneRPKM$cortex01 + geneRPKM$cortex02 + geneRPKM$cortex03 + geneRPKM$cortex04 + geneRPKM$ge01 + geneRPKM$ge02 + geneRPKM$ge03 + geneRPKM$ge04) > 0.05,]$id,]$Nexon)), col = 1, lty = 1, lwd = 5)
-lines(density(na.omit(HuFNSC01_DE$Nexon)), col = 2, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC02_DE$Nexon)), col = 3, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC03_DE$Nexon)), col = 4, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC04_DE$Nexon)), col = 5, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC01_isoform_all_gene$Nexon)), col = 2, lty = 3, lwd = 3)
-lines(density(na.omit(HuFNSC02_isoform_all_gene$Nexon)), col = 3, lty = 3, lwd = 3)
-lines(density(na.omit(HuFNSC03_isoform_all_gene$Nexon)), col = 4, lty = 3, lwd = 3)
-lines(density(na.omit(HuFNSC04_isoform_all_gene$Nexon)), col = 5, lty = 3, lwd = 3)
-legend("topleft", c("all expressed genes", "DE genes", "isoforms"), col = 1, lty = c(1, 1, 3), lwd = 5, cex = 0.8)
-legend("topright", c("all expressed genes", "cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 1:5, lty = 1, lwd = 5, cex = 0.8)
-```
+```{r venn, fig.height = 6, fig.width = 6}
+# average expression level
+(bubble_all_rpkm <- ggplot(isoform_all_rpkm) + 
+   geom_point(aes(x, y, size = RPKM), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size_area(max_size = 30, breaks = c(0.5, 2, 15)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_rpkm <- ggplot(isoform_valid_rpkm) + 
+   geom_point(aes(x, y, size = RPKM), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size_area(max_size = 30, breaks = c(0.5, 2, 15)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of validated isoforms", main.cex = 1.5)
+grid.draw(venn_valid)
 
-### Position of isoform exons on the gene   
-  * In general, there are more alternative spliced exons at the __two ends__ of genes, similar to observed in breast libraries.         
-  
-```{r exon_pos}
-plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
-lines(density(na.omit(HuFNSC01_isoform_all$exon_pos)), col = 2, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC02_isoform_all$exon_pos)), col = 3, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC03_isoform_all$exon_pos)), col = 4, lty = 1, lwd = 3)
-lines(density(na.omit(HuFNSC04_isoform_all$exon_pos)), col = 5, lty = 1, lwd = 3)
-legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 2:5, lty = 1, lwd = 5)
-```
+# No. of exons
+(bubble_all_Nexon <- ggplot(isoform_all_Nexon) + 
+   geom_point(aes(x, y, size = No.exon), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size(limits = c(9, 15), range = c(5, 15), breaks = c(11, 12)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of isoforms", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_Nexon <- ggplot(isoform_valid_Nexon) + 
+   geom_point(aes(x, y, size = No.exon), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size(limits = c(9, 15), range = c(5, 15), breaks = c(11, 12, 13)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of validated isoforms", main.cex = 1.5)
+grid.draw(venn_valid)
 
+# average exon length 
+(bubble_all_exon_length <- ggplot(isoform_all_exon_length) + 
+   geom_point(aes(x, y, size = exon_length), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size(limits = c(100, 400), range = c(5, 20), breaks = c(200, 300, 400)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of isoform exons", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_exon_length <- ggplot(isoform_valid_exon_length) + 
+   geom_point(aes(x, y, size = exon_length), color = "red") + 
+   scale_x_continuous(limits = c(0, 1)) + 
+   scale_y_continuous(limits = c(0, 1)) + 
+   scale_size(limits = c(100, 400), range = c(5, 20), breaks = c(200, 300, 400)) + 
+   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of validated isoform exons", main.cex = 1.5)
+grid.draw(venn_valid)
+```
 
