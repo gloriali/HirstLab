@@ -293,10 +293,29 @@ write.table(ge03_04_isoform_valid_gene, file = "ge_03_04_isoform_valid_gene.txt"
 
 (junction_valid_individual)
 rm(junction_exon)
+
 save.image(file = "junction_valid.Rdata")
 ################################################################################################################################################
 setwd("~/快盘/FetalBrain/RNAseq/junction/")
 load("junction_valid.Rdata")
+# gene RPKM
+brain01 <- read.delim("~/FetalBrain/RNAseq/rpkm/A03484.G.A.rpkm.pc", head = F, as.is = T)
+brain02 <- read.delim("~/FetalBrain/RNAseq/rpkm/A07825.G.A.rpkm.pc", head = F, as.is = T)
+cortex01 <- read.delim("~/FetalBrain/RNAseq/rpkm/A03473.G.A.rpkm.pc", head = F, as.is = T)
+cortex02 <- read.delim("~/FetalBrain/RNAseq/rpkm/A03475.G.A.rpkm.pc", head = F, as.is = T)
+cortex03 <- read.delim("~/FetalBrain/RNAseq/rpkm/A04599.G.A.rpkm.pc", head = F, as.is = T)
+cortex04 <- read.delim("~/FetalBrain/RNAseq/rpkm/A15298.G.A.rpkm.pc", head = F, as.is = T)
+ge01 <- read.delim("~/FetalBrain/RNAseq/rpkm/A03474.G.A.rpkm.pc", head = F, as.is = T)
+ge02 <- read.delim("~/FetalBrain/RNAseq/rpkm/A03476.G.A.rpkm.pc", head = F, as.is = T)
+ge03 <- read.delim("~/FetalBrain/RNAseq/rpkm/A15295.G.A.rpkm.pc", head = F, as.is = T)
+ge04 <- read.delim("~/FetalBrain/RNAseq/rpkm/A15299.G.A.rpkm.pc", head = F, as.is = T)
+cortex01 <- cortex01[cortex01$V1 %in% brain01$V1,]
+cortex04 <- cortex04[cortex04$V1 %in% brain01$V1,]
+ge01 <- ge01[ge01$V1 %in% brain01$V1,]
+ge03 <- ge03[ge03$V1 %in% brain01$V1,]
+ge04 <- ge04[ge04$V1 %in% brain01$V1,]
+geneRPKM <- data.frame(id = brain01$V1, brain01 = brain01$V3, brain02 = brain02$V3, cortex01 = cortex01$V3, cortex02 = cortex02$V3, cortex03 = cortex03$V3, cortex04 = cortex04$V3, ge01 = ge01$V3, ge02 = ge02$V3, ge03 = ge03$V3, ge04 = ge04$V3)
+rm(brain01, brain02, cortex01, cortex02, cortex03, cortex04, ge01, ge02, ge03, ge04)
 
 # DE gene list  
 DE_HuFNSC01up <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/UP.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T)
@@ -323,6 +342,128 @@ HuFNSC01_DE <- data.frame(id = HuFNSC01_DE, Nexon = Nexon[HuFNSC01_DE, ]$Nexon)
 HuFNSC01_isoform_all_gene <- HuFNSC01_isoform_all[!duplicated(HuFNSC01_isoform_all$id), ]
 HuFNSC01_isoform_all_gene$Nexon <- Nexon[HuFNSC01_isoform_all_gene$id, "Nexon"]
 HuFNSC01_isoform_valid_gene$Nexon <- Nexon[as.character(HuFNSC01_isoform_valid_gene$gene), "Nexon"] 
-
+HuFNSC02_DE <- data.frame(id = HuFNSC02_DE, Nexon = Nexon[HuFNSC02_DE, ]$Nexon)
+HuFNSC02_isoform_all_gene <- HuFNSC02_isoform_all[!duplicated(HuFNSC02_isoform_all$id), ]
+HuFNSC02_isoform_all_gene$Nexon <- Nexon[HuFNSC02_isoform_all_gene$id, "Nexon"]
+HuFNSC02_isoform_valid_gene$Nexon <- Nexon[as.character(HuFNSC02_isoform_valid_gene$gene), "Nexon"] 
+HuFNSC03_DE <- data.frame(id = HuFNSC03_DE, Nexon = Nexon[HuFNSC03_DE, ]$Nexon)
+HuFNSC03_isoform_all_gene <- HuFNSC03_isoform_all[!duplicated(HuFNSC03_isoform_all$id), ]
+HuFNSC03_isoform_all_gene$Nexon <- Nexon[HuFNSC03_isoform_all_gene$id, "Nexon"]
+HuFNSC03_isoform_valid_gene$Nexon <- Nexon[as.character(HuFNSC03_isoform_valid_gene$gene), "Nexon"] 
+HuFNSC04_DE <- data.frame(id = HuFNSC04_DE, Nexon = Nexon[HuFNSC04_DE, ]$Nexon)
+HuFNSC04_isoform_all_gene <- HuFNSC04_isoform_all[!duplicated(HuFNSC04_isoform_all$id), ]
+HuFNSC04_isoform_all_gene$Nexon <- Nexon[HuFNSC04_isoform_all_gene$id, "Nexon"]
+HuFNSC04_isoform_valid_gene$Nexon <- Nexon[as.character(HuFNSC04_isoform_valid_gene$gene), "Nexon"] 
 rm(exon)
+pdf("Nexon_DEvsIsoforms.pdf")
+plot(c(0, 50), c(0, 0.08), type = "n", main = "No. of exons in DE genes and isoforms", xlab = "No. of exons", ylab = "density")
+lines(density(na.omit(Nexon[Nexon$id %in% geneRPKM[(geneRPKM$cortex01 + geneRPKM$cortex02 + geneRPKM$cortex03 + geneRPKM$cortex04 + geneRPKM$ge01 + geneRPKM$ge02 + geneRPKM$ge03 + geneRPKM$ge04) > 0.05,]$id,]$Nexon)), col = 1, lty = 1, lwd = 5)
+lines(density(na.omit(HuFNSC01_DE$Nexon)), col = 2, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC02_DE$Nexon)), col = 3, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC03_DE$Nexon)), col = 4, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC04_DE$Nexon)), col = 5, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC01_isoform_all_gene$Nexon)), col = 2, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC02_isoform_all_gene$Nexon)), col = 3, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC03_isoform_all_gene$Nexon)), col = 4, lty = 3, lwd = 3)
+lines(density(na.omit(HuFNSC04_isoform_all_gene$Nexon)), col = 5, lty = 3, lwd = 3)
+legend("topleft", c("all expressed genes", "DE genes", "isoforms"), col = 1, lty = c(1, 1, 3), lwd = 5, cex = 0.8)
+legend("topright", c("all expressed genes", "cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 1:5, lty = 1, lwd = 5, cex = 0.8)
+dev.off()
+
+# Position of isoform exons on the gene
+# cortex01 vs GE01
+# start / end point of the gene 
+HuFNSC01_isoform_all$start <- ensembl[HuFNSC01_isoform_all$id, "start"]
+HuFNSC01_isoform_all$end <- ensembl[HuFNSC01_isoform_all$id, "end"]
+HuFNSC01_isoform_all$strand <- ensembl[HuFNSC01_isoform_all$id, "strand"]
+# exon position: mid point of the exon
+HuFNSC01_isoform_all$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC01_isoform_all$V1))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC01_isoform_all$V1))))/2
+# exon postition on the gene: calculate + strand & - strand separately
+HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == 1, ]$exon_pos <- (HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == 1, ]$exon_pos - HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == 1, ]$start) / (HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == 1, ]$end - HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == 1, ]$start) * 100
+HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == -1, ]$exon_pos <- 100 - (HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == -1, ]$exon_pos - HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == -1, ]$start) / (HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == -1, ]$end - HuFNSC01_isoform_all[HuFNSC01_isoform_all$strand == -1, ]$start) * 100
+HuFNSC01_isoform_valid$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC01_isoform_valid$exon))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC01_isoform_valid$exon))))/2
+HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == 1, ]$exon_pos <- (HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == 1, ]$exon_pos - HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == 1, ]$start) / (HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == 1, ]$end - HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == 1, ]$start) * 100
+HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == -1, ]$exon_pos <- 100 - (HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == -1, ]$exon_pos - HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == -1, ]$start) / (HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == -1, ]$end - HuFNSC01_isoform_valid[HuFNSC01_isoform_valid$strand == -1, ]$start) * 100
+# cortex02 vs GE02
+# start / end point of the gene 
+HuFNSC02_isoform_all$start <- ensembl[HuFNSC02_isoform_all$id, "start"]
+HuFNSC02_isoform_all$end <- ensembl[HuFNSC02_isoform_all$id, "end"]
+HuFNSC02_isoform_all$strand <- ensembl[HuFNSC02_isoform_all$id, "strand"]
+# exon position: mid point of the exon
+HuFNSC02_isoform_all$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC02_isoform_all$V1))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC02_isoform_all$V1))))/2
+# exon postition on the gene: calculate + strand & - strand separately
+HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == 1, ]$exon_pos <- (HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == 1, ]$exon_pos - HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == 1, ]$start) / (HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == 1, ]$end - HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == 1, ]$start) * 100
+HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == -1, ]$exon_pos <- 100 - (HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == -1, ]$exon_pos - HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == -1, ]$start) / (HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == -1, ]$end - HuFNSC02_isoform_all[HuFNSC02_isoform_all$strand == -1, ]$start) * 100
+HuFNSC02_isoform_valid$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC02_isoform_valid$exon))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC02_isoform_valid$exon))))/2
+HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == 1, ]$exon_pos <- (HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == 1, ]$exon_pos - HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == 1, ]$start) / (HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == 1, ]$end - HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == 1, ]$start) * 100
+HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == -1, ]$exon_pos <- 100 - (HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == -1, ]$exon_pos - HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == -1, ]$start) / (HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == -1, ]$end - HuFNSC02_isoform_valid[HuFNSC02_isoform_valid$strand == -1, ]$start) * 100
+# cortex03 vs GE03
+# start / end point of the gene 
+HuFNSC03_isoform_all$start <- ensembl[HuFNSC03_isoform_all$id, "start"]
+HuFNSC03_isoform_all$end <- ensembl[HuFNSC03_isoform_all$id, "end"]
+HuFNSC03_isoform_all$strand <- ensembl[HuFNSC03_isoform_all$id, "strand"]
+# exon position: mid point of the exon
+HuFNSC03_isoform_all$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC03_isoform_all$V1))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC03_isoform_all$V1))))/2
+# exon postition on the gene: calculate + strand & - strand separately
+HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == 1, ]$exon_pos <- (HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == 1, ]$exon_pos - HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == 1, ]$start) / (HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == 1, ]$end - HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == 1, ]$start) * 100
+HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == -1, ]$exon_pos <- 100 - (HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == -1, ]$exon_pos - HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == -1, ]$start) / (HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == -1, ]$end - HuFNSC03_isoform_all[HuFNSC03_isoform_all$strand == -1, ]$start) * 100
+HuFNSC03_isoform_valid$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC03_isoform_valid$exon))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC03_isoform_valid$exon))))/2
+HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == 1, ]$exon_pos <- (HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == 1, ]$exon_pos - HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == 1, ]$start) / (HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == 1, ]$end - HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == 1, ]$start) * 100
+HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == -1, ]$exon_pos <- 100 - (HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == -1, ]$exon_pos - HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == -1, ]$start) / (HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == -1, ]$end - HuFNSC03_isoform_valid[HuFNSC03_isoform_valid$strand == -1, ]$start) * 100
+# cortex04 vs GE04
+# start / end point of the gene 
+HuFNSC04_isoform_all$start <- ensembl[HuFNSC04_isoform_all$id, "start"]
+HuFNSC04_isoform_all$end <- ensembl[HuFNSC04_isoform_all$id, "end"]
+HuFNSC04_isoform_all$strand <- ensembl[HuFNSC04_isoform_all$id, "strand"]
+# exon position: mid point of the exon
+HuFNSC04_isoform_all$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC04_isoform_all$V1))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC04_isoform_all$V1))))/2
+# exon postition on the gene: calculate + strand & - strand separately
+HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == 1, ]$exon_pos <- (HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == 1, ]$exon_pos - HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == 1, ]$start) / (HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == 1, ]$end - HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == 1, ]$start) * 100
+HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == -1, ]$exon_pos <- 100 - (HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == -1, ]$exon_pos - HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == -1, ]$start) / (HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == -1, ]$end - HuFNSC04_isoform_all[HuFNSC04_isoform_all$strand == -1, ]$start) * 100
+HuFNSC04_isoform_valid$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsub("-[0-9]+<[-]*1_ENSG[0-9]+", "", HuFNSC04_isoform_valid$exon))) + as.numeric(gsub("chr[0-9X]+:[0-9]+-", "", gsub("<[-]*1_ENSG[0-9]+", "", HuFNSC04_isoform_valid$exon))))/2
+HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == 1, ]$exon_pos <- (HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == 1, ]$exon_pos - HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == 1, ]$start) / (HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == 1, ]$end - HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == 1, ]$start) * 100
+HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == -1, ]$exon_pos <- 100 - (HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == -1, ]$exon_pos - HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == -1, ]$start) / (HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == -1, ]$end - HuFNSC04_isoform_valid[HuFNSC04_isoform_valid$strand == -1, ]$start) * 100
+pdf("exon_position.pdf")
+plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
+lines(density(na.omit(HuFNSC01_isoform_all$exon_pos)), col = 2, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC02_isoform_all$exon_pos)), col = 3, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC03_isoform_all$exon_pos)), col = 4, lty = 1, lwd = 3)
+lines(density(na.omit(HuFNSC04_isoform_all$exon_pos)), col = 5, lty = 1, lwd = 3)
+legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = 2:5, lty = 1, lwd = 5)
+dev.off()
+
+save.image(file = "junction_valid.Rdata")
+
+################################################################################################################################################
+setwd("~/快盘/FetalBrain/RNAseq/junction/")
+load("junction_valid.Rdata")
+
+library(VennDiagram)
+# cortex vs GE
+isoform_cortexge_all <- list(HuFNSC01 = HuFNSC01_isoform_all_gene$id, HuFNSC02 = HuFNSC02_isoform_all_gene$id, HuFNSC03 = HuFNSC03_isoform_all_gene$id, HuFNSC04 = HuFNSC04_isoform_all_gene$id)
+pdf("venn_cortexge_all.pdf")
+plot.new()
+venn_cortexge_all <- venn.diagram(isoform_cortexge_all, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of all cortex vs GE isoforms")
+grid.draw(venn_cortexge_all)
+dev.off()
+isoform_cortexge_valid <- list(HuFNSC01 = as.character(HuFNSC01_isoform_valid_gene$gene), HuFNSC02 = as.character(HuFNSC02_isoform_valid_gene$gene), HuFNSC03 = as.character(HuFNSC03_isoform_valid_gene$gene), HuFNSC04 = as.character(HuFNSC04_isoform_valid_gene$gene))
+pdf("venn_cortexge_valid.pdf")
+plot.new()
+venn_cortexge_valid <- venn.diagram(isoform_cortexge_valid, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of validated cortex01 vs GE01 isoforms")
+grid.draw(venn_cortexge_valid)
+dev.off()
+
+# HuFNSC01 vs HuFNSC02
+isoform_01_02_all <- list(Brain = unique(brain01_02_isoform_all$id), Cortex = unique(cortex01_02_isoform_all$id), GE = unique(ge01_02_isoform_all$id))
+pdf("venn_01_02_all.pdf")
+plot.new()
+venn_01_02_all <- venn.diagram(isoform_01_02_all, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of all HuFNSC01 vs HuFNSC02 isoforms")
+grid.draw(venn_01_02_all)
+dev.off()
+isoform_01_02_valid <- list(Brain = as.character(brain01_02_isoform_valid_gene$gene), Cortex = as.character(cortex01_02_isoform_valid_gene$gene), GE = as.character(ge01_02_isoform_valid_gene$gene))
+pdf("venn_01_02_valid.pdf")
+plot.new()
+venn_01_02_valid <- venn.diagram(isoform_01_02_valid, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of validated HuFNSC01 vs HuFNSC02 isoforms")
+grid.draw(venn_01_02_valid)
+dev.off()
 
