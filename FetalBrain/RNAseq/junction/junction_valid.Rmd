@@ -1,0 +1,32 @@
+Fetal Brain isoform analysis - junctions
+========================================================
+
+Gloria Li         
+`r date()` 
+
+<!-- re-knit after modify junction_valid.R or junction.R script -->
+
+```{r include = FALSE}
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+```{r data}
+setwd("~/快盘/FetalBrain/RNAseq/junction")
+load("junction_valid.Rdata")
+library(ggplot2)
+```
+
+## Validate previously identified isoforms with junction RPKM
+  * Previous isoform identification with DE exons
+    * DE exons by DEfine FDR = 0.01
+    * Exon RPKM $\ge$ 10% gene RPKM in one sample & $\le$ 1% in the other
+    * Gene RPKM of both samples > 0.005 
+    * Exclude DE genes by DEfine FDR = 0.01
+
+  * Validation: For each isoform exon in the previous pairwise comparison
+    * Find junctions associated with this exon with enough coverage, i.e. sum of junction coverage of two samples $\ge$ 1
+    * Identify junctions that RPKM change in the same direction as the exon
+    * Junction RPKM > 0.1 in one sample and < 0.1 in the other      
+  
+## Results: 
+
