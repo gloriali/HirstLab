@@ -67,7 +67,7 @@ legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE0
   + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
   + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
 
-```{r validate, results='asis'}
+```{r validate, results='asis', fig.height = 5, fig.width = 5}
 library(xtable)
 junction_valid_cortexge <- xtable(junction_valid_cortexge)
 align(junction_valid_cortexge) <- "lcccccc"
@@ -105,7 +105,7 @@ grid.draw(venn_01_02_valid)
   * Average No. of exons are very __similar__ in different sections of the Venn diagram, between all, validated isoforms and all expressed genes.        
   * Average length of isoform exons are __shorter__ than all expressed genes. Validated isoform exons are also __shorter__ than all isoforms in general, _not observed in breast libraries_.         
   
-```{r venn, fig.height = 6, fig.width = 6}
+```{r venn, fig.height = 5, fig.width = 5}
 # average expression level
 (bubble_all_rpkm <- ggplot(isoform_all_rpkm) + 
    geom_point(aes(x, y, size = RPKM), color = "red") + 
