@@ -804,7 +804,17 @@ venn_myo_stem_valid <- venn.diagram(isoform_myo_stem_valid, filename = NULL, fil
 grid.draw(venn_myo_stem_valid)
 dev.off()
 
-
+##############################################################################################################################
+# sample clustering on junction RPKM  
+setwd("~/快盘/REMC/junction/all/")
+load("junction_all.Rdata")
+c <- cor(junction[, 10:17], method="spearman")
+d <- as.dist(1 - c)
+hc <- as.dendrogram(hclust(d, method = "complete"))
+pdf("junction_cluster.pdf")
+plot(hc, main = "Junction RPKM clustering", horiz = TRUE)
+dev.off()
+write.table(c, file = "junction_cor.txt", sep = "\t", quote = F)
 
 
 

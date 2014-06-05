@@ -53,6 +53,17 @@ rpkm <- data.frame(RPKM = c(junction$lum084rpkm, junction$myo084rpkm, junction$s
    coord_cartesian(ylim = c(0, 20)))
 ```
 
+### Junction RPKM clustering
+
+  * Sample clustering on junction RPKM with spearman correlation shows clustering on cell types as well.         
+  
+```{r cluster}
+c <- read.delim("~/快盘/REMC/junction/all/junction_cor.txt", as.is = T)
+d <- as.dist(1 - c)
+hc <- as.dendrogram(hclust(d, method = "complete"))
+plot(hc, main = "Junction RPKM clustering", horiz = TRUE)
+```
+
 ### Isoform junction validation
 
   * For strand specific libraries, about __40%__ of previously identified exons (__50%__ genes) have junctions with enough coverage for validation. However, __more than 99%__ of them have junction support.          
