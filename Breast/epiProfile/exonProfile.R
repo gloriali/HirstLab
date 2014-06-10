@@ -53,14 +53,14 @@ methyl_5p[methyl_5p$group == "myo.not_expressed", "methyl"] <- colMeans(myo_bism
 save(methyl_3p, methyl_5p, file = "exonProfile_methyl.Rdata")
 library(ggplot2)
 (methyl_3p_profile <- ggplot(methyl_3p, aes(x = Position, y = methyl, group = group)) + 
-   geom_line(aes(color = Expression)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
    geom_point(aes(color = Expression, shape = Cell_type)) + 
    ggtitle("DNA methylation profile around 3-prime exon boundaries") + 
    ylab("Average DNA methylation level") + 
    theme_bw())
 ggsave(methyl_3p_profile, file = "methyl_3p_profile.pdf")
 (methyl_5p_profile <- ggplot(methyl_5p, aes(x = Position, y = methyl, group = group)) + 
-   geom_line(aes(color = Expression)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
    geom_point(aes(color = Expression, shape = Cell_type)) + 
    ggtitle("DNA methylation profile around 5-prime exon boundaries") + 
    ylab("Average DNA methylation level") + 
