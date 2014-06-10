@@ -50,19 +50,14 @@ methyl_5p[methyl_5p$group == "myo.lum-specific", "methyl"] <- colMeans(myo_bisma
 methyl_5p[methyl_5p$group == "myo.myo-specific", "methyl"] <- colMeans(myo_bismark_5p[myo_specific,], na.rm = T)
 methyl_5p[methyl_5p$group == "myo.expressed_in_both", "methyl"] <- colMeans(myo_bismark_5p[both,], na.rm = T)
 methyl_5p[methyl_5p$group == "myo.not_expressed", "methyl"] <- colMeans(myo_bismark_5p[neither,], na.rm = T)
-save(methyl_3p, methyl_5p, file = "exonProfile_methyl.Rdata")
+methyl <- data.frame(rbind(methyl_3p, methyl_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(methyl_3p)), levels = c("5-prime", "3-prime")))
+save(methyl, file = "exonProfile_methyl.Rdata")
 library(ggplot2)
-(methyl_3p_profile <- ggplot(methyl_3p, aes(x = Position, y = methyl, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   ggtitle("DNA methylation profile around 3-prime exon boundaries") + 
+(methyl_profile <- ggplot(methyl, aes(x = Position, y = methyl, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
+   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+   facet_wrap(~ End) + 
+   ggtitle("DNA methylation profile around exon boundaries") + 
    ylab("Average DNA methylation level") + 
    theme_bw())
-ggsave(methyl_3p_profile, file = "methyl_3p_profile.pdf")
-(methyl_5p_profile <- ggplot(methyl_5p, aes(x = Position, y = methyl, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   ggtitle("DNA methylation profile around 5-prime exon boundaries") + 
-   ylab("Average DNA methylation level") + 
-   theme_bw())
-ggsave(methyl_5p_profile, file = "methyl_5p_profile.pdf")
+ggsave(methyl_profile, file = "methylation_profile.pdf")
