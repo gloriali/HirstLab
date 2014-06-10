@@ -30,24 +30,39 @@ lum_bismark_3p <- read.table("./exons3p_200/lumRM066_bismark.hg19v65_exons_for_g
 myo_bismark_3p <- read.table("./exons3p_200/myoRM045_bismark.hg19v65_exons_for_genes.3prime_200.unique.profile", sep = " ", head = F, as.is = T, row.names = 1)
 lum_bismark_5p <- read.table("./exons5p_200/lumRM066_bismark.hg19v65_exons_for_genes.5prime_200.unique.profile", sep = " ", head = F, as.is = T, row.names = 1)
 myo_bismark_5p <- read.table("./exons5p_200/myoRM045_bismark.hg19v65_exons_for_genes.5prime_200.unique.profile", sep = " ", head = F, as.is = T, row.names = 1)
-methyl_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*4), Expression = rep(c(rep(c("lum-specific", "myo-specific", "both_expressed", "not_expressed"), each = 20)), 2), methyl = NA)
+methyl_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*4), Expression = rep(c(rep(c("lum-specific", "myo-specific", "expressed_in_both", "not_expressed"), each = 20)), 2), Position = rep(seq(-190, 190, by = 20), times = 8), methyl = -1)
 methyl_3p$group <- interaction(methyl_3p$Cell_type, methyl_3p$Expression)
 methyl_3p[methyl_3p$group == "lum.lum-specific", "methyl"] <- colMeans(lum_bismark_3p[lum_specific,], na.rm = T)
 methyl_3p[methyl_3p$group == "lum.myo-specific", "methyl"] <- colMeans(lum_bismark_3p[myo_specific,], na.rm = T)
-methyl_3p[methyl_3p$group == "lum.both_expressed", "methyl"] <- colMeans(lum_bismark_3p[both,], na.rm = T)
+methyl_3p[methyl_3p$group == "lum.expressed_in_both", "methyl"] <- colMeans(lum_bismark_3p[both,], na.rm = T)
 methyl_3p[methyl_3p$group == "lum.not_expressed", "methyl"] <- colMeans(lum_bismark_3p[neither,], na.rm = T)
 methyl_3p[methyl_3p$group == "myo.lum-specific", "methyl"] <- colMeans(myo_bismark_3p[lum_specific,], na.rm = T)
 methyl_3p[methyl_3p$group == "myo.myo-specific", "methyl"] <- colMeans(myo_bismark_3p[myo_specific,], na.rm = T)
-methyl_3p[methyl_3p$group == "myo.both_expressed", "methyl"] <- colMeans(myo_bismark_3p[both,], na.rm = T)
+methyl_3p[methyl_3p$group == "myo.expressed_in_both", "methyl"] <- colMeans(myo_bismark_3p[both,], na.rm = T)
 methyl_3p[methyl_3p$group == "myo.not_expressed", "methyl"] <- colMeans(myo_bismark_3p[neither,], na.rm = T)
-methyl_5p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*4), Expression = rep(c(rep(c("lum-specific", "myo-specific", "both_expressed", "not_expressed"), each = 20)), 2), methyl = NA)
+methyl_5p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*4), Expression = rep(c(rep(c("lum-specific", "myo-specific", "expressed_in_both", "not_expressed"), each = 20)), 2), Position = rep(seq(-190, 190, by = 20), times = 8), methyl = -1)
 methyl_5p$group <- interaction(methyl_5p$Cell_type, methyl_5p$Expression)
 methyl_5p[methyl_5p$group == "lum.lum-specific", "methyl"] <- colMeans(lum_bismark_5p[lum_specific,], na.rm = T)
 methyl_5p[methyl_5p$group == "lum.myo-specific", "methyl"] <- colMeans(lum_bismark_5p[myo_specific,], na.rm = T)
-methyl_5p[methyl_5p$group == "lum.both_expressed", "methyl"] <- colMeans(lum_bismark_5p[both,], na.rm = T)
+methyl_5p[methyl_5p$group == "lum.expressed_in_both", "methyl"] <- colMeans(lum_bismark_5p[both,], na.rm = T)
 methyl_5p[methyl_5p$group == "lum.not_expressed", "methyl"] <- colMeans(lum_bismark_5p[neither,], na.rm = T)
 methyl_5p[methyl_5p$group == "myo.lum-specific", "methyl"] <- colMeans(myo_bismark_5p[lum_specific,], na.rm = T)
 methyl_5p[methyl_5p$group == "myo.myo-specific", "methyl"] <- colMeans(myo_bismark_5p[myo_specific,], na.rm = T)
-methyl_5p[methyl_5p$group == "myo.both_expressed", "methyl"] <- colMeans(myo_bismark_5p[both,], na.rm = T)
+methyl_5p[methyl_5p$group == "myo.expressed_in_both", "methyl"] <- colMeans(myo_bismark_5p[both,], na.rm = T)
 methyl_5p[methyl_5p$group == "myo.not_expressed", "methyl"] <- colMeans(myo_bismark_5p[neither,], na.rm = T)
-
+save(methyl_3p, methyl_5p, file = "exonProfile_methyl.Rdata")
+library(ggplot2)
+(methyl_3p_profile <- ggplot(methyl_3p, aes(x = Position, y = methyl, group = group)) + 
+   geom_line(aes(color = Expression)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   ggtitle("DNA methylation profile around 3-prime exon boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+ggsave(methyl_3p_profile, file = "methyl_3p_profile.pdf")
+(methyl_5p_profile <- ggplot(methyl_5p, aes(x = Position, y = methyl, group = group)) + 
+   geom_line(aes(color = Expression)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   ggtitle("DNA methylation profile around 5-prime exon boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+ggsave(methyl_5p_profile, file = "methyl_5p_profile.pdf")
