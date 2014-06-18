@@ -60,7 +60,7 @@ WGBS_boundaries <- data.frame(rbind(WGBS_3p, WGBS_5p), End = factor(rep(c("3-pri
    ggtitle("WGBS profile around exon boundaries") + 
    ylab("Average DNA methylation level") + 
    theme_bw())
-ggsave(WGBS_boundaries_profile, file = "WGBS_bounaries_profile.pdf")
+ggsave(WGBS_boundaries_profile, file = "WGBS_boundaries_profile.pdf")
 
 ######################################################################################################
 # MeDIP profile @ exon boundaries
@@ -267,4 +267,46 @@ H3K36me3_boundaries <- data.frame(rbind(H3K36me3_3p, H3K36me3_5p), End = factor(
 ggsave(H3K36me3_boundaries_profile, file = "H3K36me3_boundaries_profile.pdf")
 
 save(WGBS_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_boundaries, file = "exonProfile.Rdata")
+
+######################################################################################################
+# WGBS along exons
+# /gsc/software/linux-x86_64-centos5/R-3.0.2/bin/R CMD BATCH 
+setwd("~/REMC/epiProfile/exons/")
+collapse <- function(gene, raw){
+  raw_data <- na.omit(as.numeric(raw[raw$X1 == gene, 2:ncol(raw)]))
+  length <- length(raw_data)
+  output <- vector(length = 20)
+  for(i in 1:19){
+    output[i] <- mean(raw_data[(as.integer((i-1)*length/20)+1):(as.integer(i*length/20)+1)])
+  }
+  output[20] <- mean(raw_data[(as.integer((i-1)*length/20)+1):as.integer(i*length/20)])
+  return(output)
+}
+
+# less ~/REMC/epiProfile/exons/myoRM045_bismark.hg19v65_exons_for_genes.profile | awk -F' ' '{if(NF>max)max=NF}END{print max}'
+# less ~/REMC/epiProfile/exons/lumRM066_bismark.hg19v65_exons_for_genes.profile | awk -F' ' '{if(NF>max)max=NF}END{print max}'
+myo_bismark_exons_raw <- read.table("~/REMC/epiProfile/exons/myoRM045_bismark.hg19v65_exons_for_genes.profile", sep = " ", head = F, as.is = T, fill = T, col.names = as.character(1:1462))
+myo_bismark_exons <- t(sapply(unique(myo_bismark_exons_raw$X1), collapse, raw = myo_bismark_exons_raw))
+save(myo_bismark_exons, "myo_bismark_exons.Rdata")
+lum_bismark_exons_raw <- read.table("~/REMC/epiProfile/exons/lumRM066_bismark.hg19v65_exons_for_genes.profile", sep = " ", head = F, as.is = T, fill = T, col.names = as.character(1:1462))
+lum_bismark_exons <- t(sapply(unique(lum_bismark_exons_raw$X1), collapse, raw = lum_bismark_exons_raw))
+save(lum_bismark_exons, "lum_bismark_exons.Rdata")
+WGBS_exons <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*4), Expression = rep(c(rep(c("lum-specific", "myo-specific", "expressed_in_both", "not_expressed"), each = 20)), 2), Position = rep(seq(5, 100, by = 5), times = 8), WGBS = -1)
+WGBS_exons$group <- interaction(WGBS_exons$Cell_type, WGBS_exons$Expression)
+WGBS_exons[WGBS_exons$group == "lum.lum-specific", "WGBS"] <- colMeans(lum_bismark_exons[lum_specific,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "lum.myo-specific", "WGBS"] <- colMeans(lum_bismark_exons[myo_specific,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "lum.expressed_in_both", "WGBS"] <- colMeans(lum_bismark_exons[both,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "lum.not_expressed", "WGBS"] <- colMeans(lum_bismark_exons[neither,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "myo.lum-specific", "WGBS"] <- colMeans(myo_bismark_exons[lum_specific,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "myo.myo-specific", "WGBS"] <- colMeans(myo_bismark_exons[myo_specific,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "myo.expressed_in_both", "WGBS"] <- colMeans(myo_bismark_exons[both,], na.rm = T)
+WGBS_exons[WGBS_exons$group == "myo.not_expressed", "WGBS"] <- colMeans(myo_bismark_exons[neither,], na.rm = T)
+(WGBS_exons_profile <- ggplot(WGBS_exons, aes(x = Position, y = WGBS, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
+   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+   ggtitle("WGBS profile along exons") + 
+   xlab("Normalized position along exons") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+ggsave(WGBS_exons_profile, file = "WGBS_exons_profile")
 

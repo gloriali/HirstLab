@@ -134,3 +134,17 @@ library(ggplot2)
    theme_bw())
 ```
 
+### DNA methylation profile with WGBS at exon boundaries
+
+
+```{r WGBS_exons}
+(WGBS_exons_profile <- ggplot(WGBS_exons, aes(x = Position, y = WGBS, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
+   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+   ggtitle("WGBS profile along exons") + 
+   xlab("Normalized position along exons") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+```
+
+
