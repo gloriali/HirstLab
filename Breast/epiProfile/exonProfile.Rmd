@@ -1,0 +1,136 @@
+---
+output:
+  html_document:
+    toc: yes
+---
+Epigenetic profile around exon boundaries   
+==============================================
+Gloria Li         
+`r date()`             
+
+<!-- re-knit after modify exonProfile.R script -->
+```{r include = FALSE}
+library(knitr)
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+```{r data}
+setwd("~/快盘/REMC/epiProfile/")
+load("exonProfile.Rdata")
+library(ggplot2)
+```
+
+1. Profile epigenetic signals (DNA methylation, H3K4me3, H3K4me1, H3K9me3, H3K27me3, H3K36me3) around exon boundaries, i.e. exon 3-prime/5-prime +/- 200bp.            
+  * WGBS: lumRM066 and myoRM045 bismark fractional methylation calls.            
+  * MeDIP: lumRM035 and myoRM035 signals from wig files.   
+  * H3K4me3: myoRM080 wig file, no libraries for lum available.   
+  * H3K4me1, H3K9me3, H3K27me3, H3K36me3: lumRM080 and myoRM080 wig files.      
+
+2. Use exon expression and isoform analysis in RM084 lum and Rm084 myo to divide exons into four categories:    
+  * exons expressed in both cell types: positive control      
+  * lum-specific exons: only expressed in lum cells          
+  * myo-specific exons: only expressed in myo cells     
+  * exons not expressed in either cell types: negative control    
+  
+3. If the epigenetic mark is associated with the isoform event, we would expect in lum cells, its signal profile for lum-specific exons is similar to expressed in both exons, and myo-specific exons similar to not expressed exons, and a reversed pattern in myo cells.       
+
+### DNA methylation profile with WGBS at exon boundaries
+* Exons expressed in both cell types and exons not expressed in either cell type have distinct DNA methylation profiles.       
+* Profiles for isoform exons are close to exons expressed in both, without obvious distinction between two cell types.        
+
+```{r WGBS}
+(WGBS_boundaries_profile <- ggplot(WGBS_boundaries, aes(x = Position, y = WGBS, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("WGBS profile around exon boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+```
+
+### DNA methylation profile with MeDIP at exon boundaries 
+* DNA methylation profiles are similar to results from WGBS, but the dip at exon 5-prime end is not as clear.        
+* Again no distinction between cell types for isoform exons.            
+
+```{r MeDIP}
+(MeDIP_boundaries_profile <- ggplot(MeDIP_boundaries, aes(x = Position, y = MeDIP, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("MeDIP profile around exon boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+```
+
+### H3K4me3 profile at exon boundaries  
+* No H3K4me3 libraries available for lum cells.     
+* H3K4me3 profiles match DNA methylation profile well.       
+* For myo H3K4me3 signals, expressed in both and not expressed in either exons have different profiles, but no obvious differences are observed between lum-specific and myo-specific exons.       
+
+```{r H3K4me3}
+(H3K4me3_boundaries_profile <- ggplot(H3K4me3_boundaries, aes(x = Position, y = H3K4me3, group = Expression)) + 
+   geom_line(aes(color = Expression)) + 
+   geom_point(aes(color = Expression)) + 
+   facet_wrap(~ End) + 
+   ggtitle("myo H3K4me3 profile around exon boundaries") + 
+   ylab("Average H3K4me3 signal") + 
+   theme_bw())
+```
+
+### H3K4me1 profile at exon boundaries  
+* myo and lum cells have different levels of H3K4me1 signals: normalize?   
+* For each cell type, profiles for the two types of isoform exons are similar.    
+
+```{r H3K4me1}
+(H3K4me1_boundaries_profile <- ggplot(H3K4me1_boundaries, aes(x = Position, y = H3K4me1, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K4me1 profile around exon boundaries") + 
+   ylab("Average H3K4me1 signal") + 
+   theme_bw())
+```
+
+### H3K9me3 profile at exon boundaries  
+* myo and lum cells also have different levels of H3K9me3 signals.             
+* In lum cells, profiles for the two types of isoform exons are similar.    
+* In myo cells, we do see expected pattern, i.e. lum-specific exons closer to not expressed exons and myo-specific exons closer to expressed in both exons, but the differences are small and not present in lum cells.            
+
+```{r H3K9me3}
+(H3K9me3_boundaries_profile <- ggplot(H3K9me3_boundaries, aes(x = Position, y = H3K9me3, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K9me3 profile around exon boundaries") + 
+   ylab("Average H3K9me3 signal") + 
+   theme_bw())
+```
+
+### H3K27me3 profile at exon boundaries  
+* myo and lum cells still have different levels of H3K27me3 signals.             
+* In both cell types, isoform exons have higher signal level than both not expressed and expressed in both exons.             
+
+```{r H3K27me3}
+(H3K27me3_boundaries_profile <- ggplot(H3K27me3_boundaries, aes(x = Position, y = H3K27me3, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K27me3 profile around exon boundaries") + 
+   ylab("Average H3K27me3 signal") + 
+   theme_bw())
+```
+
+### H3K36me3 profile at exon boundaries  
+* myo and lum cells still have different levels of H3K36me3 signals.             
+* Exons expressed in both cell types have a distinct profile than the rest of exons. Isoform exons have similar profile as not expressed exons.                  
+
+```{r H3K36me3}
+(H3K36me3_boundaries_profile <- ggplot(H3K36me3_boundaries, aes(x = Position, y = H3K36me3, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K36me3 profile around exon boundaries") + 
+   ylab("Average H3K36me3 signal") + 
+   theme_bw())
+```
+
