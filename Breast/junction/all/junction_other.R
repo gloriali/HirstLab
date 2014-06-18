@@ -644,24 +644,22 @@ grid.draw(venn_valid)
 dev.off()
 
 # Venn diagram with average gene rpkm
-isoform_all_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), RPKM = c(mean(c(all_lm_only$lum084, all_lm_only$myo084)), mean(c(all_ls_only$lum084, all_ls_only$stem084)), mean(c(all_ms_only$myo084, all_ms_only$stem084)), mean(c(all_lm_ls_not_ms$lum084, all_lm_ls_not_ms$myo084, all_lm_ls_not_ms$stem084)), mean(c(all_ls_ms_not_lm$lum084, all_ls_ms_not_lm$myo084, all_ls_ms_not_lm$stem084)), mean(c(all_lm_ms_not_ls$lum084, all_lm_ms_not_ls$myo084, all_lm_ms_not_ls$stem084)), mean(c(all_lm_ls_ms$lum084, all_lm_ls_ms$myo084, all_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
-isoform_valid_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), RPKM = c(mean(c(valid_lm_only$lum084, valid_lm_only$myo084)), mean(c(valid_ls_only$lum084, valid_ls_only$stem084)), mean(c(valid_ms_only$myo084, valid_ms_only$stem084)), mean(c(valid_lm_ls_not_ms$lum084, valid_lm_ls_not_ms$myo084, valid_lm_ls_not_ms$stem084)), mean(c(valid_ls_ms_not_lm$lum084, valid_ls_ms_not_lm$myo084, valid_ls_ms_not_lm$stem084)), mean(c(valid_lm_ms_not_ls$lum084, valid_lm_ms_not_ls$myo084, valid_lm_ms_not_ls$stem084)), mean(c(valid_lm_ls_ms$lum084, valid_lm_ls_ms$myo084, valid_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
+isoform_all_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), gene = c(rep("isoform", 7), "all expressed genes"), RPKM = c(mean(c(all_lm_only$lum084, all_lm_only$myo084)), mean(c(all_ls_only$lum084, all_ls_only$stem084)), mean(c(all_ms_only$myo084, all_ms_only$stem084)), mean(c(all_lm_ls_not_ms$lum084, all_lm_ls_not_ms$myo084, all_lm_ls_not_ms$stem084)), mean(c(all_ls_ms_not_lm$lum084, all_ls_ms_not_lm$myo084, all_ls_ms_not_lm$stem084)), mean(c(all_lm_ms_not_ls$lum084, all_lm_ms_not_ls$myo084, all_lm_ms_not_ls$stem084)), mean(c(all_lm_ls_ms$lum084, all_lm_ls_ms$myo084, all_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
+isoform_valid_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), gene = c(rep("isoform", 7), "all expressed genes"), RPKM = c(mean(c(valid_lm_only$lum084, valid_lm_only$myo084)), mean(c(valid_ls_only$lum084, valid_ls_only$stem084)), mean(c(valid_ms_only$myo084, valid_ms_only$stem084)), mean(c(valid_lm_ls_not_ms$lum084, valid_lm_ls_not_ms$myo084, valid_lm_ls_not_ms$stem084)), mean(c(valid_ls_ms_not_lm$lum084, valid_ls_ms_not_lm$myo084, valid_ls_ms_not_lm$stem084)), mean(c(valid_lm_ms_not_ls$lum084, valid_lm_ms_not_ls$myo084, valid_lm_ms_not_ls$stem084)), mean(c(valid_lm_ls_ms$lum084, valid_lm_ls_ms$myo084, valid_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
 pdf("venn_rpkm.pdf")
 (bubble_all_rpkm <- ggplot(isoform_all_rpkm) + 
-   geom_point(aes(x, y, size = RPKM), color = "red") + 
+   geom_point(aes(x, y, size = RPKM, color = gene)) + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size_area(max_size = 30, breaks = c(0.2, 2, 20)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
 venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
 grid.draw(venn_all)
 (bubble_valid_rpkm <- ggplot(isoform_valid_rpkm) + 
-   geom_point(aes(x, y, size = RPKM), color = "red") + 
+   geom_point(aes(x, y, size = RPKM, color = gene)) + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size_area(max_size = 30, breaks = c(0.2, 2, 20)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
 venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of validated isoforms", main.cex = 1.5)
 grid.draw(venn_valid)

@@ -2,7 +2,7 @@ REMC isoform analysis - junctions
 ========================================================
 
 Gloria Li         
-Thu Jun  5 11:44:23 2014 
+Wed Jun 11 11:00:12 2014 
 
 <!-- re-knit after modify junction_valid_new.R or junction_other.R script -->
 
@@ -48,7 +48,7 @@ Thu Jun  5 11:44:23 2014
   * Venn diagram of isoforms between same cell types in different individuals show similar patterns. The __majority__ of isoforms are __shared__ among different individual. However, isoforms in strand specific libraries (RM084) have __much higher__ ratio of being validated.       
   
 <!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
-<!-- Thu Jun  5 11:45:00 2014 -->
+<!-- Wed Jun 11 11:00:51 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> No.isoform.exons </TH> <TH> No.isoform.genes </TH> <TH> No.exons.with.junction.cov </TH> <TH> No.genes.with.junction.cov </TH> <TH> No.exons.with.junction.support </TH> <TH> No.genes.with.junction.support </TH>  </TR>
   <TR> <TD> lum084_myo084 </TD> <TD align="center"> 8630 </TD> <TD align="center"> 2381 </TD> <TD align="center"> 3618 </TD> <TD align="center"> 1228 </TD> <TD align="center"> 3604 </TD> <TD align="center"> 1217 </TD> </TR>
