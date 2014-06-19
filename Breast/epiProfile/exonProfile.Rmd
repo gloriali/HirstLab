@@ -124,26 +124,13 @@ library(ggplot2)
 * myo and lum cells still have different levels of H3K36me3 signals.             
 * Exons expressed in both cell types have a distinct profile than the rest of exons. Isoform exons have similar profile as not expressed exons.                  
 
-```{r H3K36me3}
+```{r H3K36me3, fig.height=10}
 (H3K36me3_boundaries_profile <- ggplot(H3K36me3_boundaries, aes(x = Position, y = H3K36me3, group = group)) + 
    geom_line(aes(color = Expression, linetype = Cell_type)) + 
    geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
+   facet_grid(geneRPKM ~ End, scales = "free_y") + 
    ggtitle("H3K36me3 profile around exon boundaries") + 
    ylab("Average H3K36me3 signal") + 
-   theme_bw())
-```
-
-### DNA methylation profile with WGBS at exon boundaries
-
-
-```{r WGBS_exons}
-(WGBS_exons_profile <- ggplot(WGBS_exons, aes(x = Position, y = WGBS, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
-   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
-   ggtitle("WGBS profile along exons") + 
-   xlab("Normalized position along exons") + 
-   ylab("Average DNA methylation level") + 
    theme_bw())
 ```
 
