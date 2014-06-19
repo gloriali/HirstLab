@@ -303,14 +303,35 @@ grid.draw(venn_valid)
   * Isoforms identified in lum084 vs myo084 only are enriched in glucuronidation related processes. Isoforms in lum084 vs stem084 only, and myo084 vs stem084 only isoforms do not have significantly enriched terms.         
   * Common isoforms identified in all three comparisons have more enriched terms than comparison-specific isoforms, while isoforms identified in only two comparisons have no significantly enriched terms at all.           
 -->
+#### summary
+
+```{r enrich, fig.width=10, fig.height = 8}
+lum084_myo084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_DAVID_GO.txt", as.is=T)
+lum084_stem084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_stem084_isoform_all_gene_DAVID_GO.txt", as.is=T)
+myo084_stem084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/myo084_stem084_isoform_all_gene_DAVID_GO.txt", as.is=T)
+isoform_all_GO <- data.frame(Term = c(lum084_myo084_isoform_all_GO$Term, lum084_stem084_isoform_all_GO$Term, myo084_stem084_isoform_all_GO$Term), FDR = c(lum084_myo084_isoform_all_GO$FDR, lum084_stem084_isoform_all_GO$FDR, myo084_stem084_isoform_all_GO$FDR), CellType = c(rep("lum vs myo", nrow(lum084_myo084_isoform_all_GO)), rep("lum vs stem-like", nrow(lum084_stem084_isoform_all_GO)), rep("myo vs stem-like", nrow(myo084_stem084_isoform_all_GO))))
+terms <- unique(as.character(isoform_all_GO[isoform_all_GO$FDR <= 0.01, ]$Term)) # terms with FDR <= 0.01 in at least one comparisons
+isoform_all_GO <- isoform_all_GO[isoform_all_GO$Term %in% terms, ]
+isoform_all_GO$Term <- gsub("GO:[0-9]+~", "", isoform_all_GO$Term)
+isoform_all_GO$Term <- factor(isoform_all_GO$Term, levels = unique(isoform_all_GO[order(isoform_all_GO$FDR, decreasing = T),]$Term))
+(Enrich_isoform_all_GO <- ggplot(data = isoform_all_GO, aes(Term, -log10(FDR)-2)) +
+   geom_bar(aes(fill = CellType), width = .5, position="dodge") + 
+   scale_y_continuous(breaks = seq(-2, 12, by = 2), labels = as.character(seq(0, 14, by = 2))) + 
+   ylab("-log10(FDR)") + 
+   coord_flip() + 
+   theme_bw() + 
+   scale_fill_manual(values = c("lum vs myo" = "red", "lum vs stem-like" = "blue", "myo vs stem-like" = "green")))
+ggsave(Enrich_isoform_all_GO, file = "~/快盘/REMC/figures/Enrich_isoform_all_GO.pdf")
+
+```
 
 #### lum084 vs myo084
 
 ```{r enrich_lum084_myo084, fig.width=10, fig.height = 8}
-lum084_myo084_isoform_all_DAVID <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_DAVID_all.txt", as.is=T)
-# lum084_myo084_isoform_all_erminej_BP <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_erminej_BP.txt", as.is=T, skip = 34, head = F)
-# lum084_myo084_isoform_all_erminej_MF <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_erminej_MF.txt", as.is=T, skip = 34, head = F)
-# lum084_myo084_isoform_all_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = lum084_myo084_isoform_all_erminej_BP$V2, FDR = lum084_myo084_isoform_all_erminej_BP$V8), data.frame(Category = "GOMF", Term = lum084_myo084_isoform_all_erminej_MF$V2, FDR = lum084_myo084_isoform_all_erminej_MF$V8), data.frame(Category = lum084_myo084_isoform_all_DAVID$Category, Term = lum084_myo084_isoform_all_DAVID$Term, FDR = lum084_myo084_isoform_all_DAVID$FDR)))
+lum084_myo084_isoform_all_DAVID <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_DAVID.txt", as.is=T)
+lum084_myo084_isoform_all_erminej_BP <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_erminej_BP.txt", as.is=T, skip = 34, head = F)
+lum084_myo084_isoform_all_erminej_MF <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_erminej_MF.txt", as.is=T, skip = 34, head = F)
+lum084_myo084_isoform_all_enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = lum084_myo084_isoform_all_erminej_BP$V2, FDR = lum084_myo084_isoform_all_erminej_BP$V8), data.frame(Category = "GOMF", Term = lum084_myo084_isoform_all_erminej_MF$V2, FDR = lum084_myo084_isoform_all_erminej_MF$V8), data.frame(Category = lum084_myo084_isoform_all_DAVID$Category, Term = lum084_myo084_isoform_all_DAVID$Term, FDR = lum084_myo084_isoform_all_DAVID$FDR)))
 lum084_myo084_isoform_all_enrich <- data.frame(Category = lum084_myo084_isoform_all_DAVID$Category, Term = lum084_myo084_isoform_all_DAVID$Term, FDR = lum084_myo084_isoform_all_DAVID$FDR)
 lum084_myo084_isoform_all_enrich <- lum084_myo084_isoform_all_enrich[lum084_myo084_isoform_all_enrich$FDR <= 0.01, ]
 lum084_myo084_isoform_all_enrich$Category <- gsub("GOTERM_MF_5", "GOMF", lum084_myo084_isoform_all_enrich$Category)
@@ -330,8 +351,7 @@ lum084_myo084_isoform_all_enrich$Term <- factor(lum084_myo084_isoform_all_enrich
    theme_bw() +
    ggtitle("Functional enrichment for isoforms between lum084 and myo084") + 
    scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue")))
-#ggsave(Enrich_lum084_myo084_isoform_all, file = "~/快盘/REMC/junction/all/Venn/Enrich_lum084_myo084_isoform_all.pdf")
-ggsave(Enrich_lum084_myo084_isoform_all, file = "~/快盘/REMC/figures/DAVID_lum084_myo084_isoform_all.pdf")
+ggsave(Enrich_lum084_myo084_isoform_all, file = "~/快盘/REMC/junction/all/Venn/Enrich_lum084_myo084_isoform_all.pdf")
 
 lum084_myo084_isoform_valid_DAVID <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_valid_gene_DAVID.txt", as.is=T)
 lum084_myo084_isoform_valid_erminej_BP <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_valid_gene_erminej_BP.txt", as.is=T, skip = 34, head = F)
