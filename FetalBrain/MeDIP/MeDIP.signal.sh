@@ -1,5 +1,5 @@
 JAVA=/gsc/software/linux-x86_64/jre1.7.0_03/bin/java
-LIB=/projects/03/genereg/projects/SOLEXA/lib
+LIB=/home/mbilenky/bin/Solexa_Java
 csizes=/projects/03/genereg/projects/SOLEXA/resources/UCSC_chr/hg19.chrom.sizes
 dirr=/projects/epigenomics/mbilenky/CpG/hg19/CG_25_around_chr/
 dirw=/projects/mbilenky/REMC/brain/MeDIP/wigs/
