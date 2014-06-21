@@ -167,7 +167,7 @@ legend("topleft", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"
   
 ```{r exon_pos}
 # pdf("~/快盘/REMC/figures/exon_position.pdf")
-plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
+plot(c(0, 100), c(0, 0.015), type = "n", xlab = "gene position", ylab = "density")
 lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = "red", lty = 1, lwd = 3)
 lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = "blue", lty = 1, lwd = 3)
 lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = "green", lty = 1, lwd = 3)
