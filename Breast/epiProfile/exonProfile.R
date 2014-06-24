@@ -86,6 +86,29 @@ GC_boundaries <- data.frame(rbind(GC_3p, GC_5p), End = factor(rep(c("3-prime", "
    theme_bw())
 ggsave(GC_boundaries_profile, file = "GC_boundaries_profile.pdf", height = 4)
 
+WGBS_GC <- data.frame(data = c(rep("WGBS", nrow(WGBS_boundaries)), rep("GC content", nrow(GC_boundaries))), 
+                      Cell_type = c(as.character(WGBS_boundaries$Cell_type), rep("lum", nrow(GC_boundaries))), 
+                      Expression = c(as.character(WGBS_boundaries$Expression), as.character(GC_boundaries$Expression)), 
+                      Position = c(WGBS_boundaries$Position, GC_boundaries$Position), 
+                      value = c(WGBS_boundaries$WGBS, GC_boundaries$GC), 
+                      End = c(as.character(WGBS_boundaries$End), as.character(GC_boundaries$End)))
+WGBS_GC$data <- factor(WGBS_GC$data, levels = c("WGBS", "GC content"))
+WGBS_GC$End <- factor(WGBS_GC$End, levels = c("5-prime", "3-prime"))
+WGBS_GC$group <- interaction(WGBS_GC$Cell_type, WGBS_GC$Expression)
+(WGBS_GC_profile <- ggplot(WGBS_GC, aes(x = Position, y = value, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
+   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+   facet_grid(data ~ End, scales = "free_y") + 
+   ylab("Average DNA methylation / GC content") + 
+   theme_bw())
+library(grid) 
+gt <- ggplot_gtable(ggplot_build(WGBS_GC_profile)) 
+# gt$layout 
+gt$heights[[4]] <- unit(2, "null") 
+pdf("WGBS_GC_profile.pdf")
+grid.draw(gt) 
+dev.off()
+
 ######################################################################################################
 # MeDIP profile @ exon boundaries
 lum_MeDIP_3p <- read.table("~/REMC/epiProfile/exons3p_200/lumRM035_MeDIP.hg19v65_exons_for_genes.3prime_200.unique.profile", sep = " ", head = F, as.is = T, row.names = 1)
@@ -389,7 +412,7 @@ H3K36me3_exons$group <- interaction(interaction(H3K36me3_exons$Cell_type, H3K36m
 (H3K36me3_exons_profile <- ggplot(H3K36me3_exons, aes(x = Expression, y = H3K36me3, group = group)) + 
    geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.5) + 
    facet_grid(geneRPKM ~ .) + 
-   ggtitle("H3K36me3 signal for exons") + 
+   # ggtitle("H3K36me3 signal for exons") + 
    ylab("Average H3K36me3 signal") + 
    coord_cartesian(ylim = c(0, 8)) + 
    theme_bw())
@@ -400,7 +423,7 @@ t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.lum-specific.gene RPKM 1-10",
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.myo-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.myo-specific.gene RPKM 1-10", "H3K36me3"])
 
 save(both, neither, lum_specific, myo_specific, exons_1, exons_1_10, exons_10_100, exons_100, 
-     WGBS_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_boundaries, GC_boundaries, H3K36me3_exons, file = "exonProfile.Rdata")
+     WGBS_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_boundaries, GC_boundaries, H3K36me3_exons, WGBS_GC, file = "exonProfile.Rdata")
 
 # ################## Unable to complete: computational time too long ################################
 # # WGBS along exons

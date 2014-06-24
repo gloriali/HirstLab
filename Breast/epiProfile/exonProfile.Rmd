@@ -38,23 +38,18 @@ library(ggplot2)
 * Exons expressed in both cell types and exons not expressed in either cell type have distinct DNA methylation profiles.       
 * Profiles for isoform exons are close to exons expressed in both, without obvious distinction between two cell types.        
 
-```{r WGBS}
-(WGBS_boundaries_profile <- ggplot(WGBS_boundaries, aes(x = Position, y = WGBS, group = group)) + 
+```{r WGBS, fig.height = 6}
+(WGBS_GC_profile <- ggplot(WGBS_GC, aes(x = Position, y = value, group = group)) + 
    geom_line(aes(color = Expression, linetype = Cell_type)) + 
    geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
-   ggtitle("WGBS profile around exon boundaries") + 
-   ylab("Average DNA methylation level") + 
+   facet_grid(data ~ End, scales = "free_y") + 
+   ggtitle("WGBS and GC content profile around exon boundaries") + 
+   ylab("Average DNA methylation / GC content") + 
    theme_bw())
-```
-```{r GC, fig.height = 3}
-(GC_boundaries_profile <- ggplot(GC_boundaries, aes(x = Position, y = GC, group = Expression)) + 
-   geom_line(aes(color = Expression)) + 
-   geom_point(aes(color = Expression)) + 
-   facet_wrap(~ End) + 
-   ggtitle("GC content profile around exon boundaries") + 
-   ylab("Average percentage of GC") + 
-   theme_bw())
+library(grid) 
+gt <- ggplot_gtable(ggplot_build(WGBS_GC_profile)) 
+gt$heights[[4]] <- unit(2, "null") 
+grid.draw(gt) 
 ```
 
 ### DNA methylation profile with MeDIP at exon boundaries 
