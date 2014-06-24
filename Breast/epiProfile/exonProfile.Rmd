@@ -47,8 +47,18 @@ library(ggplot2)
    ylab("Average DNA methylation level") + 
    theme_bw())
 ```
+```{r GC, fig.height = 3}
+(GC_boundaries_profile <- ggplot(GC_boundaries, aes(x = Position, y = GC, group = Expression)) + 
+   geom_line(aes(color = Expression)) + 
+   geom_point(aes(color = Expression)) + 
+   facet_wrap(~ End) + 
+   ggtitle("GC content profile around exon boundaries") + 
+   ylab("Average percentage of GC") + 
+   theme_bw())
+```
 
 ### DNA methylation profile with MeDIP at exon boundaries 
+* MeDIP signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
 * DNA methylation profiles are similar to results from WGBS, but the dip at exon 5-prime end is not as clear.        
 * Again no distinction between cell types for isoform exons.            
 
@@ -78,8 +88,10 @@ library(ggplot2)
 ```
 
 ### H3K4me1 profile at exon boundaries  
-* myo and lum cells have different levels of H3K4me1 signals: normalize?   
-* For each cell type, profiles for the two types of isoform exons are similar.    
+* H3K4me1 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.          
+* Expressed in both exons and not expressed exons have distinct signal levels.                      
+* In myo cells, profiles for the two types of isoform exons are similar.    
+* In lum cells, we do see expected pattern, i.e. myo-specific exons closer to not expressed exons and lum-specific exons closer to expressed in both exons.            
 
 ```{r H3K4me1}
 (H3K4me1_boundaries_profile <- ggplot(H3K4me1_boundaries, aes(x = Position, y = H3K4me1, group = group)) + 
@@ -92,9 +104,10 @@ library(ggplot2)
 ```
 
 ### H3K9me3 profile at exon boundaries  
-* myo and lum cells also have different levels of H3K9me3 signals.             
+* H3K9me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
+* Expressed in both exons and not expressed exons have distinct signal levels.                                 
 * In lum cells, profiles for the two types of isoform exons are similar.    
-* In myo cells, we do see expected pattern, i.e. lum-specific exons closer to not expressed exons and myo-specific exons closer to expressed in both exons, but the differences are small and not present in lum cells.            
+* In myo cells, we do see expected pattern, i.e. lum-specific exons closer to not expressed exons and myo-specific exons closer to expressed in both exons. This pattern is the opposite of H3K4me1.                     
 
 ```{r H3K9me3}
 (H3K9me3_boundaries_profile <- ggplot(H3K9me3_boundaries, aes(x = Position, y = H3K9me3, group = group)) + 
@@ -107,8 +120,8 @@ library(ggplot2)
 ```
 
 ### H3K27me3 profile at exon boundaries  
-* myo and lum cells still have different levels of H3K27me3 signals.             
-* In both cell types, isoform exons have higher signal level than both not expressed and expressed in both exons.             
+* H3K27me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
+* In both cell types, isoform exons have signal levels close to not expressed exons.             
 
 ```{r H3K27me3}
 (H3K27me3_boundaries_profile <- ggplot(H3K27me3_boundaries, aes(x = Position, y = H3K27me3, group = group)) + 
@@ -121,8 +134,9 @@ library(ggplot2)
 ```
 
 ### H3K36me3 profile at exon boundaries  
-* myo and lum cells still have different levels of H3K36me3 signals.             
-* Exons expressed in both cell types have a distinct profile than the rest of exons. Isoform exons have similar profile as not expressed exons.                  
+* H3K36me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
+* Exons expressed in both cell types have a distinct profile than the rest of exons. 
+* Isoform exons have similar profile as not expressed exons, similar to H3K27me3.                  
 
 ```{r H3K36me3, fig.height=10}
 (H3K36me3_boundaries_profile <- ggplot(H3K36me3_boundaries, aes(x = Position, y = H3K36me3, group = group)) + 
@@ -131,6 +145,22 @@ library(ggplot2)
    facet_grid(geneRPKM ~ End, scales = "free_y") + 
    ggtitle("H3K36me3 profile around exon boundaries") + 
    ylab("Average H3K36me3 signal") + 
+   theme_bw())
+```
+
+### H3K36me3 signals for exon bodies   
+* H3K36me3 signals are normalized between lum and myo libraries based on the sum of signals of all exons.         
+* Isoform exons have similar signal level as not expressed exons, significantly lower than signals in exons expressed in both cell types.      
+* In gene RPKM = 1-10 group, lum-specific exons have higher signal level in lum and myo-specific exons are higher in myo, however, this observation was not reproduced in gene RPKM < 1 group, probably due to the extremely low expression level.       
+* There are only 2 lum-specific exons with gene RPKM > 10, therefore, discard this group from plotting.        
+
+```{r H3K36me3_exon}
+(H3K36me3_exons_profile <- ggplot(H3K36me3_exons, aes(x = Expression, y = H3K36me3, group = group)) + 
+   geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.5) + 
+   facet_grid(geneRPKM ~ .) + 
+   ggtitle("H3K36me3 signal for exons") + 
+   ylab("Average H3K36me3 signal") + 
+   coord_cartesian(ylim = c(0, 8)) + 
    theme_bw())
 ```
 
