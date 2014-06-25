@@ -96,11 +96,11 @@ WGBS_GC$data <- factor(WGBS_GC$data, levels = c("WGBS", "GC content"))
 WGBS_GC$End <- factor(WGBS_GC$End, levels = c("5-prime", "3-prime"))
 WGBS_GC$group <- interaction(WGBS_GC$Cell_type, WGBS_GC$Expression)
 (WGBS_GC_profile <- ggplot(WGBS_GC, aes(x = Position, y = value, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
-   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
    facet_grid(data ~ End, scales = "free_y") + 
    ylab("Average DNA methylation / GC content") + 
-   theme_bw())
+   theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 library(grid) 
 gt <- ggplot_gtable(ggplot_build(WGBS_GC_profile)) 
 # gt$layout 
@@ -410,13 +410,14 @@ H3K36me3_exons$geneRPKM <- factor(H3K36me3_exons$geneRPKM)
 H3K36me3_exons <- droplevels(na.omit(H3K36me3_exons[H3K36me3_exons$geneRPKM == "gene RPKM < 1" | H3K36me3_exons$geneRPKM == "gene RPKM 1-10", ]))
 H3K36me3_exons$group <- interaction(interaction(H3K36me3_exons$Cell_type, H3K36me3_exons$Expression), H3K36me3_exons$geneRPKM)
 (H3K36me3_exons_profile <- ggplot(H3K36me3_exons, aes(x = Expression, y = H3K36me3, group = group)) + 
-   geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.5) + 
+   geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.8) + 
    facet_grid(geneRPKM ~ .) + 
    # ggtitle("H3K36me3 signal for exons") + 
+   xlab("Exon group") + 
    ylab("Average H3K36me3 signal") + 
-   coord_cartesian(ylim = c(0, 8)) + 
-   theme_bw())
-ggsave(H3K36me3_exons_profile, file = "H3K36me3_exons_profile.pdf")
+   coord_cartesian(ylim = c(0, 6)) + 
+   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+ggsave(H3K36me3_exons_profile, file = "H3K36me3_exons_profile.pdf", width = 9, height = 8)
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.lum-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.lum-specific.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.myo-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.myo-specific.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.lum-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.lum-specific.gene RPKM 1-10", "H3K36me3"])

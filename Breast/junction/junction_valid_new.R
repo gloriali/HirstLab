@@ -284,15 +284,15 @@ myo084_stem084_isoform_valid$exon_pos <- (as.numeric(gsub("chr[0-9X]+:", "", gsu
 myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == 1, ]$exon_pos <- (myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == 1, ]$exon_pos - myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == 1, ]$start) / (myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == 1, ]$end - myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == 1, ]$start) * 100
 myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == -1, ]$exon_pos <- 100 - (myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == -1, ]$exon_pos - myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == -1, ]$start) / (myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == -1, ]$end - myo084_stem084_isoform_valid[myo084_stem084_isoform_valid$strand == -1, ]$start) * 100
 pdf("exon_position.pdf")
-plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
-lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = 1, lty = 1, lwd = 3)
-lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = 2, lty = 1, lwd = 3)
-lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = 3, lty = 1, lwd = 3)
+plot(c(0, 100), c(0, 0.015), type = "n", xlab = "Exon position along the gene", ylab = "Density", cex.axis = 1.5, cex.lab = 1.5)
+lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = 2, lty = 1, lwd = 5)
+lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = 3, lty = 1, lwd = 5)
+lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = 4, lty = 1, lwd = 5)
 # lines(density(na.omit(lum084_myo084_isoform_valid$exon_pos)), col = 1, lty = 3, lwd = 3)
 # lines(density(na.omit(lum084_stem084_isoform_valid$exon_pos)), col = 2, lty = 3, lwd = 3)
 # lines(density(na.omit(myo084_stem084_isoform_valid$exon_pos)), col = 3, lty = 3, lwd = 3)
 # legend("topleft", c("all", "validated"), col = 1, lty = c(1, 3), lwd = 5, cex = 0.8)
-legend("bottomright", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"), col = 1:3, lty = 1, lwd = 5)
+legend("bottomright", c("lum vs myo", "lum vs stem-like", "myo vs stem-like"), col = 2:4, lty = 1, lwd = 10, cex = 1.5)
 dev.off()
 
 # Venn Diagram with average expression level,  No. of exons, and average exon length              
@@ -388,99 +388,112 @@ write.table(lum084_stem084_isoform_valid_gene, file = "./Venn/lum084_stem084_iso
 write.table(myo084_stem084_isoform_valid_gene, file = "./Venn/myo084_stem084_isoform_valid_gene.txt", sep = "\t", col.names = F, row.names = F)
 save.image(file = "junction_valid_RM084.Rdata")
 
+exon_length <- read.delim("~/hg19/hg19v65_exons_for_genes.length", head = F, as.is = T)
+exon_length$gene <- gsub("chr[0-9XY:-]+<[-]*1_", "", exon_length$V1)
+
 library(VennDiagram)
-isoform_all_N <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5), N = c(nrow(all_lm_only), nrow(all_ls_only), nrow(all_ms_only), nrow(all_lm_ls_not_ms), nrow(all_ls_ms_not_lm), nrow(all_lm_ms_not_ls), nrow(all_lm_ls_ms))) 
-isoform_valid_N <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5), N = c(nrow(valid_lm_only), nrow(valid_ls_only), nrow(valid_ms_only), nrow(valid_lm_ls_not_ms), nrow(valid_ls_ms_not_lm), nrow(valid_lm_ms_not_ls), nrow(valid_lm_ls_ms))) 
+x <- c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.1)
+y <- c(0.75, 0.75, 0.2, 0.85, 0.45, 0.45, 0.55, 0.1)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), margin = 0.06, cat.cex = 1.8, category.names = c("lum vs myo", "lum vs stem-like", "myo vs stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), margin = 0.06, cat.cex = 1.8, category.names = c("lum vs myo", "lum vs stem-like", "myo vs stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
+venn_theme <- theme(plot.background = element_rect(fill = "transparent"), panel.background = element_rect(color = "black", fill = "transparent"), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.margin = unit(0, "lines"), 
+                    strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
+                    legend.position = c(0.85, 0.2), legend.text = element_text(size = 20), legend.background = element_blank(), legend.title=element_blank(), legend.key = element_blank())
+isoform_all_N <- data.frame(data = "No. of isoform genes", x= x[1:7], y = y[1:7], N = c(nrow(all_lm_only), nrow(all_ls_only), nrow(all_ms_only), nrow(all_lm_ls_not_ms), nrow(all_ls_ms_not_lm), nrow(all_lm_ms_not_ls), nrow(all_lm_ls_ms))) 
+isoform_valid_N <- data.frame(data = "No. of isoform genes", x= x[1:7], y = y[1:7], N = c(nrow(valid_lm_only), nrow(valid_ls_only), nrow(valid_ms_only), nrow(valid_lm_ls_not_ms), nrow(valid_ls_ms_not_lm), nrow(valid_lm_ms_not_ls), nrow(valid_lm_ls_ms))) 
+
 pdf("venn_isoform.pdf")
 (bubble_all_N <- ggplot(isoform_all_N) + 
    geom_point(aes(x, y, size = N), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size(limits = c(200, 1500), range = c(5, 20)) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of isoform genes", main.cex = 1.5)
+   annotate("text", x = 0.13, y = 0.14, label = "all expressed genes", size = 6) + 
+   annotate("text", x = 0.13, y = 0.08, color = "red", fontface = "bold", label = as.character(nrow(RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3,])), size = 7) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_all)
 (bubble_valid_N <- ggplot(isoform_valid_N) + 
    geom_point(aes(x, y, size = N), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size(limits = c(200, 1500), range = c(5, 20)) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of validated isoform genes", main.cex = 1.5)
+   annotate("text", x = 0.13, y = 0.14, label = "all expressed genes", size = 6) + 
+   annotate("text", x = 0.13, y = 0.08, color = "red", fontface = "bold", label = as.character(nrow(RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3,])), size = 7) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_valid)
 dev.off()
 
 # Venn diagram with average gene rpkm
-isoform_all_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), RPKM = c(mean(c(all_lm_only$lum084, all_lm_only$myo084)), mean(c(all_ls_only$lum084, all_ls_only$stem084)), mean(c(all_ms_only$myo084, all_ms_only$stem084)), mean(c(all_lm_ls_not_ms$lum084, all_lm_ls_not_ms$myo084, all_lm_ls_not_ms$stem084)), mean(c(all_ls_ms_not_lm$lum084, all_ls_ms_not_lm$myo084, all_ls_ms_not_lm$stem084)), mean(c(all_lm_ms_not_ls$lum084, all_lm_ms_not_ls$myo084, all_lm_ms_not_ls$stem084)), mean(c(all_lm_ls_ms$lum084, all_lm_ls_ms$myo084, all_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
-isoform_valid_rpkm <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), RPKM = c(mean(c(valid_lm_only$lum084, valid_lm_only$myo084)), mean(c(valid_ls_only$lum084, valid_ls_only$stem084)), mean(c(valid_ms_only$myo084, valid_ms_only$stem084)), mean(c(valid_lm_ls_not_ms$lum084, valid_lm_ls_not_ms$myo084, valid_lm_ls_not_ms$stem084)), mean(c(valid_ls_ms_not_lm$lum084, valid_ls_ms_not_lm$myo084, valid_ls_ms_not_lm$stem084)), mean(c(valid_lm_ms_not_ls$lum084, valid_lm_ms_not_ls$myo084, valid_lm_ms_not_ls$stem084)), mean(c(valid_lm_ls_ms$lum084, valid_lm_ls_ms$myo084, valid_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
+isoform_all_rpkm <- data.frame(data = "Average gene RPKM", x= x, y = y, RPKM = c(mean(c(all_lm_only$lum084, all_lm_only$myo084)), mean(c(all_ls_only$lum084, all_ls_only$stem084)), mean(c(all_ms_only$myo084, all_ms_only$stem084)), mean(c(all_lm_ls_not_ms$lum084, all_lm_ls_not_ms$myo084, all_lm_ls_not_ms$stem084)), mean(c(all_ls_ms_not_lm$lum084, all_ls_ms_not_lm$myo084, all_ls_ms_not_lm$stem084)), mean(c(all_lm_ms_not_ls$lum084, all_lm_ms_not_ls$myo084, all_lm_ms_not_ls$stem084)), mean(c(all_lm_ls_ms$lum084, all_lm_ls_ms$myo084, all_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
+isoform_valid_rpkm <- data.frame(data = "Average gene RPKM", x= x, y = y, RPKM = c(mean(c(valid_lm_only$lum084, valid_lm_only$myo084)), mean(c(valid_ls_only$lum084, valid_ls_only$stem084)), mean(c(valid_ms_only$myo084, valid_ms_only$stem084)), mean(c(valid_lm_ls_not_ms$lum084, valid_lm_ls_not_ms$myo084, valid_lm_ls_not_ms$stem084)), mean(c(valid_ls_ms_not_lm$lum084, valid_ls_ms_not_lm$myo084, valid_ls_ms_not_lm$stem084)), mean(c(valid_lm_ms_not_ls$lum084, valid_lm_ms_not_ls$myo084, valid_lm_ms_not_ls$stem084)), mean(c(valid_lm_ls_ms$lum084, valid_lm_ls_ms$myo084, valid_lm_ls_ms$stem084)), with(RM084gene, mean(c(lum084[lum084 > 0.1], myo084[myo084 > 0.1], stem084[stem084 > 0.1]))))) 
 pdf("venn_rpkm.pdf")
 (bubble_all_rpkm <- ggplot(isoform_all_rpkm) + 
    geom_point(aes(x, y, size = RPKM), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size_area(max_size = 30, breaks = c(0.2, 2, 20)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_all)
 (bubble_valid_rpkm <- ggplot(isoform_valid_rpkm) + 
    geom_point(aes(x, y, size = RPKM), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
    scale_size_area(max_size = 30, breaks = c(0.2, 2, 20)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of validated isoforms", main.cex = 1.5)
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_valid)
 dev.off()
 
 # Venn diagram with average No. of exons
-isoform_all_Nexon <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), No.exon = c(mean(all_lm_only$Nexon), mean(all_ls_only$Nexon), mean(all_ms_only$Nexon), mean(all_lm_ls_not_ms$Nexon), mean(all_ls_ms_not_lm$Nexon), mean(all_lm_ms_not_ls$Nexon), mean(all_lm_ls_ms$Nexon), mean(Nexon[RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "Nexon"]))) 
-isoform_valid_Nexon <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), No.exon = c(mean(valid_lm_only$Nexon), mean(valid_ls_only$Nexon), mean(valid_ms_only$Nexon), mean(valid_lm_ls_not_ms$Nexon), mean(valid_ls_ms_not_lm$Nexon), mean(valid_lm_ms_not_ls$Nexon), mean(valid_lm_ls_ms$Nexon), mean(Nexon[RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "Nexon"]))) 
+isoform_all_Nexon <- data.frame(data = "Average No. of exons per gene", x= x, y = y, No.exon = c(mean(all_lm_only$Nexon), mean(all_ls_only$Nexon), mean(all_ms_only$Nexon), mean(all_lm_ls_not_ms$Nexon), mean(all_ls_ms_not_lm$Nexon), mean(all_lm_ms_not_ls$Nexon), mean(all_lm_ls_ms$Nexon), mean(Nexon[RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "Nexon"]))) 
+isoform_valid_Nexon <- data.frame(data = "Average No. of exons per gene", x= x, y = y, No.exon = c(mean(valid_lm_only$Nexon), mean(valid_ls_only$Nexon), mean(valid_ms_only$Nexon), mean(valid_lm_ls_not_ms$Nexon), mean(valid_ls_ms_not_lm$Nexon), mean(valid_lm_ms_not_ls$Nexon), mean(valid_lm_ls_ms$Nexon), mean(Nexon[RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "Nexon"]))) 
 pdf("venn_Nexons.pdf")
 (bubble_all_Nexon <- ggplot(isoform_all_Nexon) + 
    geom_point(aes(x, y, size = No.exon), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
-   scale_size(limits = c(9, 15), range = c(5, 15), breaks = c(10, 12)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of isoforms", main.cex = 1.5)
+   scale_size(limits = c(9, 15), range = c(5, 25), breaks = c(10, 12)) + 
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_all)
 (bubble_valid_Nexon <- ggplot(isoform_valid_Nexon) + 
    geom_point(aes(x, y, size = No.exon), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
-   scale_size(limits = c(9, 15), range = c(5, 15), breaks = c(10, 12)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of validated isoforms", main.cex = 1.5)
+   scale_size(limits = c(9, 15), range = c(5, 25), breaks = c(10, 12)) + 
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_valid)
 dev.off()
 
 # Venn diagram with average isoform exon length
-exon_length <- read.delim("~/hg19/hg19v65_exons_for_genes.length", head = F, as.is = T)
-exon_length$gene <- gsub("chr[0-9XY:-]+<[-]*1_", "", exon_length$V1)
-isoform_all_exon_length <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), exon_length = c(mean(all_lm_only$exon_length), mean(all_ls_only$exon_length), mean(all_ms_only$exon_length), mean(all_lm_ls_not_ms$exon_length), mean(all_ls_ms_not_lm$exon_length), mean(all_lm_ms_not_ls$exon_length), mean(all_lm_ls_ms$exon_length), mean(exon_length[exon_length$gene %in% RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "V2"]))) 
-isoform_valid_exon_length <- data.frame(x= c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.05), y = c(0.7, 0.7, 0.15, 0.8, 0.4, 0.4, 0.5, 0.05), exon_length = c(mean(valid_lm_only$exon_length), mean(valid_ls_only$exon_length), mean(valid_ms_only$exon_length), mean(valid_lm_ls_not_ms$exon_length), mean(valid_ls_ms_not_lm$exon_length), mean(valid_lm_ms_not_ls$exon_length), mean(valid_lm_ls_ms$exon_length), mean(exon_length[exon_length$gene %in% RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "V2"]))) 
+isoform_all_exon_length <- data.frame(data = "Average exon length", x= x, y = y, exon_length = c(mean(all_lm_only$exon_length), mean(all_ls_only$exon_length), mean(all_ms_only$exon_length), mean(all_lm_ls_not_ms$exon_length), mean(all_ls_ms_not_lm$exon_length), mean(all_lm_ms_not_ls$exon_length), mean(all_lm_ls_ms$exon_length), mean(exon_length[exon_length$gene %in% RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "V2"]))) 
+isoform_valid_exon_length <- data.frame(data = "Average exon length", x= x, y = y, exon_length = c(mean(valid_lm_only$exon_length), mean(valid_ls_only$exon_length), mean(valid_ms_only$exon_length), mean(valid_lm_ls_not_ms$exon_length), mean(valid_ls_ms_not_lm$exon_length), mean(valid_lm_ms_not_ls$exon_length), mean(valid_lm_ls_ms$exon_length), mean(exon_length[exon_length$gene %in% RM084gene[(RM084gene$lum084 + RM084gene$myo084 + RM084gene$stem084) > 0.3, "id"], "V2"]))) 
 pdf("venn_exon_length.pdf")
 (bubble_all_exon_length <- ggplot(isoform_all_exon_length) + 
    geom_point(aes(x, y, size = exon_length), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
-   scale_size(limits = c(100, 400), range = c(5, 20), breaks = c(200, 300, 400)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of isoform exons", main.cex = 1.5)
+   scale_size(limits = c(100, 400), range = c(5, 25), breaks = c(200, 300, 400)) + 
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_all)
 (bubble_valid_exon_length <- ggplot(isoform_valid_exon_length) + 
    geom_point(aes(x, y, size = exon_length), color = "red") + 
    scale_x_continuous(limits = c(0, 1)) + 
    scale_y_continuous(limits = c(0, 1)) + 
-   scale_size(limits = c(100, 400), range = c(5, 20), breaks = c(200, 300, 400)) + 
-   geom_text(data = NULL, x = 0.06, y = 0.14, label = "all expressed genes", size = 3.5) + 
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_blank(), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0.9, 0.15), legend.title=element_blank(), legend.text = element_text(size = 15), legend.key = element_rect(fill = 'white')))
-venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of validated isoform exons", main.cex = 1.5)
+   scale_size(limits = c(100, 400), range = c(5, 25), breaks = c(200, 300, 400)) + 
+   annotate("text", x = 0.13, y = 0.18, label = "all expressed genes", size = 6) + 
+   facet_wrap(~ data) + 
+   venn_theme)
 grid.draw(venn_valid)
 dev.off()
 
