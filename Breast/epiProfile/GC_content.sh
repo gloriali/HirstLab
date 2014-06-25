@@ -18,3 +18,19 @@ exons5p=/home/lli/hg19/hg19v65_exons_for_genes.5prime_200.unique_bin_20
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/bedtools nuc -fi /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -bed $exons5p > /home/lli/REMC/epiProfile/exons5p_200/GC.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt
 less /home/lli/REMC/epiProfile/exons5p_200/GC.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} !/#/ {if ($4 == id){record=(record" "$6)} else {print record; id=$4; record=(id" "$6)}}' > /home/lli/REMC/epiProfile/exons5p_200/GC.hg19v65_exons_for_genes.5prime_200.unique
 rm /home/lli/REMC/epiProfile/exons5p_200/GC.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt
+
+
+# No. of CpGs instead of GC%
+exons3p=/home/lli/hg19/hg19v65_exons_for_genes.3prime_200.unique_bin_20
+exons5p=/home/lli/hg19/hg19v65_exons_for_genes.5prime_200.unique_bin_20
+less $exons3p | awk '{print "chr"$0}' > /home/lli/hg19/hg19v65_exons_for_genes.3prime_200.unique_bin_20.1
+mv -f /home/lli/hg19/hg19v65_exons_for_genes.3prime_200.unique_bin_20.1 $exons3p
+less $exons5p | awk '{print "chr"$0}' > /home/lli/hg19/hg19v65_exons_for_genes.5prime_200.unique_bin_20.1
+mv -f /home/lli/hg19/hg19v65_exons_for_genes.5prime_200.unique_bin_20.1 $exons5p
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $exons3p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt   
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $exons5p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt   
+less /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique
+rm /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt
+less /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique
+rm /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt
+

@@ -109,6 +109,51 @@ pdf("WGBS_GC_profile.pdf")
 grid.draw(gt) 
 dev.off()
 
+# add CpG content track 
+CpG_content_3p <- read.table("~/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_5p <- read.table("~/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_3p <- data.frame(Expression = c(rep(c("lum-specific", "myo-specific", "expressed_in_both", "not_expressed"), each = 20)), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
+CpG_3p[CpG_3p$Expression == "lum-specific", "CpG"] <- colMeans(CpG_content_3p[lum_specific,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "myo-specific", "CpG"] <- colMeans(CpG_content_3p[myo_specific,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "expressed_in_both", "CpG"] <- colMeans(CpG_content_3p[both,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "not_expressed", "CpG"] <- colMeans(CpG_content_3p[neither,], na.rm = T)
+CpG_5p <- data.frame(Expression = c(rep(c("lum-specific", "myo-specific", "expressed_in_both", "not_expressed"), each = 20)), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
+CpG_5p[CpG_5p$Expression == "lum-specific", "CpG"] <- colMeans(CpG_content_5p[lum_specific,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "myo-specific", "CpG"] <- colMeans(CpG_content_5p[myo_specific,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "expressed_in_both", "CpG"] <- colMeans(CpG_content_5p[both,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "not_expressed", "CpG"] <- colMeans(CpG_content_5p[neither,], na.rm = T)
+CpG_boundaries <- data.frame(rbind(CpG_3p, CpG_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(CpG_3p)), levels = c("5-prime", "3-prime")))
+(CpG_boundaries_profile <- ggplot(CpG_boundaries, aes(x = Position, y = CpG, group = Expression)) + 
+   geom_line(aes(color = Expression), size = 1.5) + 
+   geom_point(aes(color = Expression), size = 4) + 
+   facet_wrap(~ End) + 
+   ggtitle("CpG profile around exon boundaries") + 
+   ylab("Average percentage of CpG") + 
+   theme_bw())
+ggsave(CpG_boundaries_profile, file = "CpG_boundaries_profile.pdf", height = 4)
+
+WGBS_CpG <- data.frame(data = c(rep("WGBS", nrow(WGBS_boundaries)), rep("CpG", nrow(CpG_boundaries))), 
+                      Cell_type = c(as.character(WGBS_boundaries$Cell_type), rep("lum", nrow(CpG_boundaries))), 
+                      Expression = c(as.character(WGBS_boundaries$Expression), as.character(CpG_boundaries$Expression)), 
+                      Position = c(WGBS_boundaries$Position, CpG_boundaries$Position), 
+                      value = c(WGBS_boundaries$WGBS, CpG_boundaries$CpG), 
+                      End = c(as.character(WGBS_boundaries$End), as.character(CpG_boundaries$End)))
+WGBS_CpG$data <- factor(WGBS_CpG$data, levels = c("WGBS", "CpG"))
+WGBS_CpG$End <- factor(WGBS_CpG$End, levels = c("5-prime", "3-prime"))
+WGBS_CpG$group <- interaction(WGBS_CpG$Cell_type, WGBS_CpG$Expression)
+(WGBS_CpG_profile <- ggplot(WGBS_CpG, aes(x = Position, y = value, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_grid(data ~ End, scales = "free_y") + 
+   ylab("Average DNA methylation") + 
+   theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+library(grid) 
+gt <- ggplot_gtable(ggplot_build(WGBS_CpG_profile)) 
+# gt$layout 
+gt$heights[[4]] <- unit(2.5, "null") 
+pdf("WGBS_CpG_profile.pdf")
+grid.draw(gt) 
+dev.off()
 ######################################################################################################
 # MeDIP profile @ exon boundaries
 lum_MeDIP_3p <- read.table("~/REMC/epiProfile/exons3p_200/lumRM035_MeDIP.hg19v65_exons_for_genes.3prime_200.unique.profile", sep = " ", head = F, as.is = T, row.names = 1)
@@ -407,23 +452,32 @@ H3K36me3_exons[H3K36me3_exons$id %in% exons_1_10, "geneRPKM"] <- "gene RPKM 1-10
 H3K36me3_exons[H3K36me3_exons$id %in% exons_10_100, "geneRPKM"] <- "gene RPKM 10-100"
 H3K36me3_exons[H3K36me3_exons$id %in% exons_100, "geneRPKM"] <- "gene RPKM > 100"
 H3K36me3_exons$geneRPKM <- factor(H3K36me3_exons$geneRPKM)
-H3K36me3_exons <- droplevels(na.omit(H3K36me3_exons[H3K36me3_exons$geneRPKM == "gene RPKM < 1" | H3K36me3_exons$geneRPKM == "gene RPKM 1-10", ]))
+H3K36me3_exons$utilize <- interaction(H3K36me3_exons$Cell_type, H3K36me3_exons$Expression)
+# fold enrichment between utilized/un-utilized isoform exons
+mean(H3K36me3_exons[H3K36me3_exons$utilize == "lum.lum-specific" | H3K36me3_exons$utilize == "myo.myo-specific", "H3K36me3"])/mean(H3K36me3_exons[H3K36me3_exons$utilize == "myo.lum-specific" | H3K36me3_exons$utilize == "lum.myo-specific", "H3K36me3"])
+H3K36me3_exons <- droplevels(na.omit(H3K36me3_exons[H3K36me3_exons$geneRPKM != "gene RPKM > 100" & H3K36me3_exons$geneRPKM != "gene RPKM 10-100", ]))
 H3K36me3_exons$group <- interaction(interaction(H3K36me3_exons$Cell_type, H3K36me3_exons$Expression), H3K36me3_exons$geneRPKM)
-(H3K36me3_exons_profile <- ggplot(H3K36me3_exons, aes(x = Expression, y = H3K36me3, group = group)) + 
-   geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.8) + 
-   facet_grid(geneRPKM ~ .) + 
+library(plyr)
+H3K36me3_exons_stat <- ddply(H3K36me3_exons, ~ group, summarize, Cell_type = Cell_type[1], Expression = Expression[1], geneRPKM = geneRPKM[1], ymin = boxplot.stats(H3K36me3)$stats[1], lower = boxplot.stats(H3K36me3)$stats[2], middle = mean(H3K36me3), upper = boxplot.stats(H3K36me3)$stats[4], ymax = boxplot.stats(H3K36me3)$stats[5])
+
+(H3K36me3_exons_profile <- ggplot(H3K36me3_exons_stat, aes(x = Expression, group = group)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Cell_type), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
+   facet_grid(geneRPKM ~ ., scales = "free") + 
    # ggtitle("H3K36me3 signal for exons") + 
    xlab("Exon group") + 
    ylab("Average H3K36me3 signal") + 
-   coord_cartesian(ylim = c(0, 6)) + 
    theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 ggsave(H3K36me3_exons_profile, file = "H3K36me3_exons_profile.pdf", width = 9, height = 8)
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.lum-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.lum-specific.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.myo-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.myo-specific.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.lum-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.lum-specific.gene RPKM 1-10", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.myo-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.myo-specific.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.expressed_in_both.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.expressed_in_both.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.not_expressed.gene RPKM < 1", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.not_expressed.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.expressed_in_both.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.expressed_in_both.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.not_expressed.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.not_expressed.gene RPKM 1-10", "H3K36me3"])
 
-save(both, neither, lum_specific, myo_specific, exons_1, exons_1_10, exons_10_100, exons_100, 
+save(both, neither, lum_specific, myo_specific, exons_1, exons_1_10, exons_10_100, exons_100, H3K36me3_exons_stat, 
      WGBS_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_boundaries, GC_boundaries, H3K36me3_exons, WGBS_GC, file = "exonProfile.Rdata")
 
 # ################## Unable to complete: computational time too long ################################

@@ -150,13 +150,13 @@ grid.draw(gt)
 * There are only 2 lum-specific exons with gene RPKM > 10, therefore, discard this group from plotting.        
 
 ```{r H3K36me3_exon}
-(H3K36me3_exons_profile <- ggplot(H3K36me3_exons, aes(x = Expression, y = H3K36me3, group = group)) + 
-   geom_boxplot(aes(fill = Cell_type), position = "dodge", outlier.size = 0, width = 0.5) + 
-   facet_grid(geneRPKM ~ .) + 
+(H3K36me3_exons_profile <- ggplot(H3K36me3_exons_stat, aes(x = Expression, group = group)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Cell_type), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
+   facet_grid(geneRPKM ~ ., scales = "free") + 
    ggtitle("H3K36me3 signal for exons") + 
+   xlab("Exon group") + 
    ylab("Average H3K36me3 signal") + 
-   coord_cartesian(ylim = c(0, 8)) + 
-   theme_bw())
+   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 ```
 
 
