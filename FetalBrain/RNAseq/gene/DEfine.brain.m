@@ -11,8 +11,8 @@ out=true; corr1=true; corr2=true; rpkm=true;figs=true; RPKMmin=0.005; Nmin=25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fdr=0.01
 
-[idl,gl]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
-[id,gc]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
 
 dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
 dirOut='/home/lli/RNAseq/DEfine/';
@@ -35,8 +35,8 @@ out=true; corr1=true; corr2=true; rpkm=true;figs=true; RPKMmin=0.005; Nmin=25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fdr=0.01
 
-[idl,gl]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
-[id,gc]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
 
 dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
 dirOut='/home/lli/RNAseq/DEfine/';
@@ -59,8 +59,8 @@ out=true; corr1=true; corr2=true; rpkm=true;figs=true; RPKMmin=0.005; Nmin=25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fdr=0.01
 
-[idl,gl]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
-[id,gc]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
 
 dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
 dirOut='/home/lli/RNAseq/DEfine/';
@@ -83,8 +83,8 @@ out=true; corr1=true; corr2=true; rpkm=true;figs=true; RPKMmin=0.005; Nmin=25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fdr=0.01
 
-[idl,gl]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
-[id,gc]=textread('/projects/03/genereg/projects/SOLEXA/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
 
 dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
 dirOut='/home/lli/RNAseq/DEfine/';
