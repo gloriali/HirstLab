@@ -477,7 +477,7 @@ t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.not_expressed.gene RPKM < 1",
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.expressed_in_both.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.expressed_in_both.gene RPKM 1-10", "H3K36me3"])
 t.test(H3K36me3_exons[H3K36me3_exons$group == "lum.not_expressed.gene RPKM 1-10", "H3K36me3"], H3K36me3_exons[H3K36me3_exons$group == "myo.not_expressed.gene RPKM 1-10", "H3K36me3"])
 
-save(both, neither, lum_specific, myo_specific, exons_1, exons_1_10, exons_10_100, exons_100, H3K36me3_exons_stat, 
+save(both, neither, lum_specific, myo_specific, exons_1, exons_1_10, exons_10_100, exons_100, H3K36me3_exons_stat, WGBS_CpG, CpG_boundaries, 
      WGBS_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_boundaries, GC_boundaries, H3K36me3_exons, WGBS_GC, file = "exonProfile.Rdata")
 
 # ################## Unable to complete: computational time too long ################################
