@@ -1,8 +1,10 @@
 ## Matlab path on xhost
 `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`
+
 ## DEfine function
 * Misha's directory: `addpath /home/mbilenky/matlab -end`
-* My copy of DEfinev.0.9.2: `addpath /home/lli/bin/matlab -end`
+* My copy of DEfinev.0.9.2: `addpath /home/lli/bin/matlab -end`        
+
 ## DEfine on genes
 * Sample code        
 ```
@@ -22,6 +24,7 @@ lib2='A17919'; cell2='myo', donor2='RM084';
 [C,ix,ixl]=intersect(id,idl);
 [cc,nfup,nfdn]=DEfine(idl, r1(ix), r2(ix), n1(ix), n2(ix), [gl,gc], dirOut, [cell1,'-',donor1], [cell2,'-',donor2], out,figs, fdr,corr1,corr2,rpkm,RPKMmin,Nmin);
 ```       
+
 ## DEfine on exons
 * Sample code        
 ```
