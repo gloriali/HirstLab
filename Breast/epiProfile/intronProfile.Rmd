@@ -1,0 +1,210 @@
+---
+output:
+  html_document:
+    keep_md: true
+    toc: true
+---
+
+Epigenetic profile for intron retention   
+==============================================
+Gloria Li         
+`r date()`             
+
+<!-- re-knit after modify intronProfile.R & intronProfile.v2.R script -->
+```{r include = FALSE}
+library(knitr)
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+```{r data}
+setwd("~/快盘/REMC/epiProfile/IR/")
+library(ggplot2)
+library(grid) 
+load("intronProfile.Rdata")
+load("./v2/intronProfile_v2.Rdata")
+```
+
+1. Profile epigenetic signals (DNA methylation, H3K4me3, H3K4me1, H3K9me3, H3K27me3, H3K36me3) around exon boundaries, i.e. exon 3-prime/5-prime +/- 200bp.            
+  * WGBS: lumRM066 and myoRM045 bismark fractional methylation calls.            
+  * MeDIP: lumRM035 and myoRM035 signals from wig files.   
+  * H3K4me3: myoRM080 wig file, no libraries for lum available.   
+  * H3K4me1, H3K9me3, H3K27me3, H3K36me3: lumRM080 and myoRM080 wig files.      
+
+2. Method 1. Use IR events in RM084 lum and myo to divide introns into four categories:    
+  * introns retained in both cell types: retained in both lum084 and myo084      
+  * lum-specific IR: only retained in lum084 cells          
+  * myo-specific IR: only retained in myo084 cells     
+  * introns not retained in either cell types: all other introns         
+  
+3. Method 2. Treat lum and myo independently:   
+  * lum cells:   
+    + IR: IR in lum084  
+    + non-IR: all other introns    
+  * myo cells:  
+    + IR: IR in myo084  
+    + non-IR: all other introns      
+    
+### DNA methylation profile with WGBS at intron boundaries
+* DNA methylation in IR seem to be more flat at intron boundaries than non-IR.   
+* There is no evident distinction between lum and myo in lum-specific and myo-specific retained introns.     
+* Retained introns seem to have higher No. of CpGs than not retained introns.      
+
+```{r WGBS}
+WGBS_CpG_profile <- ggplot(WGBS_CpG, aes(x = Position, y = value, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_grid(data ~ End, scales = "free_y") + 
+   ylab("Average DNA methylation") + 
+   theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
+gt <- ggplot_gtable(ggplot_build(WGBS_CpG_profile)) 
+gt$heights[[4]] <- unit(2.5, "null") 
+grid.newpage()
+grid.draw(gt) 
+
+WGBS_CpG_v2_profile <- ggplot(WGBS_CpG_v2, aes(x = Position, y = value, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(group ~ End, scales = "free_y") + 
+   ylab("Average DNA methylation") + 
+   theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
+gt <- ggplot_gtable(ggplot_build(WGBS_CpG_v2_profile)) 
+gt$heights[[4]] <- unit(2.5, "null") 
+gt$heights[[8]] <- unit(2.5, "null") 
+grid.newpage()
+grid.draw(gt) 
+```
+
+### DNA methylation profile with MeDIP at intron boundaries
+* MeDIP results are similar to WGBS.     
+
+```{r MeDIP}
+(MeDIP_boundaries_profile <- ggplot(MeDIP_boundaries, aes(x = Position, y = MeDIP, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("MeDIP profile around intron boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+
+(MeDIP_boundaries_v2_profile <- ggplot(MeDIP_boundaries_v2, aes(x = Position, y = MeDIP, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("MeDIP profile around intron boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+```
+
+### H3K36me3 signals for intron bodies   
+* Cell type specific retained introns in the 1st figure shows an increase in H3K36me3 signal, but not statistically significant. Also not retained introns do not show decrease in H3K36me3 when gene RPKM > 1.     
+* In the 2nd figure, we see opposite patterns in different gene RPKM group: 
+  + gene RPKM < 1: increase in H3K36me3 in retained introns, statistically significant (p-value: `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM < 1", "H3K36me3"])$p.value` in lum, `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM < 1", "H3K36me3"])$p.value` in myo)   
+  + gene RPKM = 1-10: no significant difference between IR and non-IR (p-value: `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM 1-10", "H3K36me3"])$p.value` in lum, `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 1-10", "H3K36me3"])$p.value` in myo)
+  + gene RPKM = 10-100: decrease in H3K36me3 in retained introns, statistically significant (p-value: `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM 10-100", "H3K36me3"])$p.value` in lum, `r t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 10-100", "H3K36me3"])$p.value` in myo)
+
+```{r H3K36me3}
+(H3K36me3_introns_profile <- ggplot(H3K36me3_introns_stat, aes(x = Expression, group = group)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Cell_type), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
+   facet_grid(geneRPKM ~ ., scales = "free") + 
+   # ggtitle("H3K36me3 signal for introns") + 
+   xlab("intron group") + 
+   ylab("Average H3K36me3 signal") + 
+   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+
+(H3K36me3_introns_v2_profile <- ggplot(H3K36me3_introns_v2_stat_v2, aes(x = Expression, group = group)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Expression), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
+   facet_grid(geneRPKM ~ Cell_type, scales = "free") + 
+   # ggtitle("H3K36me3 signal for introns") + 
+   xlab("intron Expression") + 
+   ylab("Average H3K36me3 signal") + 
+   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+```
+
+### H3K4me1 profile at intron boundaries  
+* H3K4me1 signal increases for retained introns. 
+* There is a slight difference for lum-specific and myo-specific IR between lum and myo cells.       
+
+```{r H3K4me1}
+(H3K4me1_boundaries_profile <- ggplot(H3K4me1_boundaries, aes(x = Position, y = H3K4me1, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K4me1 profile around intron boundaries") + 
+   ylab("Average H3K4me1 signal") + 
+   theme_bw())
+
+(H3K4me1_boundaries_v2_profile <- ggplot(H3K4me1_boundaries_v2, aes(x = Position, y = H3K4me1, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("H3K4me1 profile around intron boundaries") + 
+   ylab("Average H3K4me1 signal") + 
+   theme_bw())
+```
+
+### H3K4me3 profile at intron boundaries  
+* No H3K4me3 libraries available for lum cells.    
+* H3K4me3 signal increases for retained introns.     
+
+```{r H3K4me3}
+(H3K4me3_boundaries_profile <- ggplot(H3K4me3_boundaries, aes(x = Position, y = H3K4me3, group = Expression)) + 
+   geom_line(aes(color = Expression)) + 
+   geom_point(aes(color = Expression)) + 
+   facet_wrap(~ End) + 
+   ggtitle("myo H3K4me3 profile around intron boundaries") + 
+   ylab("Average H3K4me3 signal") + 
+   theme_bw())
+
+(H3K4me3_boundaries_v2_profile <- ggplot(H3K4me3_boundaries_v2, aes(x = Position, y = H3K4me3, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(. ~ End) + 
+   ggtitle("myo H3K4me3 profile around intron boundaries") + 
+   ylab("Average H3K4me3 signal in myo") + 
+   theme_bw())
+```
+
+### H3K9me3 profile at intron boundaries  
+* It seems lum and myo cells show opposite trend in terms of H3K9me3 signal in IR vs non-IR.     
+
+```{r H3K9me3}
+(H3K9me3_boundaries_profile <- ggplot(H3K9me3_boundaries, aes(x = Position, y = H3K9me3, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K9me3 profile around intron boundaries") + 
+   ylab("Average H3K9me3 signal") + 
+   theme_bw())
+
+(H3K9me3_boundaries_v2_profile <- ggplot(H3K9me3_boundaries_v2, aes(x = Position, y = H3K9me3, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("H3K9me3 profile around intron boundaries") + 
+   ylab("Average H3K9me3 signal") + 
+   theme_bw())
+```
+
+### H3K27me3 profile at intron boundaries  
+* H3K27me3 signal decreases for retained introns.     
+* H3K27me3 signal levels are different for lum-specific and myo-specific IR between lum and myo cells, but there is too much fluctuation, eps. in myo-specific IRs, probably due to small sample size.       
+
+```{r H3K27me3}
+(H3K27me3_boundaries_profile <- ggplot(H3K27me3_boundaries, aes(x = Position, y = H3K27me3, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
+   facet_wrap(~ End) + 
+   ggtitle("H3K27me3 profile around intron boundaries") + 
+   ylab("Average H3K27me3 signal") + 
+   theme_bw())
+
+(H3K27me3_boundaries_v2_profile <- ggplot(H3K27me3_boundaries_v2, aes(x = Position, y = H3K27me3, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("H3K27me3 profile around intron boundaries") + 
+   ylab("Average H3K27me3 signal") + 
+   theme_bw())
+```
+
+

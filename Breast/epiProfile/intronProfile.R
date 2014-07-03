@@ -6,9 +6,12 @@ library(plyr)
 library(ggplot2)
 library(grid) 
 load("intronProfile.Rdata")
-introns <- read.delim("/home/lli/hg19/hg19v65_introns_for_genes", head = F, as.is = T)
-lum084_ir <- read.delim("/projects/epigenomics/acarles/intron/breast/4GloriaAnalysis/A17918.introns.retained.Id4Gloria", head = F, as.is = T)$V1
-myo084_ir <- read.delim("/projects/epigenomics/acarles/intron/breast/4GloriaAnalysis/A17919.introns.retained.Id4Gloria", head = F, as.is = T)$V1
+# introns <- read.delim("/home/lli/hg19/hg19v65_introns_for_genes", head = F, as.is = T)
+# lum084_ir <- read.delim("/projects/epigenomics/acarles/intron/breast/4GloriaAnalysis/A17918.introns.retained.Id4Gloria", head = F, as.is = T)$V1
+# myo084_ir <- read.delim("/projects/epigenomics/acarles/intron/breast/4GloriaAnalysis/A17919.introns.retained.Id4Gloria", head = F, as.is = T)$V1
+introns <- read.delim("~/hg19/hg19v65_introns_for_genes", head = F, as.is = T)
+lum084_ir <- read.delim("../A17918.introns.retained.Id4Gloria", head = F, as.is = T)$V1
+myo084_ir <- read.delim("../A17919.introns.retained.Id4Gloria", head = F, as.is = T)$V1
 both <- intersect(lum084_ir, myo084_ir)
 lum_specific <- setdiff(lum084_ir, both)
 myo_specific <- setdiff(myo084_ir, both)
@@ -138,15 +141,15 @@ ggsave(MeDIP_boundaries_profile, file = "MeDIP_boundaries_profile.pdf")
 myo_H3K4me3_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/myoRM080_H3K4me3.hg19v65_introns_for_genes.3prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
 myo_H3K4me3_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/myoRM080_H3K4me3.hg19v65_introns_for_genes.5prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
 H3K4me3_3p <- data.frame(Expression = rep(c("lum-specific", "myo-specific", "retained_in_both", "not_retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), H3K4me3 = -1)
-H3K4me3_3p[H3K4me3_3p$Expression == "lum-specific", "H3K4me3"] <- colMeans(myo_bismark_3p[lum_specific,], na.rm = T)
-H3K4me3_3p[H3K4me3_3p$Expression == "myo-specific", "H3K4me3"] <- colMeans(myo_bismark_3p[myo_specific,], na.rm = T)
-H3K4me3_3p[H3K4me3_3p$Expression == "retained_in_both", "H3K4me3"] <- colMeans(myo_bismark_3p[both,], na.rm = T)
-H3K4me3_3p[H3K4me3_3p$Expression == "not_retained", "H3K4me3"] <- colMeans(myo_bismark_3p[neither,], na.rm = T)
+H3K4me3_3p[H3K4me3_3p$Expression == "lum-specific", "H3K4me3"] <- colMeans(myo_H3K4me3_3p[lum_specific,], na.rm = T)
+H3K4me3_3p[H3K4me3_3p$Expression == "myo-specific", "H3K4me3"] <- colMeans(myo_H3K4me3_3p[myo_specific,], na.rm = T)
+H3K4me3_3p[H3K4me3_3p$Expression == "retained_in_both", "H3K4me3"] <- colMeans(myo_H3K4me3_3p[both,], na.rm = T)
+H3K4me3_3p[H3K4me3_3p$Expression == "not_retained", "H3K4me3"] <- colMeans(myo_H3K4me3_3p[neither,], na.rm = T)
 H3K4me3_5p <- data.frame(Expression = rep(c("lum-specific", "myo-specific", "retained_in_both", "not_retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), H3K4me3 = -1)
-H3K4me3_5p[H3K4me3_5p$Expression == "lum-specific", "H3K4me3"] <- colMeans(myo_bismark_5p[lum_specific,], na.rm = T)
-H3K4me3_5p[H3K4me3_5p$Expression == "myo-specific", "H3K4me3"] <- colMeans(myo_bismark_5p[myo_specific,], na.rm = T)
-H3K4me3_5p[H3K4me3_5p$Expression == "retained_in_both", "H3K4me3"] <- colMeans(myo_bismark_5p[both,], na.rm = T)
-H3K4me3_5p[H3K4me3_5p$Expression == "not_retained", "H3K4me3"] <- colMeans(myo_bismark_5p[neither,], na.rm = T)
+H3K4me3_5p[H3K4me3_5p$Expression == "lum-specific", "H3K4me3"] <- colMeans(myo_H3K4me3_5p[lum_specific,], na.rm = T)
+H3K4me3_5p[H3K4me3_5p$Expression == "myo-specific", "H3K4me3"] <- colMeans(myo_H3K4me3_5p[myo_specific,], na.rm = T)
+H3K4me3_5p[H3K4me3_5p$Expression == "retained_in_both", "H3K4me3"] <- colMeans(myo_H3K4me3_5p[both,], na.rm = T)
+H3K4me3_5p[H3K4me3_5p$Expression == "not_retained", "H3K4me3"] <- colMeans(myo_H3K4me3_5p[neither,], na.rm = T)
 H3K4me3_boundaries <- data.frame(rbind(H3K4me3_3p, H3K4me3_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(H3K4me3_3p)), levels = c("5-prime", "3-prime")))
 (H3K4me3_boundaries_profile <- ggplot(H3K4me3_boundaries, aes(x = Position, y = H3K4me3, group = Expression)) + 
    geom_line(aes(color = Expression)) + 
@@ -319,14 +322,18 @@ H3K36me3_introns_stat <- ddply(H3K36me3_introns, ~ group, summarize, Cell_type =
    theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 ggsave(H3K36me3_introns_profile, file = "H3K36me3_introns_profile.pdf", width = 9, height = 8)
 
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.lum-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.lum-specific.gene RPKM < 1", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.myo-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.myo-specific.gene RPKM < 1", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.lum-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.lum-specific.gene RPKM 1-10", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.myo-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.myo-specific.gene RPKM 1-10", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.retained_in_both.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.retained_in_both.gene RPKM < 1", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.not_retained.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.not_retained.gene RPKM < 1", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.retained_in_both.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.retained_in_both.gene RPKM 1-10", "H3K36me3"])
-# t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.not_retained.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.not_retained.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.lum-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.lum-specific.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.myo-specific.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.myo-specific.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.retained_in_both.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.retained_in_both.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.not_retained.gene RPKM < 1", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.not_retained.gene RPKM < 1", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.lum-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.lum-specific.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.myo-specific.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.myo-specific.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.retained_in_both.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.retained_in_both.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.not_retained.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.not_retained.gene RPKM 1-10", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.lum-specific.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.lum-specific.gene RPKM 10-100", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.myo-specific.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.myo-specific.gene RPKM 10-100", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.retained_in_both.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.retained_in_both.gene RPKM 10-100", "H3K36me3"])
+t.test(H3K36me3_introns[H3K36me3_introns$group == "lum.not_retained.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns[H3K36me3_introns$group == "myo.not_retained.gene RPKM 10-100", "H3K36me3"])
 
 save(both, neither, lum_specific, myo_specific, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_stat, WGBS_CpG, 
      WGBS_boundaries, CpG_boundaries, MeDIP_boundaries, H3K4me3_boundaries, H3K4me1_boundaries, H3K9me3_boundaries, H3K27me3_boundaries, H3K36me3_introns, file = "intronProfile.Rdata")
