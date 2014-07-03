@@ -1,25 +1,12 @@
----
-output:
-  html_document:
-    keep_md: true
-    toc: yes
----
 Epigenetic profile around exon boundaries   
 ==============================================
 Gloria Li         
-`r date()`             
+Wed Jul  2 17:43:28 2014             
 
 <!-- re-knit after modify exonProfile.R script -->
-```{r include = FALSE}
-library(knitr)
-opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
-```
 
-```{r data}
-setwd("~/快盘/REMC/epiProfile/")
-load("exonProfile.Rdata")
-library(ggplot2)
-```
+
+
 
 1. Profile epigenetic signals (DNA methylation, H3K4me3, H3K4me1, H3K9me3, H3K27me3, H3K36me3) around exon boundaries, i.e. exon 3-prime/5-prime +/- 200bp.            
   * WGBS: lumRM066 and myoRM045 bismark fractional methylation calls.            
@@ -39,50 +26,21 @@ library(ggplot2)
 * Exons expressed in both cell types and exons not expressed in either cell type have distinct DNA methylation profiles.       
 * Profiles for isoform exons are close to exons expressed in both, without obvious distinction between two cell types.        
 
-```{r WGBS, fig.height = 6}
-WGBS_GC_profile <- ggplot(WGBS_GC, aes(x = Position, y = value, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_grid(data ~ End, scales = "free_y") + 
-   ggtitle("WGBS and GC content profile around exon boundaries") + 
-   ylab("Average DNA methylation / GC content") + 
-   theme_bw()
-library(grid) 
-gt <- ggplot_gtable(ggplot_build(WGBS_GC_profile)) 
-gt$heights[[4]] <- unit(2, "null") 
-grid.newpage()
-grid.draw(gt) 
-```
+![plot of chunk WGBS](./exonProfile_files/figure-html/WGBS.png) 
 
 ### DNA methylation profile with MeDIP at exon boundaries 
 * MeDIP signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
 * DNA methylation profiles are similar to results from WGBS, but the dip at exon 5-prime end is not as clear.        
 * Again no distinction between cell types for isoform exons.            
 
-```{r MeDIP}
-(MeDIP_boundaries_profile <- ggplot(MeDIP_boundaries, aes(x = Position, y = MeDIP, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
-   ggtitle("MeDIP profile around exon boundaries") + 
-   ylab("Average DNA methylation level") + 
-   theme_bw())
-```
+![plot of chunk MeDIP](./exonProfile_files/figure-html/MeDIP.png) 
 
 ### H3K4me3 profile at exon boundaries  
 * No H3K4me3 libraries available for lum cells.     
 * H3K4me3 profiles match DNA methylation profile well.       
 * For myo H3K4me3 signals, expressed in both and not expressed in either exons have different profiles, but no obvious differences are observed between lum-specific and myo-specific exons.       
 
-```{r H3K4me3}
-(H3K4me3_boundaries_profile <- ggplot(H3K4me3_boundaries, aes(x = Position, y = H3K4me3, group = Expression)) + 
-   geom_line(aes(color = Expression)) + 
-   geom_point(aes(color = Expression)) + 
-   facet_wrap(~ End) + 
-   ggtitle("myo H3K4me3 profile around exon boundaries") + 
-   ylab("Average H3K4me3 signal") + 
-   theme_bw())
-```
+![plot of chunk H3K4me3](./exonProfile_files/figure-html/H3K4me3.png) 
 
 ### H3K4me1 profile at exon boundaries  
 * H3K4me1 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.          
@@ -90,15 +48,7 @@ grid.draw(gt)
 * In myo cells, profiles for the two types of isoform exons are similar.    
 * In lum cells, we do see expected pattern, i.e. myo-specific exons closer to not expressed exons and lum-specific exons closer to expressed in both exons.            
 
-```{r H3K4me1}
-(H3K4me1_boundaries_profile <- ggplot(H3K4me1_boundaries, aes(x = Position, y = H3K4me1, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
-   ggtitle("H3K4me1 profile around exon boundaries") + 
-   ylab("Average H3K4me1 signal") + 
-   theme_bw())
-```
+![plot of chunk H3K4me1](./exonProfile_files/figure-html/H3K4me1.png) 
 
 ### H3K9me3 profile at exon boundaries  
 * H3K9me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
@@ -106,44 +56,20 @@ grid.draw(gt)
 * In lum cells, profiles for the two types of isoform exons are similar.    
 * In myo cells, we do see expected pattern, i.e. lum-specific exons closer to not expressed exons and myo-specific exons closer to expressed in both exons. This pattern is the opposite of H3K4me1.                     
 
-```{r H3K9me3}
-(H3K9me3_boundaries_profile <- ggplot(H3K9me3_boundaries, aes(x = Position, y = H3K9me3, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
-   ggtitle("H3K9me3 profile around exon boundaries") + 
-   ylab("Average H3K9me3 signal") + 
-   theme_bw())
-```
+![plot of chunk H3K9me3](./exonProfile_files/figure-html/H3K9me3.png) 
 
 ### H3K27me3 profile at exon boundaries  
 * H3K27me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
 * In both cell types, isoform exons have signal levels close to not expressed exons.             
 
-```{r H3K27me3}
-(H3K27me3_boundaries_profile <- ggplot(H3K27me3_boundaries, aes(x = Position, y = H3K27me3, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_wrap(~ End) + 
-   ggtitle("H3K27me3 profile around exon boundaries") + 
-   ylab("Average H3K27me3 signal") + 
-   theme_bw())
-```
+![plot of chunk H3K27me3](./exonProfile_files/figure-html/H3K27me3.png) 
 
 ### H3K36me3 profile at exon boundaries  
 * H3K36me3 signals are normalized between lum and myo libraries based on the sum of signals of all profiled regions.         
 * Exons expressed in both cell types have a distinct profile than the rest of exons. 
 * Isoform exons have similar profile as not expressed exons, similar to H3K27me3.                  
 
-```{r H3K36me3, fig.height=10}
-(H3K36me3_boundaries_profile <- ggplot(H3K36me3_boundaries, aes(x = Position, y = H3K36me3, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type)) + 
-   geom_point(aes(color = Expression, shape = Cell_type)) + 
-   facet_grid(geneRPKM ~ End, scales = "free_y") + 
-   ggtitle("H3K36me3 profile around exon boundaries") + 
-   ylab("Average H3K36me3 signal") + 
-   theme_bw())
-```
+![plot of chunk H3K36me3](./exonProfile_files/figure-html/H3K36me3.png) 
 
 ### H3K36me3 signals for exon bodies   
 * H3K36me3 signals are normalized between lum and myo libraries based on the sum of signals of all exons.         
@@ -151,14 +77,6 @@ grid.draw(gt)
 * In gene RPKM = 1-10 group, lum-specific exons have higher signal level in lum and myo-specific exons are higher in myo, however, this observation was not reproduced in gene RPKM < 1 group, probably due to the extremely low expression level.       
 * There are only 2 lum-specific exons with gene RPKM > 10, therefore, discard this group from plotting.        
 
-```{r H3K36me3_exon}
-(H3K36me3_exons_profile <- ggplot(H3K36me3_exons_stat, aes(x = Expression, group = group)) + 
-   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Cell_type), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
-   facet_grid(geneRPKM ~ ., scales = "free") + 
-   ggtitle("H3K36me3 signal for exons") + 
-   xlab("Exon group") + 
-   ylab("Average H3K36me3 signal") + 
-   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
-```
+![plot of chunk H3K36me3_exon](./exonProfile_files/figure-html/H3K36me3_exon.png) 
 
 
