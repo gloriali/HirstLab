@@ -68,6 +68,9 @@ WGBS_CpG_v2 <- data.frame(data = c(rep("WGBS", nrow(WGBS_boundaries_v2)), rep("C
                        Position = c(WGBS_boundaries_v2$Position, CpG_boundaries_v2$Position), 
                        value = c(WGBS_boundaries_v2$WGBS, CpG_boundaries_v2$CpG), 
                        End = c(as.character(WGBS_boundaries_v2$End), as.character(CpG_boundaries_v2$End)))
+WGBS_CpG_v2$IR <- gsub("non-IR", "not retained", WGBS_CpG_v2$IR)
+WGBS_CpG_v2$IR <- gsub("IR", "retained introns", WGBS_CpG_v2$IR)
+WGBS_CpG_v2$IR <- factor(WGBS_CpG_v2$IR, levels = c("retained introns", "not retained"))
 WGBS_CpG_v2$group <- factor(interaction(WGBS_CpG_v2$data, WGBS_CpG_v2$Cell_type), levels = c("WGBS.lum", "CpG.lum", "WGBS.myo", "CpG.myo"))
 WGBS_CpG_v2$End <- factor(WGBS_CpG_v2$End, levels = c("5-prime", "3-prime"))
 (WGBS_CpG_v2_profile <- ggplot(WGBS_CpG_v2, aes(x = Position, y = value, group = Expression)) + 
@@ -75,6 +78,7 @@ WGBS_CpG_v2$End <- factor(WGBS_CpG_v2$End, levels = c("5-prime", "3-prime"))
    geom_point(aes(color = IR)) + 
    facet_grid(group ~ End, scales = "free_y") + 
    ylab("Average DNA methylation") + 
+   scale_color_manual(values = c("retained introns" = "red", "not retained" = "blue")) + 
    theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 gt <- ggplot_gtable(ggplot_build(WGBS_CpG_v2_profile)) 
 # gt$layout 
@@ -254,15 +258,19 @@ H3K36me3_introns_v2$geneRPKM <- factor(H3K36me3_introns_v2$geneRPKM)
 H3K36me3_introns_v2 <- droplevels(na.omit(H3K36me3_introns_v2[H3K36me3_introns_v2$geneRPKM != "gene RPKM > 100", ]))
 H3K36me3_introns_v2$group <- interaction(interaction(H3K36me3_introns_v2$Cell_type, H3K36me3_introns_v2$Expression), H3K36me3_introns_v2$geneRPKM)
 H3K36me3_introns_v2_stat_v2 <- ddply(H3K36me3_introns_v2, ~ group, summarize, Cell_type = Cell_type[1], Expression = Expression[1], geneRPKM = geneRPKM[1], ymin = boxplot.stats(H3K36me3)$stats[1], lower = boxplot.stats(H3K36me3)$stats[2], middle = mean(H3K36me3), upper = boxplot.stats(H3K36me3)$stats[4], ymax = boxplot.stats(H3K36me3)$stats[5])
+H3K36me3_introns_v2_stat_v2$Expression <- gsub("not-retained", "not retained", H3K36me3_introns_v2_stat_v2$Expression)
+H3K36me3_introns_v2_stat_v2$Expression <- gsub("IR", "retained introns", H3K36me3_introns_v2_stat_v2$Expression)
+H3K36me3_introns_v2_stat_v2$Expression <- factor(H3K36me3_introns_v2_stat_v2$Expression, levels = c("retained introns", "not retained"))
 
 (H3K36me3_introns_v2_profile <- ggplot(H3K36me3_introns_v2_stat_v2, aes(x = Expression, group = group)) + 
-   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Expression), stat = "identity", position = "dodge", outlier.shape = NA, width = 0.8) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Expression), color = "grey", stat = "identity", position = "dodge", width = 0.8) + 
    facet_grid(geneRPKM ~ Cell_type, scales = "free") + 
    # ggtitle("H3K36me3 signal for introns") + 
-   xlab("intron Expression") + 
+   xlab("intron retention") + 
    ylab("Average H3K36me3 signal") + 
+   scale_fill_manual(name = "IR", values = c("retained introns" = "red", "not retained" = "blue")) + 
    theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
-ggsave(H3K36me3_introns_v2_profile, file = "H3K36me3_introns_v2_profile.pdf", width = 9, height = 8)
+ggsave(H3K36me3_introns_v2_profile, file = "H3K36me3_introns_v2_profile.pdf", width = 10, height = 8)
 
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM < 1", "H3K36me3"])
