@@ -37,7 +37,7 @@
   + return vector: `No. of DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes` 
 
 ### Usage: 
-  + source on xhost: `source(/home/lli/bin/R-3.0.2/isoform.R)`          
+  + source on xhost: `source("/home/lli/bin/R-3.0.2/isoform.R")`          
   + example: `lumRM084_myoRM084 <- isoform(lib1 = "A17918", lib2 = "A17919", cell1 = "lum", cell2 = "myo", donor1 = "RM084", donor2 = "RM084")`      
 
   
