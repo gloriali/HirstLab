@@ -1,5 +1,5 @@
-isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cutoff2 = 0.1, RPKMmin = 0.005, fdr = 0.01, rmin = 0.005, Nmin = 25, 
-                    dirExon = "./exon/", dirGene = "./gene/", dirOut = "", dirIn1 = "/projects/epigenomics/ep50/internal/jqc.1.7.6/", dirIn2 = dirIn1, 
+isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cutoff2 = 0.1, RPKMmin = 0.01, fdr = 0.01, rmin = 0.005, Nmin = 25, 
+                    dirExon = "../DEfine/exon/", dirGene = "../DEfine/gene/", dirOut = "", dirIn1 = "/projects/epigenomics/ep50/internal/jqc.1.7.6/", dirIn2 = dirIn1, 
                     RPKM1 = paste0(dirIn1, lib1, "/coverage/", lib1, ".G.A.rpkm.pc"), RPKM2 = paste0(dirIn2, lib2, "/coverage/", lib2, ".G.A.rpkm.pc"), 
                     geneUP = paste0(dirGene, "UP.", cell1, "-", donor1, "_", cell2, "-", donor2, ".FDR_", fdr, ".rmin_", rmin, ".Nmin_", Nmin), geneDN = paste0(dirGene, "DN.", cell1, "-", donor1, "_", cell2, "-", donor2, ".FDR_", fdr, ".rmin_", rmin, ".Nmin_", Nmin),
                     exonUP = paste0(dirExon, "UP.", cell1, "-", donor1, "_", cell2, "-", donor2, ".FDR_", fdr, ".rmin_", rmin, ".Nmin_", Nmin), exonDN = paste0(dirExon, "DN.", cell1, "-", donor1, "_", cell2, "-", donor2, ".FDR_", fdr, ".rmin_", rmin, ".Nmin_", Nmin)){
@@ -36,7 +36,8 @@ isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cut
   (isoform_genes <- nrow(isoform_gene))
   write.table(exon, file = paste0(dirOut, cell1, "-", donor1, "_", cell2, "-", donor2, "_isoform.txt"), sep = "\t", quote = F, row.names = F)
   write.table(isoform_gene, file = paste0(dirOut, cell1, "-", donor1, "_", cell2, "-", donor2, "_isoform_gene.txt"), sep = "\t", quote = F, row.names = F)
-  return(c(DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes))
+  summary <- c("DE_genes" = DE_genes, "DE_exons" = DE_exons, "with_expressed_genes" = with_expressed_genes, "isoform_exons" = isoform_exons, "exclude_DE_genes" = exclude_DE_genes, "isoform_genes" = isoform_genes)
+  return(list(summary = summary, isoform_exon = exon, isoform_gene = isoform_gene))
 }
 # isoform (cassete exon) identification 
 # Criteria: 
@@ -49,10 +50,10 @@ isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cut
 #  cell1, cell2: cell types
 #  donor1, donor2: individuals
 #  [cutoff, cutoff2]: cutoff for exons expressed or not. Exon RPKM < cutoff*geneRPKM are considered not expressed, default set to 1%; exon RPKM > cutoff2*geneRPKM are considered expressed, default set to 10%
-#  [RPKMmin]: min RPKM for gene to be considered expressed, default set to 0.005
+#  [RPKMmin]: min RPKM for gene to be considered expressed, default set to 0.01
 #  [fdr, rmin, Nmin]: FDR, rmin and Nmin used in DEfine, should be the same for both exons and genes, default set to 0.01, 0.005, 25
-#  [dirExon]: directory to DE exon results from DEfine, default to <current working directory>/exon/
-#  [dirGene]: directory to DE gene results from DEfine, default to <current working directory>/gene/
+#  [dirExon]: directory to DE exon results from DEfine, default to <current working directory>../DEfine/exon/
+#  [dirGene]: directory to DE gene results from DEfine, default to <current working directory>../DEfine/gene/
 #  [dirOut]: output directory, default to current working directory
 #  [dirIn1, dirIn2]: path to all libraries, default set to the same; default to /projects/epigenomics/ep50/internal/jqc.1.7.6/
 #  [RPKM1, RPKM2]: gene RPKM files, default to <dirIn><lib>/coverage/<lib1>.G.A.rpkm.pc
@@ -64,5 +65,8 @@ isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cut
 # Output:
 #  cassete exons: <dirOut><cell1>"-"<donor1>"_"<cell2>"-"<donor2>_isoform.txt
 #  isoform genes: <dirOut><cell1>"-"<donor1>"_"<cell2>"-"<donor2>_isoform_gene.txt
-#  return vector: No. of DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes
+#  return list: 
+#   summary: No. of DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes
+#   isoform_exon: exons identified as isoforms 
+#   isoform_gene: genes identified as isoforms
 

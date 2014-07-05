@@ -16,11 +16,11 @@
   + lib1, lib2: library IDs
   + cell1, cell2: cell types
   + donor1, donor2: individuals
-  + [cutoff, cutoff2]: cutoff for exons expressed or not. `Exon RPKM < cutoff*geneRPKM are considered not expressed, default set to 1%; exon RPKM > cutoff2*geneRPKM` are considered expressed, default set to 10%
-  + [RPKMmin]: min RPKM for gene to be considered expressed, default set to 0.005
+  + [cutoff, cutoff2]: cutoff for exons expressed or not. `Exon RPKM < cutoff*geneRPKM` are considered not expressed, default set to 1%; `exon RPKM > cutoff2*geneRPKM` are considered expressed, default set to 10%
+  + [RPKMmin]: min RPKM for gene to be considered expressed, default set to 0.01
   + [fdr, rmin, Nmin]: FDR, rmin and Nmin used in DEfine, should be the same for both exons and genes, default set to 0.01, 0.005, 25
-  + [dirExon]: directory to DE exon results from DEfine, default to `current working directory/exon/`
-  + [dirGene]: directory to DE gene results from DEfine, default to `current working directory/gene/`
+  + [dirExon]: directory to DE exon results from DEfine, default to `<current working directory>../DEfine/exon/`
+  + [dirGene]: directory to DE gene results from DEfine, default to `<current working directory>../DEfine/gene/`
   + [dirOut]: output directory, default to `current working directory`
   + [dirIn1, dirIn2]: path to all libraries, default set to the same; default to `/projects/epigenomics/ep50/internal/jqc.1.7.6/`
   + [RPKM1, RPKM2]: gene RPKM files, default to `<dirIn><lib>/coverage/<lib1>.G.A.rpkm.pc`
@@ -32,13 +32,25 @@
   + gene RPKM file for both library: `dirIn, lib, "/coverage/", lib, ".G.A.rpkm.pc"`; file format: `ENSG_id Nreads  gene_RPKM average_RPKM  min_RPKM  max_RPKM`      
 
 ### Output:
-  + cassete exons: `<dirOut><cell1>"-"<donor1>"_"<cell2>"-"<donor2>_isoform.txt`
+  + cassette exons: `<dirOut><cell1>"-"<donor1>"_"<cell2>"-"<donor2>_isoform.txt`
   + isoform genes: `<dirOut><cell1>"-"<donor1>"_"<cell2>"-"<donor2>_isoform_gene.txt`
-  + return vector: `No. of DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes` 
+  + return list:
+    * summary: No. of DE_genes, DE_exons, with_expressed_genes, isoform_exons, exclude_DE_genes, isoform_genes
+    * isoform_exon: cassette exons 
+    * isoform_gene: genes identified as isoforms
 
 ### Usage: 
   + source on xhost: `source("/home/lli/bin/R-3.0.2/isoform.R")`          
-  + example: `lumRM084_myoRM084 <- isoform(lib1 = "A17918", lib2 = "A17919", cell1 = "lum", cell2 = "myo", donor1 = "RM084", donor2 = "RM084")`      
+  + example:   
+```
+lib1='A03473'; cell1='Cortex'; donor1='HuFNSC01';
+lib2='A03474'; cell2='GE'; donor2='HuFNSC01';
+cortex01_GE01 <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2)
+cortex01_GE01_summary <- cortex01_GE01$summary
+cortex01_GE01_isoform_exon <- cortex01_GE01$isoform_exon
+cortex01_GE01_isoform_gene <- cortex01_GE01$isoform_gene
+rm(cortex01_GE01)
+``` 
 
   
   
