@@ -31,9 +31,9 @@ less $exons5p | awk '{print "chr"$0}' > /home/lli/hg19/hg19v65_exons_for_genes.5
 mv -f /home/lli/hg19/hg19v65_exons_for_genes.5prime_200.unique_bin_20.1 $exons5p
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $exons3p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt   
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $exons5p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt   
-less /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique
+less /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/hg19/CpG.hg19v65_exons_for_genes.3prime_200.unique
 rm /home/lli/REMC/epiProfile/exons3p_200/CpG.hg19v65_exons_for_genes.3prime_200.unique_bin_20.txt
-less /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique
+less /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/hg19/CpG.hg19v65_exons_for_genes.5prime_200.unique
 rm /home/lli/REMC/epiProfile/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_bin_20.txt
 
 
@@ -56,8 +56,8 @@ less $introns5p | awk '{print "chr"$0}' > /home/lli/hg19/hg19v65_introns_for_gen
 mv -f /home/lli/hg19/hg19v65_introns_for_genes.5prime_200_bin_20.1 $introns5p
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $introns3p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200_bin_20.txt   
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $introns5p -b /home/lli/hg19/CG.BED -c > /home/lli/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200_bin_20.txt   
-less /home/lli/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200
+less /home/lli/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/hg19/CpG.hg19v65_introns_for_genes.3prime_200
 rm /home/lli/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200_bin_20.txt
-less /home/lli/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200
+less /home/lli/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200_bin_20.txt | awk 'BEGIN {id=""; record=""} {if ($4 == id){record=(record" "$5)} else {print record; id=$4; record=(id" "$5)}}' > /home/lli/hg19/CpG.hg19v65_introns_for_genes.5prime_200
 rm /home/lli/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200_bin_20.txt
 
