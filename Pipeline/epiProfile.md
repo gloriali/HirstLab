@@ -47,7 +47,7 @@ rm <output directory>/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_
 ## Step 2. Calculate and plot average profile for isoform exons / intron retention
 * [epiProfile.R](./epiProfile.R)
 
-### Criteria:   
+### Required input:   
 * H3K36me3: exon coverage results from RegionsCoverageFromWigCalculator.jar, name <cell><donor>_H3K36me3       
 * WGBS: exon boundary profile results from RegionsProfileFromBEDCalculator.jar, name <cell><donor>_WGBS       
 * other marks: exon boundary profile results from RegionsProfileFromWigCalculator.jar, name <cell><donor>_mark        

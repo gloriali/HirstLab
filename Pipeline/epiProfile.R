@@ -67,7 +67,7 @@ epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", b
   }
 }
 # Epigenetic profile for isoform exons
-# Criteria: 
+# Required input: 
 #   H3K36me3: exon coverage results from RegionsCoverageFromWigCalculator.jar, name <cell><donor>_H3K36me3
 #   WGBS: exon boundary profile results from RegionsProfileFromBEDCalculator.jar, name <cell><donor>_WGBS
 #   other marks: exon boundary profile results from RegionsProfileFromWigCalculator.jar, name <cell><donor>_mark 
