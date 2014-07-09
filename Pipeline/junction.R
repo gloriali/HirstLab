@@ -19,7 +19,7 @@ high_fold <- function(exon, up, covcut, junctions, junction_exons){
 Vhigh_fold <- Vectorize(high_fold, vectorize.args = c("exon", "up"), SIMPLIFY = T)
 
 junction <- function(lib1, lib2, cell1, cell2, donor1, donor2, Nread1, Nread2, read_length1 = 75, read_length2 = 75, jcut = 0.1, covcut = 1, 
-                     dirIn = "", dirIsoform = "../isoform/", dirOut = "", junction_exon = junction_exon, ensembl = ensembl){
+                     dirIn = "", dirIsoform = "../isoform/", dirOut = ""){
   junction1 <- read.delim(paste0(dirIn, lib1, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F, row.names = 1)
   rownames(junction1) <- gsub("chr", "", rownames(junction1))
   junction2 <- read.delim(paste0(dirIn, lib2, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F, row.names = 1)
@@ -53,7 +53,7 @@ junction <- function(lib1, lib2, cell1, cell2, donor1, donor2, Nread1, Nread2, r
   isoform_valid_gene <- isoform_valid[!duplicated(isoform_valid$geneID), ]
   write.table(isoform_valid_gene, file = paste0(dirOut, cell1, "-", donor1, "_", cell2, "-", donor2, "_isoform_valid_gene.txt"), sep = "\t", quote = F, row.names = F, col.names = T)
   summary = c("isoform exons" = isoform_exons, "isoform genes" = isoform_genes, "exons with junction coverage" = exons_with_junction_cov, "genes with junction coverage" = genes_with_junction_cov, "exons with junction support" = exons_with_junction_support, "genes with junction support" = genes_with_junction_support)
-  return(list(summary = summary, isoform_valid = isoform_valid, isoform_valid_gene = isoform_valid_gene))
+  return(list(summary = summary, isoform_valid_exon = isoform_valid, isoform_valid_gene = isoform_valid_gene))
 }
 # isoform validation with junction reads
 # Criteria: 
@@ -81,7 +81,7 @@ junction <- function(lib1, lib2, cell1, cell2, donor1, donor2, Nread1, Nread2, r
 #  validated genes: `<dirOut><cell1>-<donor1>_<cell2>-<donor2>_isoform_valid_gene.txt`  
 #  return list: 
 #   summary: isoform exons, isoform_genes, exons_with_junction_cov, genes_with_junction_cov, exons_with_junction_support, genes with junction support
-#   isoform_valid: validated exons   
+#   isoform_valid_exon: validated exons   
 #   isoform_valid_gene: validatedgenes   
 
 
