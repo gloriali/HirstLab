@@ -102,4 +102,36 @@ save.image("FetalBrain_junction.Rdata")
 rm(list = ls())
 
 ##################################################################################
+setwd("~/快盘/FetalBrain/RNAseq/junction/")
+load("FetalBrain_junction.Rdata")
+source("~/HirstLab/Pipeline/enrich.R")
+library(VennDiagram)
+library(ggplot2)
+
+# cortex vs GE
+isoform_valid_cortex_GE <- list(HuFNSC01 = cortex01_GE01_isoform_valid_gene$geneID, HuFNSC02 = cortex02_GE02_isoform_valid_gene$geneID, HuFNSC03 = cortex03_GE03_isoform_valid_gene$geneID, HuFNSC04 = cortex04_GE04_isoform_valid_gene$geneID)
+venn_cortex_GE <- venn.diagram(isoform_valid_cortex_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex vs GE isoform_valids", main.cex = 2)
+pdf("venn_cortex_GE_isoform_valid.pdf")
+plot.new()
+grid.draw(venn_cortex_GE)
+dev.off()
+
+# HuFNSC01 vs HuFNSC02
+isoform_valid_HuFNSC01_HuFNSC02 <- list(brain = brain01_brain02_isoform_valid_gene$geneID, cortex = cortex01_cortex02_isoform_valid_gene$geneID, GE = GE01_GE02_isoform_valid_gene$geneID)
+venn_HuFNSC01_HuFNSC02 <- venn.diagram(isoform_valid_HuFNSC01_HuFNSC02, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 isoform_valids", main.cex = 2)
+pdf("venn_HuFNSC01_HuFNSC02_isoform_valid.pdf")
+plot.new()
+grid.draw(venn_HuFNSC01_HuFNSC02)
+dev.off()
+
+# HuFNSC03 vs HuFNSC04
+isoform_valid_HuFNSC03_HuFNSC04 <- list(cortex = cortex03_cortex04_isoform_valid_gene$geneID, GE = GE03_GE04_isoform_valid_gene$geneID)
+venn_HuFNSC03_HuFNSC04 <- venn.diagram(isoform_valid_HuFNSC03_HuFNSC04, filename = NULL, fill = c("blue", "green"), main = "Venn diagram of HuFNSC03 vs HuFNSC04 isoform_valids", main.cex = 2)
+pdf("venn_HuFNSC03_HuFNSC04_isoform_valid.pdf")
+plot.new()
+grid.draw(venn_HuFNSC03_HuFNSC04)
+dev.off()
+
+save.image("FetalBrain_isoform_valid.Rdata")
+
 
