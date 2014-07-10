@@ -20,10 +20,12 @@ Vhigh_fold <- Vectorize(high_fold, vectorize.args = c("exon", "up"), SIMPLIFY = 
 
 junction <- function(lib1, lib2, cell1, cell2, donor1, donor2, Nread1, Nread2, read_length1 = 75, read_length2 = 75, jcut = 0.1, covcut = 1, 
                      dirIn = "", dirIsoform = "../isoform/", dirOut = ""){
-  junction1 <- read.delim(paste0(dirIn, lib1, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F, row.names = 1)
-  rownames(junction1) <- gsub("chr", "", rownames(junction1))
-  junction2 <- read.delim(paste0(dirIn, lib2, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F, row.names = 1)
-  rownames(junction2) <- gsub("chr", "", rownames(junction2))
+  junction1 <- read.delim(paste0(dirIn, lib1, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F)
+  junction1 <- junction1[!duplicated(junction1$V1), ]
+  rownames(junction1) <- gsub("chr", "", junction1$V1)
+  junction2 <- read.delim(paste0(dirIn, lib2, ".q5.F516.jb.bedGraph.gz"), as.is =T, head = F)
+  junction2 <- junction2[!duplicated(junction2$V1), ]
+  rownames(junction2) <- gsub("chr", "", junction2$V1)
   junction <- data.frame(junctionID = unique(c(rownames(junction1), rownames(junction2))), N1 = 0, N2 = 0)
   rownames(junction) <- junction$junctionID
   junction[rownames(junction1), "N1"] <- junction1$V3
