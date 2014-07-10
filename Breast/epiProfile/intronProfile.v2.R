@@ -71,22 +71,30 @@ WGBS_CpG_v2 <- data.frame(data = c(rep("WGBS", nrow(WGBS_boundaries_v2)), rep("C
 WGBS_CpG_v2$IR <- gsub("non-IR", "not retained", WGBS_CpG_v2$IR)
 WGBS_CpG_v2$IR <- gsub("IR", "retained introns", WGBS_CpG_v2$IR)
 WGBS_CpG_v2$IR <- factor(WGBS_CpG_v2$IR, levels = c("retained introns", "not retained"))
+WGBS_CpG_v2$color <- as.character(interaction(WGBS_CpG_v2$Cell_type, WGBS_CpG_v2$IR))
+WGBS_CpG_v2$color <- gsub("lum.not retained", "not retained", WGBS_CpG_v2$color)
+WGBS_CpG_v2$color <- gsub("myo.not retained", "not retained", WGBS_CpG_v2$color)
+WGBS_CpG_v2$color <- factor(WGBS_CpG_v2$color, levels = c("lum.retained introns", "myo.retained introns", "not retained"))
 WGBS_CpG_v2$group <- factor(interaction(WGBS_CpG_v2$data, WGBS_CpG_v2$Cell_type), levels = c("WGBS.lum", "CpG.lum", "WGBS.myo", "CpG.myo"))
 WGBS_CpG_v2$End <- factor(WGBS_CpG_v2$End, levels = c("5-prime", "3-prime"))
 (WGBS_CpG_v2_profile <- ggplot(WGBS_CpG_v2, aes(x = Position, y = value, group = Expression)) + 
-   geom_line(aes(color = IR)) + 
-   geom_point(aes(color = IR)) + 
+   geom_line(aes(color = color)) + 
+   geom_point(aes(color = color)) + 
    facet_grid(group ~ End, scales = "free_y") + 
-   ylab("Average DNA methylation") + 
-   scale_color_manual(values = c("retained introns" = "red", "not retained" = "blue")) + 
-   theme(axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+   ylab("") + 
+   scale_color_manual(name = "IR", values = c("lum.retained introns" = rgb(200,50,0, maxColorValue = 255), "myo.retained introns" = rgb(50,200,50, maxColorValue = 255), "not retained" = "blue")) + 
+   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 gt <- ggplot_gtable(ggplot_build(WGBS_CpG_v2_profile)) 
 # gt$layout 
 gt$heights[[4]] <- unit(2.5, "null") 
 gt$heights[[8]] <- unit(2.5, "null") 
-pdf("WGBS_CpG_v2_profile.pdf")
+pdf("WGBS_CpG_v2_profile.pdf", width = 10, height = 10)
 # grid.newpage()
 grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.82, "npc"), rot = 90)
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90)
+grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.12, "npc"), rot = 90)
+grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.58, "npc"), rot = 90)
 dev.off()
 
 ######################################################################################################
@@ -108,13 +116,21 @@ MeDIP_5p[MeDIP_5p$Expression == "lum_not-retained", "MeDIP"] <- colMeans(lum_MeD
 MeDIP_5p[MeDIP_5p$Expression == "myo_IR", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo084_ir,], na.rm = T)
 MeDIP_5p[MeDIP_5p$Expression == "myo_not-retained", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo084_other,], na.rm = T)
 MeDIP_boundaries_v2 <- data.frame(rbind(MeDIP_3p, MeDIP_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(MeDIP_3p)), levels = c("5-prime", "3-prime")))
+MeDIP_boundaries_v2$IR <- gsub("non-IR", "not retained", MeDIP_boundaries_v2$IR)
+MeDIP_boundaries_v2$IR <- gsub("IR", "retained introns", MeDIP_boundaries_v2$IR)
+MeDIP_boundaries_v2$IR <- factor(MeDIP_boundaries_v2$IR, levels = c("retained introns", "not retained"))
+MeDIP_boundaries_v2$color <- as.character(interaction(MeDIP_boundaries_v2$Cell_type, MeDIP_boundaries_v2$IR))
+MeDIP_boundaries_v2$color <- gsub("lum.not retained", "not retained", MeDIP_boundaries_v2$color)
+MeDIP_boundaries_v2$color <- gsub("myo.not retained", "not retained", MeDIP_boundaries_v2$color)
+MeDIP_boundaries_v2$color <- factor(MeDIP_boundaries_v2$color, levels = c("lum.retained introns", "myo.retained introns", "not retained"))
 (MeDIP_boundaries_v2_profile <- ggplot(MeDIP_boundaries_v2, aes(x = Position, y = MeDIP, group = Expression)) + 
-   geom_line(aes(color = IR)) + 
-   geom_point(aes(color = IR)) + 
+   geom_line(aes(color = color)) + 
+   geom_point(aes(color = color)) + 
    facet_grid(Cell_type ~ End) + 
-   ggtitle("MeDIP profile around intron boundaries") + 
-   ylab("Average DNA methylation level") + 
-   theme_bw())
+   ylab("Average MeDIP signal") + 
+   # ggtitle("MeDIP profile around intron boundaries") + 
+   scale_color_manual(name = "IR", values = c("lum.retained introns" = rgb(200,50,0, maxColorValue = 255), "myo.retained introns" = rgb(50,200,50, maxColorValue = 255), "not retained" = "blue")) + 
+   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 ggsave(MeDIP_boundaries_v2_profile, file = "MeDIP_boundaries_v2_profile.pdf")
 
 ######################################################################################################
