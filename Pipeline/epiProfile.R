@@ -1,6 +1,7 @@
 epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", both, neither, cell1_specific, cell2_specific, geneRPKM, CpG = F, 
                        color1 = rgb(200,50,0, maxColorValue = 255), color2 = rgb(50,200,50, maxColorValue = 255), color_both = "purple", color_neither = "blue"){
   library(ggplot2)
+  library(grid) 
   if(mark == "H3K36me3"){
     cell1_mark_exons <- read.delim(paste0(dirIn, "exons/hg19v65_exons_for_genes.", cell1, donor1, "_", mark, ".coverage"), head = F, as.is = T)
     cell2_mark_exons <- read.delim(paste0(dirIn, "exons/hg19v65_exons_for_genes.", cell2, donor2, "_", mark, ".coverage"), head = F, as.is = T)
@@ -27,7 +28,7 @@ epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", b
        xlab("Exon group") + 
        ylab(paste0("Average ", mark, " signal")) + 
        scale_fill_manual(values = c(color1, color2)) + 
-       theme_bw()
+      theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
     ggsave(mark_exons_profile, file = paste0(dirOut, mark, "_exons_profile.pdf"), width = 9, height = 8)
     return(list(data = mark_exons, profile = mark_exons_stat, figure = mark_exons_profile))
   }
@@ -90,14 +91,13 @@ epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", b
        facet_grid(data ~ End, scales = "free_y") + 
        ylab("") + 
        scale_color_manual(values = c(color1, color2, color_both, color_neither)) + 
-       theme_bw()
-    library(grid) 
+       theme(panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
     gt <- ggplot_gtable(ggplot_build(mark_CpG_profile)) 
     gt$heights[[4]] <- unit(3, "null") 
     pdf(paste0(mark, "_CpG_profile.pdf"), width = 9)
     grid.draw(gt) 
     grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
-    grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.18, "npc"), rot = 90)
+    grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.18, "npc"), rot = 90)
     dev.off()
     return(list(profile = mark_CpG, figure = mark_CpG_profile))
   }
@@ -138,7 +138,7 @@ epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", b
        facet_wrap(~ End) + 
        ylab(paste0("Average ", mark, " signal")) + 
        scale_color_manual(values = c(color1, color2, color_both, color_neither)) + 
-       theme_bw()
+       theme(panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
     ggsave(mark_boundaries_profile, file = paste0(dirOut, mark, "_boundaries_profile.pdf"))
     return(list(profile = mark_boundaries, figure = mark_boundaries_profile))
   }
