@@ -39,8 +39,8 @@ WGBS_boundaries_v2 <- data.frame(rbind(WGBS_3p, WGBS_5p), End = factor(rep(c("3-
 ggsave(WGBS_boundaries_v2_profile, file = "WGBS_boundaries_v2_profile.pdf")
 
 # add CpG content track 
-CpG_content_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
-CpG_content_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_3p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.3prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_5p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.5prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
 CpG_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
 CpG_3p[CpG_3p$Expression == "lum_IR", "CpG"] <- colMeans(CpG_content_3p[lum084_ir,], na.rm = T)
 CpG_3p[CpG_3p$Expression == "lum_not-retained", "CpG"] <- colMeans(CpG_content_3p[lum084_other,], na.rm = T)
@@ -95,6 +95,50 @@ grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.82, "npc
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90)
 grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.12, "npc"), rot = 90)
 grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.58, "npc"), rot = 90)
+dev.off()
+######################################################################################################
+# delta WGBS vs intron/exon correlation
+e <- 1e-6
+lum_intron_exon <- read.delim("../A17918.introns_cov.fankingExons", , head = F, as.is = T)
+rownames(lum_intron_exon) <- paste0(lum_intron_exon$V5, "_", lum_intron_exon$V1, ":", lum_intron_exon$V2, "-", lum_intron_exon$V3, "<", lum_intron_exon$V4)
+lum_intron_exon$ratio3p <- (lum_intron_exon$V6 + e) / (lum_intron_exon$V8 + e)
+lum_intron_exon$ratio5p <- (lum_intron_exon$V6 + e) / (lum_intron_exon$V7 + e)
+lum_correlate3p <- data.frame(id = rownames(lum_intron_exon), 
+                              ratio = lum_intron_exon[, "ratio3p"], 
+                              delta = apply(lum_bismark_3p[, 1:10], 1, max) - apply(lum_bismark_3p[, 11:20], 1, min))
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/3p-exon", ylab = "3p-delta")
+points(lum_correlate3p$ratio, lum_correlate3p$delta, pch = 19, cex = 0.5)
+cor(lum_correlate3p$ratio, lum_correlate3p$delta)
+lum_correlate5p <- data.frame(id = rownames(lum_intron_exon), 
+                              ratio = lum_intron_exon[, "ratio5p"], 
+                              delta = apply(lum_bismark_5p[, 1:10], 1, max) - apply(lum_bismark_5p[, 11:20], 1, min))
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/5p-exon", ylab = "5p-delta")
+points(lum_correlate5p$ratio, lum_correlate5p$delta, pch = 19, cex = 0.5)
+cor(lum_correlate5p$ratio, lum_correlate5p$delta)
+
+myo_intron_exon <- read.delim("../A17919.introns_cov.fankingExons", , head = F, as.is = T)
+rownames(myo_intron_exon) <- paste0(myo_intron_exon$V5, "_", myo_intron_exon$V1, ":", myo_intron_exon$V2, "-", myo_intron_exon$V3, "<", myo_intron_exon$V4)
+myo_intron_exon$ratio3p <- (myo_intron_exon$V6 + e) / (myo_intron_exon$V8 + e)
+myo_intron_exon$ratio5p <- (myo_intron_exon$V6 + e) / (myo_intron_exon$V7 + e)
+myo_correlate3p <- data.frame(id = rownames(myo_intron_exon), 
+                              ratio = myo_intron_exon[, "ratio3p"], 
+                              delta = apply(myo_bismark_3p[, 1:10], 1, max) - apply(myo_bismark_3p[, 11:20], 1, min))
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/3p-exon", ylab = "3p-delta")
+points(myo_correlate3p$ratio, myo_correlate3p$delta, pch = 19, cex = 0.5)
+cor(myo_correlate3p$ratio, myo_correlate3p$delta)
+myo_correlate5p <- data.frame(id = rownames(myo_intron_exon), 
+                              ratio = myo_intron_exon[, "ratio5p"], 
+                              delta = apply(myo_bismark_5p[, 1:10], 1, max) - apply(myo_bismark_5p[, 11:20], 1, min))
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/5p-exon", ylab = "5p-delta")
+points(myo_correlate5p$ratio, myo_correlate5p$delta, pch = 19, cex = 0.5)
+cor(myo_correlate5p$ratio, myo_correlate5p$delta)
+
+# intron RPKM ecdf
+pdf("Ecdf_intronRPKM.pdf")
+plot(x=c(0,10), y=c(0,1), xlab = "intron RPKM", ylab = "Ecdf", type="n")
+lines(ecdf(lum_intron_exon$V6), col = "red")
+lines(ecdf(myo_intron_exon$V6), col = "green")
+legend("bottomright", c("lum", "myo"), col = c("red", "green"), lwd = 5)
 dev.off()
 
 ######################################################################################################
@@ -295,6 +339,6 @@ t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 1-10",
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM 10-100", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 10-100", "H3K36me3"])
 
-save(lum084_other, myo084_other, lum084_ir, myo084_ir, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_v2_stat_v2, WGBS_CpG_v2, 
+save(lum084_other, myo084_other, lum084_ir, myo084_ir, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_v2_stat_v2, WGBS_CpG_v2, lum_correlate3p, lum_correlate5p, myo_correlate3p, myo_correlate5p, 
      WGBS_boundaries_v2, CpG_boundaries_v2, MeDIP_boundaries_v2, H3K4me3_boundaries_v2, H3K4me1_boundaries_v2, H3K9me3_boundaries_v2, H3K27me3_boundaries_v2, H3K36me3_introns_v2, file = "intronProfile_v2.Rdata")
 

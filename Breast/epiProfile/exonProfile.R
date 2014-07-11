@@ -2,6 +2,7 @@
 setwd("~/快盘/REMC/epiProfile/")
 source("~/HirstLab/Pipeline/epiProfile.R")
 library(ggplot2)
+library(grid)
 load("exonProfile.Rdata")
 lum084 <- read.delim("~/REMC/epiProfile/A17918.G.exn.A.rpkm", head = F, as.is = T)
 lum084$coord <- gsub("<[-]*1", "", lum084$V1)
@@ -243,13 +244,14 @@ MeDIP_5p[MeDIP_5p$group == "myo.myo-specific", "MeDIP"] <- colMeans(myo_MeDIP_5p
 MeDIP_5p[MeDIP_5p$group == "myo.expressed_in_both", "MeDIP"] <- colMeans(myo_MeDIP_5p[both,], na.rm = T)
 MeDIP_5p[MeDIP_5p$group == "myo.not_expressed", "MeDIP"] <- colMeans(myo_MeDIP_5p[neither,], na.rm = T)
 MeDIP_boundaries <- data.frame(rbind(MeDIP_3p, MeDIP_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(MeDIP_3p)), levels = c("5-prime", "3-prime")))
-(MeDIP_boundaries_profile <- ggplot(MeDIP_boundaries, aes(x = Position, y = MeDIP, group = group)) + 
-   geom_line(aes(color = Expression, linetype = Cell_type), size = 1.5) + 
-   geom_point(aes(color = Expression, shape = Cell_type), size = 4) + 
+(MeDIP_boundaries_profile <- ggplot(MeDIP_boundaries, aes(x = Position, y = mark, group = group)) + 
+   geom_line(aes(color = Expression, linetype = Cell_type)) + 
+   geom_point(aes(color = Expression, shape = Cell_type)) + 
    facet_wrap(~ End) + 
    ggtitle("MeDIP profile around exon boundaries") + 
-   ylab("Average DNA methylation level") + 
-   theme_bw())
+   ylab("") + 
+   scale_color_manual(values = c("lum-specific" = rgb(200,50,0, maxColorValue = 255), "myo-specific" = rgb(50,200,50, maxColorValue = 255), "expressed_in_both" = "purple", "not_expressed" = "blue")) + 
+   theme(panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 ggsave(MeDIP_boundaries_profile, file = "MeDIP_boundaries_profile.pdf")
 
 # expressed genes only

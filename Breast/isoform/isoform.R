@@ -567,7 +567,7 @@ eNexons2_up<-c(117809,117201,104419,117201,114900,114900)
 eNexons2_low<-c(109462,108666,100078,108666,110273,110273)
 
 coltissue<-data.frame(tissue=c("fibr","lum","myo","stem-like","vHMEC"),
-                      col=c("blueviolet","red","greenyellow","blue","green"))
+                      col=c(rgb(110,190,30, maxColorValue = 255), rgb(200,50,0, maxColorValue = 255),rgb(50,200,50, maxColorValue = 255),rgb(0,100,200, maxColorValue = 255),rgb(150,70,50, maxColorValue = 255)))
 colNexons1<-c(as.character(coltissue$col[5]),as.character(coltissue$col[5]),as.character(coltissue$col[5]),as.character(coltissue$col[3]),as.character(coltissue$col[3]),as.character(coltissue$col[2]))
 colNexons2<-c(as.character(coltissue$col[3]),as.character(coltissue$col[2]),as.character(coltissue$col[1]),as.character(coltissue$col[2]),as.character(coltissue$col[4]),as.character(coltissue$col[4]))
 
