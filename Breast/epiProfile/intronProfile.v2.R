@@ -39,8 +39,8 @@ WGBS_boundaries_v2 <- data.frame(rbind(WGBS_3p, WGBS_5p), End = factor(rep(c("3-
 ggsave(WGBS_boundaries_v2_profile, file = "WGBS_boundaries_v2_profile.pdf")
 
 # add CpG content track 
-CpG_content_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/CpG.hg19v65_introns_for_genes.3prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
-CpG_content_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/CpG.hg19v65_introns_for_genes.5prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_3p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.3prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_5p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.5prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
 CpG_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
 CpG_3p[CpG_3p$Expression == "lum_IR", "CpG"] <- colMeans(CpG_content_3p[lum084_ir,], na.rm = T)
 CpG_3p[CpG_3p$Expression == "lum_not-retained", "CpG"] <- colMeans(CpG_content_3p[lum084_other,], na.rm = T)
@@ -86,16 +86,79 @@ WGBS_CpG_v2$End <- factor(WGBS_CpG_v2$End, levels = c("5-prime", "3-prime"))
    theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 gt <- ggplot_gtable(ggplot_build(WGBS_CpG_v2_profile)) 
 # gt$layout 
-gt$heights[[4]] <- unit(2.5, "null") 
-gt$heights[[8]] <- unit(2.5, "null") 
+gt$heights[[4]] <- unit(2, "null") 
+gt$heights[[8]] <- unit(2, "null") 
 pdf("WGBS_CpG_v2_profile.pdf", width = 10, height = 10)
 # grid.newpage()
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.82, "npc"), rot = 90)
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90)
-grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.12, "npc"), rot = 90)
-grid.text("No. of CpGs", x = unit(0.015, "npc"), y = unit(0.58, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.12, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.58, "npc"), rot = 90)
+grid.text(expression("p=2.96x10"^-13), x = unit(0.32, "npc"), y = unit(0.9, "npc"))
+grid.text(expression("p=7.14x10"^-15), x = unit(0.48, "npc"), y = unit(0.9, "npc"))
+grid.text(expression("p=3.08x10"^-55), x = unit(0.32, "npc"), y = unit(0.6, "npc"))
+grid.text(expression("p=2.96x10"^-45), x = unit(0.48, "npc"), y = unit(0.62, "npc"))
+grid.text(expression("p=1.50x10"^-17), x = unit(0.32, "npc"), y = unit(0.45, "npc"))
+grid.text(expression("p=6.80x10"^-28), x = unit(0.48, "npc"), y = unit(0.45, "npc"))
+grid.text(expression("p=2.45x10"^-41), x = unit(0.32, "npc"), y = unit(0.13, "npc"))
+grid.text(expression("p=5.97x10"^-32), x = unit(0.48, "npc"), y = unit(0.16, "npc"))
 dev.off()
+######################################################################################################
+# delta WGBS 
+e <- 1e-6
+lum_intron_exon <- read.delim("../A17918.introns_cov.fankingExons", , head = F, as.is = T)
+rownames(lum_intron_exon) <- paste0(lum_intron_exon$V5, "_", lum_intron_exon$V1, ":", lum_intron_exon$V2, "-", lum_intron_exon$V3, "<", lum_intron_exon$V4)
+lum_intron_exon$ratio3p <- (lum_intron_exon$V6 + e) / (lum_intron_exon$V8 + e)
+lum_intron_exon$ratio5p <- (lum_intron_exon$V6 + e) / (lum_intron_exon$V7 + e)
+lum_summary3p <- data.frame(id = rownames(lum_intron_exon), 
+                              ratio = lum_intron_exon[, "ratio3p"], 
+                              delta = apply(lum_bismark_3p[, 11:20], 1, max) - apply(lum_bismark_3p[, 1:10], 1, min))
+lum_summary5p <- data.frame(id = rownames(lum_intron_exon), 
+                              ratio = lum_intron_exon[, "ratio5p"], 
+                              delta = apply(lum_bismark_5p[, 1:10], 1, max) - apply(lum_bismark_5p[, 11:20], 1, min))
+myo_intron_exon <- read.delim("../A17919.introns_cov.fankingExons", , head = F, as.is = T)
+rownames(myo_intron_exon) <- paste0(myo_intron_exon$V5, "_", myo_intron_exon$V1, ":", myo_intron_exon$V2, "-", myo_intron_exon$V3, "<", myo_intron_exon$V4)
+myo_intron_exon$ratio3p <- (myo_intron_exon$V6 + e) / (myo_intron_exon$V8 + e)
+myo_intron_exon$ratio5p <- (myo_intron_exon$V6 + e) / (myo_intron_exon$V7 + e)
+myo_summary3p <- data.frame(id = rownames(myo_intron_exon), 
+                              ratio = myo_intron_exon[, "ratio3p"], 
+                              delta = apply(myo_bismark_3p[, 11:20], 1, max) - apply(myo_bismark_3p[, 1:10], 1, min))
+myo_summary5p <- data.frame(id = rownames(myo_intron_exon), 
+                              ratio = myo_intron_exon[, "ratio5p"], 
+                              delta = apply(myo_bismark_5p[, 1:10], 1, max) - apply(myo_bismark_5p[, 11:20], 1, min))
+
+# delta WGBS vs intron/exon correlation
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/3p-exon", ylab = "3p-delta")
+points(lum_summary3p$ratio, lum_summary3p$delta, pch = 19, cex = 0.5)
+cor(lum_summary3p$ratio, lum_summary3p$delta)
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/5p-exon", ylab = "5p-delta")
+points(lum_summary5p$ratio, lum_summary5p$delta, pch = 19, cex = 0.5)
+cor(lum_summary5p$ratio, lum_summary5p$delta)
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/3p-exon", ylab = "3p-delta")
+points(myo_summary3p$ratio, myo_summary3p$delta, pch = 19, cex = 0.5)
+cor(myo_summary3p$ratio, myo_summary3p$delta)
+plot(x=c(0.3, 1), y=c(0, 0.2), type = "n", xlab = "intron/5p-exon", ylab = "5p-delta")
+points(myo_summary5p$ratio, myo_summary5p$delta, pch = 19, cex = 0.5)
+cor(myo_summary5p$ratio, myo_summary5p$delta)
+
+# intron RPKM ecdf
+pdf("Ecdf_intronRPKM.pdf")
+plot(x=c(0,10), y=c(0,1), xlab = "intron RPKM", ylab = "Ecdf", type="n")
+lines(ecdf(lum_intron_exon$V6), col = rgb(200,50,0, maxColorValue = 255))
+lines(ecdf(myo_intron_exon$V6), col = rgb(50,200,50, maxColorValue = 255))
+legend("bottomright", c("lum", "myo"), col = c(rgb(200,50,0, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), lwd = 5)
+dev.off()
+
+# t-tests
+t.test(lum_summary3p[lum084_ir, "delta"], lum_summary3p[lum084_other, "delta"])$p.value
+t.test(lum_summary5p[lum084_ir, "delta"], lum_summary5p[lum084_other, "delta"])$p.value
+t.test(myo_summary3p[myo084_ir, "delta"], myo_summary3p[myo084_other, "delta"])$p.value
+t.test(myo_summary5p[myo084_ir, "delta"], myo_summary5p[myo084_other, "delta"])$p.value
+t.test(rowMeans(CpG_content_3p[lum084_ir, ]), rowMeans(CpG_content_3p[lum084_other, ]))$p.value
+t.test(rowMeans(CpG_content_5p[lum084_ir, ]), rowMeans(CpG_content_5p[lum084_other, ]))$p.value
+t.test(rowMeans(CpG_content_3p[myo084_ir, ]), rowMeans(CpG_content_3p[myo084_other, ]))$p.value
+t.test(rowMeans(CpG_content_5p[myo084_ir, ]), rowMeans(CpG_content_5p[myo084_other, ]))$p.value
 
 ######################################################################################################
 # MeDIP profile @ intron boundaries
@@ -295,6 +358,93 @@ t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 1-10",
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM 10-100", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 10-100", "H3K36me3"])
 
-save(lum084_other, myo084_other, lum084_ir, myo084_ir, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_v2_stat_v2, WGBS_CpG_v2, 
+save(lum084_other, myo084_other, lum084_ir, myo084_ir, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_v2_stat_v2, WGBS_CpG_v2, lum_summary3p, lum_summary5p, myo_summary3p, myo_summary5p, 
      WGBS_boundaries_v2, CpG_boundaries_v2, MeDIP_boundaries_v2, H3K4me3_boundaries_v2, H3K4me1_boundaries_v2, H3K9me3_boundaries_v2, H3K27me3_boundaries_v2, H3K36me3_introns_v2, file = "intronProfile_v2.Rdata")
+######################################################################################################
+# WGBS profile @ intron boundaries
+common_ir <- intersect(lum084_ir, myo084_ir)
+other <- setdiff(rownames(lum_intron_exon), common_ir)
+lum_bismark_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/lumRM066_bismark.hg19v65_introns_for_genes.3prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
+myo_bismark_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/myoRM045_bismark.hg19v65_introns_for_genes.3prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
+lum_bismark_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/lumRM066_bismark.hg19v65_introns_for_genes.5prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
+myo_bismark_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/myoRM045_bismark.hg19v65_introns_for_genes.5prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
+WGBS_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), WGBS = -1)
+WGBS_3p[WGBS_3p$Expression == "lum_IR", "WGBS"] <- colMeans(lum_bismark_3p[common_ir,], na.rm = T)
+WGBS_3p[WGBS_3p$Expression == "lum_not-retained", "WGBS"] <- colMeans(lum_bismark_3p[other,], na.rm = T)
+WGBS_3p[WGBS_3p$Expression == "myo_IR", "WGBS"] <- colMeans(myo_bismark_3p[common_ir,], na.rm = T)
+WGBS_3p[WGBS_3p$Expression == "myo_not-retained", "WGBS"] <- colMeans(myo_bismark_3p[other,], na.rm = T)
+WGBS_5p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), WGBS = -1)
+WGBS_5p[WGBS_5p$Expression == "lum_IR", "WGBS"] <- colMeans(lum_bismark_5p[common_ir,], na.rm = T)
+WGBS_5p[WGBS_5p$Expression == "lum_not-retained", "WGBS"] <- colMeans(lum_bismark_5p[other,], na.rm = T)
+WGBS_5p[WGBS_5p$Expression == "myo_IR", "WGBS"] <- colMeans(myo_bismark_5p[common_ir,], na.rm = T)
+WGBS_5p[WGBS_5p$Expression == "myo_not-retained", "WGBS"] <- colMeans(myo_bismark_5p[other,], na.rm = T)
+WGBS_boundaries_v2 <- data.frame(rbind(WGBS_3p, WGBS_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(WGBS_3p)), levels = c("5-prime", "3-prime")))
+(WGBS_boundaries_v2_profile <- ggplot(WGBS_boundaries_v2, aes(x = Position, y = WGBS, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("WGBS profile around intron boundaries") + 
+   ylab("Average DNA methylation level") + 
+   theme_bw())
+ggsave(WGBS_boundaries_v2_profile, file = "WGBS_boundaries_v2_profile.pdf")
+
+# add CpG content track 
+CpG_content_3p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.3prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_content_5p <- read.table("~/hg19/CpG.hg19v65_introns_for_genes.5prime_200", sep = " ", head = F, as.is = T, row.names = 1, fill = T)
+CpG_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
+CpG_3p[CpG_3p$Expression == "lum_IR", "CpG"] <- colMeans(CpG_content_3p[common_ir,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "lum_not-retained", "CpG"] <- colMeans(CpG_content_3p[other,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "myo_IR", "CpG"] <- colMeans(CpG_content_3p[common_ir,], na.rm = T)
+CpG_3p[CpG_3p$Expression == "myo_not-retained", "CpG"] <- colMeans(CpG_content_3p[other,], na.rm = T)
+CpG_5p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), CpG = -1)
+CpG_5p[CpG_5p$Expression == "lum_IR", "CpG"] <- colMeans(CpG_content_5p[common_ir,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "lum_not-retained", "CpG"] <- colMeans(CpG_content_5p[other,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "myo_IR", "CpG"] <- colMeans(CpG_content_5p[common_ir,], na.rm = T)
+CpG_5p[CpG_5p$Expression == "myo_not-retained", "CpG"] <- colMeans(CpG_content_5p[other,], na.rm = T)
+CpG_boundaries_v2 <- data.frame(rbind(CpG_3p, CpG_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(CpG_3p)), levels = c("5-prime", "3-prime")))
+(CpG_boundaries_v2_profile <- ggplot(CpG_boundaries_v2, aes(x = Position, y = CpG, group = Expression)) + 
+   geom_line(aes(color = IR)) + 
+   geom_point(aes(color = IR)) + 
+   facet_grid(Cell_type ~ End) + 
+   ggtitle("CpG profile around intron boundaries") + 
+   ylab("Average percentage of CpG") + 
+   theme_bw())
+ggsave(CpG_boundaries_v2_profile, file = "CpG_boundaries_v2_profile.pdf", height = 4)
+
+WGBS_CpG_v2 <- data.frame(data = c(rep("WGBS", nrow(WGBS_boundaries_v2)), rep("CpG", nrow(CpG_boundaries_v2))), 
+                          Cell_type = c(as.character(WGBS_boundaries_v2$Cell_type), as.character(CpG_boundaries_v2$Cell_type)), 
+                          IR = c(as.character(WGBS_boundaries_v2$IR), as.character(CpG_boundaries_v2$IR)), 
+                          Expression = c(as.character(WGBS_boundaries_v2$Expression), as.character(CpG_boundaries_v2$Expression)), 
+                          Position = c(WGBS_boundaries_v2$Position, CpG_boundaries_v2$Position), 
+                          value = c(WGBS_boundaries_v2$WGBS, CpG_boundaries_v2$CpG), 
+                          End = c(as.character(WGBS_boundaries_v2$End), as.character(CpG_boundaries_v2$End)))
+WGBS_CpG_v2$IR <- gsub("non-IR", "not retained", WGBS_CpG_v2$IR)
+WGBS_CpG_v2$IR <- gsub("IR", "retained introns", WGBS_CpG_v2$IR)
+WGBS_CpG_v2$IR <- factor(WGBS_CpG_v2$IR, levels = c("retained introns", "not retained"))
+WGBS_CpG_v2$color <- as.character(interaction(WGBS_CpG_v2$Cell_type, WGBS_CpG_v2$IR))
+WGBS_CpG_v2$color <- gsub("lum.not retained", "not retained", WGBS_CpG_v2$color)
+WGBS_CpG_v2$color <- gsub("myo.not retained", "not retained", WGBS_CpG_v2$color)
+WGBS_CpG_v2$color <- factor(WGBS_CpG_v2$color, levels = c("lum.retained introns", "myo.retained introns", "not retained"))
+WGBS_CpG_v2$group <- factor(interaction(WGBS_CpG_v2$data, WGBS_CpG_v2$Cell_type), levels = c("WGBS.lum", "CpG.lum", "WGBS.myo", "CpG.myo"))
+WGBS_CpG_v2$End <- factor(WGBS_CpG_v2$End, levels = c("5-prime", "3-prime"))
+(WGBS_CpG_v2_profile <- ggplot(WGBS_CpG_v2, aes(x = Position, y = value, group = Expression)) + 
+   geom_line(aes(color = color)) + 
+   geom_point(aes(color = color)) + 
+   facet_grid(group ~ End, scales = "free_y") + 
+   ylab("") + 
+   scale_color_manual(name = "IR", values = c("lum.retained introns" = rgb(200,50,0, maxColorValue = 255), "myo.retained introns" = rgb(50,200,50, maxColorValue = 255), "not retained" = "blue")) + 
+   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+gt <- ggplot_gtable(ggplot_build(WGBS_CpG_v2_profile)) 
+# gt$layout 
+gt$heights[[4]] <- unit(2, "null") 
+gt$heights[[8]] <- unit(2, "null") 
+pdf("WGBS_CpG_v2_profile_common.pdf", width = 10, height = 10)
+# grid.newpage()
+grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.82, "npc"), rot = 90)
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.12, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.58, "npc"), rot = 90)
+dev.off()
+######################################################################################################
 
