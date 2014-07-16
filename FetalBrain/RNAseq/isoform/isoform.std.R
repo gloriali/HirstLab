@@ -114,7 +114,7 @@ write.table(isoform_cortex_GE_gene_dup, file = "./enrich/isoform_cortex_GE_gene_
 
 # HuFNSC01 vs HuFNSC02
 isoform_HuFNSC01_HuFNSC02 <- list(brain = brain01_brain02_isoform_gene$id, cortex = cortex01_cortex02_isoform_gene$id, GE = GE01_GE02_isoform_gene$id)
-venn_HuFNSC01_HuFNSC02 <- venn.diagram(isoform_HuFNSC01_HuFNSC02, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 isoforms", main.cex = 2)
+venn_HuFNSC01_HuFNSC02 <- venn.diagram(isoform_HuFNSC01_HuFNSC02, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 isoforms", main.cex = 2)
 pdf("venn_HuFNSC01_HuFNSC02_isoform.pdf")
 plot.new()
 grid.draw(venn_HuFNSC01_HuFNSC02)
@@ -129,7 +129,7 @@ write.table(GE01_GE02_isoform_gene$id, file = "./enrich/isoform_GE01_GE02.txt", 
 
 # HuFNSC03 vs HuFNSC04
 isoform_HuFNSC03_HuFNSC04 <- list(cortex = cortex03_cortex04_isoform_gene$id, GE = GE03_GE04_isoform_gene$id)
-venn_HuFNSC03_HuFNSC04 <- venn.diagram(isoform_HuFNSC03_HuFNSC04, filename = NULL, fill = c("blue", "green"), main = "Venn diagram of HuFNSC03 vs HuFNSC04 isoforms", main.cex = 2)
+venn_HuFNSC03_HuFNSC04 <- venn.diagram(isoform_HuFNSC03_HuFNSC04, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of HuFNSC03 vs HuFNSC04 isoforms", main.cex = 2)
 pdf("venn_HuFNSC03_HuFNSC04_isoform.pdf")
 plot.new()
 grid.draw(venn_HuFNSC03_HuFNSC04)
