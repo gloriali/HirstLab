@@ -168,11 +168,11 @@ legend("topleft", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"
   
 ```{r exon_pos}
 # pdf("~/快盘/REMC/figures/exon_position.pdf")
-plot(c(0, 100), c(0, 0.015), type = "n", xlab = "gene position", ylab = "density")
-lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = "red", lty = 1, lwd = 3)
-lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = "blue", lty = 1, lwd = 3)
-lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = "green", lty = 1, lwd = 3)
-legend("bottomright", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"), col = c("red", "blue", "green"), lty = 1, lwd = 5)
+plot(c(0, 100), c(0, 0.015), type = "n", xlab = "position along the gene", ylab = "density")
+lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = rgb(200,50,0, maxColorValue = 255), lty = 1, lwd = 3)
+lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = rgb(0,100,200, maxColorValue = 255), lty = 1, lwd = 3)
+lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = rgb(50,200,50, maxColorValue = 255), lty = 1, lwd = 3)
+legend("bottomright", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"), col = c(rgb(200,50,0, maxColorValue = 255), rgb(0,100,200, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), lty = 1, lwd = 5)
 # dev.off()
 # # frequency of exon usage in all transcripts for multi-transcript genes
 # library(plyr)
@@ -212,8 +212,8 @@ legend("bottomright", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem
 ```{r venn, fig.height = 6, fig.width = 6}
 x <- c(0.2, 0.85, 0.5, 0.5, 0.7, 0.3, 0.5, 0.1)
 y <- c(0.75, 0.75, 0.2, 0.85, 0.45, 0.45, 0.55, 0.1)
-venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), margin = 0.06, cat.cex = 1.8, category.names = c("lum_myo", "lum_stem-like", "myo_stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
-venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), margin = 0.06, cat.cex = 1.8, category.names = c("lum_myo", "lum_stem-like", "myo_stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c(rgb(200,50,0, maxColorValue = 255), rgb(0,100,200, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), margin = 0.06, cat.cex = 1.8, category.names = c("lum_myo", "lum_stem-like", "myo_stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c(rgb(200,50,0, maxColorValue = 255), rgb(0,100,200, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), margin = 0.06, cat.cex = 1.8, category.names = c("lum_myo", "lum_stem-like", "myo_stem-like"), cat.dist = c(-0.01, -0.01, 0.01))
 venn_theme <- theme(plot.background = element_rect(fill = "transparent"), panel.background = element_rect(color = "black", fill = "transparent"), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.margin = unit(0, "lines"), 
                     strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"), axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), 
                     legend.position = c(0.85, 0.2), legend.text = element_text(size = 20), legend.background = element_blank(), legend.title=element_blank(), legend.key = element_blank())
@@ -306,6 +306,29 @@ grid.draw(venn_all)
    facet_wrap(~ data) + 
    venn_theme)
 grid.draw(venn_valid)
+
+#pdf("~/快盘/REMC/figures/venn_all.pdf", width = 15, height = 15)
+#vp1 <- viewport(x=0.25, y=0.75, width=0.5, height=0.5)
+#pushViewport(vp1)
+#print(bubble_all_N, newpage = F)
+#grid.draw(venn_all)
+#upViewport()
+#vp2 <- viewport(x=0.75, y=0.75, width=0.5, height=0.5)
+#pushViewport(vp2)
+#print(bubble_all_rpkm, newpage = F)
+#grid.draw(venn_all)
+#upViewport()
+#vp3 <- viewport(x=0.25, y=0.25, width=0.5, height=0.5)
+#pushViewport(vp3)
+#print(bubble_all_Nexon, newpage = F)
+#grid.draw(venn_all)
+#upViewport()
+#vp4 <- viewport(x=0.75, y=0.25, width=0.5, height=0.5)
+#pushViewport(vp4)
+#print(bubble_all_exon_length, newpage = F)
+#grid.draw(venn_all)
+#upViewport()
+#dev.off()
 ```
 
 ### Enrichment of all isoform genes and validated isoform genes for each section on the Venn diagram   
@@ -332,9 +355,9 @@ isoform_all_GO$Term <- factor(isoform_all_GO$Term, levels = unique(isoform_all_G
    scale_y_continuous(breaks = seq(-2, 12, by = 2), labels = as.character(seq(0, 14, by = 2))) + 
    ylab("-log10(FDR)") + 
    coord_flip() + 
-   scale_fill_manual(values = c("lum vs myo" = "red", "lum vs stem-like" = "blue", "myo vs stem-like" = "green")) + 
+   scale_fill_manual(values = c("lum vs myo" = rgb(200,50,0, maxColorValue = 255), "lum vs stem-like" = rgb(0,100,200, maxColorValue = 255), "myo vs stem-like" = rgb(50,200,50, maxColorValue = 255))) + 
    theme(axis.title.y = element_text(size = 0), axis.title.x = element_text(size = 15), axis.text = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent")))
-ggsave(Enrich_isoform_all_GO, file = "~/快盘/REMC/figures/Enrich_isoform_all_GO.pdf")
+ggsave(Enrich_isoform_all_GO, file = "~/快盘/REMC/figures/Enrich_isoform_all_GO.pdf", width = 12)
 
 ```
 

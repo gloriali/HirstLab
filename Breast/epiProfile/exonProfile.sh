@@ -108,3 +108,13 @@ chr=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
 
 /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $out -s $chr -n $name
 
+############################################################################################
+# H3K36me3 signal @ exons
+#bed=/projects/mbilenky/REMC/breast/hg19/marks/FindER/H3K36me3/HS2795.H3K36me3.FindER_scan.bin20.step20.signal.bedGraph.gz; name=lumRM080_H3K36me3_FindER;
+bed=/projects/mbilenky/REMC/breast/hg19/marks/FindER/H3K36me3/HS2763.H3K36me3.FindER_scan.bin20.step20.signal.bedGraph.gz; name=myoRM080_H3K36me3_FindER;
+exons=/home/lli/hg19/hg19v65_exons_for_genes
+out=/home/lli/REMC/epiProfile/exons/; reg=$exons
+chr=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
+
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromBEDCalculator.jar -b $bed -r $reg -o $out -s $chr -n $name -trueBED
+
