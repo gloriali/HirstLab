@@ -162,6 +162,12 @@ t.test(rowMeans(CpG_content_5p[myo084_ir, ]), rowMeans(CpG_content_5p[myo084_oth
 
 ######################################################################################################
 # MeDIP profile @ intron boundaries
+lum035_ir <- read.delim("../HS1187.introns.retained.ENSG_ID", head = F, as.is = T)
+myo035_ir <- read.delim("../HS1188.introns.retained.ENSG_ID", head = F, as.is = T)
+lum035_ir <- paste0(lum035_ir$V5, "_", lum035_ir$V1, ":", lum035_ir$V2, "-", lum035_ir$V3, "<", lum035_ir$V4)
+myo035_ir <- paste0(myo035_ir$V5, "_", myo035_ir$V1, ":", myo035_ir$V2, "-", myo035_ir$V3, "<", myo035_ir$V4)
+lum035_other <- setdiff(introns$V5, lum035_ir)
+myo035_other <- setdiff(introns$V5, myo035_ir)
 lum_MeDIP_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/lumRM035_MeDIP.hg19v65_introns_for_genes.3prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
 myo_MeDIP_3p <- read.table("~/REMC/epiProfile/IR/introns3p_200/myoRM035_MeDIP.hg19v65_introns_for_genes.3prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
 lum_MeDIP_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/lumRM035_MeDIP.hg19v65_introns_for_genes.5prime_200.profile", sep = " ", head = F, as.is = T, row.names = 1)[, -21]
@@ -169,15 +175,15 @@ myo_MeDIP_5p <- read.table("~/REMC/epiProfile/IR/introns5p_200/myoRM035_MeDIP.hg
 lum_MeDIP_3p <- sum(myo_MeDIP_3p)/sum(lum_MeDIP_3p) * lum_MeDIP_3p
 lum_MeDIP_5p <- sum(myo_MeDIP_5p)/sum(lum_MeDIP_5p) * lum_MeDIP_5p
 MeDIP_3p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), MeDIP = -1)
-MeDIP_3p[MeDIP_3p$Expression == "lum_IR", "MeDIP"] <- colMeans(lum_MeDIP_3p[lum084_ir,], na.rm = T)
-MeDIP_3p[MeDIP_3p$Expression == "lum_not-retained", "MeDIP"] <- colMeans(lum_MeDIP_3p[lum084_other,], na.rm = T)
-MeDIP_3p[MeDIP_3p$Expression == "myo_IR", "MeDIP"] <- colMeans(myo_MeDIP_3p[myo084_ir,], na.rm = T)
-MeDIP_3p[MeDIP_3p$Expression == "myo_not-retained", "MeDIP"] <- colMeans(myo_MeDIP_3p[myo084_other,], na.rm = T)
+MeDIP_3p[MeDIP_3p$Expression == "lum_IR", "MeDIP"] <- colMeans(lum_MeDIP_3p[lum035_ir,], na.rm = T)
+MeDIP_3p[MeDIP_3p$Expression == "lum_not-retained", "MeDIP"] <- colMeans(lum_MeDIP_3p[lum035_other,], na.rm = T)
+MeDIP_3p[MeDIP_3p$Expression == "myo_IR", "MeDIP"] <- colMeans(myo_MeDIP_3p[myo035_ir,], na.rm = T)
+MeDIP_3p[MeDIP_3p$Expression == "myo_not-retained", "MeDIP"] <- colMeans(myo_MeDIP_3p[myo035_other,], na.rm = T)
 MeDIP_5p <- data.frame(Cell_type = rep(c("lum", "myo"), each = 20*2), IR = rep(rep(c("IR", "non-IR"), each = 20), times = 2), Expression = rep(c("lum_IR", "lum_not-retained", "myo_IR", "myo_not-retained"), each = 20), Position = rep(seq(-190, 190, by = 20), times = 4), MeDIP = -1)
-MeDIP_5p[MeDIP_5p$Expression == "lum_IR", "MeDIP"] <- colMeans(lum_MeDIP_5p[lum084_ir,], na.rm = T)
-MeDIP_5p[MeDIP_5p$Expression == "lum_not-retained", "MeDIP"] <- colMeans(lum_MeDIP_5p[lum084_other,], na.rm = T)
-MeDIP_5p[MeDIP_5p$Expression == "myo_IR", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo084_ir,], na.rm = T)
-MeDIP_5p[MeDIP_5p$Expression == "myo_not-retained", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo084_other,], na.rm = T)
+MeDIP_5p[MeDIP_5p$Expression == "lum_IR", "MeDIP"] <- colMeans(lum_MeDIP_5p[lum035_ir,], na.rm = T)
+MeDIP_5p[MeDIP_5p$Expression == "lum_not-retained", "MeDIP"] <- colMeans(lum_MeDIP_5p[lum035_other,], na.rm = T)
+MeDIP_5p[MeDIP_5p$Expression == "myo_IR", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo035_ir,], na.rm = T)
+MeDIP_5p[MeDIP_5p$Expression == "myo_not-retained", "MeDIP"] <- colMeans(myo_MeDIP_5p[myo035_other,], na.rm = T)
 MeDIP_boundaries_v2 <- data.frame(rbind(MeDIP_3p, MeDIP_5p), End = factor(rep(c("3-prime", "5-prime"), each = nrow(MeDIP_3p)), levels = c("5-prime", "3-prime")))
 MeDIP_boundaries_v2$IR <- gsub("non-IR", "not retained", MeDIP_boundaries_v2$IR)
 MeDIP_boundaries_v2$IR <- gsub("IR", "retained introns", MeDIP_boundaries_v2$IR)
@@ -305,12 +311,18 @@ ggsave(H3K27me3_boundaries_v2_profile, file = "H3K27me3_boundaries_v2_profile.pd
 # separate on gene RPKM for H3K36me3: <1; 1-10; 10-100; >100 
 lum084gene <- read.delim("~/REMC/gene/A17918.G.A.rpkm.pc", head = F, as.is = T)
 myo084gene <- read.delim("~/REMC/gene/A17919.G.A.rpkm.pc", head = F, as.is = T)
+rownames(lum084gene) <- lum084gene$V1
+rownames(myo084gene) <- myo084gene$V1
 geneRPKM <- data.frame(gene = lum084gene$V1, RPKM = (lum084gene$V3 + myo084gene$V3)/2)
 rownames(geneRPKM) <- geneRPKM$gene
 introns_geneRPKM <- data.frame(intron = c(lum084_other, lum084_ir, myo084_ir, myo084_other))
 introns_geneRPKM$gene <- gsub("_chr[0-9XYM]+:[0-9_<-]+", "", introns_geneRPKM$intron)
 introns_geneRPKM$geneRPKM <- geneRPKM[introns_geneRPKM$gene, "RPKM"]
+introns_geneRPKM$lum084gene <- lum084gene[introns_geneRPKM$gene, "V3"]
+introns_geneRPKM$myo084gene <- myo084gene[introns_geneRPKM$gene, "V3"]
 introns_geneRPKM <- na.omit(introns_geneRPKM)
+introns_geneRPKM <- introns_geneRPKM[!duplicated(introns_geneRPKM$intron),]
+rownames(introns_geneRPKM) <- introns_geneRPKM$intron
 introns_1 <- as.character(introns_geneRPKM[introns_geneRPKM$geneRPKM <= 1, "intron"])
 introns_1_10 <- as.character(introns_geneRPKM[introns_geneRPKM$geneRPKM > 1 & introns_geneRPKM$geneRPKM <= 10, "intron"])
 introns_10_100 <- as.character(introns_geneRPKM[introns_geneRPKM$geneRPKM > 10 & introns_geneRPKM$geneRPKM <= 100, "intron"])
@@ -321,7 +333,7 @@ lum_H3K36me3_introns_v2 <- read.delim("~/REMC/epiProfile/IR/introns/hg19v65_intr
 myo_H3K36me3_introns_v2 <- read.delim("~/REMC/epiProfile/IR/introns/hg19v65_introns_for_genes.myoRM080_H3K36me3.coverage", head = F, as.is = T)
 # normalize signal
 (norm <- sum(myo_H3K36me3_introns_v2$V6)/sum(lum_H3K36me3_introns_v2$V6))
-H3K36me3_introns_v2 <- data.frame(id = c(lum_H3K36me3_introns_v2$V4, myo_H3K36me3_introns_v2$V4), Cell_type = c(rep("lum", nrow(lum_H3K36me3_introns_v2)), rep("myo", nrow(myo_H3K36me3_introns_v2))), geneRPKM = NA, Expression = NA, H3K36me3 = c(lum_H3K36me3_introns_v2$V6 * norm, myo_H3K36me3_introns_v2$V6))
+H3K36me3_introns_v2 <- data.frame(id = c(lum_H3K36me3_introns_v2$V4, myo_H3K36me3_introns_v2$V4), Cell_type = c(rep("lum", nrow(lum_H3K36me3_introns_v2)), rep("myo", nrow(myo_H3K36me3_introns_v2))), geneRPKM = NA, Expression = NA, geneExpression = NA, H3K36me3 = c(lum_H3K36me3_introns_v2$V6 * norm, myo_H3K36me3_introns_v2$V6))
 H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% lum084_other & H3K36me3_introns_v2$Cell_type == "lum", "Expression"] <- "not-retained"
 H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% myo084_other & H3K36me3_introns_v2$Cell_type == "myo", "Expression"] <- "not-retained"
 H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% lum084_ir & H3K36me3_introns_v2$Cell_type == "lum", "Expression"] <- "IR"
@@ -332,24 +344,30 @@ H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% introns_1_10, "geneRPKM"] <- "ge
 H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% introns_10_100, "geneRPKM"] <- "gene RPKM 10-100"
 H3K36me3_introns_v2[H3K36me3_introns_v2$id %in% introns_100, "geneRPKM"] <- "gene RPKM > 100"
 H3K36me3_introns_v2$geneRPKM <- factor(H3K36me3_introns_v2$geneRPKM)
+H3K36me3_introns_v2[H3K36me3_introns_v2$Cell_type == "lum", "geneExpression"] <- introns_geneRPKM[H3K36me3_introns_v2[H3K36me3_introns_v2$Cell_type == "lum", "id"], "lum084gene"]
+H3K36me3_introns_v2[H3K36me3_introns_v2$Cell_type == "myo", "geneExpression"] <- introns_geneRPKM[H3K36me3_introns_v2[H3K36me3_introns_v2$Cell_type == "myo", "id"], "myo084gene"]
+H3K36me3_introns_v2 <- droplevels(na.omit(H3K36me3_introns_v2[H3K36me3_introns_v2$geneRPKM != "gene RPKM > 100", ]))
+H3K36me3_introns_v2$group <- interaction(H3K36me3_introns_v2$Cell_type, H3K36me3_introns_v2$Expression)
+H3K36me3_introns_v2$IR <- as.character(interaction(H3K36me3_introns_v2$Cell_type, H3K36me3_introns_v2$Expression))
+H3K36me3_introns_v2$IR <- gsub("lum.not-retained", "not retained", H3K36me3_introns_v2$IR)
+H3K36me3_introns_v2$IR <- gsub("myo.not-retained", "not retained", H3K36me3_introns_v2$IR)
+H3K36me3_introns_v2$IR <- gsub("lum.IR", "lum.retained introns", H3K36me3_introns_v2$IR)
+H3K36me3_introns_v2$IR <- gsub("myo.IR", "myo.retained introns", H3K36me3_introns_v2$IR)
+H3K36me3_introns_v2_stat_v2 <- ddply(H3K36me3_introns_v2, ~ group, summarize, Cell_type = Cell_type[1], IR = IR[1], Expression = Expression[1], ymin = boxplot.stats(H3K36me3)$stats[1], lower = boxplot.stats(H3K36me3)$stats[2], middle = mean(H3K36me3), upper = boxplot.stats(H3K36me3)$stats[4], ymax = boxplot.stats(H3K36me3)$stats[5])
 # # fold enrichment between utilized/un-utilized isoform introns
 # mean(H3K36me3_introns_v2[H3K36me3_introns_v2$utilize == "lum.lum_IR" | H3K36me3_introns_v2$utilize == "myo.myo_IR", "H3K36me3"])/mean(H3K36me3_introns_v2[H3K36me3_introns_v2$utilize == "myo.lum_IR" | H3K36me3_introns_v2$utilize == "lum.myo_IR", "H3K36me3"])
-H3K36me3_introns_v2 <- droplevels(na.omit(H3K36me3_introns_v2[H3K36me3_introns_v2$geneRPKM != "gene RPKM > 100", ]))
-H3K36me3_introns_v2$group <- interaction(interaction(H3K36me3_introns_v2$Cell_type, H3K36me3_introns_v2$Expression), H3K36me3_introns_v2$geneRPKM)
-H3K36me3_introns_v2_stat_v2 <- ddply(H3K36me3_introns_v2, ~ group, summarize, Cell_type = Cell_type[1], Expression = Expression[1], geneRPKM = geneRPKM[1], ymin = boxplot.stats(H3K36me3)$stats[1], lower = boxplot.stats(H3K36me3)$stats[2], middle = mean(H3K36me3), upper = boxplot.stats(H3K36me3)$stats[4], ymax = boxplot.stats(H3K36me3)$stats[5])
-H3K36me3_introns_v2_stat_v2$Expression <- gsub("not-retained", "not retained", H3K36me3_introns_v2_stat_v2$Expression)
-H3K36me3_introns_v2_stat_v2$Expression <- gsub("IR", "retained introns", H3K36me3_introns_v2_stat_v2$Expression)
-H3K36me3_introns_v2_stat_v2$Expression <- factor(H3K36me3_introns_v2_stat_v2$Expression, levels = c("retained introns", "not retained"))
+H3K36me3_introns_v2_stat_v2[H3K36me3_introns_v2_stat_v2$group == "lum.IR", "middle"]/H3K36me3_introns_v2_stat_v2[H3K36me3_introns_v2_stat_v2$group == "lum.not-retained", "middle"]
+H3K36me3_introns_v2_stat_v2[H3K36me3_introns_v2_stat_v2$group == "myo.IR", "middle"]/H3K36me3_introns_v2_stat_v2[H3K36me3_introns_v2_stat_v2$group == "myo.not-retained", "middle"]
 
-(H3K36me3_introns_v2_profile <- ggplot(H3K36me3_introns_v2_stat_v2, aes(x = Expression, group = group)) + 
-   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = Expression), color = "grey", stat = "identity", position = "dodge", width = 0.8) + 
-   facet_grid(geneRPKM ~ Cell_type, scales = "free") + 
+(H3K36me3_introns_v2_profile <- ggplot(H3K36me3_introns_v2_stat_v2, aes(x = Expression, group = Expression)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax, fill = IR), stat = "identity", position = "dodge", width = 0.8) + 
+   facet_grid(. ~ Cell_type) + 
    # ggtitle("H3K36me3 signal for introns") + 
    xlab("intron retention") + 
    ylab("Average H3K36me3 signal") + 
-   scale_fill_manual(name = "IR", values = c("retained introns" = "red", "not retained" = "blue")) + 
-   theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
-ggsave(H3K36me3_introns_v2_profile, file = "H3K36me3_introns_v2_profile.pdf", width = 10, height = 8)
+   scale_color_manual(values = c("lum.retained introns" = rgb(200,50,0, maxColorValue = 255), "myo.retained introns" = rgb(50,200,50, maxColorValue = 255), "not retained" = "blue")) + 
+   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+ggsave(H3K36me3_introns_v2_profile, file = "H3K36me3_introns_v2.pdf", width = 10, height = 6)
 
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM < 1", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM < 1", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM < 1", "H3K36me3"])
@@ -357,6 +375,15 @@ t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 1-10",
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 1-10", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 1-10", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "lum.not-retained.gene RPKM 10-100", "H3K36me3"])
 t.test(H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.IR.gene RPKM 10-100", "H3K36me3"], H3K36me3_introns_v2[H3K36me3_introns_v2$group == "myo.not-retained.gene RPKM 10-100", "H3K36me3"])
+
+(K36_geneRPKM <- ggplot(H3K36me3_introns_v2, aes(x = log10(geneExpression + 1e-6), y = H3K36me3, group = Expression)) + 
+   geom_point(aes(color = Expression), alpha = 0.01) + 
+   geom_smooth(aes(color = Expression), size = 2) + 
+   facet_grid(Cell_type ~ .) +
+   coord_cartesian(ylim =c(0, 15)) + 
+   theme_bw())
+ggsave(K36_geneRPKM, file = "K36_geneRPKM.pdf", width = 10, height = 8)
+
 
 save(lum084_other, myo084_other, lum084_ir, myo084_ir, introns_1, introns_1_10, introns_10_100, introns_100, H3K36me3_introns_v2_stat_v2, WGBS_CpG_v2, lum_summary3p, lum_summary5p, myo_summary3p, myo_summary5p, 
      WGBS_boundaries_v2, CpG_boundaries_v2, MeDIP_boundaries_v2, H3K4me3_boundaries_v2, H3K4me1_boundaries_v2, H3K9me3_boundaries_v2, H3K27me3_boundaries_v2, H3K36me3_introns_v2, file = "intronProfile_v2.Rdata")

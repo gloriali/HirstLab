@@ -172,7 +172,7 @@ plot(c(0, 100), c(0, 0.015), type = "n", xlab = "position along the gene", ylab 
 lines(density(na.omit(lum084_myo084_isoform_all$exon_pos)), col = rgb(200,50,0, maxColorValue = 255), lty = 1, lwd = 3)
 lines(density(na.omit(lum084_stem084_isoform_all$exon_pos)), col = rgb(0,100,200, maxColorValue = 255), lty = 1, lwd = 3)
 lines(density(na.omit(myo084_stem084_isoform_all$exon_pos)), col = rgb(50,200,50, maxColorValue = 255), lty = 1, lwd = 3)
-legend("bottomright", c("lum084 vs myo084", "lum084 vs stem084", "myo084 vs stem084"), col = c(rgb(200,50,0, maxColorValue = 255), rgb(0,100,200, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), lty = 1, lwd = 5)
+legend("bottomright", c("lum084 vs myo084", "lum084 vs stem-like084", "myo084 vs stem-like084"), col = c(rgb(200,50,0, maxColorValue = 255), rgb(0,100,200, maxColorValue = 255), rgb(50,200,50, maxColorValue = 255)), lty = 1, lwd = 5)
 # dev.off()
 # # frequency of exon usage in all transcripts for multi-transcript genes
 # library(plyr)
@@ -345,15 +345,14 @@ grid.draw(venn_valid)
 lum084_myo084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_myo084_isoform_all_gene_DAVID_GO.txt", as.is=T)
 lum084_stem084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/lum084_stem084_isoform_all_gene_DAVID_GO.txt", as.is=T)
 myo084_stem084_isoform_all_GO <- read.delim("~/快盘/REMC/junction/all/Venn/myo084_stem084_isoform_all_gene_DAVID_GO.txt", as.is=T)
-isoform_all_GO <- data.frame(Term = c(lum084_myo084_isoform_all_GO$Term, lum084_stem084_isoform_all_GO$Term, myo084_stem084_isoform_all_GO$Term), FDR = c(lum084_myo084_isoform_all_GO$FDR, lum084_stem084_isoform_all_GO$FDR, myo084_stem084_isoform_all_GO$FDR), CellType = c(rep("lum vs myo", nrow(lum084_myo084_isoform_all_GO)), rep("lum vs stem-like", nrow(lum084_stem084_isoform_all_GO)), rep("myo vs stem-like", nrow(myo084_stem084_isoform_all_GO))))
-terms <- unique(as.character(isoform_all_GO[isoform_all_GO$FDR <= 0.01, ]$Term)) # terms with FDR <= 0.01 in at least one comparisons
+isoform_all_GO <- data.frame(Term = c(lum084_myo084_isoform_all_GO$Term, lum084_stem084_isoform_all_GO$Term, myo084_stem084_isoform_all_GO$Term), Benjamini = c(lum084_myo084_isoform_all_GO$Benjamini, lum084_stem084_isoform_all_GO$Benjamini, myo084_stem084_isoform_all_GO$Benjamini), CellType = c(rep("lum vs myo", nrow(lum084_myo084_isoform_all_GO)), rep("lum vs stem-like", nrow(lum084_stem084_isoform_all_GO)), rep("myo vs stem-like", nrow(myo084_stem084_isoform_all_GO))))
+terms <- intersect(as.character(myo084_stem084_isoform_all_GO[myo084_stem084_isoform_all_GO$Benjamini <= 0.01, ]$Term), intersect(as.character(lum084_myo084_isoform_all_GO[lum084_myo084_isoform_all_GO$Benjamini <= 0.01, ]$Term), as.character(lum084_stem084_isoform_all_GO[lum084_stem084_isoform_all_GO$Benjamini <= 0.01, ]$Term))) 
 isoform_all_GO <- isoform_all_GO[isoform_all_GO$Term %in% terms, ]
 isoform_all_GO$Term <- gsub("GO:[0-9]+~", "", isoform_all_GO$Term)
-isoform_all_GO$Term <- factor(isoform_all_GO$Term, levels = unique(isoform_all_GO[order(isoform_all_GO$FDR, decreasing = T),]$Term))
-(Enrich_isoform_all_GO <- ggplot(data = isoform_all_GO, aes(Term, -log10(FDR)-2)) +
+isoform_all_GO$Term <- factor(isoform_all_GO$Term, levels = unique(isoform_all_GO[order(isoform_all_GO$Benjamini, decreasing = T),]$Term))
+(Enrich_isoform_all_GO <- ggplot(data = isoform_all_GO, aes(Term, -log10(Benjamini))) +
    geom_bar(aes(fill = CellType), width = .5, position="dodge") + 
-   scale_y_continuous(breaks = seq(-2, 12, by = 2), labels = as.character(seq(0, 14, by = 2))) + 
-   ylab("-log10(FDR)") + 
+   ylab("-log10(Benjamini P-value)") + 
    coord_flip() + 
    scale_fill_manual(values = c("lum vs myo" = rgb(200,50,0, maxColorValue = 255), "lum vs stem-like" = rgb(0,100,200, maxColorValue = 255), "myo vs stem-like" = rgb(50,200,50, maxColorValue = 255))) + 
    theme(axis.title.y = element_text(size = 0), axis.title.x = element_text(size = 15), axis.text = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent")))
