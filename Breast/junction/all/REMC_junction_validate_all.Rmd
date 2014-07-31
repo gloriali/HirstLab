@@ -102,6 +102,8 @@ isoform_lum_myo_all <- list(RM084 = lum084_myo084_isoform_all_gene$id, RM080 = l
 plot.new()
 venn_lum_myo_all <- venn.diagram(isoform_lum_myo_all, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of all lum vs myo isoforms")
 grid.draw(venn_lum_myo_all)
+# lum_myo_isoform_intersect <- intersect(lum084_myo084_isoform_all_gene$id, intersect(lum080_myo080_isoform_all_gene$id, lum035_myo035_isoform_all_gene$id))
+# write.table(lum_myo_isoform_intersect, file = "~/快盘/REMC/lum_myo_isoform_common.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 isoform_lum_myo_valid <- list(RM084 = lum084_myo084_isoform_valid_gene$gene, RM080 = lum080_myo080_isoform_valid_gene$gene, RM035 = lum035_myo035_isoform_valid_gene$gene)
 plot.new()
 venn_lum_myo_valid <- venn.diagram(isoform_lum_myo_valid, filename = NULL, fill = c("red", "blue", "green"), main = "Venn diagram of valid lum vs myo isoforms")
@@ -358,6 +360,21 @@ isoform_all_GO$Term <- factor(isoform_all_GO$Term, levels = unique(isoform_all_G
    theme(axis.title.y = element_text(size = 0), axis.title.x = element_text(size = 15), axis.text = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent")))
 ggsave(Enrich_isoform_all_GO, file = "~/快盘/REMC/figures/Enrich_isoform_all_GO.pdf", width = 12)
 
+lum_myo_isoform_common_DAVID <- read.delim("~/快盘/REMC/lum_myo_isoform_common_DAVID.txt", as.is=T)
+lum_myo_isoform_common_DAVID <- lum_myo_isoform_common_DAVID[lum_myo_isoform_common_DAVID$Benjamini < 0.01, ]
+lum_myo_isoform_common_DAVID$Term <- gsub("GO:[0-9]+~", "", lum_myo_isoform_common_DAVID$Term)
+lum_myo_isoform_common_DAVID$Term <- gsub("hsa[0-9]+:", "", lum_myo_isoform_common_DAVID$Term)
+lum_myo_isoform_common_DAVID$Category <- gsub("GOTERM_MF_5", "GOMF", lum_myo_isoform_common_DAVID$Category)
+lum_myo_isoform_common_DAVID$Category <- gsub("GOTERM_BP_5", "GOBP", lum_myo_isoform_common_DAVID$Category)
+lum_myo_isoform_common_DAVID$Term <- factor(lum_myo_isoform_common_DAVID$Term, levels = lum_myo_isoform_common_DAVID[order(lum_myo_isoform_common_DAVID$Category, lum_myo_isoform_common_DAVID$Benjamini, decreasing = T),]$Term)
+(Enrich_lum_myo_isoform_common <- ggplot(data = lum_myo_isoform_common_DAVID, aes(Term, -log10(Benjamini))) +
+   geom_bar(aes(fill = Category), width = .5) + 
+   coord_flip() + 
+   ylab("-log10(Benjamini P-value)") + 
+   geom_text(aes(label = round(-log10(Benjamini), 2), hjust = 0)) + 
+   scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen")) +
+   theme(axis.title.y = element_text(size = 0), axis.title.x = element_text(size = 15), axis.text = element_text(size = 15, color = "black"), legend.text = element_text(size = 15), legend.title = element_text(size = 15), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent")))
+ggsave(Enrich_lum_myo_isoform_common, file = "~/快盘/REMC/figures/Enrich_lum_myo_isoform_common.pdf", width = 11)
 ```
 
 #### lum084 vs myo084
