@@ -571,17 +571,19 @@ mean(H3K36me3_exons[H3K36me3_exons$utilize == "myo.not_expressed", "H3K36me3"])/
 
 # exon usage in transcripts
 library(plyr)
-exons <- read.delim("~/快盘/hg19/hg19v65_exons", head = F, as.is = T)
-exons$id <- paste0(exons$V1, "_", exons$V3, "_", exons$V4, "_", exons$V5)
-Ntranscript <- ddply(exons, ~ V1, summarize, Ntranscript = length(unique(V2)))
-rownames(Ntranscript) <- Ntranscript$V1
-exon <- ddply(exons, ~ id, summarize, transcript = length(unique(V2)))
-exon$gene <- gsub("_[0-9XY]+_[0-9_]+", "", exon$id)
-exons <- exons[!duplicated(exons$id),]
-rownames(exons) <- exons$id
-exon$Ntranscript <- Ntranscript[exon$gene, "Ntranscript"]
-exon$percentTrans <- exon$transcript / exon$Ntranscript
-rownames(exon) <- exon$id
+# exons <- read.delim("~/快盘/hg19/hg19v65_exons", head = F, as.is = T)
+# exons$id <- paste0(exons$V1, "_", exons$V3, "_", exons$V4, "_", exons$V5)
+# Ntranscript <- ddply(exons, ~ V1, summarize, Ntranscript = length(unique(V2)))
+# rownames(Ntranscript) <- Ntranscript$V1
+# exon <- ddply(exons, ~ id, summarize, transcript = length(unique(V2)))
+# exon$gene <- gsub("_[0-9XY]+_[0-9_]+", "", exon$id)
+# exons <- exons[!duplicated(exons$id),]
+# rownames(exons) <- exons$id
+# exon$Ntranscript <- Ntranscript[exon$gene, "Ntranscript"]
+# exon$percentTrans <- exon$transcript / exon$Ntranscript
+# rownames(exon) <- exon$id
+# save(exon, file = "~/hg19/exonUsage.Rdata")
+load("~/hg19/exonUsage.Rdata")
 exon_usage <- na.omit(data.frame(id = H3K36me3_exons$id, Cell_type = H3K36me3_exons$Cell_type, Expression = H3K36me3_exons$Expression, utilize = H3K36me3_exons$utilize, usage = exon[as.character(H3K36me3_exons$id), "percentTrans"]))
 exon_usage_stat <- ddply(exon_usage, ~ utilize, summarize, Cell_type = Cell_type[1], Expression = Expression[1], ymin = boxplot.stats(usage)$stats[1], lower = boxplot.stats(usage)$stats[2], middle = mean(usage), upper = boxplot.stats(usage)$stats[4], ymax = boxplot.stats(usage)$stats[5])
 H3K36me3_exons_stat <- data.frame(rbind(H3K36me3_exons_stat, exon_usage_stat), type = c(rep("H3K36me3", nrow(H3K36me3_exons_stat)), rep("Exon usage", nrow(exon_usage_stat))))
@@ -593,20 +595,20 @@ H3K36me3_exons_stat$type <- factor(H3K36me3_exons_stat$type, levels = c("H3K36me
    xlab("Exon group") + 
    ylab("") + 
    scale_fill_manual(values = c("lum" = rgb(200,50,0, maxColorValue = 255), "myo" = rgb(50,200,50, maxColorValue = 255))) + 
-   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
+   theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), axis.title = element_text(size = 15), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 15), legend.title = element_text(size = 15), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 15, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black")))
 library(grid) 
 gt <- ggplot_gtable(ggplot_build(H3K36me3_exons_profile)) 
 # gt$layout 
-gt$heights[[3]] <- unit(2, "null") 
+gt$heights[[3]] <- unit(2.5, "null") 
 # grid.newpage()
-pdf("H3K36me3_exons_profile.pdf", width = 10, height = 7)
+pdf("H3K36me3_exons_profile.pdf", width = 10, height = 6)
 grid.draw(gt) 
 grid.text("Average H3K36me3 signal", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("Exon usage", x = unit(0.015, "npc"), y = unit(0.25, "npc"), rot = 90)
-grid.text("myo/lum=1.02", x = unit(0.18, "npc"), y = unit(0.955, "npc"))
-grid.text("lum/myo=1.40", x = unit(0.34, "npc"), y = unit(0.6, "npc"))
-grid.text("myo/lum=1.16", x = unit(0.51, "npc"), y = unit(0.6, "npc"))
-grid.text("myo/lum=1.03", x = unit(0.68, "npc"), y = unit(0.6, "npc"))
+grid.text("myo/lum=1.02", x = unit(0.18, "npc"), y = unit(0.95, "npc"))
+grid.text("lum/myo=1.40", x = unit(0.36, "npc"), y = unit(0.6, "npc"))
+grid.text("myo/lum=1.16", x = unit(0.535, "npc"), y = unit(0.6, "npc"))
+grid.text("myo/lum=1.03", x = unit(0.71, "npc"), y = unit(0.6, "npc"))
 dev.off()
 
 
