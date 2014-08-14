@@ -6,6 +6,7 @@ Analysis pipeline
 * [junction.md](./junction.md): instructions for validating isoforms with junction reads.  
 * [epiProfile.md](./epiProfile.md): instructions for calculating and plotting epigenetic profiles for isoform and intron retention.       
 * [ChromHMM.md](./ChromHMM.md): instructions on running ChromHMM. _unfinished_.  
+* [MeDIP.DMR.py](./MeDIP.DMR.py): collapse single DM CpGs to DMRs. 
 * [DEfine.m](./DEfine.m): copy of Misha's DEfine function.   
 * [myfnorm.m](./myfnorm.m): copy of Misha's myfnorm function, required for DEfine.
 * [enrich.R](./enrich.R): enrich function to plot enriched terms with `ggplot2`.   
