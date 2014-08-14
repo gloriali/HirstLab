@@ -1,3 +1,5 @@
+#!/bin/sh
+
 JAVA=/gsc/software/linux-x86_64/jre1.7.0_03/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java
 csizes=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
