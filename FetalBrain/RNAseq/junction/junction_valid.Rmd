@@ -113,26 +113,34 @@ grid.draw(venn_HuFNSC03_HuFNSC04_valid)
 ```{r venn, fig.height = 5, fig.width = 5}
 # No. of isoforms
 (bubble_all_N)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of isoform genes", main.cex = 1.5)
 grid.draw(venn_all)
 (bubble_valid_N)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of validated isoform genes", main.cex = 1.5)
 grid.draw(venn_valid)
 
 # average expression level
 (bubble_all_rpkm)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
 grid.draw(venn_all)
 (bubble_valid_rpkm)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of validated isoforms", main.cex = 1.5)
 grid.draw(venn_valid)
 
 # No. of exons
 (bubble_all_Nexon)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of isoforms", main.cex = 1.5)
 grid.draw(venn_all)
 (bubble_valid_Nexon)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of validated isoforms", main.cex = 1.5)
 grid.draw(venn_valid)
 
 # average exon length 
 (bubble_all_exon_length)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of isoform exons", main.cex = 1.5)
 grid.draw(venn_all)
 (bubble_valid_exon_length)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of validated isoform exons", main.cex = 1.5)
 grid.draw(venn_valid)
 ```
 
