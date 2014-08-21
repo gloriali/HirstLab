@@ -10,7 +10,8 @@ Fetal Brain isoform analysis
 Gloria Li         
 `r date()` 
 
-<!-- re-knit after modify isoform2.R script -->
+<!-- re-knit after modify isoform.std.R script -->
+
 ```{r include = FALSE}
 library(knitr)
 opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
@@ -32,7 +33,8 @@ library(VennDiagram)
 
 ## Isoform genes between cortex and GE
 
-  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r length(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.              
+  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r length(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
+  * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
 
 ```{r cortex_ge, results='asis'}
 cortex_GE_summary <- xtable(cortex_GE_summary)
@@ -46,7 +48,7 @@ grid.draw(venn_cortex_GE)
 
 ### Functional enrichment analysis 
   * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
-  * Isoforms shared by at least two individuals are enriched in terms related to __neuronal signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
+  * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
 ```{r enrich_cortex_ge, fig.width=10, fig.height = 8}
 (isoform_cortex_GE_enrich)
@@ -55,7 +57,7 @@ grid.draw(venn_cortex_GE)
 ## Isoform genes between individuals
 
   * On average, __`r round(mean(individual_summary[1:3, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r length(isoform_HuFNSC01_HuFNSC02_gene_shared)`__ genes are shared by all three cell types.              
-  * On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.              
+  * On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.            
 
 ```{r individual, results='asis'}
 library(xtable)
@@ -72,7 +74,7 @@ grid.draw(venn_HuFNSC03_HuFNSC04)
 ### Functional enrichment analysis 
 #### HuFNSC01 vs HuFNSC02
   * Different regions on the Venn diagram have __no__ significantly enriched terms.     
-  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms.    
+  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
 
 ```{r enrich_HuFNSC01_02, fig.width=10, fig.height = 4}
 (isoform_brain01_brain02_enrich)
@@ -81,10 +83,7 @@ grid.draw(venn_HuFNSC03_HuFNSC04)
 ```
 
 #### HuFNSC03 vs HuFNSC04
-  * Isoforms shared in cortex and GE are enriched in EGF and Fibronectin domain.     
-  * Isoforms found only in cortex and only in GE both show enrichment in neuroactive ligand-receptor interaction pathway.       
-  * Isoforms between HuFNSC03 and HuFNSC04 in both cortex and GE show enrichment in neuroactive ligand-receptor interaction pathway and Fibronectin. Isoforms in GE are also enriched for EGF protein domain.       
-
+  
 ```{r enrich_HuFNSC03_04, fig.width=10, fig.height = 2}
 (isoform_cortex03_cortex04_enrich)
 (isoform_GE03_GE04_enrich)
