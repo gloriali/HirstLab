@@ -31,11 +31,12 @@ print(all.equal(brain01$V1, ge02$V1))
 MeDIP <- data.frame(brain01 = brain01$V2, brain02 = brain02$V2, cortex01 = cortex01$V2, cortex02 = cortex02$V2, ge01 = ge01$V2, ge02 = ge02$V2)
 rownames(MeDIP) <- brain01$V1
 dim(MeDIP)
-write.table(MeDIP, file = "/home/lli/FetalBrain/MeDIP/MeDIP_FetalBrain_fractional.txt", sep = "\t", col.names = F, row.names = T, quote = F)
 MeDIP$chr <- paste0("chr", gsub("_[0-9]+", "", rownames(MeDIP)))
 MeDIP$start <- as.numeric(gsub("[0-9X]+_", "", rownames(MeDIP))) + 23
 MeDIP$end <- MeDIP$start + 2
-save(MeDIP, file = "/home/lli/FetalBrain/MeDIP/MeDIP_FetalBrain_fractional.Rdata")
+save(MeDIP, file = "~/FetalBrain/MeDIP/MeDIP_FetalBrain_fractional.Rdata")
+fractional <- data.frame(chr = MeDIP$chr, start = MeDIP$start, end = MeDIP$end, ID = rownames(MeDIP), brain01 = brain01$V2, brain02 = brain02$V2, cortex01 = cortex01$V2, cortex02 = cortex02$V2, ge01 = ge01$V2, ge02 = ge02$V2)
+write.table(fractional, file = "~/FetalBrain/MeDIP/MeDIP_FetalBrain_fractional.txt", sep = "\t", col.names = F, row.names = F, quote = F)
 
 ####################################################################################################################################################
 # compare distribution with WGBS and MethylCRF

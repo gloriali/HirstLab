@@ -41,6 +41,7 @@ cortex04_GE04_isoform_gene <- cortex04_GE04$isoform_gene
 rm(cortex04_GE04, lib1, lib2, cell1, cell2, donor1, donor2)
 
 cortex_GE_summary <- rbind(cortex01_GE01_summary, cortex02_GE02_summary, cortex03_GE03_summary, cortex04_GE04_summary)
+rm(cortex01_GE01_summary, cortex02_GE02_summary, cortex03_GE03_summary, cortex04_GE04_summary)
 write.table(cortex_GE_summary, file = "cortex_GE_isoform_summary.txt", sep = "\t", quote = F)
 
 # isoform between individuals
@@ -85,6 +86,7 @@ GE03_GE04_isoform_gene <- GE03_GE04$isoform_gene
 rm(GE03_GE04, lib1, lib2, cell1, cell2, donor1, donor2)
 
 individual_summary <- rbind(brain01_brain02_summary, cortex01_cortex02_summary, GE01_GE02_summary, cortex03_cortex04_summary, GE03_GE04_summary)
+rm(brain01_brain02_summary, cortex01_cortex02_summary, GE01_GE02_summary, cortex03_cortex04_summary, GE03_GE04_summary)
 write.table(individual_summary, file = "individual_isoform_summary.txt", sep = "\t", quote = F)
 save.image("FetalBrain_isoform.Rdata")
 rm(list = ls())
@@ -98,7 +100,7 @@ library(ggplot2)
 
 # cortex vs GE
 isoform_cortex_GE <- list(HuFNSC01 = cortex01_GE01_isoform_gene$id, HuFNSC02 = cortex02_GE02_isoform_gene$id, HuFNSC03 = cortex03_GE03_isoform_gene$id, HuFNSC04 = cortex04_GE04_isoform_gene$id)
-venn_cortex_GE <- venn.diagram(isoform_cortex_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex vs GE isoforms", main.cex = 2)
+venn_cortex_GE <- venn.diagram(isoform_cortex_GE, filename = NULL, fill = c("red", "blue", "green", "purple"), main = "Venn diagram of cortex vs GE isoforms", main.cex = 2)
 pdf("venn_cortex_GE_isoform.pdf")
 plot.new()
 grid.draw(venn_cortex_GE)

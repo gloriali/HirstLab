@@ -2,9 +2,10 @@ Fetal Brain isoform analysis
 ========================================================
 
 Gloria Li         
-Sat Jul  5 14:49:51 2014 
+Thu Aug 21 15:55:00 2014 
 
-<!-- re-knit after modify isoform2.R script -->
+<!-- re-knit after modify isoform.std.R script -->
+
 
 
 
@@ -17,10 +18,11 @@ Sat Jul  5 14:49:51 2014
 
 ## Isoform genes between cortex and GE
 
-  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __4213__ genes are shared in at least two individuals.              
+  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __4213__ genes are shared in at least two individuals.       
+  * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
 
-<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Sat Jul  5 14:49:52 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
+<!-- Thu Aug 21 15:55:01 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
@@ -32,17 +34,17 @@ Sat Jul  5 14:49:51 2014
 
 ### Functional enrichment analysis 
   * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
-  * Isoforms shared by at least two individuals are enriched in terms related to __neuronal signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
+  * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
 ![plot of chunk enrich_cortex_ge](./fetalBrain_isoform_files/figure-html/enrich_cortex_ge.png) 
 
 ## Isoform genes between individuals
 
   * On average, __2617__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __796__ genes are shared by all three cell types.              
-  * On average, __1724__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __927__ genes are shared between two cell types.              
+  * On average, __1724__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __927__ genes are shared between two cell types.            
 
-<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Sat Jul  5 14:49:53 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
+<!-- Thu Aug 21 15:55:03 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>
@@ -56,15 +58,12 @@ Sat Jul  5 14:49:51 2014
 ### Functional enrichment analysis 
 #### HuFNSC01 vs HuFNSC02
   * Different regions on the Venn diagram have __no__ significantly enriched terms.     
-  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms.    
+  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
 
 ![plot of chunk enrich_HuFNSC01_02](./fetalBrain_isoform_files/figure-html/enrich_HuFNSC01_021.png) ![plot of chunk enrich_HuFNSC01_02](./fetalBrain_isoform_files/figure-html/enrich_HuFNSC01_022.png) ![plot of chunk enrich_HuFNSC01_02](./fetalBrain_isoform_files/figure-html/enrich_HuFNSC01_023.png) 
 
 #### HuFNSC03 vs HuFNSC04
-  * Isoforms shared in cortex and GE are enriched in EGF and Fibronectin domain.     
-  * Isoforms found only in cortex and only in GE both show enrichment in neuroactive ligand-receptor interaction pathway.       
-  * Isoforms between HuFNSC03 and HuFNSC04 in both cortex and GE show enrichment in neuroactive ligand-receptor interaction pathway and Fibronectin. Isoforms in GE are also enriched for EGF protein domain.       
-
+  
 ![plot of chunk enrich_HuFNSC03_04](./fetalBrain_isoform_files/figure-html/enrich_HuFNSC03_041.png) ![plot of chunk enrich_HuFNSC03_04](./fetalBrain_isoform_files/figure-html/enrich_HuFNSC03_042.png) 
 
 
