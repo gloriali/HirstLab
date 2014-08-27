@@ -51,3 +51,23 @@ wc -l $dirOut/IS.DMR.CpG_gene.bed
 wc -l $dirOut/IS.DMR.CpG_exon.bed
 wc -l $dirOut/IS.DMR.CpG_promoter.bed
 
+
+# calculate chrX enrichment based on DM CpGs
+#dirOut='/home/lli/REMC/IS.DMR/lum'
+#dirOutX='/home/lli/REMC/IS.DMR/chrX/lum'
+dirOut='/home/lli/REMC/IS.DMR/myo'
+dirOutX='/home/lli/REMC/IS.DMR/chrX/myo'
+
+wc -l $dirOut/IS.DMR.CpG.bed
+# No. of total DM CpGs: lum: 216744; myo: 199764
+wc -l /home/lli/hg19/CG.BED
+# No. of total CpGs: 28217448
+wc -l $dirOutX/IS.DMR.X.CpG.bed
+# No. of DM CpGs on chrX: lum: 17547; myo: 14077
+grep 'X' /home/lli/hg19/CG.BED | wc -l 
+# No. of total CpGs on chrX: 1246401
+
+# enrichment in chrX: (#DM CpGs on chrX/#total CpGs on chrX)/(#total DM CpGs/#total CpGs)
+# lum: (17547/1246401)/(216744/28217448) = 1.832803
+# myo: (14077/1246401)/(199764/28217448) = 1.595338
+
