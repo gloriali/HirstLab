@@ -58,7 +58,7 @@ GREAT_myo$Term <- factor(GREAT_myo$Term, levels = GREAT_myo$Term[length(GREAT_my
    ylab("") + 
    theme_bw() +
    scale_fill_manual(values = c("InterPro" = "blue", "MSigPerturbation" = "purple")))
-ggsave(GREAT_lum_plot, file = "GREAT_lum.pdf", width = 12, height = 8)
+ggsave(GREAT_lum_plot, file = "GREAT_IS_DMR_chrX_lum.pdf", width = 12, height = 9)
 (GREAT_myo_plot <- ggplot(data = GREAT_myo, aes(Term, -log10(FDR))) +
    geom_bar(aes(fill = Category), width = .5) + 
    coord_flip() + 
@@ -68,54 +68,6 @@ ggsave(GREAT_lum_plot, file = "GREAT_lum.pdf", width = 12, height = 8)
    ylab("-log10(Binomial FDR)") + 
    theme_bw() +
    scale_fill_manual(values = c("InterPro" = "blue", "MSigPerturbation" = "purple")))
-ggsave(GREAT_myo_plot, file = "GREAT_myo.pdf", width = 12, height = 7)
-
-
-# GREAT on IS DMRs 
-library(ggplot2)
-setwd("~/快盘/REMC/IS.DMR")
-lum.InterPro <- read.delim("./lum/shown-interpro.tsv", head = T, as.is = T)
-lum.MSig <- read.delim("./lum/shown-MSigDBGeneSetsPerturbation.tsv", head = T, as.is = T)
-myo.InterPro <- read.delim("./myo/shown-interpro.tsv", head = T, as.is = T)
-myo.MSig <- read.delim("./myo/shown-MSigDBGeneSetsPerturbation.tsv", head = T, as.is = T)
-GREAT <- data.frame(cell = rep(c("lum", "myo"), each = 20), Category = rep(c("InterPro", "MSigPerturbation", "InterPro", "MSigPerturbation"), each = 10), 
-                    Term = c(lum.InterPro$Term.Name[1:10], lum.MSig$Term.Name[1:10], myo.InterPro$Term.Name[1:10], myo.MSig$Term.Name[1:10]), 
-                    FDR = c(lum.InterPro$Binom.FDR.Q.Val[1:10], lum.MSig$Binom.FDR.Q.Val[1:10], myo.InterPro$Binom.FDR.Q.Val[1:10], myo.MSig$Binom.FDR.Q.Val[1:10]))
-GREAT$Term <- as.character(GREAT$Term)
-for(i in 1:nrow(GREAT)){
-  if(nchar(GREAT$Term[i]) > 120){
-    GREAT$Term[i] <- paste0(substr(GREAT$Term[i], 1, as.integer(nchar(GREAT$Term[i])/3)), "-\n", 
-                            substr(GREAT$Term[i], as.integer(nchar(GREAT$Term[i])/3) + 1, 2*as.integer(nchar(GREAT$Term[i])/3)), "-\n", 
-                            substr(GREAT$Term[i], 2*as.integer(nchar(GREAT$Term[i])/3) + 1, nchar(GREAT$Term[i])))
-  }
-  if(nchar(GREAT$Term[i]) > 60 & nchar(GREAT$Term[i]) <= 120){
-    GREAT$Term[i] <- paste0(substr(GREAT$Term[i], 1, as.integer(nchar(GREAT$Term[i])/2)), "-\n", substr(GREAT$Term[i], as.integer(nchar(GREAT$Term[i])/2)+1, nchar(GREAT$Term[i])))
-  }
-}
-GREAT[GREAT$FDR == 0, "FDR"] <- 10^-310
-GREAT_lum <- droplevels(GREAT[1:20,])
-GREAT_lum$Term <- factor(GREAT_lum$Term, levels = GREAT_lum$Term[length(GREAT_lum$Term):1])
-GREAT_myo <- droplevels(GREAT[21:40,])
-GREAT_myo$Term <- factor(GREAT_myo$Term, levels = GREAT_myo$Term[length(GREAT_myo$Term):1])
-(GREAT_lum_plot <- ggplot(data = GREAT_lum, aes(Term, -log10(FDR))) +
-   geom_bar(aes(fill = Category), width = .5) + 
-   coord_flip() + 
-   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
-   facet_grid(cell ~ .) + 
-   xlab("") + 
-   ylab("") + 
-   theme_bw() +
-   scale_fill_manual(values = c("InterPro" = "blue", "MSigPerturbation" = "purple")))
-ggsave(GREAT_lum_plot, file = "GREAT_lum.pdf", width = 12, height = 8)
-(GREAT_myo_plot <- ggplot(data = GREAT_myo, aes(Term, -log10(FDR))) +
-   geom_bar(aes(fill = Category), width = .5) + 
-   coord_flip() + 
-   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
-   facet_grid(cell ~ .) + 
-   xlab("") + 
-   ylab("-log10(Binomial FDR)") + 
-   theme_bw() +
-   scale_fill_manual(values = c("InterPro" = "blue", "MSigPerturbation" = "purple")))
-ggsave(GREAT_myo_plot, file = "GREAT_myo.pdf", width = 12, height = 7)
+ggsave(GREAT_myo_plot, file = "GREAT_IS_DMR_chrX_myo.pdf", width = 12, height = 9)
 
 

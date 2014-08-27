@@ -4,9 +4,9 @@ lum.GOBP <- read.delim("shown-GOBiologicalProcess.lum.UMR.tsv", head = T, as.is 
 lum.MSig <- read.delim("shown-MSigDBGeneSetsPerturbation.lum.UMR.tsv", head = T, as.is = T)
 myo.GOBP <- read.delim("shown-GOBiologicalProcess.myo.UMR.tsv", head = T, as.is = T)
 myo.pathway <- read.delim("shown-pathwayCommons.myo.UMR.tsv", head = T, as.is = T)
-GREAT <- data.frame(cell = rep(c("lum.UMR", "myo.UMR"), each = 20), Category = rep(c("GOBP", "MSigPerturbation", "GOBP", "PathwaysCommon"), each = 10), 
+GREAT <- na.omit(data.frame(cell = rep(c("lum.UMR", "myo.UMR"), each = 20), Category = rep(c("GOBP", "MSigPerturbation", "GOBP", "PathwaysCommon"), each = 10), 
                     Term = c(lum.GOBP$Term.Name[1:10], lum.MSig$Term.Name[1:10], myo.GOBP$Term.Name[1:10], myo.pathway$Term.Name[1:10]), 
-                    FDR = c(lum.GOBP$Binom.FDR.Q.Val[1:10], lum.MSig$Binom.FDR.Q.Val[1:10], myo.GOBP$Binom.FDR.Q.Val[1:10], myo.pathway$Binom.FDR.Q.Val[1:10]))
+                    FDR = c(lum.GOBP$Binom.FDR.Q.Val[1:10], lum.MSig$Binom.FDR.Q.Val[1:10], myo.GOBP$Binom.FDR.Q.Val[1:10], myo.pathway$Binom.FDR.Q.Val[1:10])))
 GREAT$Term <- as.character(GREAT$Term)
 for(i in 1:nrow(GREAT)){
   if(nchar(GREAT$Term[i]) > 120){
@@ -18,9 +18,9 @@ for(i in 1:nrow(GREAT)){
     GREAT$Term[i] <- paste0(substr(GREAT$Term[i], 1, as.integer(nchar(GREAT$Term[i])/2)), "-\n", substr(GREAT$Term[i], as.integer(nchar(GREAT$Term[i])/2)+1, nchar(GREAT$Term[i])))
   }
 }
-GREAT_lum <- droplevels(GREAT[1:20,])
+GREAT_lum <- droplevels(GREAT[as.character(GREAT$cell) == "lum.UMR",])
 GREAT_lum$Term <- factor(GREAT_lum$Term, levels = GREAT_lum$Term[length(GREAT_lum$Term):1])
-GREAT_myo <- droplevels(GREAT[21:40,])
+GREAT_myo <- droplevels(GREAT[as.character(GREAT$cell) == "myo.UMR",])
 GREAT_myo$Term <- factor(GREAT_myo$Term, levels = GREAT_myo$Term[length(GREAT_myo$Term):1])
 library(ggplot2)
 (GREAT_lum_plot <- ggplot(data = GREAT_lum, aes(Term, -log10(FDR))) +
@@ -32,7 +32,7 @@ library(ggplot2)
   ylab("") + 
   theme_bw() +
   scale_fill_manual(values = c("GOBP" = "blue", "MSigPerturbation" = "purple", "PathwaysCommon" = "darkgreen")))
-ggsave(GREAT_lum_plot, file = "GREAT_lum.pdf", width = 12, height = 8)
+ggsave(GREAT_lum_plot, file = "GREAT_lum.pdf", width = 12, height = 7)
 (GREAT_myo_plot <- ggplot(data = GREAT_myo, aes(Term, -log10(FDR))) +
    geom_bar(aes(fill = Category), width = .5) + 
    coord_flip() + 
