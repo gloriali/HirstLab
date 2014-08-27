@@ -8,13 +8,15 @@ File paths on xhost
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`  
 * Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/`
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`
+* ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
 * R libraries and function: `/home/lli/bin/R-3.0.2/`
+* Python scripts: `/home/lli/bin/python/`  
 * UCSC scripts: `/home/lli/bin/`  
 
 ## Rescources
-* Self processed: `/home/lli/hg19/`
+* Self processed hg19: `/home/lli/hg19/`
 * Ensembl v65: `/projects/epigenomics/resources/Ensembl/hg19v65/`
 * Genome hg19: `/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa`    
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
@@ -32,7 +34,8 @@ File paths on xhost
 * Fetal Brain:
     + Histone modification wig files: `/home/lli/FetalBrain/HisMod/wigs/`
     + MeDIP wig files: `/projects/mbilenky/REMC/brain/MeDIP/wigs/`  
-    + MeDIP fractional calls: `/home/lli/FetalBrain/MeDIP/MeDIP_FetalBrain_fractional.Rdata`
+    + MeDIP fractional calls: `/projects/epigenomics/lli/FetalBrain/MeDIP/`
+    + DMRs from MeDIP: `/projects/epigenomics/lli/FetalBrain/MeDIP/DMR/`  
     + Junction coverage: `/home/lli/FetalBrain/RNAseq/junction/`
     + UCSC browser hubs: `/gsc/www/bcgsc.ca/downloads/mb/BrainHubs/`  
 * H1:   
