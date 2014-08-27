@@ -22,6 +22,7 @@ File paths on xhost
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
 * CpG +/- 25bp bins: `/projects/epigenomics/mbilenky/CpG/hg19/CG_25_around_chr/`  
+* Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`
 
 ## REMC project
 * WGBS fractional calls: `/projects/edcc_prj2/bs-seq/`
