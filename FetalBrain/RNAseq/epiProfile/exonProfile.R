@@ -402,3 +402,8 @@ save(exons_geneRPKM_brain, isoform_brain, brain01_specific_brain, brain02_specif
      exons_geneRPKM_cortex, isoform_cortex, cortex01_specific_cortex, cortex02_specific_cortex, both_cortex, neither_cortex, MeDIP_profile_cortex, MeDIP_figure_cortex, H3K36me3_data_cortex, H3K36me3_profile_cortex, H3K36me3_figure_cortex, 
      exons_geneRPKM_ge, isoform_ge, ge01_specific_ge, ge02_specific_ge, both_ge, neither_ge, MeDIP_profile_ge, MeDIP_figure_ge, H3K36me3_data_ge, H3K36me3_profile_ge, H3K36me3_figure_ge, 
      file = "exonProfile_twins.Rdata")
+
+save(WGBS_figure_HuFNSC02, MeDIP_figure_HuFNSC02, WGBS_figure_HuFNSC04, MeDIP_figure_HuFNSC01, H3K36me3_figure_HuFNSC01, H3K36me3_figure_HuFNSC02, 
+     MeDIP_figure_brain, MeDIP_figure_cortex, MeDIP_figure_ge, H3K36me3_figure_brain, H3K36me3_figure_cortex, H3K36me3_figure_ge, 
+     file = "exonProfile_Rmd.Rdata")
+
