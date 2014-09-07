@@ -1,0 +1,253 @@
+---
+output: 
+  html_document:
+    keep_md: true
+    toc: yes
+---
+Fetal Brain RNA-seq Analysis Summary
+========================================================
+
+Gloria Li         
+`r date()` 
+
+```{r include = FALSE}
+library(knitr)
+library(ggplot2)
+library(xtable)
+library(VennDiagram)
+library(grid) 
+source("~/HirstLab/Pipeline/epiProfile.R")
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+load("~/快盘/FetalBrain/RNAseq/isoform/FetalBrain_isoform.Rdata")
+load("~/快盘/FetalBrain/RNAseq/junction/FetalBrain_isoform_valid.Rdata")
+load("~/快盘/FetalBrain/RNAseq/epiProfile/exonProfile_Rmd.Rdata")
+```
+
+## Differential gene expression 
+### Between cortex and GE neurospheres
+### Between MZ twins - HuFNSC01 vs HuFNSC02
+
+
+
+
+## Isoform analysis
+### Isoform identification and junction validation  
+  * DEfine on exons: FDR = 0.01     
+  * Exon expressed in one sample ($\ge$ 10% gene RPKM) and not expressed in the other ($\le$ 1% gene RPKM)   
+  * Gene is not DE: DEfine FDR = 0.01
+  * Gene is expressed in both samples: gene RPKM > 0.01         
+  * Validation: For each isoform exon in the previous pairwise comparison
+    + Find junctions associated with this exon with enough coverage, i.e. sum of junction coverage of two samples $\ge$ 1
+    + Identify junctions that RPKM change in the same direction as the exon
+    + Junction RPKM > 0.1 in one sample and < 0.1 in the other      
+
+#### Between cortex and GE neurospheres
+
+  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r length(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
+  * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
+  * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
+  * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
+
+```{r isoform_cortex_ge, results='asis'}
+cortex_GE_summary <- xtable(cortex_GE_summary)
+align(cortex_GE_summary) <- "lcccccc"
+print(cortex_GE_summary, type = "html", include.rownames = T)
+
+venn_cortex_GE <- venn.diagram(isoform_cortex_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex vs GE isoforms", main.cex = 2)
+plot.new()
+grid.draw(venn_cortex_GE)
+```
+
+```{r isoform_enrich_cortex_ge, fig.width=10, fig.height = 8}
+(isoform_cortex_GE_enrich)
+```
+
+#### Between MZ twins - HuFNSC01 vs HuFNSC02
+
+  * On average, __`r round(mean(individual_summary[1:3, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r length(isoform_HuFNSC01_HuFNSC02_gene_shared)`__ genes are shared by all three cell types.              
+  * On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.            
+  * Different regions on the Venn diagram have __no__ significantly enriched terms.     
+  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
+
+```{r isoform_HuFNSC01_02, results='asis'}
+library(xtable)
+individual_summary <- xtable(individual_summary)
+align(individual_summary) <- "lcccccc"
+print(individual_summary, type = "html", include.rownames = T)
+
+plot.new()
+grid.draw(venn_HuFNSC01_HuFNSC02)
+plot.new()
+grid.draw(venn_HuFNSC03_HuFNSC04)
+```
+
+```{r isoform_enrich_HuFNSC01_02, fig.width=10, fig.height = 4}
+(isoform_brain01_brain02_enrich)
+(isoform_cortex01_cortex02_enrich)
+(isoform_GE01_GE02_enrich)
+```
+
+#### Junction validation
+  + For cortex vs GE, on average, __`r round(mean(cortex_GE_valid_summary[, "genes with junction coverage"]/cortex_GE_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(cortex_GE_valid_summary[, "genes with junction support"]/cortex_GE_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.    
+  + For comparisons between individuals, on average, __`r round(mean(individual_valid_summary[, "genes with junction coverage"]/individual_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(individual_valid_summary[, "genes with junction support"]/individual_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.     
+  + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
+  + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
+
+```{r isoform_validate, results='asis', fig.height = 5, fig.width = 5}
+library(xtable)
+cortex_GE_valid_summary <- xtable(cortex_GE_valid_summary)
+align(cortex_GE_valid_summary) <- "lcccccc"
+print(cortex_GE_valid_summary, type = "html", include.rownames = T)
+individual_valid_summary <- xtable(individual_valid_summary)
+align(individual_valid_summary) <- "lcccccc"
+print(individual_valid_summary, type = "html", include.rownames = T)
+```
+
+### No. of exons for DE genes / isoform genes    
+  * DE genes have roughly the same No. of exons as all expressed genes.             
+  * Identified isoforms have slightly more No. of exons than DE genes and all expressed genes.  
+  * Compared to DE genes, the distribution in No. of exons for isoforms are __much similar__ between different individuals, _not observed in breast libraries_.    
+  
+```{r isoform_Nexon, fig.height = 8, fig.width = 8}
+plot(c(0, 50), c(0, 0.08), type = "n", main = "No. of exons in DE genes and isoforms", xlab = "No. of exons", ylab = "density")
+lines(density(na.omit(Nexon[rownames(Nexon) %in% as.character(geneRPKM[(geneRPKM$cortex01 + geneRPKM$cortex02 + geneRPKM$cortex03 + geneRPKM$cortex04 + geneRPKM$ge01 + geneRPKM$ge02 + geneRPKM$ge03 + geneRPKM$ge04) > 0.08, "id"]), "Nexon"])), col = 1, lty = 1, lwd = 5)
+lines(density(na.omit(cortex01_GE01_DE$Nexon)), col = "red", lty = 1, lwd = 3)
+lines(density(na.omit(cortex02_GE02_DE$Nexon)), col = "blue", lty = 1, lwd = 3)
+lines(density(na.omit(cortex03_GE03_DE$Nexon)), col = "green", lty = 1, lwd = 3)
+lines(density(na.omit(cortex04_GE04_DE$Nexon)), col = "purple", lty = 1, lwd = 3)
+lines(density(na.omit(cortex01_GE01_isoform_gene$Nexon)), col = "red", lty = 3, lwd = 3)
+lines(density(na.omit(cortex02_GE02_isoform_gene$Nexon)), col = "blue", lty = 3, lwd = 3)
+lines(density(na.omit(cortex03_GE03_isoform_gene$Nexon)), col = "green", lty = 3, lwd = 3)
+lines(density(na.omit(cortex04_GE04_isoform_gene$Nexon)), col = "purple", lty = 3, lwd = 3)
+legend("topleft", c("all expressed genes", "DE genes", "isoforms"), col = 1, lty = c(1, 1, 3), lwd = 5, cex = 0.8)
+legend("topright", c("all expressed genes", "cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = c("black", "red", "blue", "green", "purple"), lty = 1, lwd = 5, cex = 0.8)
+```
+
+### Position of isoform exons on the gene   
+  * In general, there are more alternative spliced exons at the __two ends__ of genes, _similar to observed in breast libraries_.         
+  
+```{r isoform_exon_pos, fig.height = 8, fig.width = 8}
+plot(c(0, 100), c(0, 0.015), type = "n", main = "Distribution of isoform exons along genes", xlab = "gene position", ylab = "density")
+lines(density(na.omit(cortex01_GE01_isoform_exon$exon_pos)), col = "red", lty = 1, lwd = 3)
+lines(density(na.omit(cortex02_GE02_isoform_exon$exon_pos)), col = "blue", lty = 1, lwd = 3)
+lines(density(na.omit(cortex03_GE03_isoform_exon$exon_pos)), col = "green", lty = 1, lwd = 3)
+lines(density(na.omit(cortex04_GE04_isoform_exon$exon_pos)), col = "purple", lty = 1, lwd = 3)
+legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE03", "cortex04 vs GE04"), col = c("red", "blue", "green", "purple"), lty = 1, lwd = 5)
+```
+
+### Venn Diagram with average expression level, average No. of exons and average exon length   
+  * Isoforms have __much lower__ expression level than all expressed genes.          
+  * On average, common isoforms between different comparisons have __lower expression level__ than comparison-specific isoforms.                 
+  * In general, compared to all isoforms identified, validated isoforms have __lower__ expression levels, _not observed in breast libraries_.     
+  * Average No. of exons are very __similar__ in different sections of the Venn diagram, between all, validated isoforms and all expressed genes.        
+  * Average length of isoform exons are __shorter__ than all expressed genes. Validated isoform exons are also __shorter__ than all isoforms in general, _not observed in breast libraries_.         
+  
+```{r isoform_venn, fig.height = 5, fig.width = 5}
+# No. of isoforms
+(bubble_all_N)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of isoform genes", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_N)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of validated isoform genes", main.cex = 1.5)
+grid.draw(venn_valid)
+
+# average expression level
+(bubble_all_rpkm)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_rpkm)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of validated isoforms", main.cex = 1.5)
+grid.draw(venn_valid)
+
+# No. of exons
+(bubble_all_Nexon)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of isoforms", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_Nexon)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of validated isoforms", main.cex = 1.5)
+grid.draw(venn_valid)
+
+# average exon length 
+(bubble_all_exon_length)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of isoform exons", main.cex = 1.5)
+grid.draw(venn_all)
+(bubble_valid_exon_length)
+venn_valid <- venn.diagram(isoform_valid, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of validated isoform exons", main.cex = 1.5)
+grid.draw(venn_valid)
+```
+
+
+## Epigenetic signature marking 
+### Between cortex and GE neurospheres
+#### DNA methylation at exon boundaries 
+* 5mC at cassette exon boundaries has similar pattern to expressed in both exons.   
+* 5mC for cassette exons between cortex and GE neurospheres shows no significant differences.   
+* Results from both WGBS (HuFNSC02 & HuFNSC04) and MeDIP (HuFNSC01 & HuFNSC02) support the assumption that 5mC is a stable mark for exon transcription during development.   
+* 5mC exon marking is established between neurospheres. _Needs further validation against H1_.   
+
+```{r epiProfile_5mC_cortexge}
+gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC02 + ggtitle("WGBS HuFNSC02 cortex vs GE"))) 
+gt$heights[[4]] <- unit(3.5, "null") 
+grid.newpage()
+grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
+
+(MeDIP_figure_HuFNSC02 + ggtitle("MeDIP HuFNSC02 cortex vs GE"))
+
+gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC04 + ggtitle("WGBS HuFNSC04 cortex vs GE"))) 
+gt$heights[[4]] <- unit(3.5, "null") 
+grid.newpage()
+grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
+
+(MeDIP_figure_HuFNSC01 + ggtitle("MeDIP HuFNSC01 cortex vs GE"))
+```
+
+#### H3K36me3 in exon bodies
+* H3K36me3 in expressed in both / not expressed exons shows no significant differences between HuFNSC01 and HuFNSC02.    
+* H3K36me3 in cassette exons in HuFNSC01 are enriched in GE compared to cortex. However, it is not reproduced in HuFNSC02, where there is no significant differences between cortex and GE. _Not sure what to make of this. Are there any potential bias?_    
+
+```{r epiProfile_H3K36me3_cortexge}
+(H3K36me3_figure_HuFNSC01 + ggtitle("H3K36me3 HuFNSC01 cortex vs GE"))
+
+(H3K36me3_figure_HuFNSC02 + ggtitle("H3K36me3 HuFNSC02 cortex vs GE"))
+```
+
+### Between MZ twins - HuFNSC01 vs HuFNSC02
+#### DNA methylation at exon boundaries 
+* 5mC for cassette exons between HuFNSC01 and HuFNSC02 shows no significant differences.   
+* There are significant differences in 5mC between HuFNSC01 and HuFNSC02 specific exons in all three cell types.   
+* In brain, 5mC in HuFNSC02 specific exons are closer to expressed in both, and HuFNSC01 specific exons are closer to not expressed exons. However, we observe the opposite trend in cortex and GE. _Is this a reflection of developmental stages differences between MZ twins? Are the opposite trends between brain and cortex/GE because of cell culture? Or could all these differences be technical bias / noise?_    
+
+```{r epiProfile_5mC_MZ}
+(MeDIP_figure_brain + ggtitle("MeDIP HuFNSC01 vs HuFNSC02 brain"))
+
+(MeDIP_figure_cortex + ggtitle("MeDIP HuFNSC01 vs HuFNSC02 cortex"))
+
+(MeDIP_figure_ge + ggtitle("MeDIP HuFNSC01 vs HuFNSC02 GE"))
+```
+
+#### H3K36me3 in exon bodies
+* There are some differences between HuFNSC01 and HuFNSC02 in expressed in both and not expressed exons, less so in GE.   
+* For cassette exons, HuFNSC02 have enriched H3K36me3 compared to HuFNSC01 in both brain and cortex, but __not__ in GE. _Could this be related to the asymmetry we observed in DNA methylation in brain and cortex?_   
+
+```{r epiProfile_H3K36me3_MZ}
+(H3K36me3_figure_brain + ggtitle("H3K36m3 HuFNSC01 vs HuFNSC02 brain"))
+
+(H3K36me3_figure_cortex + ggtitle("H3K36m3 HuFNSC01 vs HuFNSC02 cortex"))
+
+(H3K36me3_figure_ge + ggtitle("H3K36m3 HuFNSC01 vs HuFNSC02 GE"))
+```
+
+
+
+
+
+
+
+
+
+
+
