@@ -547,10 +547,10 @@ load("REMC.isoform.breast.RData")
 #                      tissue=c("vHMEC_myo", "vHMEC_lum","vHMEC_fibr","myo_lum","myo_stem-like","lum_stem-like")))
 # ggplot(df, aes(tissue, value, fill=variable)) + geom_bar(position="dodge")
 summary<-data.frame(tissue=c("vHMEC_myo", "vHMEC_lum","vHMEC_fibr","myo_lum","myo_stem-like","lum_stem-like"),
-                    Isoform=c(3204,2963,1829,3240,3038.5,3254), 
+                    Isoform=c(3204,2963,1829,2349,2408.5,2387), 
                     DE_gene=c(994,1474,1845,1211,1339.5,1522),
-                    Isoform_max=c(3204,2963,1829,4098,3650,4079),
-                    Isoform_min=c(3204,2963,1829,2381,2427,2429),
+                    Isoform_max=c(3204,2963,1829,2381,2427,2429),
+                    Isoform_min=c(3204,2963,1829,2325,2390,2345),
                     DE_max=c(994,1474,1845,1255,1401,1569),
                     DE_min=c(994,1474,1845,1171,1278,1475),
                     Nexons1=c(101826.5,101826.5,101826.5,113100.6667,113100.6667,112374.3333),
