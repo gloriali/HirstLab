@@ -138,7 +138,7 @@ print(individual_DE_summary, type = "html", include.rownames = T)
 DE_HuFNSC01_HuFNSC02 <- list(brain = rownames(brain01_brain02DE), cortex = rownames(cortex01_cortex02DE), GE = rownames(GE01_GE02DE))
 venn_DE_HuFNSC01_HuFNSC02 <- venn.diagram(DE_HuFNSC01_HuFNSC02, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 DE genes", main.cex = 2)
 DE_HuFNSC03_HuFNSC04 <- list(cortex = rownames(cortex03_cortex04DE), GE = rownames(GE03_GE04DE))
-venn_DE_HuFNSC03_HuFNSC04 <- venn.diagram(DE_HuFNSC03_HuFNSC04, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 DE genes", main.cex = 2)
+venn_DE_HuFNSC03_HuFNSC04 <- venn.diagram(DE_HuFNSC03_HuFNSC04, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of HuFNSC03 vs HuFNSC04 DE genes", main.cex = 2)
 plot.new()
 grid.draw(venn_DE_HuFNSC01_HuFNSC02)
 plot.new()
@@ -153,7 +153,7 @@ enrich_cortex01_cortex02DE <- enrich(name = "cortex01_cortex02DE", fdr = 0.01, p
 (enrich_cortex01_cortex02DE$figure)
 enrich_GE01_GE02DE <- enrich(name = "GE01_GE02DE", fdr = 0.01, p = "FDR", erminej = T, height = 6, width = 9)
 (enrich_GE01_GE02DE$figure)
-# save.image("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
+save.image("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 ```
 
 

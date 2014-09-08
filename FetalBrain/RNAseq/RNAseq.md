@@ -2,7 +2,7 @@ Fetal Brain RNA-seq Analysis Summary
 ========================================================
 
 Gloria Li         
-Mon Sep  8 15:35:59 2014 
+Mon Sep  8 15:54:02 2014 
 
 
 
@@ -20,7 +20,7 @@ Mon Sep  8 15:35:59 2014
   * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:40 2014 -->
+<!-- Mon Sep  8 15:54:41 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
@@ -39,7 +39,7 @@ Mon Sep  8 15:35:59 2014
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:44 2014 -->
+<!-- Mon Sep  8 15:54:43 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>
@@ -72,7 +72,7 @@ Mon Sep  8 15:35:59 2014
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:47 2014 -->
+<!-- Mon Sep  8 15:54:44 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
@@ -92,7 +92,7 @@ Mon Sep  8 15:35:59 2014
   * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:48 2014 -->
+<!-- Mon Sep  8 15:54:44 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>
@@ -112,7 +112,7 @@ Mon Sep  8 15:35:59 2014
   + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:50 2014 -->
+<!-- Mon Sep  8 15:54:46 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> <TD align="center"> 1900 </TD> <TD align="center"> 832 </TD> <TD align="center"> 1543 </TD> <TD align="center"> 697 </TD> </TR>
@@ -121,7 +121,7 @@ Mon Sep  8 15:35:59 2014
   <TR> <TD> cortex04_GE04_summary </TD> <TD align="center"> 4259 </TD> <TD align="center"> 1386 </TD> <TD align="center"> 941 </TD> <TD align="center"> 483 </TD> <TD align="center"> 935 </TD> <TD align="center"> 478 </TD> </TR>
    </TABLE>
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:36:50 2014 -->
+<!-- Mon Sep  8 15:54:46 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> <TD align="center"> 1791 </TD> <TD align="center"> 921 </TD> <TD align="center"> 1520 </TD> <TD align="center"> 808 </TD> </TR>
