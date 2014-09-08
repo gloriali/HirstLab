@@ -51,7 +51,7 @@ grid.draw(venn_cortex_GE)
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
 ```{r enrich_cortex_ge, fig.width=10, fig.height = 8}
-(isoform_cortex_GE_enrich)
+(isoform_cortex_GE_enrich$figure)
 ```
 
 ## Isoform genes between individuals
@@ -77,16 +77,16 @@ grid.draw(venn_HuFNSC03_HuFNSC04)
   * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
 
 ```{r enrich_HuFNSC01_02, fig.width=10, fig.height = 4}
-(isoform_brain01_brain02_enrich)
-(isoform_cortex01_cortex02_enrich)
-(isoform_GE01_GE02_enrich)
+(isoform_brain01_brain02_enrich$figure)
+(isoform_cortex01_cortex02_enrich$figure)
+(isoform_GE01_GE02_enrich$figure)
 ```
 
 #### HuFNSC03 vs HuFNSC04
   
 ```{r enrich_HuFNSC03_04, fig.width=10, fig.height = 2}
-(isoform_cortex03_cortex04_enrich)
-(isoform_GE03_GE04_enrich)
+(isoform_cortex03_cortex04_enrich$figure)
+(isoform_GE03_GE04_enrich$figure)
 ```
 
 

@@ -112,7 +112,8 @@ isoform_cortex_GE_exon <- c(cortex01_GE01_isoform_exon$V1, cortex02_GE02_isoform
 isoform_cortex_GE_exon_dup <-isoform_cortex_GE_exon[duplicated(isoform_cortex_GE_exon)] 
 isoform_cortex_GE_exon <- unique(isoform_cortex_GE_exon)
 write.table(isoform_cortex_GE_gene_dup, file = "./enrich/isoform_cortex_GE_gene_dup.txt", sep = "\t", quote = F, row.names = F, col.names = F)
-(isoform_cortex_GE_enrich <- enrich(name = "isoform_cortex_GE"))
+isoform_cortex_GE_enrich <- enrich(name = "isoform_cortex_GE")
+(isoform_cortex_GE_enrich$figure)
 
 # HuFNSC01 vs HuFNSC02
 isoform_HuFNSC01_HuFNSC02 <- list(brain = brain01_brain02_isoform_gene$id, cortex = cortex01_cortex02_isoform_gene$id, GE = GE01_GE02_isoform_gene$id)
@@ -125,9 +126,12 @@ isoform_HuFNSC01_HuFNSC02_gene_shared <- intersect(brain01_brain02_isoform_gene$
 write.table(brain01_brain02_isoform_gene$id, file = "./enrich/isoform_brain01_brain02.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 write.table(cortex01_cortex02_isoform_gene$id, file = "./enrich/isoform_cortex01_cortex02.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 write.table(GE01_GE02_isoform_gene$id, file = "./enrich/isoform_GE01_GE02.txt", sep = "\t", quote = F, row.names = F, col.names = F)
-(isoform_brain01_brain02_enrich <- enrich(name = "isoform_brain01_brain02", height = 4))
-(isoform_cortex01_cortex02_enrich <- enrich(name = "isoform_cortex01_cortex02"))
-(isoform_GE01_GE02_enrich <- enrich(name = "isoform_GE01_GE02"))
+isoform_brain01_brain02_enrich <- enrich(name = "isoform_brain01_brain02", height = 4)
+(isoform_brain01_brain02_enrich$figure)
+isoform_cortex01_cortex02_enrich <- enrich(name = "isoform_cortex01_cortex02")
+(isoform_cortex01_cortex02_enrich$figure)
+isoform_GE01_GE02_enrich <- enrich(name = "isoform_GE01_GE02")
+(isoform_GE01_GE02_enrich$figure)
 
 # HuFNSC03 vs HuFNSC04
 isoform_HuFNSC03_HuFNSC04 <- list(cortex = cortex03_cortex04_isoform_gene$id, GE = GE03_GE04_isoform_gene$id)
@@ -139,8 +143,10 @@ dev.off()
 isoform_HuFNSC03_HuFNSC04_gene_shared <- intersect(cortex03_cortex04_isoform_gene$id, GE03_GE04_isoform_gene$id)
 write.table(cortex03_cortex04_isoform_gene$id, file = "./enrich/isoform_cortex03_cortex04.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 write.table(GE03_GE04_isoform_gene$id, file = "./enrich/isoform_GE03_GE04.txt", sep = "\t", quote = F, row.names = F, col.names = F)
-(isoform_cortex03_cortex04_enrich <- enrich(name = "isoform_cortex03_cortex04", height = 4))
-(isoform_GE03_GE04_enrich <- enrich(name = "isoform_GE03_GE04", height = 3))
+isoform_cortex03_cortex04_enrich <- enrich(name = "isoform_cortex03_cortex04", height = 4)
+(isoform_cortex03_cortex04_enrich$figure)
+isoform_GE03_GE04_enrich <- enrich(name = "isoform_GE03_GE04", height = 3)
+(isoform_GE03_GE04_enrich$figure)
 
 save.image("FetalBrain_isoform.Rdata")
 
