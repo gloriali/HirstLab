@@ -16,11 +16,12 @@ library(ggplot2)
 library(xtable)
 library(VennDiagram)
 library(grid) 
-source("~/HirstLab/Pipeline/epiProfile.R")
+source("~/HirstLab/Pipeline/enrich.R")
 opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ```
 
 ```{r DEfine}
+load("~/快盘/hg19/hg19v65_genes.Rdata")
 col <- c("Gene id", "rpkm1", "rpkm2", "p-value", "Multiple testing corrected p-value")
 setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/")
 cortex01_GE01UP<-read.table("UP.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25")
@@ -49,6 +50,9 @@ cortex04_GE04DE <- rbind(cortex04_GE04UP,cortex04_GE04DN)
 rownames(cortex04_GE04DE) <- cortex04_GE04DE$V1
 cortex_GE_DE_summary <- data.frame(UP = c(nrow(cortex01_GE01UP), nrow(cortex02_GE02UP), nrow(cortex03_GE03UP), nrow(cortex04_GE04UP)), DN = c(nrow(cortex01_GE01DN), nrow(cortex02_GE02DN), nrow(cortex03_GE03DN), nrow(cortex04_GE04DN)), DE = c(nrow(cortex01_GE01DE), nrow(cortex02_GE02DE), nrow(cortex03_GE03DE), nrow(cortex04_GE04DE)))
 rownames(cortex_GE_DE_summary) <- c("HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04")
+cortex_GE_duplicated <- c(rownames(cortex01_GE01DE), rownames(cortex02_GE02DE), rownames(cortex03_GE03DE), rownames(cortex04_GE04DE))
+cortex_GE_duplicated <- ensembl[cortex_GE_duplicated[duplicated(cortex_GE_duplicated)], ]
+# write.table(cortex_GE_duplicated, file = "~/快盘/FetalBrain/RNAseq/DEfine/gene/cortex_GE_DE_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 
 setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/individual/")
 brain01_brain02UP <- read.table("UP.Brain-HuFNSC01_Brain-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
@@ -83,7 +87,73 @@ GE03_GE04DE <- rbind(GE03_GE04UP,GE03_GE04DN)
 rownames(GE03_GE04DE) <- GE03_GE04DE$V1
 individual_DE_summary <- data.frame(UP = c(nrow(brain01_brain02UP), nrow(cortex01_cortex02UP), nrow(GE01_GE02UP), nrow(cortex03_cortex04UP), nrow(GE03_GE04UP)), DN = c(nrow(brain01_brain02DN), nrow(cortex01_cortex02DN), nrow(GE01_GE02DN), nrow(cortex03_cortex04DN), nrow(GE03_GE04DN)), DE = c(nrow(brain01_brain02DE), nrow(cortex01_cortex02DE), nrow(GE01_GE02DE), nrow(cortex03_cortex04DE), nrow(GE03_GE04DE)))
 rownames(individual_DE_summary) <- c("brain01_brain02", "cortex01_cortex02", "GE01_GE02", "cortex03_GE03", "cortex04_GE04")
+# write.table(brain01_brain02DE, file = "~/快盘/FetalBrain/RNAseq/DEfine/gene/brain01_brain02DE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+# write.table(cortex01_cortex02DE, file = "~/快盘/FetalBrain/RNAseq/DEfine/gene/cortex01_cortex02DE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+# write.table(GE01_GE02DE, file = "~/快盘/FetalBrain/RNAseq/DEfine/gene/GE01_GE02DE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+```
+
+## Differentially expressed genes
+### DEfine
+
+  * FDR = 0.01    
+  * Minimum sum of RPKM (rmin) = 0.005    
+  * Minimum sum of coverage (Nmin) = 25    
+  
+### Between cortex and GE neurospheres
+
+  * On average, there are __`r mean(cortex_GE_DE_summary$DE)`__ genes differentially expressed between cortex and GE, among them, __`r mean(cortex_GE_DE_summary$UP)`__ are upregulated in cortex, and __`r mean(cortex_GE_DE_summary$DN)`__ are downregulated.    
+  * __`r nrow(cortex_GE_duplicated)`__ DE genes are shared by at least two individuals.    
+  * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
+
+```{r cortex_GE, results='asis', fig.height = 6, fig.width = 6}
 setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/")
+cortex_GE_DE_summary <- xtable(cortex_GE_DE_summary)
+align(cortex_GE_DE_summary) <- "lccc"
+print(cortex_GE_DE_summary, type = "html", include.rownames = T)
+
+DE_cortex_GE <- list(HuFNSC01 = rownames(cortex01_GE01DE), HuFNSC02 = rownames(cortex02_GE02DE), HuFNSC03 = rownames(cortex03_GE03DE), HuFNSC04 = rownames(cortex04_GE04DE))
+venn_DE_cortex_GE <- venn.diagram(DE_cortex_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of cortex vs GE DE genes", main.cex = 2)
+plot.new()
+grid.draw(venn_DE_cortex_GE)
+```
+
+```{r cortex_GE_enrich, fig.height = 8, fig.width = 8}
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/")
+enrich_DE_cortex_GE <- enrich(name = "cortex_GE_DE_duplicated", fdr = 0.01, p = "FDR", erminej = F, height = 7, width = 9)
+(enrich_DE_cortex_GE$figure)
+```
+
+### Between MZ twins - HuFNSC01 vs HuFNSC02
+
+  * On average, there are __`r as.integer(mean(individual_DE_summary$DE[1:3]))`__ DE genes across three cells types.   
+  * Majority of DE genes are cell type specific, only __`r sum(duplicated(c(rownames(brain01_brain02DE), rownames(cortex01_cortex02DE), rownames(GE01_GE02DE))))`__ are shared between any two cell types.   
+  * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
+
+```{r individual, results='asis', fig.height = 6, fig.width = 6}
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/")
+individual_DE_summary <- xtable(individual_DE_summary)
+align(individual_DE_summary) <- "lccc"
+print(individual_DE_summary, type = "html", include.rownames = T)
+
+DE_HuFNSC01_HuFNSC02 <- list(brain = rownames(brain01_brain02DE), cortex = rownames(cortex01_cortex02DE), GE = rownames(GE01_GE02DE))
+venn_DE_HuFNSC01_HuFNSC02 <- venn.diagram(DE_HuFNSC01_HuFNSC02, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 DE genes", main.cex = 2)
+DE_HuFNSC03_HuFNSC04 <- list(cortex = rownames(cortex03_cortex04DE), GE = rownames(GE03_GE04DE))
+venn_DE_HuFNSC03_HuFNSC04 <- venn.diagram(DE_HuFNSC03_HuFNSC04, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of HuFNSC01 vs HuFNSC02 DE genes", main.cex = 2)
+plot.new()
+grid.draw(venn_DE_HuFNSC01_HuFNSC02)
+plot.new()
+grid.draw(venn_DE_HuFNSC03_HuFNSC04)
+```
+
+```{r individual_enrich, fig.height = 4, fig.width = 8}
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/")
+enrich_brain01_brain02DE <- enrich(name = "brain01_brain02DE", fdr = 0.01, p = "FDR", erminej = F, height = 4, width = 9)
+(enrich_brain01_brain02DE$figure)
+enrich_cortex01_cortex02DE <- enrich(name = "cortex01_cortex02DE", fdr = 0.01, p = "FDR", erminej = F, height = 4, width = 9)
+(enrich_cortex01_cortex02DE$figure)
+enrich_GE01_GE02DE <- enrich(name = "GE01_GE02DE", fdr = 0.01, p = "FDR", erminej = T, height = 6, width = 9)
+(enrich_GE01_GE02DE$figure)
+# save.image("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 ```
 
 
