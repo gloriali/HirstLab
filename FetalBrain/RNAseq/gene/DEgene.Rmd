@@ -1,0 +1,91 @@
+---
+output: 
+  html_document:
+    keep_md: true
+    toc: yes
+---
+Fetal Brain RNA-seq - DE genes 
+========================================================
+
+Gloria Li         
+`r date()` 
+
+```{r include = FALSE}
+library(knitr)
+library(ggplot2)
+library(xtable)
+library(VennDiagram)
+library(grid) 
+source("~/HirstLab/Pipeline/epiProfile.R")
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+```{r DEfine}
+col <- c("Gene id", "rpkm1", "rpkm2", "p-value", "Multiple testing corrected p-value")
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/cortexge/")
+cortex01_GE01UP<-read.table("UP.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25")
+cortex01_GE01UP$DE <- "UP"
+cortex01_GE01DN<-read.table("DN.Cortex-HuFNSC01_GE-HuFNSC01.FDR_0.01.rmin_0.005.Nmin_25")
+cortex01_GE01DN$DE <- "DN"
+cortex02_GE02UP<-read.table("UP.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+cortex02_GE02UP$DE <- "UP"
+cortex02_GE02DN<-read.table("DN.Cortex-HuFNSC02_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+cortex02_GE02DN$DE <- "DN"
+cortex03_GE03UP<-read.table("UP.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25")
+cortex03_GE03UP$DE <- "UP"
+cortex03_GE03DN<-read.table("DN.Cortex-HuFNSC03_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25")
+cortex03_GE03DN$DE <- "DN"
+cortex04_GE04UP<-read.table("UP.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+cortex04_GE04UP$DE <- "UP"
+cortex04_GE04DN<-read.table("DN.Cortex-HuFNSC04_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+cortex04_GE04DN$DE <- "DN"
+cortex01_GE01DE <- rbind(cortex01_GE01UP,cortex01_GE01DN)
+rownames(cortex01_GE01DE) <- cortex01_GE01DE$V1
+cortex02_GE02DE <- rbind(cortex02_GE02UP,cortex02_GE02DN)
+rownames(cortex02_GE02DE) <- cortex02_GE02DE$V1
+cortex03_GE03DE <- rbind(cortex03_GE03UP,cortex03_GE03DN)
+rownames(cortex03_GE03DE) <- cortex03_GE03DE$V1
+cortex04_GE04DE <- rbind(cortex04_GE04UP,cortex04_GE04DN)
+rownames(cortex04_GE04DE) <- cortex04_GE04DE$V1
+cortex_GE_DE_summary <- data.frame(UP = c(nrow(cortex01_GE01UP), nrow(cortex02_GE02UP), nrow(cortex03_GE03UP), nrow(cortex04_GE04UP)), DN = c(nrow(cortex01_GE01DN), nrow(cortex02_GE02DN), nrow(cortex03_GE03DN), nrow(cortex04_GE04DN)), DE = c(nrow(cortex01_GE01DE), nrow(cortex02_GE02DE), nrow(cortex03_GE03DE), nrow(cortex04_GE04DE)))
+rownames(cortex_GE_DE_summary) <- c("HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04")
+
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/individual/")
+brain01_brain02UP <- read.table("UP.Brain-HuFNSC01_Brain-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+brain01_brain02UP$DE <- "UP"
+brain01_brain02DN <- read.table("DN.Brain-HuFNSC01_Brain-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+brain01_brain02DN$DE <- "DN"
+cortex01_cortex02UP <- read.table("UP.Cortex-HuFNSC01_Cortex-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+cortex01_cortex02UP$DE <- "UP"
+cortex01_cortex02DN <- read.table("DN.Cortex-HuFNSC01_Cortex-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+cortex01_cortex02DN$DE <- "DN"
+cortex03_cortex04UP <- read.table("UP.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+cortex03_cortex04UP$DE <- "UP"
+cortex03_cortex04DN <- read.table("DN.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+cortex03_cortex04DN$DE <- "DN"
+GE01_GE02UP <- read.table("UP.GE-HuFNSC01_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+GE01_GE02UP$DE <- "UP"
+GE01_GE02DN <- read.table("DN.GE-HuFNSC01_GE-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25")
+GE01_GE02DN$DE <- "DN"
+GE03_GE04UP <- read.table("UP.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+GE03_GE04UP$DE <- "UP"
+GE03_GE04DN <- read.table("DN.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25")
+GE03_GE04DN$DE <- "DN"
+brain01_brain02DE <- rbind(brain01_brain02UP,brain01_brain02DN)
+rownames(brain01_brain02DE) <- brain01_brain02DE$V1
+cortex01_cortex02DE <- rbind(cortex01_cortex02UP,cortex01_cortex02DN)
+rownames(cortex01_cortex02DE) <- cortex01_cortex02DE$V1
+cortex03_cortex04DE <- rbind(cortex03_cortex04UP,cortex03_cortex04DN)
+rownames(cortex03_cortex04DE) <- cortex03_cortex04DE$V1
+GE01_GE02DE <- rbind(GE01_GE02UP,GE01_GE02DN)
+rownames(GE01_GE02DE) <- GE01_GE02DE$V1
+GE03_GE04DE <- rbind(GE03_GE04UP,GE03_GE04DN)
+rownames(GE03_GE04DE) <- GE03_GE04DE$V1
+individual_DE_summary <- data.frame(UP = c(nrow(brain01_brain02UP), nrow(cortex01_cortex02UP), nrow(GE01_GE02UP), nrow(cortex03_cortex04UP), nrow(GE03_GE04UP)), DN = c(nrow(brain01_brain02DN), nrow(cortex01_cortex02DN), nrow(GE01_GE02DN), nrow(cortex03_cortex04DN), nrow(GE03_GE04DN)), DE = c(nrow(brain01_brain02DE), nrow(cortex01_cortex02DE), nrow(GE01_GE02DE), nrow(cortex03_cortex04DE), nrow(GE03_GE04DE)))
+rownames(individual_DE_summary) <- c("brain01_brain02", "cortex01_cortex02", "GE01_GE02", "cortex03_GE03", "cortex04_GE04")
+setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/")
+```
+
+
+
+
