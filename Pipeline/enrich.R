@@ -1,7 +1,8 @@
-enrich <- function(name, dirIn = "./enrich/", dirOut = "./enrich/", fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG_PATHWAY", "PANTHER_PATHWAY", "REACTOME_PATHWAY", "INTERPRO"), height = 6, width = 9){
+enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG_PATHWAY", "PANTHER_PATHWAY", "REACTOME_PATHWAY", "INTERPRO"), height = 6, width = 9){
   library(ggplot2)
   DAVID <- read.delim(paste0(dirIn, name, "_DAVID.txt"), as.is=T)
   if(erminej){
+    DAVID <- DAVID[!(DAVID$Category %in% c("GOTERM_MF", "GOTERM_BP")), ]
     erminej_BP <- read.delim(paste0(dirIn, name, "_erminej_BP.txt"), as.is=T, skip = 34, head = F)
     if(sum(is.na(erminej_BP$V10)) == nrow(erminej_BP)){erminej_BP$V10 <- erminej_BP$V8}
     erminej_MF <- read.delim(paste0(dirIn, name, "_erminej_MF.txt"), as.is=T, skip = 34, head = F)
@@ -14,6 +15,9 @@ enrich <- function(name, dirIn = "./enrich/", dirOut = "./enrich/", fdr = 0.01, 
     enrich <- na.omit(data.frame(Category = DAVID$Category, Term = DAVID$Term, FDR = DAVID[, p]))
   }
   enrich <- enrich[enrich$FDR <= fdr, ]
+  if(nrow(enrich) == 0){
+    return(list(enrich = paste("No enrichment for", name), figure = paste("No enrichment for", name)))
+  }
   enrich <- enrich[as.character(enrich$Category) %in% category, ]
   enrich$Term <- gsub("IPR[0-9]+:", "", enrich$Term)
   enrich$Term <- gsub("hsa[0-9]+:", "", enrich$Term)
@@ -23,7 +27,7 @@ enrich <- function(name, dirIn = "./enrich/", dirOut = "./enrich/", fdr = 0.01, 
   enrich$Term <- strtrim(enrich$Term, 50)
   enrich$Term <- factor(enrich$Term, levels = enrich[order(enrich$Category, enrich$FDR, decreasing = T),]$Term)
   Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR))) +
-     geom_bar(aes(fill = Category), width = .5) + 
+     geom_bar(aes(fill = Category), stat = "identity", width = .5) + 
      coord_flip() + 
      geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
@@ -50,5 +54,6 @@ enrich <- function(name, dirIn = "./enrich/", dirOut = "./enrich/", fdr = 0.01, 
 #   return list
 #     $enrich: data frame of enriched terms, category and corrected p-values 
 #     $figure: ggplot2 object for enrichment plot
+#   If no enriched terms, return "No enrichment" for both $enrich and $figure
 
 
