@@ -72,7 +72,6 @@ legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE0
   + For cortex vs GE, on average, __`r round(mean(cortex_GE_valid_summary[, "genes with junction coverage"]/cortex_GE_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(cortex_GE_valid_summary[, "genes with junction support"]/cortex_GE_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.    
   + For comparisons between individuals, on average, __`r round(mean(individual_valid_summary[, "genes with junction coverage"]/individual_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(individual_valid_summary[, "genes with junction support"]/individual_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.     
   + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
-  + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
 
 ```{r validate, results='asis', fig.height = 5, fig.width = 5}
 library(xtable)

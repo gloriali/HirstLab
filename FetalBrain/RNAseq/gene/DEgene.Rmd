@@ -51,7 +51,7 @@ rownames(cortex04_GE04DE) <- cortex04_GE04DE$V1
 cortex_GE_DE_summary <- data.frame(UP = c(nrow(cortex01_GE01UP), nrow(cortex02_GE02UP), nrow(cortex03_GE03UP), nrow(cortex04_GE04UP)), DN = c(nrow(cortex01_GE01DN), nrow(cortex02_GE02DN), nrow(cortex03_GE03DN), nrow(cortex04_GE04DN)), DE = c(nrow(cortex01_GE01DE), nrow(cortex02_GE02DE), nrow(cortex03_GE03DE), nrow(cortex04_GE04DE)))
 rownames(cortex_GE_DE_summary) <- c("HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04")
 cortex_GE_duplicated <- c(rownames(cortex01_GE01DE), rownames(cortex02_GE02DE), rownames(cortex03_GE03DE), rownames(cortex04_GE04DE))
-cortex_GE_duplicated <- ensembl[cortex_GE_duplicated[duplicated(cortex_GE_duplicated)], ]
+cortex_GE_duplicated <- ensembl[unique(cortex_GE_duplicated[duplicated(cortex_GE_duplicated)]), ]
 # write.table(cortex_GE_duplicated, file = "~/快盘/FetalBrain/RNAseq/DEfine/gene/cortex_GE_DE_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 
 setwd("~/快盘/FetalBrain/RNAseq/DEfine/gene/individual/")

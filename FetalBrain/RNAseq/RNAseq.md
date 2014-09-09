@@ -2,7 +2,7 @@ Fetal Brain RNA-seq Analysis Summary
 ========================================================
 
 Gloria Li         
-Mon Sep  8 15:54:02 2014 
+Mon Sep  8 22:39:00 2014 
 
 
 
@@ -16,11 +16,11 @@ Mon Sep  8 15:54:02 2014
 ### Between cortex and GE neurospheres
 
   * On average, there are __860__ genes differentially expressed between cortex and GE, among them, __454__ are upregulated in cortex, and __406__ are downregulated.    
-  * __1196__ DE genes are shared by at least two individuals.    
+  * __886__ DE genes are shared by at least two individuals.    
   * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:41 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:37 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
@@ -38,8 +38,8 @@ Mon Sep  8 15:54:02 2014
   * Majority of DE genes are cell type specific, only __98__ are shared between any two cell types.   
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:43 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:38 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>
@@ -66,13 +66,13 @@ Mon Sep  8 15:54:02 2014
 
 #### Between cortex and GE neurospheres
 
-  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __4213__ genes are shared in at least two individuals.       
+  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __2352__ genes are shared in at least two individuals.       
   * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
   * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:44 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:40 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
@@ -89,10 +89,10 @@ Mon Sep  8 15:54:02 2014
   * On average, __2617__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __796__ genes are shared by all three cell types.              
   * On average, __1724__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __927__ genes are shared between two cell types.            
   * Different regions on the Venn diagram have __no__ significantly enriched terms.     
-  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
+  * Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:44 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:40 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>
@@ -108,11 +108,10 @@ Mon Sep  8 15:54:02 2014
 #### Junction validation
   + For cortex vs GE, on average, __36.4%__ isoform genes have enough junction coverage. Among them, __89.8%__ have support from junction reads.    
   + For comparisons between individuals, on average, __34.4%__ isoform genes have enough junction coverage. Among them, __87.7%__ have support from junction reads.     
-  + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
-  + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
+  + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support (> 98% compared to ~ 80%).   
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:46 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:42 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> <TD align="center"> 1900 </TD> <TD align="center"> 832 </TD> <TD align="center"> 1543 </TD> <TD align="center"> 697 </TD> </TR>
@@ -120,8 +119,8 @@ Mon Sep  8 15:54:02 2014
   <TR> <TD> cortex03_GE03_summary </TD> <TD align="center"> 6022 </TD> <TD align="center"> 2086 </TD> <TD align="center"> 1972 </TD> <TD align="center"> 872 </TD> <TD align="center"> 1836 </TD> <TD align="center"> 824 </TD> </TR>
   <TR> <TD> cortex04_GE04_summary </TD> <TD align="center"> 4259 </TD> <TD align="center"> 1386 </TD> <TD align="center"> 941 </TD> <TD align="center"> 483 </TD> <TD align="center"> 935 </TD> <TD align="center"> 478 </TD> </TR>
    </TABLE>
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:54:46 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:39:42 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> <TD align="center"> 1791 </TD> <TD align="center"> 921 </TD> <TD align="center"> 1520 </TD> <TD align="center"> 808 </TD> </TR>
@@ -150,7 +149,7 @@ Mon Sep  8 15:54:02 2014
   * Average No. of exons are very __similar__ in different sections of the Venn diagram, between all, validated isoforms and all expressed genes.        
   * Average length of isoform exons are __shorter__ than all expressed genes. Validated isoform exons are also __shorter__ than all isoforms in general, _not observed in breast libraries_.         
   
-![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn1.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn2.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn3.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn4.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn5.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn6.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn7.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn8.png) 
+![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn1.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn2.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn3.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn4.png) 
 
 
 ## Epigenetic signature marking 

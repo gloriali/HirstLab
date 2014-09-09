@@ -34,7 +34,7 @@ epiProfile <- function(mark, cell1, cell2, donor1, donor2, dirIn, dirOut = "", b
        xlab("Exon group") + 
        ylab(paste0("Average ", mark, " signal")) + 
        scale_fill_manual(values = c(color1, color2)) + 
-      theme(axis.title = element_text(size = 20), axis.text.x = element_text(size = 15, color = "black"), legend.text = element_text(size = 20), legend.title = element_text(size = 20), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 20, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
+      theme(panel.border = element_rect(linetype = "solid", fill = "transparent"), panel.margin = unit(0.75, "lines"), axis.title = element_text(size = 12), legend.text = element_text(size = 12), legend.title = element_text(size = 12), legend.key = element_rect(fill = "transparent"), panel.background = element_rect(fill = "transparent", color = "black"), plot.background = element_rect(fill = "transparent"), strip.text = element_text(color = "black", size = 12, hjust = 0.5, vjust = 0.5), strip.background = element_rect(color = "black"))
     ggsave(mark_exons_profile, file = paste0(dirOut, mark, "_exons_profile_", cell1, "-", donor1, "_", cell2, "-", donor2,".pdf"), width = 9, height = 8)
     return(list(data = mark_exons, profile = mark_exons_stat, figure = mark_exons_profile))
   }

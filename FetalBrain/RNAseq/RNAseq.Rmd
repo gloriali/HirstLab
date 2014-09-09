@@ -85,7 +85,7 @@ grid.draw(venn_DE_HuFNSC03_HuFNSC04)
 
 #### Between cortex and GE neurospheres
 
-  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r length(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
+  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r nrow(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
   * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
   * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
@@ -108,7 +108,7 @@ grid.draw(venn_cortex_GE)
   * On average, __`r round(mean(individual_summary[1:3, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r length(isoform_HuFNSC01_HuFNSC02_gene_shared)`__ genes are shared by all three cell types.              
   * On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.            
   * Different regions on the Venn diagram have __no__ significantly enriched terms.     
-  * Isoforms between HuFNSC01 and HuFNSC02 in different cell types show similar terms, related to signaling.     
+  * Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
 
 ```{r isoform_HuFNSC01_02, results='asis'}
 library(xtable)
@@ -131,8 +131,7 @@ grid.draw(venn_HuFNSC03_HuFNSC04)
 #### Junction validation
   + For cortex vs GE, on average, __`r round(mean(cortex_GE_valid_summary[, "genes with junction coverage"]/cortex_GE_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(cortex_GE_valid_summary[, "genes with junction support"]/cortex_GE_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.    
   + For comparisons between individuals, on average, __`r round(mean(individual_valid_summary[, "genes with junction coverage"]/individual_valid_summary[, "isoform genes"])*100, 1)`%__ isoform genes have enough junction coverage. Among them, __`r round(mean(individual_valid_summary[, "genes with junction support"]/individual_valid_summary[, "genes with junction coverage"])*100, 1)`%__ have support from junction reads.     
-  + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support(> 98% compared to ~ 80%).   
-  + From the Venn diagrams, similar to observed in breast libraries, the overlapping isoforms between different comparisons have __much lower__ ratio of being validated compared to comparison specific isoforms.    
+  + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support (> 98% compared to ~ 80%).   
 
 ```{r isoform_validate, results='asis', fig.height = 5, fig.width = 5}
 library(xtable)
@@ -186,27 +185,23 @@ legend("bottomright", c("cortex01 vs GE01", "cortex02 vs GE02", "cortex03 vs GE0
 ```{r isoform_venn, fig.height = 5, fig.width = 5}
 # No. of isoforms
 (bubble_all_N)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "No. of isoform genes", main.cex = 1.5)
 grid.draw(venn_all)
-(bubble_valid_N)
-grid.draw(venn_valid)
 
 # average expression level
 (bubble_all_rpkm)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average gene RPKM of isoforms", main.cex = 1.5)
 grid.draw(venn_all)
-(bubble_valid_rpkm)
-grid.draw(venn_valid)
 
 # No. of exons
 (bubble_all_Nexon)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average No. of exons of isoforms", main.cex = 1.5)
 grid.draw(venn_all)
-(bubble_valid_Nexon)
-grid.draw(venn_valid)
 
 # average exon length 
 (bubble_all_exon_length)
+venn_all <- venn.diagram(isoform_all, filename = NULL, fill = rep("white", 3), cex = 0, alpha = 0, col = c("red", "blue", "green"), main = "Average length of isoform exons", main.cex = 1.5)
 grid.draw(venn_all)
-(bubble_valid_exon_length)
-grid.draw(venn_valid)
 ```
 
 

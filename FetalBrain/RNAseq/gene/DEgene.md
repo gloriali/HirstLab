@@ -2,7 +2,7 @@ Fetal Brain RNA-seq - DE genes
 ========================================================
 
 Gloria Li         
-Mon Sep  8 15:50:30 2014 
+Mon Sep  8 22:25:53 2014 
 
 
 
@@ -18,11 +18,11 @@ Mon Sep  8 15:50:30 2014
 ### Between cortex and GE neurospheres
 
   * On average, there are __860__ genes differentially expressed between cortex and GE, among them, __454__ are upregulated in cortex, and __406__ are downregulated.    
-  * __1196__ DE genes are shared by at least two individuals.    
+  * __886__ DE genes are shared by at least two individuals.    
   * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:50:33 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:25:56 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
@@ -40,8 +40,8 @@ Mon Sep  8 15:50:30 2014
   * Majority of DE genes are cell type specific, only __98__ are shared between any two cell types.   
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:50:35 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 22:25:58 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>

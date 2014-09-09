@@ -2,7 +2,7 @@ Fetal Brain isoform analysis
 ========================================================
 
 Gloria Li         
-Mon Sep  8 15:15:41 2014 
+Mon Sep  8 21:13:35 2014 
 
 <!-- re-knit after modify isoform.std.R script -->
 
@@ -18,11 +18,11 @@ Mon Sep  8 15:15:41 2014
 
 ## Isoform genes between cortex and GE
 
-  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __4213__ genes are shared in at least two individuals.       
+  * On average, __2054__ genes are identified as isoforms between cortex and GE in each individual. __2352__ genes are shared in at least two individuals.       
   * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:15:43 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 21:13:37 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
@@ -43,8 +43,8 @@ Mon Sep  8 15:15:41 2014
   * On average, __2617__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __796__ genes are shared by all three cell types.              
   * On average, __1724__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __927__ genes are shared between two cell types.            
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 15:15:44 2014 -->
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Mon Sep  8 21:13:39 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>

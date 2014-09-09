@@ -33,7 +33,7 @@ library(VennDiagram)
 
 ## Isoform genes between cortex and GE
 
-  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r length(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
+  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r nrow(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
   * There are more individual-specific isoforms than found in breast cells, although the overlap across individuals are still significant.     
 
 ```{r cortex_ge, results='asis'}
