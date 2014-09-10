@@ -25,7 +25,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta '{if($1!=$3)prin
 less $dirDM/$dm | grep 'Bad line'
 less $dirDM/$dm | awk 'BEGIN {print "DM CpGs: "} {if($4==1)hyper++; if($4==-1)hypo++} END {print "No.of hypermethylated CpGs: ", hyper, "\nNo.of hypomethylated CpGs:  ", hypo}'
 /gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python /home/lli/bin/python/MeDIP.DMR.py -i $dirDM/$dm -o $dirDM
-less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$3-$2; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$3-$2}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
+less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$7; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$7}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
 
 ## Cortex01 vs Cortex02
 lib1="HS2775"; cell1="Cortex"; donor1="HuFNSC01"; name1="HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174";
@@ -36,7 +36,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta '{if($1!=$3)prin
 less $dirDM/$dm | grep 'Bad line'
 less $dirDM/$dm | awk 'BEGIN {print "DM CpGs: "} {if($4==1)hyper++; if($4==-1)hypo++} END {print "No.of hypermethylated CpGs: ", hyper, "\nNo.of hypomethylated CpGs:  ", hypo}'
 /gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python /home/lli/bin/python/MeDIP.DMR.py -i $dirDM/$dm -o $dirDM
-less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$3-$2; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$3-$2}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
+less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$7; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$7}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
 
 ## GE01 vs GE02
 lib1="HS2777"; cell1="GE"; donor1="HuFNSC01"; name1="HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157";
@@ -47,5 +47,5 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta '{if($1!=$3)prin
 less $dirDM/$dm | grep 'Bad line'
 less $dirDM/$dm | awk 'BEGIN {print "DM CpGs: "} {if($4==1)hyper++; if($4==-1)hypo++} END {print "No.of hypermethylated CpGs: ", hyper, "\nNo.of hypomethylated CpGs:  ", hypo}'
 /gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python /home/lli/bin/python/MeDIP.DMR.py -i $dirDM/$dm -o $dirDM
-less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$3-$2; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$3-$2}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
+less $dirDM/*$cell1"-"$donor1"_"$cell2"-"$donor2*s*c* | awk '{l=l+$7; c=c+$6; count++; if($5==1){hyper++;hyperlen=hyperlen+$7}} END {print "Average length of DMRs:     "l/count, "\nAverage No.of CpGs per DMR: "c/count, "\nDMRs:                       "count, "regions\t", l, "bases", "\nhypermethylated DMRs:       "hyper, "regions\t", hyperlen, "bases", "\nhypomethylated DMRs:        "count-hyper, "regions\t", l-hyperlen, "bases\n\n"}'
 

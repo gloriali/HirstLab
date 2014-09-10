@@ -4,8 +4,8 @@ import sys
 import argparse
 __author__ = 'Gloria Li'
  
-parser = argparse.ArgumentParser(description='Collapse single DM CpGs into DMRs.')
-parser.add_argument('-i', '--input', help='Input file name', required=True)
+parser = argparse.ArgumentParser(description="Collapse single DM CpGs into DMRs. Output format: chr; start; end; ID; DM(hyper:1, hypo:-1); CpG count; DMR length")
+parser.add_argument('-i', '--input', help='Input file name: DM status (1,0,-1) for each CpG', required=True)
 parser.add_argument('-o', '--output', help='Output directory', required=True)
 parser.add_argument('-s', '--dis', help='distance between adjacent CpGs to be considered within the same DMR, default 200', default=200, type=int)
 parser.add_argument('-c', '--cmin', help='minimum No. of CpGs to be considered DMR, default 3', default=3, type=int)
@@ -31,8 +31,9 @@ for line in In:
         continue
     # switch from DMR to new region
     elif flag and (chrom != dmr_chr or (start > dmr_start + dis) or (dm != 0 and dm != dmr_dm)): 
-        if count >= cmin: 
-            Out.write(dmr_chr+"\t"+str(dmr_start)+"\t"+str(dmr_end)+"\t"+dmr_chr+':'+str(dmr_start)+'-'+str(dmr_end)+"\t"+str(dmr_dm)+"\t"+str(count)+"\n")
+        if count >= cmin:
+            dmr_len = dmr_end-dmr_start; 
+            Out.write(dmr_chr+"\t"+str(dmr_start)+"\t"+str(dmr_end)+"\t"+dmr_chr+':'+str(dmr_start)+'-'+str(dmr_end)+"\t"+str(dmr_dm)+"\t"+str(count)+"\t"+str(dmr_len)+"\n")
         if dm != 0: # start a new DMR
             dmr_chr = chrom; dmr_start = start; dmr_end = end; dmr_dm = dm; count = 1; flag = 1;
         else:
