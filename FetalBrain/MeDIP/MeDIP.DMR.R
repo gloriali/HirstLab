@@ -3,7 +3,7 @@
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.fractional.m
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.DM.sh
 
-source("~/HirstLab/Pipeline/DMR.plots.R")
+source("~/HirstLab/Pipeline/DMR.figures.R")
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
 # Between MZ twins 
 setwd("~/快盘/FetalBrain/MeDIP/DMR/MZ/")
