@@ -1,0 +1,65 @@
+---
+output: 
+  html_document:
+    keep_md: true
+    toc: yes
+---
+Fetal Brain MeDIP Analysis Summary
+========================================================
+
+Gloria Li         
+`r date()` 
+
+```{r include = FALSE}
+library(knitr)
+library(ggplot2)
+library(xtable)
+library(VennDiagram)
+library(grid) 
+load("~/快盘/FetalBrain/MeDIP/DMR/MZ/DMR_MZ.Rdata")
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+## DMR analysis from MeDIP fractional calls
+
+  * DM CpG identification: $\Delta$mC < -0.4: hypomethylated; $\Delta$mC > 0.4: hypermethylated.       
+  * Collapse DM CpGs into DMRs:   
+    + adjacent CpGs have the same DM status;    
+    + distance between adjacent CpGs $\le$ 200bp;   
+    + No. of CpGs within each DMR $\ge$ 3.   
+    
+## DMRs between monozygptic twins
+### Summary and sanity check
+
+  * On average, there are __`r as.integer(mean(DMR_MZ_summary$Total))`__ DMR regions identified across three cell types, with __`r as.integer(mean(DMR_MZ_summary$Hyper))`__ hypermethylated, and __`r as.integer(mean(DMR_MZ_summary$Hypo))`__ hypomethylated.      
+  * Average length of all DMRs is __`r as.integer(mean(DMR_pos_MZ_figure$data$length))`bp__. __Smaller__ than observed in breast. _Bad script or biology?_      
+  * Average No. of CpGs per DMR is __`r as.integer(mean(DMR_pos_MZ_figure$data$count))`__. __Same__ as in breast.        
+  * Average distance between adjacent DMRs is approximately __`r as.integer(mean(DMR_pos_MZ_figure$data$dis[DMR_pos_MZ_figure$data$dis != -100000])/1000)`Kb__.         
+  * DMRs are scattered along the genome, no obvious chunks of hyper/hypo regions.         
+
+```{r DMR_MZ_sanity, results='asis', fig.width = 10, fig.height = 7}
+load("~/快盘/FetalBrain/MeDIP/DMR/MZ/DMR_MZ.Rdata")
+DMR_MZ_summary <- xtable(DMR_MZ_summary)
+align(DMR_MZ_summary) <- "lccc"
+print(DMR_MZ_summary, type = "html", include.rownames = T)
+
+(DMR_length_MZ_figure + ggtitle("DMR length between monozygotic twins"))
+(DMR_count_MZ_figure + ggtitle("No. of CpGs per DMR between monozygotic twins"))
+(DMR_dis_MZ_figure + ggtitle("Distance between adjacent DMRs between monozygotic twins"))
+(DMR_pos_MZ_figure + ggtitle("DMR positions on the chromosomes between monozygotic twins"))
+```
+
+### MZ DMR analysis
+
+  + There is an __asymmetry__ between hyper/hypo DMRs across all three cell types, most significant in cortex neurosphere, and least so in GE neurosphere. Fold change in total DMR length hyper/hypo in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.      
+  + Majority of DM CpGs overlap with genes, on average __`r round(mean(genomicBreak_MZ$Gene)*100, 2)`%__. And DM CpGs are __`r round(mean(genomicBreak_MZ$Promoter)/(3727169/28217448), 0)`-fold__ enriched in promoter regions, with on average __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "Promoter", "CpG"])*100, 2)`%__ DM CpGs are in promoter regions.
+<!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
+
+```{r DMR_MZ_analysis, fig.width = 10, fig.height = 7}
+(DMR_freq_MZ_figure + ggtitle("DMR frequency between monozygotic twins"))
+(genomicBreak_MZ_figure + ggtitle("DM CpG breakdown between monozygotic twins"))
+
+```
+
+
+

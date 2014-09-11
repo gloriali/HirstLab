@@ -1,5 +1,6 @@
 Fetal Brain - DNA methylation analysis with MeDIP
 ==================================================
+* [MeDIP.Rmd](./MeDIP.md): summary of Fetal Brain MeDIP DMR analysis     
 * [MeDIP.signal.sh](./MeDIP.signal.sh): calculate regional MeDIP signal coverage from wig files - input for [MeDIP.fractional.m](./MeDIP.fractional.m)
 * [MeDIP.fractional.m](./MeDIP.fractional.m): generate MeDIP fractional methylation calls for Fetal Brain libraries - from Misha's script
 * [MeDIP.DM.sh](./MeDIP.DM.sh): call DMRs on MeDIP fractional methylation calls
