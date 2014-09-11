@@ -7,7 +7,8 @@ Analysis pipeline
 * [epiProfile.md](./epiProfile.md): instructions for calculating and plotting epigenetic profiles for isoform and intron retention.       
 * [ChromHMM.md](./ChromHMM.md): instructions on running ChromHMM. _unfinished_.  
 * [MeDIP.DMR.py](./MeDIP.DMR.py): collapse single DM CpGs to DMRs.
-* [DMR.figures.R](./DMR.figures.R): `DMR_figures` R function for DMR analysis and visualization.   
+* [DMR.figures.R](./DMR.figures.R): `DMR_figures` R function for DMR analysis and visualization.
+* [DMR.intersect.sh](./DMR.intersect.sh): intersecting DMRs with genomic regions and report CpG% breakdown in intergenic, intron, exon, gene, promoter regions.     
 * [enrich.R](./enrich.R): `enrich` R function to plot enriched terms with `ggplot2`.   
 * [isoform.R](./isoform.R): `isoform` R function for identifying isoform genes and cassette exons.
 * [junction.R](./junction.R): `junction` R function for validating isoform genes and cassette exons with junction reads.   
