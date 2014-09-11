@@ -16,7 +16,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
   }
   enrich <- enrich[enrich$FDR <= fdr, ]
   if(nrow(enrich) == 0){
-    return(list(enrich = paste("No enrichment for", name), figure = paste("No enrichment for", name)))
+    return(paste("No enrichment for", name))
   }
   enrich <- enrich[as.character(enrich$Category) %in% category, ]
   enrich$Term <- gsub("IPR[0-9]+:", "", enrich$Term)
@@ -34,7 +34,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
      ggtitle(paste0("Functional enrichment for ", name)) + 
      scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue"))
   ggsave(Enrich_plot, file = paste0(dirOut, name, "_enrich.pdf"), height = height, width = width)
-  return(list(enrich = enrich, figure = Enrich_plot))
+  return(Enrich_plot)
 }
 # Plot enrichment terms from ermineJ (GO) and DAVID (KEGG, PANTHER, REACTOME, INTERPRO)
 # Criteria: 
@@ -51,9 +51,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
 #   [height], [width]: for output pdf plot, default to 6*9
 # Output: 
 #   pdf figure with enrichment plot
-#   return list
-#     $enrich: data frame of enriched terms, category and corrected p-values 
-#     $figure: ggplot2 object for enrichment plot
+#   return ggplot2 object for enrichment plot
 #   If no enriched terms, return "No enrichment" for both $enrich and $figure
 
 
