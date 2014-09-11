@@ -69,7 +69,7 @@ print(DMR_MZ_summary, type = "html", include.rownames = T)
 
   + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$pc.Promoters))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_gene_MZ_summary$pc.Promoters)/mean(DMR_MZ_summary$Total)*100, 2)`%__ of all DMRs, corresponds to __`r as.integer(mean(DMR_gene_MZ_summary$unique.Promoters))`__ protein-coding genes.         
   + These genes are __mostly shared__ by all three cell types.       
-  + DAVID enrichment shows these genes are enriched in __transcription regulation and neuron development__. 
+  + DAVID enrichment (FDR = 10^-6) shows these genes are enriched in __transcription regulation and neuron development__. 
   
 ```{r DMR_MZ_promoter, results='asis', fig.width = 8, fig.height = 8}
 DMR_gene_MZ_summary <- xtable(DMR_gene_MZ_summary)
