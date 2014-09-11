@@ -32,9 +32,9 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ### Summary and sanity check
 
   * On average, there are __`r as.integer(mean(DMR_MZ_summary$Total))`__ DMR regions identified across three cell types, with __`r as.integer(mean(DMR_MZ_summary$Hyper))`__ hypermethylated, and __`r as.integer(mean(DMR_MZ_summary$Hypo))`__ hypomethylated.      
-  * Average length of all DMRs is __`r as.integer(mean(DMR_pos_MZ_figure$data$length))`bp__. __Smaller__ than observed in breast. _Bad script or biology?_      
-  * Average No. of CpGs per DMR is __`r as.integer(mean(DMR_pos_MZ_figure$data$count))`__. __Same__ as in breast.        
-  * Average distance between adjacent DMRs is approximately __`r as.integer(mean(DMR_pos_MZ_figure$data$dis[DMR_pos_MZ_figure$data$dis != -100000])/1000)`Kb__.         
+  * Median length of all DMRs is __`r median(DMR_pos_MZ_figure$data$length)`bp__. __Smaller__ than observed in breast (about half). _Bad script or biology?_      
+  * Median No. of CpGs per DMR is __`r median(DMR_pos_MZ_figure$data$count)`__. Also __smaller__ than in breast.        
+  * Median distance between adjacent DMRs is approximately __`r as.integer(median(DMR_pos_MZ_figure$data$dis[DMR_pos_MZ_figure$data$dis != -100000])/1000)`Kb__.         
   * DMRs are scattered along the genome, no obvious chunks of hyper/hypo regions.         
 
 ```{r DMR_MZ_sanity, results='asis', fig.width = 10, fig.height = 7}

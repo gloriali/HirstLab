@@ -2,7 +2,7 @@ Fetal Brain MeDIP Analysis Summary
 ========================================================
 
 Gloria Li         
-Thu Sep 11 12:33:33 2014 
+Thu Sep 11 13:43:59 2014 
 
 
 
@@ -18,13 +18,13 @@ Thu Sep 11 12:33:33 2014
 ### Summary and sanity check
 
   * On average, there are __160150__ DMR regions identified across three cell types, with __103839__ hypermethylated, and __56311__ hypomethylated.      
-  * Average length of all DMRs is __108bp__. __Smaller__ than observed in breast. _Bad script or biology?_      
-  * Average No. of CpGs per DMR is __5__. __Same__ as in breast.        
-  * Average distance between adjacent DMRs is approximately __18Kb__.         
+  * Median length of all DMRs is __109bp__. __Smaller__ than observed in breast (about half). _Bad script or biology?_      
+  * Median No. of CpGs per DMR is __3__. Also __smaller__ than in breast.        
+  * Median distance between adjacent DMRs is approximately __8Kb__.         
   * DMRs are scattered along the genome, no obvious chunks of hyper/hypo regions.         
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 11 12:33:38 2014 -->
+<!-- Thu Sep 11 13:44:04 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> Total </TH> <TH> Hyper </TH> <TH> Hypo </TH>  </TR>
   <TR> <TD> Brain </TD> <TD align="center"> 192955 </TD> <TD align="center"> 126452 </TD> <TD align="center"> 66503 </TD> </TR>
@@ -52,7 +52,7 @@ Thu Sep 11 12:33:33 2014
   + DAVID enrichment (FDR = 10^-6) shows these genes are enriched in __transcription regulation and neuron development__. 
   
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 11 12:34:01 2014 -->
+<!-- Thu Sep 11 13:44:27 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> pc.Genes </TH> <TH> unique.Genes </TH> <TH> pc.Promoters </TH> <TH> unique.Promoters </TH> <TH> proximal.DE.Genes </TH> <TH> same.direction </TH> <TH> unique.DE.Genes </TH>  </TR>
   <TR> <TD> Brain </TD> <TD align="center"> 97583 </TD> <TD align="center"> 16273 </TD> <TD align="center"> 31680 </TD> <TD align="center"> 13621 </TD> <TD align="center"> 1286 </TD> <TD align="center"> 641 </TD> <TD align="center"> 440 </TD> </TR>
