@@ -67,7 +67,9 @@ print(DMR_MZ_summary, type = "html", include.rownames = T)
 
 ### MZ DMR intersect with protein-coding promoters
 
-  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$pc.Promoters))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_gene_MZ_summary$pc.Promoters)/mean(DMR_MZ_summary$Total)*100, 2)`%__ of all DMRs, corresponds to __`r as.integer(mean(DMR_gene_MZ_summary$unique.Promoters))`__ protein-coding genes. These genes are __mostly shared__ by all three cell types, and enriched in __transcription regulation and neuron development__. 
+  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$pc.Promoters))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_gene_MZ_summary$pc.Promoters)/mean(DMR_MZ_summary$Total)*100, 2)`%__ of all DMRs, corresponds to __`r as.integer(mean(DMR_gene_MZ_summary$unique.Promoters))`__ protein-coding genes.         
+  + These genes are __mostly shared__ by all three cell types.       
+  + DAVID enrichment shows these genes are enriched in __transcription regulation and neuron development__. 
   
 ```{r DMR_MZ_promoter, results='asis', fig.width = 8, fig.height = 8}
 DMR_gene_MZ_summary <- xtable(DMR_gene_MZ_summary)
@@ -83,7 +85,9 @@ grid.draw(venn_DMR_pcPromoter_MZ)
 
 ### MZ DMR in promoters intersect with DE genes
 
-  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$proximal.DE.Genes))`__ promoter DMRs associated with DE genes, __`r round(mean(DMR_gene_MZ_summary$proximal.DE.Genes)/mean(DMR_gene_MZ_summary$pc.Promoters)*100, 2)`%__ of all promoter DMRs. Among them, there are __`r as.integer(mean(DMR_gene_MZ_summary$unique.DE.Genes))`__unique DE genes associated with promoter DMRs across three cell types. Most of them are __cell type specific__. They are enriched in __neurogenesis and migration__ in both Brain and Cortex, but no enriched terms were found for GE.             
+  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$proximal.DE.Genes))`__ promoter DMRs associated with DE genes, __`r round(mean(DMR_gene_MZ_summary$proximal.DE.Genes)/mean(DMR_gene_MZ_summary$pc.Promoters)*100, 2)`%__ of all promoter DMRs. Among them, there are __`r as.integer(mean(DMR_gene_MZ_summary$unique.DE.Genes))`__ unique DE genes associated with promoter DMRs across three cell types.         
+  + Most of the DE genes are __cell type specific__.       
+  + These DE genes are enriched in __neurogenesis and migration__ in both Brain and Cortex, but no enriched terms were found for GE.             
 
 ```{r DMR_MZ_DE, fig.width = 8, fig.height = 6}
 plot.new()
