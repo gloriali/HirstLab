@@ -9,7 +9,7 @@ dirw=/projects/mbilenky/REMC/brain/MeDIP/wigs/
 for name in "HS2788.MeDIP.Brain01.q5.F1028.SET_174" "HS2790.MeDIP.Brain02.q5.F1028.SET_174" "HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174" "HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174" "HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157" "HS2781.MeDIP.NeurospheresGE02.q5.F1028.SET_166"
 do
     echo "$name"
-    out="/home/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
+    out="/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
     mkdir -p $out
     for chr in {1..22} "X" "Y" 
     do
@@ -28,7 +28,7 @@ do
     echo "$chr"
     for name in "HS2788.MeDIP.Brain01.q5.F1028.SET_174" "HS2790.MeDIP.Brain02.q5.F1028.SET_174" "HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174" "HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174" "HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157" "HS2781.MeDIP.NeurospheresGE02.q5.F1028.SET_166"
     do
-        dir="/home/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
+        dir="/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
         wc -l $dir/$chr/$chr"."$name.cov
     done
 done

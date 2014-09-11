@@ -14,7 +14,7 @@ cd /projects/epigenomics/lli/FetalBrain/MeDIP/
 delta=0.4 # difference in fractional calls to call DM CpG
 dirIn='/projects/epigenomics/lli/FetalBrain/MeDIP'
 dirDM=$dirIn/DMR
-mkdir $dirDM
+mkdir -p $dirDM
 
 ## Brain01 vs Brain02
 lib1="HS2788"; cell1="Brain"; donor1="HuFNSC01"; name1="HS2788.MeDIP.Brain01.q5.F1028.SET_174";

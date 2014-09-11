@@ -12,7 +12,7 @@ for i = 1:6
     for j = 1:24
         chr=chrs{1,j}
         close all; 
-        [l,cc] = textread(['/home/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.cov'],'%s %f');
+        [l,cc] = textread(['/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.cov'],'%s %f');
         [c,n,cn]=textread(['/projects/mbilenky/REMC/brain/MeDIP/analysis/CpG_empty_500_coverage/',chr,'/',chr,'.gz.',name1,'.covDist'],'%f %f %f');
          
         x=c;
@@ -25,12 +25,12 @@ for i = 1:6
         xlabel('Fractional methylation');
         ylabel('Fraction of CpGs');
         title(strcat(name1,'.',chr));
-        dirOut='/home/lli/FetalBrain/MeDIP/CDF_5mC_plots/';
+        dirOut='/projects/epigenomics/lli/FetalBrain/MeDIP/CDF_5mC_plots/';
         nameOut=strcat(dirOut, 'CDF_5mC_',name1,'.',chr);
         print(gcf, '-dpdf', strcat(nameOut, '.pdf'));
          
         t=size(dip); n=t(2);
-        fileOut = fopen(strcat('/home/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.dip'),'w');
+        fileOut = fopen(strcat('/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.dip'),'w');
         for i=1:n
         fprintf(fileOut,'%s\t', l{i});
         fprintf(fileOut,'%7.3f\t',dip(i));
