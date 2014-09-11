@@ -49,16 +49,47 @@ print(DMR_MZ_summary, type = "html", include.rownames = T)
 (DMR_pos_MZ_figure + ggtitle("DMR positions on the chromosomes between monozygotic twins"))
 ```
 
-### MZ DMR analysis
+### MZ DMR asymmetry
 
-  + There is an __asymmetry__ between hyper/hypo DMRs across all three cell types, most significant in cortex neurosphere, and least so in GE neurosphere. Fold change in total DMR length hyper/hypo in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.      
-  + Majority of DM CpGs overlap with genes, on average __`r round(mean(genomicBreak_MZ$Gene)*100, 2)`%__. And DM CpGs are __`r round(mean(genomicBreak_MZ$Promoter)/(3727169/28217448), 0)`-fold__ enriched in promoter regions, with on average __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "Promoter", "CpG"])*100, 2)`%__ DM CpGs are in promoter regions.
-<!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
-
-```{r DMR_MZ_analysis, fig.width = 10, fig.height = 7}
+  + There is an __asymmetry__ between hyper/hypo DMRs across all three cell types, most significant in cortex neurosphere, and least so in GE neurosphere. Fold change in total DMR length hyper/hypo in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.    
+  
+```{r DMR_MZ_asymmetry, fig.width = 10, fig.height = 8}
 (DMR_freq_MZ_figure + ggtitle("DMR frequency between monozygotic twins"))
-(genomicBreak_MZ_figure + ggtitle("DM CpG breakdown between monozygotic twins"))
+```
 
+### MZ DMR breakdown
+
+  + Majority of DM CpGs overlap with genes, on average __`r round(mean(genomicBreak_MZ$Gene)*100, 2)`%__. And DM CpGs are __`r round(mean(genomicBreak_MZ$Promoter)/(3727169/28217448), 0)`-fold__ enriched in promoter regions, with on average __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "Promoter", "CpG"])*100, 2)`%__ DM CpGs are in promoter regions.         
+<!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->    
+```{r DMR_MZ_breakdown, fig.width = 7, fig.height = 5}
+(genomicBreak_MZ_figure + ggtitle("DM CpG breakdown between monozygotic twins"))
+```
+
+### MZ DMR intersect with protein-coding promoters
+
+  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$pc.Promoters))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_gene_MZ_summary$pc.Promoters)/mean(DMR_MZ_summary$Total)*100, 2)`%__ of all DMRs, corresponds to __`r as.integer(mean(DMR_gene_MZ_summary$unique.Promoters))`__ protein-coding genes. These genes are __mostly shared__ by all three cell types, and enriched in __transcription regulation and neuron development__. 
+  
+```{r DMR_MZ_promoter, results='asis', fig.width = 8, fig.height = 8}
+DMR_gene_MZ_summary <- xtable(DMR_gene_MZ_summary)
+align(DMR_gene_MZ_summary) <- "lccccccc"
+print(DMR_gene_MZ_summary, type = "html", include.rownames = T)
+
+plot.new()
+grid.draw(venn_DMR_pcPromoter_MZ)
+(Brain01_Brain02_DMR_pcPromoter_DAVID)
+(Cortex01_Cortex02_DMR_pcPromoter_DAVID)
+(GE01_GE02_DMR_pcPromoter_DAVID)
+```
+
+### MZ DMR in promoters intersect with DE genes
+
+  + On average, there are __`r as.integer(mean(DMR_gene_MZ_summary$proximal.DE.Genes))`__ promoter DMRs associated with DE genes, __`r round(mean(DMR_gene_MZ_summary$proximal.DE.Genes)/mean(DMR_gene_MZ_summary$pc.Promoters)*100, 2)`%__ of all promoter DMRs. Among them, there are __`r as.integer(mean(DMR_gene_MZ_summary$unique.DE.Genes))`__unique DE genes associated with promoter DMRs across three cell types. Most of them are __cell type specific__. They are enriched in __neurogenesis and migration__ in both Brain and Cortex, but no enriched terms were found for GE.             
+
+```{r DMR_MZ_DE, fig.width = 8, fig.height = 6}
+plot.new()
+grid.draw(venn_DMR_pcPromoter_DE_MZ)
+(Brain01_Brain02_DMR_pcPromoter_DE_DAVID)
+(Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID)
 ```
 
 

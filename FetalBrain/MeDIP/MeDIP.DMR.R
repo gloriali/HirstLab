@@ -114,8 +114,90 @@ genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, 
 ggsave(genomicBreak_MZ_figure, file = "genomicBreak_MZ.pdf")
 (genomicBreak_MZ_figure + ggtitle("DM CpG breakdown between monozygotic twins"))
 
+# proximal DMRs (promoter: TSS+/-1.5Kb) and associated genes
+load("~/hg19/hg19v65_genes.Rdata")
+load("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
+source('~/HirstLab/Pipeline/enrich.R')
+library(VennDiagram)
+DMR_gene_MZ_summary <- data.frame(matrix(NA, ncol = 7, nrow = 3, dimnames = list(c("Brain", "Cortex", "GE"), c("pc.Genes", "unique.Genes", "pc.Promoters", "unique.Promoters", "proximal.DE.Genes", "same.direction", "unique.DE.Genes"))))
+# Brain
+Brain01_Brain02_DMR_pcGene <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.CpG_gene_pc.bed", head = F, as.is = T)
+Brain01_Brain02_DMR_pcPromoter <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.CpG_promoter_pc.bed", head = F, as.is = T)
+Brain01_Brain02_DMR_pcPromoter_DE <- Brain01_Brain02_DMR_pcPromoter[Brain01_Brain02_DMR_pcPromoter$V5 %in% brain01_brain02DE$V1, ]
+Brain01_Brain02_DMR_pcPromoter_DE <- Brain01_Brain02_DMR_pcPromoter_DE[!duplicated(Brain01_Brain02_DMR_pcPromoter_DE$V4), ]
+Brain01_Brain02_DMR_pcPromoter_DE$DM <- as.integer(gsub("chr[0-9X:-]+>", "", Brain01_Brain02_DMR_pcPromoter_DE$V4))
+Brain01_Brain02_DMR_pcPromoter_DE$DE <- brain01_brain02DE[Brain01_Brain02_DMR_pcPromoter_DE$V5, "DE"]
+DMR_gene_MZ_summary["Brain", "pc.Genes"] <- length(unique(Brain01_Brain02_DMR_pcGene$V4))
+DMR_gene_MZ_summary["Brain", "unique.Genes"] <- length(unique(Brain01_Brain02_DMR_pcGene$V5))
+DMR_gene_MZ_summary["Brain", "pc.Promoters"] <- length(unique(Brain01_Brain02_DMR_pcPromoter$V4))
+DMR_gene_MZ_summary["Brain", "unique.Promoters"] <- length(unique(Brain01_Brain02_DMR_pcPromoter$V5))
+DMR_gene_MZ_summary["Brain", "proximal.DE.Genes"] <- nrow(Brain01_Brain02_DMR_pcPromoter_DE)
+DMR_gene_MZ_summary["Brain", "same.direction"] <- sum((Brain01_Brain02_DMR_pcPromoter_DE$DM == 1 & Brain01_Brain02_DMR_pcPromoter_DE$DE == "DN")|(Brain01_Brain02_DMR_pcPromoter_DE$DM == -1 & Brain01_Brain02_DMR_pcPromoter_DE$DE == "UP"))
+DMR_gene_MZ_summary["Brain", "unique.DE.Genes"] <- length(unique(Brain01_Brain02_DMR_pcPromoter_DE$V5))
+Brain01_Brain02_DMR_pcPromoter <- Brain01_Brain02_DMR_pcPromoter[!duplicated(Brain01_Brain02_DMR_pcPromoter$V5), ]
+write.table(Brain01_Brain02_DMR_pcPromoter, file = "DMR_pcPromoter.Brain-HuFNSC01_Brain-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(Brain01_Brain02_DMR_pcPromoter_DAVID <- enrich(name = "DMR_pcPromoter.Brain01_Brain02", erminej = F, fdr = 1e-6))
+Brain01_Brain02_DMR_pcPromoter_DE <- Brain01_Brain02_DMR_pcPromoter_DE[!duplicated(Brain01_Brain02_DMR_pcPromoter_DE$V5), ]
+write.table(Brain01_Brain02_DMR_pcPromoter_DE, file = "DMR_pcPromoter_DE.Brain-HuFNSC01_Brain-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(Brain01_Brain02_DMR_pcPromoter_DE_DAVID <- enrich(name = "DMR_pcPromoter_DE.Brain01_Brain02", erminej = F))
+# Cortex
+Cortex01_Cortex02_DMR_pcGene <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.CpG_gene_pc.bed", head = F, as.is = T)
+Cortex01_Cortex02_DMR_pcPromoter <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.CpG_promoter_pc.bed", head = F, as.is = T)
+Cortex01_Cortex02_DMR_pcPromoter_DE <- Cortex01_Cortex02_DMR_pcPromoter[Cortex01_Cortex02_DMR_pcPromoter$V5 %in% cortex01_cortex02DE$V1, ]
+Cortex01_Cortex02_DMR_pcPromoter_DE <- Cortex01_Cortex02_DMR_pcPromoter_DE[!duplicated(Cortex01_Cortex02_DMR_pcPromoter_DE$V4), ]
+Cortex01_Cortex02_DMR_pcPromoter_DE$DM <- as.integer(gsub("chr[0-9X:-]+>", "", Cortex01_Cortex02_DMR_pcPromoter_DE$V4))
+Cortex01_Cortex02_DMR_pcPromoter_DE$DE <- cortex01_cortex02DE[Cortex01_Cortex02_DMR_pcPromoter_DE$V5, "DE"]
+DMR_gene_MZ_summary["Cortex", "pc.Genes"] <- length(unique(Cortex01_Cortex02_DMR_pcGene$V4))
+DMR_gene_MZ_summary["Cortex", "unique.Genes"] <- length(unique(Cortex01_Cortex02_DMR_pcGene$V5))
+DMR_gene_MZ_summary["Cortex", "pc.Promoters"] <- length(unique(Cortex01_Cortex02_DMR_pcPromoter$V4))
+DMR_gene_MZ_summary["Cortex", "unique.Promoters"] <- length(unique(Cortex01_Cortex02_DMR_pcPromoter$V5))
+DMR_gene_MZ_summary["Cortex", "proximal.DE.Genes"] <- nrow(Cortex01_Cortex02_DMR_pcPromoter_DE)
+DMR_gene_MZ_summary["Cortex", "same.direction"] <- sum((Cortex01_Cortex02_DMR_pcPromoter_DE$DM == 1 & Cortex01_Cortex02_DMR_pcPromoter_DE$DE == "DN")|(Cortex01_Cortex02_DMR_pcPromoter_DE$DM == -1 & Cortex01_Cortex02_DMR_pcPromoter_DE$DE == "UP"))
+DMR_gene_MZ_summary["Cortex", "unique.DE.Genes"] <- length(unique(Cortex01_Cortex02_DMR_pcPromoter_DE$V5))
+Cortex01_Cortex02_DMR_pcPromoter <- Cortex01_Cortex02_DMR_pcPromoter[!duplicated(Cortex01_Cortex02_DMR_pcPromoter$V5), ]
+write.table(Cortex01_Cortex02_DMR_pcPromoter, file = "DMR_pcPromoter.Cortex-HuFNSC01_Cortex-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(Cortex01_Cortex02_DMR_pcPromoter_DAVID <- enrich(name = "DMR_pcPromoter.Cortex01_Cortex02", erminej = F, fdr = 1e-6))
+Cortex01_Cortex02_DMR_pcPromoter_DE <- Cortex01_Cortex02_DMR_pcPromoter_DE[!duplicated(Cortex01_Cortex02_DMR_pcPromoter_DE$V5), ]
+write.table(Cortex01_Cortex02_DMR_pcPromoter_DE, file = "DMR_pcPromoter_DE.Cortex-HuFNSC01_Cortex-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID <- enrich(name = "DMR_pcPromoter_DE.Cortex01_Cortex02", erminej = F))
+# GE
+GE01_GE02_DMR_pcGene <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.CpG_gene_pc.bed", head = F, as.is = T)
+GE01_GE02_DMR_pcPromoter <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.CpG_promoter_pc.bed", head = F, as.is = T)
+GE01_GE02_DMR_pcPromoter_DE <- GE01_GE02_DMR_pcPromoter[GE01_GE02_DMR_pcPromoter$V5 %in% GE01_GE02DE$V1, ]
+GE01_GE02_DMR_pcPromoter_DE <- GE01_GE02_DMR_pcPromoter_DE[!duplicated(GE01_GE02_DMR_pcPromoter_DE$V4), ]
+GE01_GE02_DMR_pcPromoter_DE$DM <- as.integer(gsub("chr[0-9X:-]+>", "", GE01_GE02_DMR_pcPromoter_DE$V4))
+GE01_GE02_DMR_pcPromoter_DE$DE <- GE01_GE02DE[GE01_GE02_DMR_pcPromoter_DE$V5, "DE"]
+DMR_gene_MZ_summary["GE", "pc.Genes"] <- length(unique(GE01_GE02_DMR_pcGene$V4))
+DMR_gene_MZ_summary["GE", "unique.Genes"] <- length(unique(GE01_GE02_DMR_pcGene$V5))
+DMR_gene_MZ_summary["GE", "pc.Promoters"] <- length(unique(GE01_GE02_DMR_pcPromoter$V4))
+DMR_gene_MZ_summary["GE", "unique.Promoters"] <- length(unique(GE01_GE02_DMR_pcPromoter$V5))
+DMR_gene_MZ_summary["GE", "proximal.DE.Genes"] <- nrow(GE01_GE02_DMR_pcPromoter_DE)
+DMR_gene_MZ_summary["GE", "same.direction"] <- sum((GE01_GE02_DMR_pcPromoter_DE$DM == 1 & GE01_GE02_DMR_pcPromoter_DE$DE == "DN")|(GE01_GE02_DMR_pcPromoter_DE$DM == -1 & GE01_GE02_DMR_pcPromoter_DE$DE == "UP"))
+DMR_gene_MZ_summary["GE", "unique.DE.Genes"] <- length(unique(GE01_GE02_DMR_pcPromoter_DE$V5))
+GE01_GE02_DMR_pcPromoter <- GE01_GE02_DMR_pcPromoter[!duplicated(GE01_GE02_DMR_pcPromoter$V5), ]
+write.table(GE01_GE02_DMR_pcPromoter, file = "DMR_pcPromoter.GE-HuFNSC01_GE-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(GE01_GE02_DMR_pcPromoter_DAVID <- enrich(name = "DMR_pcPromoter.GE01_GE02", erminej = F, fdr = 1e-6))
+GE01_GE02_DMR_pcPromoter_DE <- GE01_GE02_DMR_pcPromoter_DE[!duplicated(GE01_GE02_DMR_pcPromoter_DE$V5), ]
+write.table(GE01_GE02_DMR_pcPromoter_DE, file = "DMR_pcPromoter_DE.GE-HuFNSC01_GE-HuFNSC02.txt", sep = "\t", quote = F, col.names = F, row.names = F)
+(GE01_GE02_DMR_pcPromoter_DE_DAVID <- enrich(name = "DMR_pcPromoter_DE.GE01_GE02", erminej = F))
+
+DMR_pcPromoter_MZ <- list(Brain = Brain01_Brain02_DMR_pcPromoter$V5, Cortex = Cortex01_Cortex02_DMR_pcPromoter$V5, GE = GE01_GE02_DMR_pcPromoter$V5)
+venn_DMR_pcPromoter_MZ <- venn.diagram(DMR_pcPromoter_MZ, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of DE genes with promoter DMR between MZ twins")
+pdf("venn_DMR_pcPromoter_MZ.pdf")
+plot.new()
+grid.draw(venn_DMR_pcPromoter_MZ)
+dev.off()
+DMR_pcPromoter_DE_MZ <- list(Brain = Brain01_Brain02_DMR_pcPromoter_DE$V5, Cortex = Cortex01_Cortex02_DMR_pcPromoter_DE$V5, GE = GE01_GE02_DMR_pcPromoter_DE$V5)
+venn_DMR_pcPromoter_DE_MZ <- venn.diagram(DMR_pcPromoter_DE_MZ, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of DE genes with promoter DMR between MZ twins")
+pdf("venn_DMR_pcPromoter_DE_MZ.pdf")
+plot.new()
+grid.draw(venn_DMR_pcPromoter_DE_MZ)
+dev.off()
+
 save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, 
-     DMR_MZ_summary, genomicBreak_MZ, genomicBreak_MZ_figure, 
+     DMR_MZ_summary, genomicBreak_MZ, genomicBreak_MZ_figure, DMR_gene_MZ_summary, venn_DMR_pcPromoter_MZ, venn_DMR_pcPromoter_DE_MZ, 
+     Brain01_Brain02_DMR_pcPromoter_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DAVID, GE01_GE02_DMR_pcPromoter_DAVID, 
+     Brain01_Brain02_DMR_pcPromoter_DE_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID, GE01_GE02_DMR_pcPromoter_DE_DAVID, 
      file = "DMR_MZ.Rdata")
 
 
