@@ -95,7 +95,7 @@ do
 done
 ```
 
-## DMR identification for pairwise comparisons
+## Step2. DMR identification for pairwise comparisons
 + Parameters:
     * delta: minimum difference in fractional calls to call DM CpG    
     * size: max distance between two consecutive CpGs     
