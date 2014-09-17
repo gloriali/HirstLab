@@ -1,6 +1,7 @@
 Analysis pipeline
 ====================
-* [Path.md](./Path.md): file paths on xhost.    
+* [Path.md](./Path.md): file paths on xhost.
+* [LIMS_API_Sita.md](./LIMS_API_Sita.md): API access to LIMS.       
 * [DEfine.md](./DEfine.md): instructions and sample code for using DEfine on genes or exons.  
 * [isoform.md](./isoform.md): instructions for identifying isoform genes and cassette exons.  
 * [junction.md](./junction.md): instructions for validating isoforms with junction reads.  
