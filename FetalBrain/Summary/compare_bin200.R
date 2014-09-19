@@ -93,3 +93,4 @@ splom(cortex02_bin200, panel = panel.hexbinplot, main = "correlation between met
 splom(ge02_bin200, panel = panel.hexbinplot, main = "correlation between methods - ge02")
 dev.off()
 save(cortex02_bin200, ge02_bin200, file = "cortex02_ge02_3methods.Rdata")
+

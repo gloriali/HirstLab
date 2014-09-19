@@ -8,8 +8,8 @@ Tue Mar 11 21:48:00 2014
 ## WGBS   
 * Is methylation on two strands symmetric?   
     Seems the differences between strands are most likely result from technical variations.          
-<img src="../WGBS/strand.symmetry.cortex02.png" height="400px" width="400px" />
-<img src="../WGBS/strand.symmetry.distribution.png" height="400px" width="400px" />    
+<img src="./figure/strand.symmetry.cortex02.png" height="400px" width="400px" />
+<img src="./figure/strand.symmetry.distribution.png" height="400px" width="400px" />    
 * Take the weighted average on coverage for fractional calls on both strand.     
 
 ## MeDIP
@@ -20,9 +20,9 @@ Tue Mar 11 21:48:00 2014
 * WGBS fractional calls from different samples seem more stable after taking the weighted average.     
 * MeDIP calls vary more between different samples than other two methods. (not observed in breast datasets) 
   * Possible reason: sequencing fragment length in the brain samples varies more. But wig files are generated with average fragment length, so regional coverage calculated from the wig files are more unstable. -- Misha is looking into this.   
-<img src="../MeDIP/ECDF.MeDIP.MethylCRF.WGBS.png" height="400px" width="400px" />          
-<img src="../MeDIP/cortex02.3methods_boxplot.png" height="200px" width="600px" />            
-<img src="../MeDIP/ge02.3methods_boxplot.png" height="200px" width="600px" />           
+<img src="./figure/ECDF.MeDIP.MethylCRF.WGBS.png" height="400px" width="400px" />          
+<img src="./figure/cortex02.3methods_boxplot.png" height="200px" width="600px" />            
+<img src="./figure/ge02.3methods_boxplot.png" height="200px" width="600px" />           
 
 
 
