@@ -2,7 +2,7 @@
 ### Calculate MeDIP signal around CpGs 
 + Run `RegionsCoverageFromWigCalculator.jar` on MeDIP libraries for CpG +/- 25bp regions.
 + Input files:
-    * CpG +/- 25bp regions for each chr bed files: `/projects/epigenomics/mbilenky/CpG/hg19/CG_25_around_chr/`
+    * CpG +/- 25bp regions for each chr bed files: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`
     * MeDIP wig file        
 + Output files:   
     * `<chr>.<name>.coverage` file for each chr in each library: `chr   start   end     normalized coverage     max coverage`
@@ -12,13 +12,13 @@
 JAVA=/gsc/software/linux-x86_64/jre1.7.0_03/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java
 csizes=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
-dirr=/projects/epigenomics/mbilenky/CpG/hg19/CG_25_around_chr/
+dirr=/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/
 dirw=/projects/mbilenky/REMC/brain/MeDIP/wigs/
 
 for name in "HS2788.MeDIP.Brain01.q5.F1028.SET_174" "HS2790.MeDIP.Brain02.q5.F1028.SET_174" "HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174" "HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174" "HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157" "HS2781.MeDIP.NeurospheresGE02.q5.F1028.SET_166"
 do
     echo "$name"
-    out="/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
+    out="/projects/epigenomics/users/lli/FetalBrain/MeDIP/CG_25_around_chr/"$name
     mkdir -p $out
     for chr in {1..22} "X" "Y" 
     do
@@ -53,7 +53,7 @@ for i = 1:6
     for j = 1:24
         chr=chrs{1,j}
         close all; 
-        [l,cc] = textread(['/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.cov'],'%s %f');
+        [l,cc] = textread(['/projects/epigenomics/users/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.cov'],'%s %f');
         [c,n,cn]=textread(['/projects/mbilenky/REMC/brain/MeDIP/analysis/CpG_empty_500_coverage/',chr,'/',chr,'.gz.',name1,'.covDist'],'%f %f %f');
          
         x=c;
@@ -66,12 +66,12 @@ for i = 1:6
         xlabel('Fractional methylation');
         ylabel('Fraction of CpGs');
         title(strcat(name1,'.',chr));
-        dirOut='/projects/epigenomics/lli/FetalBrain/MeDIP/CDF_5mC_plots/';
+        dirOut='/projects/epigenomics/users/lli/FetalBrain/MeDIP/CDF_5mC_plots/';
         nameOut=strcat(dirOut, 'CDF_5mC_',name1,'.',chr);
         print(gcf, '-dpdf', strcat(nameOut, '.pdf'));
          
         t=size(dip); n=t(2);
-        fileOut = fopen(strcat('/projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.dip'),'w');
+        fileOut = fopen(strcat('/projects/epigenomics/users/lli/FetalBrain/MeDIP/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.dip'),'w');
         for i=1:n
         fprintf(fileOut,'%s\t', l{i});
         fprintf(fileOut,'%7.3f\t',dip(i));
@@ -86,8 +86,8 @@ end
 + For each sample, join all `<chr>.<name>.dip` files into one `<name>.dip` file    
 + Sample code:
 ```
-cd /projects/epigenomics/lli/FetalBrain/MeDIP/CG_25_around_chr
-out='/projects/epigenomics/lli/FetalBrain/MeDIP'
+cd /projects/epigenomics/users/lli/FetalBrain/MeDIP/CG_25_around_chr
+out='/projects/epigenomics/users/lli/FetalBrain/MeDIP'
 for name in "HS2788.MeDIP.Brain01.q5.F1028.SET_174" "HS2790.MeDIP.Brain02.q5.F1028.SET_174" "HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174" "HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174" "HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157" "HS2781.MeDIP.NeurospheresGE02.q5.F1028.SET_166"
 do
     echo "$name"
@@ -112,8 +112,8 @@ done
 delta=0.6 # minimum difference in fractional calls to call DM CpG
 size=500  # max distance between two consecutive CpGs
 cut=3     # minimum number of CpGs
-cd /projects/epigenomics/lli/FetalBrain/MeDIP/
-dirIn='/projects/epigenomics/lli/FetalBrain/MeDIP'
+cd /projects/epigenomics/users/lli/FetalBrain/MeDIP/
+dirIn='/projects/epigenomics/users/lli/FetalBrain/MeDIP'
 dirDM=$dirIn/DMR
 mkdir -p $dirDM
 >$dirDM/DMR.summary.stats # samples, delta, size, cut, Average length of DMRs, Average No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    

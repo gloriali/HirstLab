@@ -11,7 +11,8 @@ File paths on xhost
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
-* R libraries and function: `/home/lli/bin/R-3.0.2/`
+* R libraries and functions: `/home/lli/bin/R-3.0.2/`
+* Shell scripts: `/home/lli/bin/shell/`   
 * Python scripts: `/home/lli/bin/python/`  
 * UCSC scripts: `/home/lli/bin/`  
 
@@ -21,7 +22,7 @@ File paths on xhost
 * Genome hg19: `/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa`    
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
-* CpG +/- 25bp bins: `/projects/epigenomics/mbilenky/CpG/hg19/CG_25_around_chr/`  
+* CpG +/- 25bp bins: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`  
 * Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`
 
 ## REMC project
@@ -35,8 +36,8 @@ File paths on xhost
 * Fetal Brain:
     + Histone modification wig files: `/home/lli/FetalBrain/HisMod/wigs/`
     + MeDIP wig files: `/projects/mbilenky/REMC/brain/MeDIP/wigs/`  
-    + MeDIP fractional calls: `/projects/epigenomics/lli/FetalBrain/MeDIP/`
-    + DMRs from MeDIP: `/projects/epigenomics/lli/FetalBrain/MeDIP/DMR/`  
+    + MeDIP fractional calls: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/`
+    + DMRs from MeDIP: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/`  
     + Junction coverage: `/home/lli/FetalBrain/RNAseq/junction/`
     + UCSC browser hubs: `/gsc/www/bcgsc.ca/downloads/mb/BrainHubs/`  
 * H1:   
