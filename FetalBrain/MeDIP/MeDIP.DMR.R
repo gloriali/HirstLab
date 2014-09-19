@@ -5,6 +5,18 @@
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.fractional.m
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.DM.sh
 
+setwd("~/快盘/FetalBrain/MeDIP/DMR/")
+library(ggplot2)
+
+# testing DMR script parameters
+DMR_test_summary <- read.delim("DMR.summary.stats.test", head = F, as.is = T, col.names = c("Sample", "delta", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
+DMR_test_summary$Sample <- factor(DMR_test_summary$Sample, levels = c("Brain-HuFNSC01_Brain-HuFNSC02", "Cortex-HuFNSC01_Cortex-HuFNSC02", "GE-HuFNSC01_GE-HuFNSC02", "Cortex-HuFNSC01_GE-HuFNSC01", "Cortex-HuFNSC02_GE-HuFNSC02"))
+pdf("DMR_test.pdf", width = 9)
+(ggplot(DMR_test_summary, aes(x = size, y = Median.length)) + geom_point(aes(color = Sample)) + geom_line(aes(color = Sample)) + geom_smooth(group = 1, color = "black", size = 1.2, se = F) + geom_hline(aes(yintercept = 250)) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("Median DMR length"))
+(ggplot(DMR_test_summary, aes(x = size, y = Total.DMR, color = Sample)) + geom_point() + geom_line() + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("Total No. of DMRs"))
+(ggplot(DMR_test_summary, aes(x = size, y = log2(Hyper.DMR/Hypo.DMR), color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("log2(Hyper/Hypo)"))
+dev.off()
+
 source("~/HirstLab/Pipeline/DMR.figures.R")
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
 # Between MZ twins 
@@ -100,7 +112,7 @@ ggsave(DMR_pos_MZ_figure, file = "DMRpos_MZ.pdf")
 (DMR_pos_MZ_figure + ggtitle("DMR positions on the chromosomes between monozygotic twins"))
 
 # intersect DMRs with genomic regions 
-# /home/lli/bin/shell/DMR.intersect.sh -d /projects/epigenomics/lli/FetalBrain/MeDIP/DMR
+# /home/lli/bin/shell/DMR.intersect.sh -d /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR
 genomicBreak_MZ <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter"))
 genomicBreak_MZ_tall <- genomicBreak_MZ[, -1]
 genomicBreak_MZ_tall <- data.frame(Sample = rep(row.names(genomicBreak_MZ_tall), ncol(genomicBreak_MZ_tall)), Region = factor(rep(colnames(genomicBreak_MZ_tall), each = nrow(genomicBreak_MZ_tall)), levels = colnames(genomicBreak_MZ_tall)), CpG = as.vector(as.matrix(genomicBreak_MZ_tall)))
@@ -199,5 +211,28 @@ save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_f
      Brain01_Brain02_DMR_pcPromoter_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DAVID, GE01_GE02_DMR_pcPromoter_DAVID, 
      Brain01_Brain02_DMR_pcPromoter_DE_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID, GE01_GE02_DMR_pcPromoter_DE_DAVID, 
      file = "DMR_MZ.Rdata")
+
+DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, row.names = 1, col.names = c("Sample", "delta", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
+# Between Cortex and GE
+rm(list = ls())
+setwd("~/快盘/FetalBrain/MeDIP/DMR/")
+source("~/HirstLab/Pipeline/DMR.figures.R")
+col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
+Cortex01_GE01_DMR <- read.delim("DMR.Cortex-HuFNSC01_GE-HuFNSC01.d0.6.s500.c3", head = F, as.is = T, col.names = col)
+Cortex02_GE02_DMR <- read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.d0.6.s500.c3", head = F, as.is = T, col.names = col)
+DMR_Cortex_GE_summary <- DMR_summary[grep("Cortex.*_GE", rownames(DMR_summary)), grep("DMR", colnames(DMR_summary))]
+Cortex01_GE01_DMR_figures <- DMR_figures(Cortex01_GE01_DMR, sample1 = "Cortex-HuFNSC01", sample2 = "GE-HuFNSC01")
+(Cortex01_GE01_DMR_figures$length)
+(Cortex01_GE01_DMR_figures$count)
+(Cortex01_GE01_DMR_figures$dis)
+(Cortex01_GE01_DMR_figures$freq)
+(Cortex01_GE01_DMR_figures$pos)
+Cortex02_GE02_DMR_figures <- DMR_figures(Cortex02_GE02_DMR, sample1 = "Cortex-HuFNSC02", sample2 = "GE-HuFNSC02")
+(Cortex02_GE02_DMR_figures$length)
+(Cortex02_GE02_DMR_figures$count)
+(Cortex02_GE02_DMR_figures$dis)
+(Cortex02_GE02_DMR_figures$freq)
+(Cortex02_GE02_DMR_figures$pos)
+
 
 
