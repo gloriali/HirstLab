@@ -8,7 +8,8 @@ File paths on xhost
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`  
 * Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/`
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`
-* ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`   
+* ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`
+* methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
 * R libraries and functions: `/home/lli/bin/R-3.0.2/`
@@ -35,6 +36,7 @@ File paths on xhost
     + UCSC browser hubs: `/gsc/www/bcgsc.ca/downloads/mb/BCHubs/`  
 * Fetal Brain:
     + Histone modification wig files: `/home/lli/FetalBrain/HisMod/wigs/`
+    + WGBS fractional calls and coverage symlink files: `/projects/epigenomics/users/lli/FetalBrain/WGBS/`
     + MeDIP wig files: `/projects/mbilenky/REMC/brain/MeDIP/wigs/`  
     + MeDIP fractional calls: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/`
     + DMRs from MeDIP: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/`  
