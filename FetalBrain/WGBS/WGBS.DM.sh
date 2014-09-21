@@ -14,18 +14,33 @@ done
 
 # Tuning parameters
 cd $dirOut
-delta=0.6
-for pth in 0.05 0.01 0.005 0.001
+for file in *.diff
 do
-    for file in *.diff
+    for pth in 0.05 0.01 0.005 0.001
     do
-        name=$(echo $file | sed -e s/'.diff'//g)
-        echo "Processing "$name", p="$pth "delta="$delta 
-        less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); end=gensub(".*-", "", "g", $1); start=end-2; if(1-$6<pth && d>delta){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.p$pth.d$delta.bed
-        dm=($(wc -l $dirOut/DM.$name.p$pth.d$delta.bed));
-        hyper=($(less $dirOut/DM.$name.p$pth.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}'))
-        hypo=($(less $dirOut/DM.$name.p$pth.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
-        echo -e $name"\t"$pth"\t"$delta"\t"$dm"\t"$hyper"\t"$hypo >> $dirOut/DM.summary.stats
+        for delta in 0.5 0.6
+        do
+            name=$(echo $file | sed -e s/'.diff'//g)
+            echo "Processing "$name", p="$pth "delta="$delta 
+            less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); end=gensub(".*-", "", "g", $1); start=end-2; if(1-$6<pth && d>delta){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.p$pth.d$delta.bed
+            dm=($(wc -l $dirOut/DM.$name.p$pth.d$delta.bed));
+            hyper=($(less $dirOut/DM.$name.p$pth.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}'))
+            hypo=($(less $dirOut/DM.$name.p$pth.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
+            echo -e $name"\t"$pth"\t"$delta"\t"$dm"\t"$hyper"\t"$hypo >> $dirOut/DM.summary.stats
+        done
     done
 done
+
+for file in DM.*.bed
+do
+    name=$(echo $file | sed -e s/'DM.'//g)
+    name=$(echo $name | sed -e s/'.bed'//g)
+    for size in 100 200 300 500 800 1000
+    do
+        echo "Processing "$name", size = "$size
+        /home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $file -n $name -s $size
+    done
+done
+
+
 
