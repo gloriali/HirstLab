@@ -8,13 +8,13 @@
 setwd("~/快盘/FetalBrain/MeDIP/DMR/")
 library(ggplot2)
 
-# testing DMR script parameters
+# testing DMR script parameters on Cortex02 vs GE02 
 DM_test_summary <- read.delim("DM.summary.stats.test", head = F, as.is = T, col.names = c("Sample", "m", "delta", "Total.DM.CpGs", "Hyper.DM.CpGs", "Hypo.DM.CpGs"))
 DMR_test_summary <- read.delim("DMR.summary.stats.test", head = F, as.is = T, col.names = c("Sample", "m", "delta", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
 pdf("DMR_test_delta.pdf", width = 9)
 (ggplot(DM_test_summary, aes(x = delta, y = Total.DM.CpGs)) + geom_point() + geom_line() + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("Total No. of DM CpGs"))
 (ggplot(DM_test_summary, aes(x = delta, y = log2(Hyper.DM.CpGs/Hypo.DM.CpGs))) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("log2(Hyper/Hypo)"))
-(ggplot(DMR_test_summary, aes(x = delta, y = Median.length, color = factor(size))) + geom_point() + geom_line() + geom_hline(aes(yintercept = 250)) + facet_wrap(~ m) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("Median DMR length"))
+(ggplot(DMR_test_summary, aes(x = delta, y = Median.length, color = factor(size))) + geom_point() + geom_line() + geom_hline(aes(yintercept = 250)) + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("Median DMR length"))
 (ggplot(DMR_test_summary, aes(x = delta, y = Total.DMR, , color = factor(size))) + geom_point() + geom_line() + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("Total No. of DMRs"))
 (ggplot(DMR_test_summary, aes(x = delta, y = log2(Hyper.DMR/Hypo.DMR), color = factor(size))) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("log2(Hyper/Hypo)"))
 (ggplot(DMR_test_summary, aes(x = size, y = Median.length, color = factor(delta))) + geom_point() + geom_line() + geom_hline(aes(yintercept = 250)) + facet_wrap(~ m) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("Median DMR length"))
