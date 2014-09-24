@@ -13,35 +13,38 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
   DMR$dis <- c(-100000, DMR[2:nrow(DMR), ]$pos - DMR[1:nrow(DMR)-1,]$pos)
   DMR[DMR$dis < 0, ]$dis <- -100000
   if("length" %in% figures){
-    DMR_length_stat <- ddply(DMR, ~ chr, summarize, ymin = boxplot.stats(length)$stats[1], lower = boxplot.stats(length)$stats[2], middle = boxplot.stats(length)$stats[3], upper = boxplot.stats(length)$stats[4], ymax = boxplot.stats(length)$stats[5])
+    DMR_length_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(length)$stats[1], lower = boxplot.stats(length)$stats[2], middle = boxplot.stats(length)$stats[3], upper = boxplot.stats(length)$stats[4], ymax = boxplot.stats(length)$stats[5])
     DMR_length_figure <- ggplot(DMR_length_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
       ylab("DMR length (bp)") + 
       ggtitle(paste("DMR length -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
+      facet_wrap(~ DM) + 
       theme_bw()
     ggsave(DMR_length_figure, file = paste0(dirOut, "/DMRlength_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("count" %in% figures){
-    DMR_count_stat <- ddply(DMR, ~ chr, summarize, ymin = boxplot.stats(count)$stats[1], lower = boxplot.stats(count)$stats[2], middle = boxplot.stats(count)$stats[3], upper = boxplot.stats(count)$stats[4], ymax = boxplot.stats(count)$stats[5])
+    DMR_count_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(count)$stats[1], lower = boxplot.stats(count)$stats[2], middle = boxplot.stats(count)$stats[3], upper = boxplot.stats(count)$stats[4], ymax = boxplot.stats(count)$stats[5])
     DMR_count_figure <- ggplot(DMR_count_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
       ylab("No. of CpGs per DMR") + 
       ggtitle(paste("No. of CpGs per DMR -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
+      facet_wrap(~ DM) + 
       theme_bw()
     ggsave(DMR_count_figure, file = paste0(dirOut, "/CpGcount_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("adjacentDis" %in% figures){
-    DMR_dis_stat <- ddply(DMR, ~ chr, summarize, ymin = boxplot.stats(dis)$stats[1], lower = boxplot.stats(dis)$stats[2], middle = boxplot.stats(dis)$stats[3], upper = boxplot.stats(dis)$stats[4], ymax = boxplot.stats(dis)$stats[5])
+    DMR_dis_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(dis)$stats[1], lower = boxplot.stats(dis)$stats[2], middle = boxplot.stats(dis)$stats[3], upper = boxplot.stats(dis)$stats[4], ymax = boxplot.stats(dis)$stats[5])
     DMR_dis_figure <- ggplot(DMR_dis_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
       ylab("Distance between adjacent DMRs (bp)") + 
       ggtitle(paste("Distance between DMRs -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
+      facet_wrap(~ DM) + 
       theme_bw()
     ggsave(DMR_dis_figure, file = paste0(dirOut, "/DMRdis_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
@@ -78,7 +81,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
 }
 # DMR analysis and visualization  
 # Required input: 
-#   DMR files with chr, start, end, hyper(1)/hypo(-1), CpG count, length
+#   DMR files with chr, start, end, [id], hyper(1)/hypo(-1), CpG count, length
 # Parameters: 
 #   DMR: data frame with DMRs   
 #   sample1, sample2: sample names   
