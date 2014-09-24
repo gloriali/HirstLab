@@ -43,5 +43,10 @@ do
     done
 done
 
-
-
+# set parameters to m=0.75, p=0.005, delta=0.5, size=300
+# Bed files for intersect DMR and GREAT  
+for f in $dirOut/*.m0.75.p0.005.d0.5.s300*.hyp*
+do
+    less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
+done
+/home/lli/bin/shell/DMR.intersect.sh -d $dirOut
