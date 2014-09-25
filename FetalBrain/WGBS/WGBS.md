@@ -2,7 +2,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 ========================================================
 
 Gloria Li         
-Wed Sep 24 18:08:13 2014 
+Thu Sep 25 10:36:16 2014 
 
 
 
@@ -24,13 +24,13 @@ Wed Sep 24 18:08:13 2014
   * Median No. of CpGs per DMR is 5, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:14 2014 -->
+<!-- Thu Sep 25 10:36:17 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </TD> <TD align="center"> 2178 </TD> <TD align="center"> 420 </TD> <TD align="center"> 1758 </TD> </TR>
   <TR> <TD align="center"> Cortex-HuFNSC04_GE-HuFNSC04 </TD> <TD align="center"> 646 </TD> <TD align="center">  91 </TD> <TD align="center"> 555 </TD> </TR>
    </TABLE>
-![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity1.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity2.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity3.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity4.png) 
+![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity1.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity2.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity3.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity4.png) ![plot of chunk WGBS_sanity](./WGBS_files/figure-html/WGBS_sanity5.png) 
 
 ## Asymmetry between Cortex UMRs and GE UMRs  
 
@@ -53,7 +53,7 @@ Wed Sep 24 18:08:13 2014
 
 ## UMR genomic break down  
 
-  + On average, 65.9391% of CpGs in UMRs overlap with genebody, and 15.8304% of CpGs in UMRs overlap with promoters, not a significant enrichment (1.2-fold).   
+  + On average, __65.94%__ of CpGs in UMRs overlap with genebody, and __15.83%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(1.2-fold)__.   
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 
@@ -67,7 +67,7 @@ Wed Sep 24 18:08:13 2014
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:20 2014 -->
+<!-- Thu Sep 25 10:36:23 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> pc.Genes </TH> <TH> unique.Genes </TH> <TH> pc.Promoters </TH> <TH> unique.Promoters </TH> <TH> proximal.DE.Genes </TH> <TH> same.direction </TH> <TH> unique.DE.Genes </TH>  </TR>
   <TR> <TD align="center"> GE_UMRs-HuFNSC02 </TD> <TD align="center"> 222 </TD> <TD align="center"> 210 </TD> <TD align="center">  17 </TD> <TD align="center">  17 </TD> <TD align="center">   4 </TD> <TD align="center">   1 </TD> <TD align="center">   4 </TD> </TR>
@@ -80,7 +80,7 @@ Wed Sep 24 18:08:13 2014
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:20 2014 -->
+<!-- Thu Sep 25 10:36:23 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule_[Source:HGNC_Symbol;Acc:1688] </TD> </TR>
@@ -101,7 +101,7 @@ Wed Sep 24 18:08:13 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:20 2014 -->
+<!-- Thu Sep 25 10:36:23 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C_[Source:HGNC_Symbol;Acc:22393] </TD> </TR>
@@ -118,7 +118,7 @@ Wed Sep 24 18:08:13 2014
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:20 2014 -->
+<!-- Thu Sep 25 10:36:23 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6_[Source:HGNC_Symbol;Acc:8620] </TD> </TR>
@@ -129,7 +129,7 @@ Wed Sep 24 18:08:13 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Wed Sep 24 18:08:20 2014 -->
+<!-- Thu Sep 25 10:36:23 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right">  </TD> <TD align="right">  </TD> </TR>

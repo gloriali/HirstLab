@@ -170,7 +170,7 @@ Cortex04_UMR_pcPromoter_DE$V5 <- NULL
 write.table(Cortex04_UMR_pcPromoter_DE, file = "DMR_pcPromoter_DE.Cortex-HuFNSC04_GE-HuFNSC04.hypo.txt", sep = "\t", quote = F, col.names = F, row.names = F)
 # (Cortex04_UMR_pcPromoter_DE_DAVID <- enrich(name = "DMR_pcPromoter_DE.Cortex_UMRs-HuFNSC04", erminej = F))
 
-#' Venn diagrams
+#' Venn diagrams 
 venn_Cortex_UMR_WGBS <- draw.pairwise.venn(area1 = nrow(filter(Cortex02_GE02_DMR, V5 == -1)), area2 = nrow(filter(Cortex04_GE04_DMR, V5 == -1)), cross.area = 179, category = c("HuFNSC02", "HuFNSC04"), fill = c("red", "blue"))
 venn_GE_UMR_WGBS <- draw.pairwise.venn(area1 = nrow(filter(Cortex02_GE02_DMR, V5 == 1)), area2 = nrow(filter(Cortex04_GE04_DMR, V5 == 1)), cross.area = 10, category = c("HuFNSC02", "HuFNSC04"), fill = c("red", "blue"))
 Cortex_UMR_pcGene_WGBS <- list(HuFNSC02 = Cortex02_UMR_pcGene$V5, HuFNSC04 = Cortex04_UMR_pcGene$V5)
@@ -220,8 +220,34 @@ plot.new()
 grid.draw(venn_GE_UMR_pcPromoter_DE_WGBS)
 dev.off()
 
+#' validate WGBS DMRs with MeDIP/MRE
+setwd("~/快盘/FetalBrain/WGBS/DMR/valid/")
+CortexUMR_MeDIP <- data.frame(UMR = "Cortex_UMRs", Assay = "MeDIP", 
+                              Cortex = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.Cortex02_UMRs_MeDIP_cortex02.coverage", head = F, as.is = T)$V5,
+                              GE = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.Cortex02_UMRs_MeDIP_GE02.coverage", head = F, as.is = T)$V5)
+CortexUMR_MRE <- data.frame(UMR = "Cortex_UMRs", Assay = "MRE", 
+                            Cortex = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.Cortex02_UMRs_MRE_cortex02.coverage", head = F, as.is = T)$V5,
+                            GE = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.Cortex02_UMRs_MRE_GE02.coverage", head = F, as.is = T)$V5)
+GEUMR_MeDIP <- data.frame(UMR = "GE_UMRs", Assay = "MeDIP", 
+                          Cortex = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed.GE02_UMRs_MeDIP_cortex02.coverage", head = F, as.is = T)$V5,
+                          GE = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed.GE02_UMRs_MeDIP_GE02.coverage", head = F, as.is = T)$V5)
+GEUMR_MRE <- data.frame(UMR = "GE_UMRs", Assay = "MRE", 
+                        Cortex = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed.GE02_UMRs_MRE_cortex02.coverage", head = F, as.is = T)$V5,
+                        GE = read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed.GE02_UMRs_MRE_GE02.coverage", head = F, as.is = T)$V5)
+valid <- rbind(CortexUMR_MeDIP, CortexUMR_MRE, GEUMR_MeDIP, GEUMR_MRE)
+valid <- mutate(valid, Asymmetry = (Cortex - GE)/(Cortex + GE))
+(valid_boxplot <- ggplot(valid, aes(x = UMR, y = Asymmetry, color = UMR)) + 
+   geom_boxplot(outlier.shape = 20, width = 0.8, size = 1.1) + 
+   facet_grid(Assay ~ ., scales = "free") + 
+   coord_flip() + 
+   xlab("") + 
+   ylab("(Cortex - GE)/(Cortex + GE)") + 
+   scale_color_hue(l = 40) + 
+   theme_bw())
+ggsave(valid_boxplot, file = "valid_boxplot.pdf")
+
 save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR, Cortex02_GE02_DMR_figures, Cortex04_GE04_DMR, Cortex04_GE04_DMR_figures, 
-     GREAT_Cortex02.UMR, GREAT_GE02.UMR, GREAT_Cortex04.UMR, GREAT_GE04.UMR, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
+     GREAT_Cortex02.UMR, GREAT_GE02.UMR, GREAT_Cortex04.UMR, GREAT_GE04.UMR, valid_boxplot, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
      venn_Cortex_UMR_WGBS, venn_Cortex_UMR_pcGene_WGBS, venn_Cortex_UMR_pcPromoter_WGBS, venn_Cortex_UMR_pcPromoter_DE_WGBS, 
      venn_GE_UMR_WGBS, venn_GE_UMR_pcGene_WGBS, venn_GE_UMR_pcPromoter_WGBS, venn_GE_UMR_pcPromoter_DE_WGBS, 
      Cortex02_UMR_pcPromoter, Cortex02_UMR_pcPromoter_DE, GE02_UMR_pcPromoter, GE02_UMR_pcPromoter_DE, 

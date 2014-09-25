@@ -42,6 +42,8 @@ DMR_WGBS_summary <- xtable(DMR_WGBS_summary)
 align(DMR_WGBS_summary) <- "ccccc"
 print(DMR_WGBS_summary, type = "html", include.rownames = F)
 
+(valid_boxplot + ggtitle("Validate WGBS UMRs with MeDIP/MRE in HuFNSC02"))
+
 (Cortex02_GE02_DMR_figures$length)
 (Cortex02_GE02_DMR_figures$count)
 plot.new()
@@ -88,7 +90,7 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## UMR genomic break down  
 
-  + On average, `r summarise(filter(genomicBreak_WGBS_figure$data, Region == "Gene"), mean(CpG))*100`% of CpGs in UMRs overlap with genebody, and `r summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))*100`% of CpGs in UMRs overlap with promoters, not a significant enrichment (`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold).   
+  + On average, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold)__.   
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 
