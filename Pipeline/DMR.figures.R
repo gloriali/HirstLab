@@ -1,8 +1,7 @@
-DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length")){
+DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/快盘/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)){
   library(ggplot2)
-  library(plyr)
+  library(dplyr)
   DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_position_figure <- NULL;
-  chrlength <- read.csv("~/快盘/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
   chrlength <- chrlength[chrlength$chr %in% chrs, ]
   chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
   colnames(DMR) <- colname
@@ -13,7 +12,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
   DMR$dis <- c(-100000, DMR[2:nrow(DMR), ]$pos - DMR[1:nrow(DMR)-1,]$pos)
   DMR[DMR$dis < 0, ]$dis <- -100000
   if("length" %in% figures){
-    DMR_length_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(length)$stats[1], lower = boxplot.stats(length)$stats[2], middle = boxplot.stats(length)$stats[3], upper = boxplot.stats(length)$stats[4], ymax = boxplot.stats(length)$stats[5])
+    DMR_length_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(length)$stats[1], lower = boxplot.stats(length)$stats[2], middle = boxplot.stats(length)$stats[3], upper = boxplot.stats(length)$stats[4], ymax = boxplot.stats(length)$stats[5])
     DMR_length_figure <- ggplot(DMR_length_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -25,7 +24,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_length_figure, file = paste0(dirOut, "/DMRlength_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("count" %in% figures){
-    DMR_count_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(count)$stats[1], lower = boxplot.stats(count)$stats[2], middle = boxplot.stats(count)$stats[3], upper = boxplot.stats(count)$stats[4], ymax = boxplot.stats(count)$stats[5])
+    DMR_count_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(count)$stats[1], lower = boxplot.stats(count)$stats[2], middle = boxplot.stats(count)$stats[3], upper = boxplot.stats(count)$stats[4], ymax = boxplot.stats(count)$stats[5])
     DMR_count_figure <- ggplot(DMR_count_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -37,7 +36,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_count_figure, file = paste0(dirOut, "/CpGcount_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("adjacentDis" %in% figures){
-    DMR_dis_stat <- ddply(DMR, .(chr, DM), summarize, ymin = boxplot.stats(dis)$stats[1], lower = boxplot.stats(dis)$stats[2], middle = boxplot.stats(dis)$stats[3], upper = boxplot.stats(dis)$stats[4], ymax = boxplot.stats(dis)$stats[5])
+    DMR_dis_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(dis)$stats[1], lower = boxplot.stats(dis)$stats[2], middle = boxplot.stats(dis)$stats[3], upper = boxplot.stats(dis)$stats[4], ymax = boxplot.stats(dis)$stats[5])
     DMR_dis_figure <- ggplot(DMR_dis_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -49,7 +48,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_dis_figure, file = paste0(dirOut, "/DMRdis_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("frequency" %in% figures){
-    DMR_freq <- ddply(DMR, .(chr, DM), summarize, DMRlen = sum(DM*length))
+    DMR_freq <- summarise(group_by(DMR, chr, DM), DMRlen = sum(DM*length))
     DMR_freq$chrlen <- chrlength[DMR_freq$chr, ]$length
     DMR_freq$freq <- DMR_freq$DMRlen / DMR_freq$chrlen * 10^6 
     DMR_freq$DM <- factor(DMR_freq$DM, levels = c("1", "-1"))
