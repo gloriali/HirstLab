@@ -1,0 +1,84 @@
+---
+output: 
+  html_document:
+    keep_md: true
+    toc: yes
+---
+Fetal Brain MeDIP Test Parameters
+========================================================
+
+Gloria Li         
+`r date()` 
+
+```{r include = FALSE}
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(xtable)
+library(VennDiagram)
+library(grid) 
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+## DMR stats with different parameters  
+
+  * Parameters for MeDIP DMRs: 
+    + `m`: fractional methylation of one sample > m. `m = 0.75`
+    + `delta`: difference of fractional methylation > delta. `delta = 0.6, 0.7, 0.75`   
+    + `size`: max distance between adjacent DM CpGs. `size = 1kB, 1.2kB, 1.5kB, 2kB, 2.5kB`
+    + `c`: min No. of CpGs per DMR. `c = 3`  
+  * The median DMR length stays ~ 100bp until size increase to 1kB, but if size further increases, median DMR length varies a lot for different samples. 
+  
+```{r parameters}
+setwd("~/快盘/FetalBrain/MeDIP/DMR/")
+DM_test_summary <- read.delim("DM.summary.stats", head = F, as.is = T, col.names = c("Sample", "m", "delta", "Total.DM.CpGs", "Hyper.DM.CpGs", "Hypo.DM.CpGs"))
+DMR_test_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
+DMR_test_summary$m <- gsub(".*m", "", DMR_test_summary$Sample)
+DMR_test_summary$m <- as.numeric(gsub(".d.*", "", DMR_test_summary$m))
+DMR_test_summary$delta <- as.numeric(gsub(".*d", "", DMR_test_summary$Sample))
+DMR_test_summary$Sample <- gsub(".m.*.d.*", "", DMR_test_summary$Sample)
+(ggplot(DMR_test_summary, aes(x = size, y = Median.length, color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 250)) + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Median DMR length") + ggtitle("Median DMR length under different parameters"))
+(ggplot(DMR_test_summary, aes(x = size, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Total No. of DMRs") + ggtitle("Total No. of DMRs under different parameters"))
+```
+
+## Intersecting MeDIP DMRs between individuals and with WGBS
+
+```{r intersect}
+Cortex02UMR_WGBS <- 1758
+GE02UMR_WGBS <- 420
+Cortex02UMR_MeDIP <- as.integer(select(filter(DMR_test_summary, size == 1200, Sample == "Cortex-HuFNSC02_GE-HuFNSC02"), Hypo.DMR))
+GE02UMR_MeDIP <- as.integer(select(filter(DMR_test_summary, size == 1200, Sample == "Cortex-HuFNSC02_GE-HuFNSC02"), Hyper.DMR))
+Cortex01UMR_MeDIP <- as.integer(select(filter(DMR_test_summary, size == 1200, Sample == "Cortex-HuFNSC01_GE-HuFNSC01"), Hypo.DMR))
+GE01UMR_MeDIP <- as.integer(select(filter(DMR_test_summary, size == 1200, Sample == "Cortex-HuFNSC01_GE-HuFNSC01"), Hyper.DMR))
+Cortex02UMR_WGBS_MeDIP <- 360
+GE02UMR_WGBS_MeDIP <- 76
+Cortex_UMR_MeDIP_01_02 <- 633
+GE_UMR_MeDIP_01_02 <- 238
+```
+
+  + Parameters:
+    * MeDIP DMRs: `m = 0.75, delta = 0.6, size = 1.2kB, c = 3`  
+    * WGBS DMRs: `m = 0.75, delta = 0.5, p=0.005, size = 300, c = 3` 
+  + On average, there are __`r round(mean(c(Cortex02UMR_MeDIP/Cortex02UMR_WGBS, GE01UMR_MeDIP/GE02UMR_WGBS)), 0)` times__ DMRs identified with MeDIP compared to WGBS. __`r round(mean(c(Cortex02UMR_WGBS_MeDIP/Cortex02UMR_WGBS, GE02UMR_WGBS_MeDIP/GE02UMR_WGBS))*100, 2)`%__ of WGBS UMRs overlap with MeDIP UMRs.     
+  + On average, __`r round(mean(c(Cortex_UMR_MeDIP_01_02/Cortex02UMR_MeDIP, Cortex_UMR_MeDIP_01_02/Cortex01UMR_MeDIP, GE_UMR_MeDIP_01_02/GE02UMR_MeDIP, GE_UMR_MeDIP_01_02/GE01UMR_MeDIP))*100, 2)`%__ of MeDIP UMRs overlap between the two individuals.  
+  + The asymmetry between Cortex and GE is supported in MeDIP HuFNSC02, but __not__ in HuFNSC01. 
+
+```{r Venn, results='asis', fig.width=5}
+summary <- xtable(data.frame(Assay = c("WGBS", "MeDIP", "MeDIP"), Donor = c("HuFNSC02", "HuFNSC02", "HuFNSC01"), Cortex_UMR = c(Cortex02UMR_WGBS, Cortex02UMR_MeDIP, Cortex01UMR_MeDIP), GE_UMR = c(GE02UMR_WGBS, GE02UMR_MeDIP, GE01UMR_MeDIP)))
+align(summary) <- "ccccc"
+print(summary, type = "html", include.rownames = F)
+
+plot.new()
+grid.text("Venn diagram of Cortex UMRs between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.9, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = Cortex02UMR_WGBS, area2 = Cortex02UMR_MeDIP, cross.area = Cortex02UMR_WGBS_MeDIP, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+plot.new()
+grid.text("Venn diagram of GE UMRs between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.9, "npc"))
+venn_GE_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = GE02UMR_WGBS, area2 = GE02UMR_MeDIP, cross.area = GE02UMR_WGBS_MeDIP, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+plot.new()
+grid.text("Venn diagram of MeDIP Cortex UMRs between HuFNSC01 and HuFNSC02", x = unit(0.5, "npc"), y = unit(0.9, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = Cortex01UMR_MeDIP, area2 = Cortex02UMR_MeDIP, cross.area = Cortex_UMR_MeDIP_01_02, category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"))
+plot.new()
+grid.text("Venn diagram of MeDIP GE UMRs between HuFNSC01 and HuFNSC02", x = unit(0.5, "npc"), y = unit(0.9, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = GE01UMR_MeDIP, area2 = GE02UMR_MeDIP, cross.area = GE_UMR_MeDIP_01_02, category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"))
+```
+

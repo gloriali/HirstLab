@@ -8,7 +8,7 @@
 setwd("~/快盘/FetalBrain/MeDIP/DMR/")
 library(ggplot2)
 
-# testing DMR script parameters 
+#' testing DMR script parameters 
 DM_test_summary <- read.delim("DM.summary.stats", head = F, as.is = T, col.names = c("Sample", "m", "delta", "Total.DM.CpGs", "Hyper.DM.CpGs", "Hypo.DM.CpGs"))
 DMR_test_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
 DMR_test_summary$m <- gsub(".*m", "", DMR_test_summary$Sample)
