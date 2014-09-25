@@ -50,3 +50,36 @@ do
     less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
 done
 /home/lli/bin/shell/DMR.intersect.sh -d $dirOut
+
+# validate DMR MeDIP/MRE signal
+mkdir -p $dirOut/valid/
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+reg=$dirOut/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed # GE02 UMR
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2779.bam.q5.F1028.SET_174.wig.gz       # MeDIP Cortex02
+name=GE02_UMRs_MeDIP_cortex02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2781.bam.q5.F1028.SET_166.wig.gz       # MeDIP GE02
+name=GE02_UMRs_MeDIP_GE02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2778.bam.q5.F1028.SET_50.wig.gz        # MRE Cortex02
+name=GE02_UMRs_MRE_cortex02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2780.bam.q5.F1028.SET_50.wig.gz        # MRE GE02
+name=GE02_UMRs_MRE_GE02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+reg=$dirOut/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed # Cortex02 UMR
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2779.bam.q5.F1028.SET_174.wig.gz       # MeDIP Cortex02
+name=Cortex02_UMRs_MeDIP_cortex02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2781.bam.q5.F1028.SET_166.wig.gz       # MeDIP GE02
+name=Cortex02_UMRs_MeDIP_GE02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2778.bam.q5.F1028.SET_50.wig.gz        # MRE Cortex02
+name=Cortex02_UMRs_MRE_cortex02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2780.bam.q5.F1028.SET_50.wig.gz        # MRE GE02
+name=Cortex02_UMRs_MRE_GE02
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
+
+
+
