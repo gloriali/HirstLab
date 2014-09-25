@@ -25,6 +25,7 @@ enrich_GREAT <- function(file, name, top = 10, dirIn = paste0(getwd(), "/enrich/
     geom_bar(aes(fill = Category), stat = "identity", width = .5) + 
     coord_flip() + 
     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+    xlab("") + 
     theme_bw() +
     ggtitle(paste0("GREAT enrichment for ", name)) + 
     scale_fill_hue(l = 40)
