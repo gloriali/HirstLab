@@ -1,9 +1,9 @@
 HirstLab
 ========
 
-Code and results in Hirst Lab
+Code and summary results in Hirst Lab
 
-* Breast: REMC breast isoform analysis
-* FetalBrain: REMC Fetal Brain data analysis
-* Pipeline: Analysis pipelines and instructions for tools
+* [Pipeline](./Pipeline): Analysis pipelines and instructions for tools
+* [FetalBrain](./FetalBrain): REMC Fetal Brain data analysis
+* [Breast](./Breast): REMC Breast data analysis
 
