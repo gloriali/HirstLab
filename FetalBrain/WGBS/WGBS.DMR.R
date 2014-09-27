@@ -53,7 +53,7 @@ Cortex04_GE04_DMR_figures <- DMR_figures(Cortex04_GE04_DMR, sample1 = "Cortex-Hu
 (GREAT_GE04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC04_GE-HuFNSC04.hyper", name = "HuFNSC04-GE.UMRs", height = 3))
 
 #' genomic break down  
-genomicBreak_WGBS <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter"))
+genomicBreak_WGBS <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
 genomicBreak_WGBS_tall <- genomicBreak_WGBS[, -1]
 genomicBreak_WGBS_tall <- data.frame(Sample = rep(gsub(".m.*", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), DM = rep(gsub(".*.c3.", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), Region = factor(rep(colnames(genomicBreak_WGBS_tall), each = nrow(genomicBreak_WGBS_tall)), levels = colnames(genomicBreak_WGBS_tall)), CpG = as.vector(as.matrix(genomicBreak_WGBS_tall)))
 genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = CpG, fill = Sample)) + 
@@ -65,7 +65,7 @@ genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = C
   facet_wrap(~ DM) + 
   theme_bw()
 (genomicBreak_WGBS_figure + ggtitle("DM CpG breakdown between WGBS Cortex and GE"))
-ggsave(genomicBreak_WGBS_figure, file = "genomicBreak_WGBS.pdf", height = 6)
+ggsave(genomicBreak_WGBS_figure, file = "./CpG/genomicBreak_WGBS.pdf", height = 6)
 
 #' intersecting with genes/promoters
 setwd("~/快盘/FetalBrain/WGBS/DMR/CpG")

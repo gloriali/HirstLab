@@ -33,9 +33,9 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 
 ## Summary and sanity check  
 
-  * On average, there are `r mean(DMR_WGBS_summary$Hypo.DMR)` Cortex UMRs, 179 intersect between two individuals, and `r mean(DMR_WGBS_summary$Hyper.DMR)` GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
-  * Median DMR length is `r median(c(Cortex02_GE02_DMR$V7, Cortex04_GE04_DMR$V7))`, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
-  * Median No. of CpGs per DMR is `r median(c(Cortex02_GE02_DMR$V6, Cortex04_GE04_DMR$V6))`, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
+  * On average, there are __`r as.integer(mean(DMR_WGBS_summary$Hypo.DMR))`__ Cortex UMRs, 179 intersect between two individuals, and __`r as.integer(mean(DMR_WGBS_summary$Hyper.DMR))`__ GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
+  * Median DMR length is __`r median(c(Cortex02_GE02_DMR$V7, Cortex04_GE04_DMR$V7))`__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
+  * Median No. of CpGs per DMR is __`r median(c(Cortex02_GE02_DMR$V6, Cortex04_GE04_DMR$V6))`__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 ```{r WGBS_sanity, results='asis'}
 DMR_WGBS_summary <- xtable(DMR_WGBS_summary)
@@ -56,7 +56,7 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## Asymmetry between Cortex UMRs and GE UMRs  
 
-  * On average, there are , `r as.integer(mean(DMR_WGBS_summary$Hypo.DMR)/mean(DMR_WGBS_summary$Hyper.DMR))`-times more UMRs in Cortex than GE.  
+  * On average, there are , __`r as.integer(mean(DMR_WGBS_summary$Hypo.DMR)/mean(DMR_WGBS_summary$Hyper.DMR))`__-times more UMRs in Cortex than GE.  
   * The asymmetry appears to be global, in all chromosomes, and is reproduced in the two individuals.  
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on UMR level can be reproduced with __different cutoffs__. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
@@ -90,9 +90,10 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## UMR genomic break down  
 
-  + On average, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold)__.   
+  + On average, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold)__. __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
+<!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
 
 ```{r WGBS_breakdown}
 (genomicBreak_WGBS_figure + ggtitle("DM CpG breakdown between WGBS Cortex and GE"))

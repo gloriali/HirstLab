@@ -2,7 +2,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 ========================================================
 
 Gloria Li         
-Thu Sep 25 10:36:16 2014 
+Sat Sep 27 14:00:38 2014 
 
 
 
@@ -19,12 +19,12 @@ Thu Sep 25 10:36:16 2014
 
 ## Summary and sanity check  
 
-  * On average, there are 1156.5 Cortex UMRs, 179 intersect between two individuals, and 255.5 GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
-  * Median DMR length is 267, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
-  * Median No. of CpGs per DMR is 5, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
+  * On average, there are __1156__ Cortex UMRs, 179 intersect between two individuals, and __255__ GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
+  * Median DMR length is __267__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
+  * Median No. of CpGs per DMR is __5__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:17 2014 -->
+<!-- Sat Sep 27 14:00:40 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </TD> <TD align="center"> 2178 </TD> <TD align="center"> 420 </TD> <TD align="center"> 1758 </TD> </TR>
@@ -34,7 +34,7 @@ Thu Sep 25 10:36:16 2014
 
 ## Asymmetry between Cortex UMRs and GE UMRs  
 
-  * On average, there are , 4-times more UMRs in Cortex than GE.  
+  * On average, there are , __4__-times more UMRs in Cortex than GE.  
   * The asymmetry appears to be global, in all chromosomes, and is reproduced in the two individuals.  
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on UMR level can be reproduced with __different cutoffs__. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
@@ -53,9 +53,10 @@ Thu Sep 25 10:36:16 2014
 
 ## UMR genomic break down  
 
-  + On average, __65.94%__ of CpGs in UMRs overlap with genebody, and __15.83%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(1.2-fold)__.   
+  + On average, __65.94%__ of CpGs in UMRs overlap with genebody, and __15.83%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(1.2-fold)__. __40.2%__ of CpGs in UMRs overlap with CGIs, __5.43-fold__ than expected by random.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
+<!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
 
 ![plot of chunk WGBS_breakdown](./WGBS_files/figure-html/WGBS_breakdown.png) 
 
@@ -67,7 +68,7 @@ Thu Sep 25 10:36:16 2014
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:23 2014 -->
+<!-- Sat Sep 27 14:00:46 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> pc.Genes </TH> <TH> unique.Genes </TH> <TH> pc.Promoters </TH> <TH> unique.Promoters </TH> <TH> proximal.DE.Genes </TH> <TH> same.direction </TH> <TH> unique.DE.Genes </TH>  </TR>
   <TR> <TD align="center"> GE_UMRs-HuFNSC02 </TD> <TD align="center"> 222 </TD> <TD align="center"> 210 </TD> <TD align="center">  17 </TD> <TD align="center">  17 </TD> <TD align="center">   4 </TD> <TD align="center">   1 </TD> <TD align="center">   4 </TD> </TR>
@@ -80,7 +81,7 @@ Thu Sep 25 10:36:16 2014
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:23 2014 -->
+<!-- Sat Sep 27 14:00:46 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule_[Source:HGNC_Symbol;Acc:1688] </TD> </TR>
@@ -101,7 +102,7 @@ Thu Sep 25 10:36:16 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:23 2014 -->
+<!-- Sat Sep 27 14:00:46 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C_[Source:HGNC_Symbol;Acc:22393] </TD> </TR>
@@ -118,7 +119,7 @@ Thu Sep 25 10:36:16 2014
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:23 2014 -->
+<!-- Sat Sep 27 14:00:46 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6_[Source:HGNC_Symbol;Acc:8620] </TD> </TR>
@@ -129,7 +130,7 @@ Thu Sep 25 10:36:16 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Sep 25 10:36:23 2014 -->
+<!-- Sat Sep 27 14:00:46 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH>  </TR>
   <TR> <TD align="right">  </TD> <TD align="right">  </TD> </TR>
