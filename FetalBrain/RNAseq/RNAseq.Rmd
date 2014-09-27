@@ -33,8 +33,8 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ### Between cortex and GE neurospheres
 
   * On average, there are __`r mean(cortex_GE_DE_summary$DE)`__ genes differentially expressed between cortex and GE, among them, __`r mean(cortex_GE_DE_summary$UP)`__ are upregulated in cortex, and __`r mean(cortex_GE_DE_summary$DN)`__ are downregulated.    
-  * __`r nrow(cortex_GE_duplicated)`__ DE genes are shared by at least two individuals.    
-  * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
+  * __`r nrow(cortex_GE_UP_duplicated)`__ Cortex up-regulated genes, and __`r nrow(cortex_GE_DN_duplicated)`__ GE up-regulated genes are shared by at least two individuals.    
+  * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, GE up-regulated genes are enriched in __EGF-related__ protein domains as well. 
 
 ```{r cortex_GE, results='asis', fig.height = 6, fig.width = 6}
 cortex_GE_DE_summary <- xtable(cortex_GE_DE_summary)
@@ -42,11 +42,14 @@ align(cortex_GE_DE_summary) <- "lccc"
 print(cortex_GE_DE_summary, type = "html", include.rownames = T)
 
 plot.new()
-grid.draw(venn_DE_cortex_GE)
+grid.draw(venn_UP_cortex_GE)
+plot.new()
+grid.draw(venn_DN_cortex_GE)
 ```
 
 ```{r cortex_GE_enrich, fig.height = 8, fig.width = 8}
-(enrich_DE_cortex_GE$figure)
+(enrich_UP_cortex_GE + ggtitle("DAVID enrichment for Cortex up-regulated genes"))
+(enrich_DN_cortex_GE + ggtitle("DAVID enrichment for GE up-regulated genes"))
 ```
 
 ### Between MZ twins - HuFNSC01 vs HuFNSC02

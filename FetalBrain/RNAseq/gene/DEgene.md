@@ -2,7 +2,7 @@ Fetal Brain RNA-seq - DE genes
 ========================================================
 
 Gloria Li         
-Mon Sep  8 22:25:53 2014 
+Sat Sep 27 15:20:00 2014 
 
 
 
@@ -18,11 +18,11 @@ Mon Sep  8 22:25:53 2014
 ### Between cortex and GE neurospheres
 
   * On average, there are __860__ genes differentially expressed between cortex and GE, among them, __454__ are upregulated in cortex, and __406__ are downregulated.    
-  * __886__ DE genes are shared by at least two individuals.    
+  * __382__ Cortex up-regulated genes, and __456__ GE up-regulated genes are shared by at least two individuals.    
   * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, as well as __EGF-related__ protein domains. 
 
-<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 22:25:56 2014 -->
+<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
+<!-- Sat Sep 27 15:20:02 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
@@ -30,9 +30,9 @@ Mon Sep  8 22:25:53 2014
   <TR> <TD> HuFNSC03 </TD> <TD align="center"> 447 </TD> <TD align="center"> 227 </TD> <TD align="center"> 674 </TD> </TR>
   <TR> <TD> HuFNSC04 </TD> <TD align="center"> 378 </TD> <TD align="center"> 249 </TD> <TD align="center"> 627 </TD> </TR>
    </TABLE>
-![plot of chunk cortex_GE](./DEgene_files/figure-html/cortex_GE.png) 
+![plot of chunk cortex_GE](./DEgene_files/figure-html/cortex_GE1.png) ![plot of chunk cortex_GE](./DEgene_files/figure-html/cortex_GE2.png) 
 
-![plot of chunk cortex_GE_enrich](./DEgene_files/figure-html/cortex_GE_enrich.png) 
+![plot of chunk cortex_GE_enrich](./DEgene_files/figure-html/cortex_GE_enrich1.png) ![plot of chunk cortex_GE_enrich](./DEgene_files/figure-html/cortex_GE_enrich2.png) 
 
 ### Between MZ twins - HuFNSC01 vs HuFNSC02
 
@@ -40,8 +40,8 @@ Mon Sep  8 22:25:53 2014
   * Majority of DE genes are cell type specific, only __98__ are shared between any two cell types.   
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
-<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Mon Sep  8 22:25:58 2014 -->
+<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
+<!-- Sat Sep 27 15:20:04 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>
