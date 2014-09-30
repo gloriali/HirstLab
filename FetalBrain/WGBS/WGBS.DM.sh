@@ -81,5 +81,17 @@ wig=/home/lli/FetalBrain/MeDIPMRE/wigs/HS2780.bam.q5.F1028.SET_50.wig.gz        
 name=Cortex02_UMRs_MRE_GE02
 /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
 
-
-
+# intersecting with TFBSs
+> $dirOut/TF/DMR.TF.summary
+mkdir -p $dirOut/TF/
+cd $dirOut
+for file in DMR.*.bed
+do
+    name=$(echo $file | sed -e s/'.bed'//g)
+    echo "Processing "$name >> $dirOut/TF/DMR.TF.summary
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $file -b /projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz -wa -wb | awk '{print $4"\t"$5":"$6"-"$7"\t"$8}' > $dirOut/TF/$name.TF
+    less $dirOut/TF/$name.TF | awk '{if(!($1 in h1)){c1=c1+1; h1[$1]=1} if(!($2 in h2)){c2=c2+1; h2[$2]=1} if(!($3 in h3)){c3=c3+1; h3[$3]=1} else{h3[$3]=h3[$3]+1}} END{print "No. of DMRs overlap with TFBSs", c1; print "No. of unique TFBSs", c2; print "No. of unique TFs", c3; for(i in h3){print i"\t"h3[i] >> "'$dirOut'""/TF/""'$name'"".TF.summary"}}' >> $dirOut/TF/DMR.TF.summary
+done
+awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary
+awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary
+awk 'NR==FNR {cortex[$1]=$2; ge[$1]=$3; ratio[$1]=$4; next} {if($1 in cortex){print $0"\t"cortex[$1]"\t"ge[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex_GE.m0.75.p0.005.d0.5.s300.c3.TF.summary
