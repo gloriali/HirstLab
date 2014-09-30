@@ -46,14 +46,14 @@
 # DMRs
 m=0.75    # fractional methylation of one sample need to > m 
 delta=0.6 # minimum difference in fractional calls to call DM CpG
-size=1200  # max distance between two consecutive CpGs
+size=300  # max distance between two consecutive CpGs
 cut=3     # minimum number of CpGs
 cd /projects/epigenomics/users/lli/FetalBrain/MeDIP/
 dirIn='/projects/epigenomics/users/lli/FetalBrain/MeDIP'
 dirOut=$dirIn/DMR
 mkdir -p $dirOut
-#> $dirOut/DMR.summary.stats # samples, size, cut, Average length of DMRs, Average No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    
-#> $dirOut/DM.summary.stats  # samples, m, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs    
+> $dirOut/DMR.summary.stats # samples, size, cut, Average length of DMRs, Average No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    
+> $dirOut/DM.summary.stats  # samples, m, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs    
 
 ## Brain01 vs Brain02
 lib1="HS2788"; cell1="Brain"; donor1="HuFNSC01"; name1="HS2788.MeDIP.Brain01.q5.F1028.SET_174";

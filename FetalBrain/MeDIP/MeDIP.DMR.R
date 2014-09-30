@@ -25,10 +25,10 @@ dev.off()
 source("~/HirstLab/Pipeline/DMR.figures.R")
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
 # Between MZ twins 
-setwd("~/快盘/FetalBrain/MeDIP/DMR/MZ/")
-Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.d0.4.s200.c3.bed", as.is = T, head = F)
-Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.d0.4.s200.c3.bed", as.is = T, head = F)
-GE01_GE02_DMR <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.d0.4.s200.c3.bed", as.is = T, head = F)
+setwd("~/快盘/FetalBrain/MeDIP/DMR/")
+Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
+Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
+GE01_GE02_DMR <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
 DMR_MZ_summary <- data.frame(Total = c(nrow(Brain01_Brain02_DMR), nrow(Cortex01_Cortex02_DMR), nrow(GE01_GE02_DMR)), 
                           Hyper = c(nrow(Brain01_Brain02_DMR[Brain01_Brain02_DMR$V5 == 1, ]), nrow(Cortex01_Cortex02_DMR[Cortex01_Cortex02_DMR$V5 == 1, ]), nrow(GE01_GE02_DMR[GE01_GE02_DMR$V5 == 1, ])), 
                           Hypo = c(nrow(Brain01_Brain02_DMR[Brain01_Brain02_DMR$V5 == -1, ]), nrow(Cortex01_Cortex02_DMR[Cortex01_Cortex02_DMR$V5 == -1, ]), nrow(GE01_GE02_DMR[GE01_GE02_DMR$V5 == -1, ])))
@@ -59,7 +59,7 @@ DMR_length_MZ_figure <- ggplot(DMR_length_MZ, aes(x = chr, fill = chr)) +
   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
   xlab("") + 
   ylab("DMR length (bp)") + 
-  facet_wrap(~ cell) + 
+  facet_wrap(DM ~ cell) + 
   guides(fill = F) + 
   theme_bw()
 ggsave(DMR_length_MZ_figure, file = "DMRlength_MZ.pdf")
@@ -70,7 +70,7 @@ DMR_count_MZ_figure <- ggplot(DMR_count_MZ, aes(x = chr, fill = chr)) +
   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
   xlab("") + 
   ylab("No. of CpGs per DMR") + 
-  facet_wrap(~ cell) + 
+  facet_wrap(DM ~ cell) + 
   guides(fill = F) + 
   theme_bw()
 ggsave(DMR_count_MZ_figure, file = "DMRcount_MZ.pdf")
@@ -81,7 +81,7 @@ DMR_dis_MZ_figure <- ggplot(DMR_dis_MZ, aes(x = chr, fill = chr)) +
   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
   xlab("") + 
   ylab("Distance between adjacent DMRs (bp)") + 
-  facet_wrap(~ cell) + 
+  facet_wrap(DM ~ cell) + 
   guides(fill = F) + 
   theme_bw()
 ggsave(DMR_dis_MZ_figure, file = "DMRdis_MZ.pdf")
@@ -97,7 +97,7 @@ DMR_freq_MZ_figure <- ggplot(DMR_freq_MZ, aes(x = chr, y = freq, fill = DM)) +
   scale_fill_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
   theme_bw()
 ggsave(DMR_freq_MZ_figure, file = "DMRfreq_MZ.pdf")
-(DMR_freq_MZ_figure + ggtitle("DMR frequency between monozygotic twins"))
+(DMR_freq_MZ_figure + ggtitle("DMR frequency asymmetry between monozygotic twins"))
 
 chrs = c(paste0("chr", as.character(1:22)), "chrX")
 chrlength <- read.csv("~/快盘/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
