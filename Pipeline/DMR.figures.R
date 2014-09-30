@@ -12,7 +12,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
   DMR$dis <- c(-100000, DMR[2:nrow(DMR), ]$pos - DMR[1:nrow(DMR)-1,]$pos)
   DMR[DMR$dis < 0, ]$dis <- -100000
   if("length" %in% figures){
-    DMR_length_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(length)$stats[1], lower = boxplot.stats(length)$stats[2], middle = boxplot.stats(length)$stats[3], upper = boxplot.stats(length)$stats[4], ymax = boxplot.stats(length)$stats[5])
+    DMR_length_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(length, 0.25), middle = median(length), upper = quantile(length, 0.75), min = min(length), max = max(length)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
     DMR_length_figure <- ggplot(DMR_length_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -24,7 +24,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_length_figure, file = paste0(dirOut, "/DMRlength_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("count" %in% figures){
-    DMR_count_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(count)$stats[1], lower = boxplot.stats(count)$stats[2], middle = boxplot.stats(count)$stats[3], upper = boxplot.stats(count)$stats[4], ymax = boxplot.stats(count)$stats[5])
+    DMR_count_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(count, 0.25), middle = median(count), upper = quantile(count, 0.75), min = min(count), max = max(count)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
     DMR_count_figure <- ggplot(DMR_count_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -36,7 +36,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_count_figure, file = paste0(dirOut, "/CpGcount_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("adjacentDis" %in% figures){
-    DMR_dis_stat <- summarise(group_by(DMR, chr, DM), ymin = boxplot.stats(dis)$stats[1], lower = boxplot.stats(dis)$stats[2], middle = boxplot.stats(dis)$stats[3], upper = boxplot.stats(dis)$stats[4], ymax = boxplot.stats(dis)$stats[5])
+    DMR_dis_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(dis, 0.25), middle = median(dis), upper = quantile(dis, 0.75), min = min(dis), max = max(dis)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
     DMR_dis_figure <- ggplot(DMR_dis_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
