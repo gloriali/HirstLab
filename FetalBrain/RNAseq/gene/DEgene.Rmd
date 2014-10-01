@@ -129,6 +129,30 @@ enrich_UP_cortex_GE <- enrich(name = "cortex_GE_UP_duplicated", fdr = 0.01, p = 
 (enrich_UP_cortex_GE)
 enrich_DN_cortex_GE <- enrich(name = "cortex_GE_DN_duplicated", fdr = 0.01, p = "FDR", erminej = F, height = 7, width = 9)
 (enrich_DN_cortex_GE)
+# GOBP_UP_cortex_GE <- cbind(enrich_UP_cortex_GE$data, EX = "Cortex up-regulated")
+# GOBP_UP_cortex_GE <- GOBP_UP_cortex_GE[as.character(GOBP_UP_cortex_GE$Category) == "GOBP", ]
+# GOBP_UP_cortex_GE_plot <- ggplot(data = GOBP_UP_cortex_GE, aes(Term, -log10(FDR))) +
+#   geom_bar(fill = "blue", stat = "identity", width = .5) + 
+#   facet_grid(EX ~ .) + 
+#   coord_flip() + 
+#   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+#   xlab("") + 
+#   theme_bw() +
+#   scale_fill_hue(l = 40)
+# (GOBP_UP_cortex_GE_plot + ggtitle("GOBP enrichment for Cortex up-regulated genes"))
+# ggsave(GOBP_UP_cortex_GE_plot, file = "./enrich/GOBP_Cortex_GE.UP.pdf", height = 5, width = 6)
+# GOBP_DN_cortex_GE <- cbind(enrich_DN_cortex_GE$data, EX = "GE up-regulated")
+# GOBP_DN_cortex_GE <- GOBP_DN_cortex_GE[as.character(GOBP_DN_cortex_GE$Category) == "GOBP", ]
+# GOBP_DN_cortex_GE_plot <- ggplot(data = GOBP_DN_cortex_GE, aes(Term, -log10(FDR))) +
+#   geom_bar(fill = "blue", stat = "identity", width = .5) + 
+#   facet_grid(EX ~ .) + 
+#   coord_flip() + 
+#   geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+#   xlab("") + 
+#   theme_bw() +
+#   scale_fill_hue(l = 40)
+# (GOBP_DN_cortex_GE_plot + ggtitle("GOBP enrichment for GE up-regulated genes"))
+# ggsave(GOBP_DN_cortex_GE_plot, file = "./enrich/GOBP_Cortex_GE.DN.pdf", height = 5, width = 6)
 ```
 
 ### Between MZ twins - HuFNSC01 vs HuFNSC02

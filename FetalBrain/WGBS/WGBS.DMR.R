@@ -45,12 +45,48 @@ Cortex04_GE04_DMR_figures <- DMR_figures(Cortex04_GE04_DMR, sample1 = "Cortex-Hu
 (Cortex04_GE04_DMR_figures$dis)
 (Cortex04_GE04_DMR_figures$freq)
 (Cortex04_GE04_DMR_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
+DMR_freq_neurospheres <- rbind(cbind(Cortex02_GE02_DMR_figures$freq$data, donor = "HuFNSC02"), cbind(Cortex04_GE04_DMR_figures$freq$data, donor = "HuFNSC04"))
+DMR_freq_neurospheres_figure <- ggplot(DMR_freq_neurospheres, aes(x = chr, y = freq, fill = DM)) + 
+  geom_bar(position = "identity", stat = "identity", width = 0.8) + 
+  facet_wrap(~ donor) + 
+  xlab("") + 
+  ylab("DMR frequency (bp/MB)") + 
+  coord_flip() + 
+  scale_fill_manual(values = c("red", "blue"), labels = c("GE UMRs","Cortex UMRs"), name = "") + 
+  theme_bw()
+ggsave(DMR_freq_neurospheres_figure, file = "DMRfreq_neurospheres.pdf", width = 14, height = 9)
+(DMR_freq_neurospheres_figure + ggtitle("DMR frequency asymmetry between cortex an GE neurospheres"))
+
 
 #` GREAT enrichment analysis
 (GREAT_Cortex02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo", name = "HuFNSC02-Cortex.UMRs", height = 9))
 (GREAT_GE02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hyper", name = "HuFNSC02-GE.UMRs"))
 (GREAT_Cortex04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC04_GE-HuFNSC04.hypo", name = "HuFNSC04-Cortex.UMRs", height = 13))
 (GREAT_GE04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC04_GE-HuFNSC04.hyper", name = "HuFNSC04-GE.UMRs", height = 3))
+GOBP_Cortex02.UMR <- cbind(GREAT_Cortex02.UMR$data, UMR = "Cortex UMRs")
+GOBP_Cortex02.UMR <- GOBP_Cortex02.UMR[as.character(GOBP_Cortex02.UMR$Category) == "GOBP", ]
+GOBP_Cortex02.UMR_plot <- ggplot(data = GOBP_Cortex02.UMR, aes(Term, -log10(FDR))) +
+  geom_bar(fill = "blue", stat = "identity", width = .5) + 
+  facet_grid(UMR ~ .) + 
+  coord_flip() + 
+  geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+  xlab("") + 
+  theme_bw() +
+  scale_fill_hue(l = 40)
+(GOBP_Cortex02.UMR_plot + ggtitle("GOBP GREAT enrichment for Cortex UMRs"))
+ggsave(GOBP_Cortex02.UMR_plot, file = "./Enrich/GOBP_HuFNSC02_Cortex.UMR_enrich.pdf", height = 3, width = 6)
+GOBP_GE02.UMR <- cbind(GREAT_GE02.UMR$data, UMR = "GE UMRs")
+GOBP_GE02.UMR <- GOBP_GE02.UMR[as.character(GOBP_GE02.UMR$Category) == "GOBP", ]
+GOBP_GE02.UMR_plot <- ggplot(data = GOBP_GE02.UMR, aes(Term, -log10(FDR))) +
+  geom_bar(fill = "blue", stat = "identity", width = .5) + 
+  facet_grid(UMR ~ .) + 
+  coord_flip() + 
+  geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+  xlab("") + 
+  theme_bw() +
+  scale_fill_hue(l = 40)
+(GOBP_GE02.UMR_plot + ggtitle("GOBP GREAT enrichment for GE UMRs"))
+ggsave(GOBP_GE02.UMR_plot, file = "./Enrich/GOBP_HuFNSC02_GE.UMR_enrich.pdf", height = 3, width = 6)
 
 #' genomic break down  
 genomicBreak_WGBS <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
