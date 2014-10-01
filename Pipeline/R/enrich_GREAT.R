@@ -1,4 +1,5 @@
 enrich_GREAT <- function(file, name, top = 10, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), categories = NULL, height = 6, width = 9){
+  library(ggplot2)
   enrich <- data.frame()
   for(f in list.files(path = dirIn, pattern = paste0("GREAT.*", file))){
     category <- sub("GREAT_", "", f)
