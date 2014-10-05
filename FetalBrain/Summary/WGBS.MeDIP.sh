@@ -13,6 +13,7 @@ less /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DM.Cortex-HuFNSC02_GE-
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/WGBS.Cortex_GE.hypo.bed -b $dirOut/MeDIP.Cortex_GE.hypo.bed -wa > $dirOut/DM.hypo.intersect.bed
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/WGBS.Cortex_GE.hypo.bed -b $dirOut/MeDIP.Cortex_GE.hypo.bed -v> $dirOut/DM.hypo.WGBS.bed
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/MeDIP.Cortex_GE.hypo.bed -b $dirOut/WGBS.Cortex_GE.hypo.bed -v > $dirOut/DM.hypo.MeDIP.bed
+## genomic breakdown
 mkdir -p $dirOut/CpG/
 > $dirOut/CpG/genomic.breakdown.summary
 for file in DM.*.bed
@@ -46,3 +47,10 @@ less $dirOut/Cortex_UMR.intersect | awk '{if(!($4 in h)){c=c+1; h[$4]=1}}END{pri
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $WGBS_GE_UMR -b $MeDIP_GE_UMR -v > $dirOut/GE_UMR.WGBS
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $MeDIP_GE_UMR -b $WGBS_GE_UMR -v > $dirOut/GE_UMR.MeDIP
 less $dirOut/GE_UMR.intersect | awk '{if(!($4 in h)){c=c+1; h[$4]=1}}END{print "GE_UMR intersect", c}'
+## GC density
+for file in *UMR*
+do
+    echo "Processing $file" 
+    less $file | awk '{gsub("chr", "", $1); print $1"\t"$2"\t"$3"\t"$4}' > $file.bed
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/bedtools nuc -fi /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -bed $file.bed > GC.$file.txt
+done
