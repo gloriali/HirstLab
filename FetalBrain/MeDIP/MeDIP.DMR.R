@@ -5,8 +5,11 @@
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.fractional.m
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.DM.sh
 
-setwd("~/快盘/FetalBrain/MeDIP/DMR/")
-library(ggplot2)
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+require(ggplot2, lib.loc = "~/bin/R-3.0.2/")
+require(VennDiagram, lib.loc = "~/bin/R-3.0.2/")
+source('~/HirstLab/Pipeline/enrich.R')
+source("~/HirstLab/Pipeline/R/DMR.figures.R")
 
 #' testing DMR script parameters 
 DM_test_summary <- read.delim("DM.summary.stats", head = F, as.is = T, col.names = c("Sample", "m", "delta", "Total.DM.CpGs", "Hyper.DM.CpGs", "Hypo.DM.CpGs"))
@@ -22,10 +25,9 @@ pdf("DMR_parameters.pdf", width = 9)
 (ggplot(DMR_test_summary, aes(x = size, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Total No. of DMRs"))
 dev.off()
 
-source("~/HirstLab/Pipeline/DMR.figures.R")
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
 # Between MZ twins 
-setwd("~/快盘/FetalBrain/MeDIP/DMR/")
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
 Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
 GE01_GE02_DMR <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
@@ -100,7 +102,7 @@ ggsave(DMR_freq_MZ_figure, file = "DMRfreq_MZ.pdf")
 (DMR_freq_MZ_figure + ggtitle("DMR frequency asymmetry between monozygotic twins"))
 
 chrs = c(paste0("chr", as.character(1:22)), "chrX")
-chrlength <- read.csv("~/快盘/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
+chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
 chrlength <- chrlength[chrlength$chr %in% chrs, ]
 chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
 DMR_pos_MZ <- rbind(cbind(Brain01_Brain02_DMR_figures$pos$data, cell = "Brain"), cbind(Cortex01_Cortex02_DMR_figures$pos$data, cell = "Cortex"), cbind(GE01_GE02_DMR_figures$pos$data, cell = "GE"))
@@ -133,9 +135,7 @@ ggsave(genomicBreak_MZ_figure, file = "genomicBreak_MZ.pdf")
 
 # proximal DMRs (promoter: TSS+/-1.5Kb) and associated genes
 load("~/hg19/hg19v65_genes.Rdata")
-load("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
-source('~/HirstLab/Pipeline/enrich.R')
-library(VennDiagram)
+load("~/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 DMR_gene_MZ_summary <- data.frame(matrix(NA, ncol = 7, nrow = 3, dimnames = list(c("Brain", "Cortex", "GE"), c("pc.Genes", "unique.Genes", "pc.Promoters", "unique.Promoters", "proximal.DE.Genes", "same.direction", "unique.DE.Genes"))))
 # Brain
 Brain01_Brain02_DMR_pcGene <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.CpG_gene_pc.bed", head = F, as.is = T)
@@ -217,14 +217,13 @@ save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_f
      Brain01_Brain02_DMR_pcPromoter_DE_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID, GE01_GE02_DMR_pcPromoter_DE_DAVID, 
      file = "DMR_MZ.Rdata")
 
-DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, row.names = 1, col.names = c("Sample", "delta", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
+DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, row.names = 1, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
 # Between Cortex and GE
 rm(list = ls())
-setwd("~/快盘/FetalBrain/MeDIP/DMR/")
-source("~/HirstLab/Pipeline/DMR.figures.R")
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
-Cortex01_GE01_DMR <- read.delim("DMR.Cortex-HuFNSC01_GE-HuFNSC01.d0.6.s500.c3", head = F, as.is = T, col.names = col)
-Cortex02_GE02_DMR <- read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.d0.6.s500.c3", head = F, as.is = T, col.names = col)
+Cortex01_GE01_DMR <- read.delim("DMR.Cortex-HuFNSC01_GE-HuFNSC01.m0.75.d0.6.s300.c3", head = F, as.is = T, col.names = col)
+Cortex02_GE02_DMR <- read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c3", head = F, as.is = T, col.names = col)
 DMR_Cortex_GE_summary <- DMR_summary[grep("Cortex.*_GE", rownames(DMR_summary)), grep("DMR", colnames(DMR_summary))]
 Cortex01_GE01_DMR_figures <- DMR_figures(Cortex01_GE01_DMR, sample1 = "Cortex-HuFNSC01", sample2 = "GE-HuFNSC01")
 (Cortex01_GE01_DMR_figures$length)
