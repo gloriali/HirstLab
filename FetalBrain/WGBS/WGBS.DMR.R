@@ -1,4 +1,4 @@
-#' DMR analysis from MeDIP fractional calls  
+#' DMR analysis from WGBS fractional calls  
 
 #' DMR identification: ~/HirstLab/FetalBrain/WGBS/WGBS.DM.sh
 
@@ -282,10 +282,30 @@ valid <- mutate(valid, Asymmetry = (Cortex - GE)/(Cortex + GE))
    theme_bw())
 ggsave(valid_boxplot, file = "valid_boxplot.pdf")
 
+#' overlap with TFBSs
+setwd("~/快盘/FetalBrain/WGBS/DMR/TF/")
+DMR_TF <- read.delim("DMR.Cortex_GE.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T, col.names = c("TF", "Cortex02UMR", "GE02UMR", "Ratio02", "Cortex04UMR", "GE04UMR", "Ratio04"))
+DMR_TF_tall <- data.frame(TF = rep(DMR_TF$TF, 2), Donor = rep(c("HuFNSC02", "HuFNSC04"), each = nrow(DMR_TF)), Cortex_UMR = c(DMR_TF$Cortex02UMR, DMR_TF$Cortex04UMR), GE_UMR = c(DMR_TF$GE02UMR, DMR_TF$GE04UMR), Ratio = c(DMR_TF$Ratio02, DMR_TF$Ratio04))
+DMR_TF_tall$Asymmetry <- NA
+DMR_TF_tall[DMR_TF_tall$Ratio > 1,]$Asymmetry <- "Cortex enriched"
+DMR_TF_tall[DMR_TF_tall$Ratio < 1,]$Asymmetry <- "GE enriched"
+DMR_TF_tall[DMR_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
+(DMR_TF_aymmetry <- ggplot(DMR_TF_tall, aes(x = Cortex_UMR, y = GE_UMR, label = TF, color = Asymmetry)) + 
+   geom_point() + 
+   geom_abline(intercept=0, slope=1) + 
+   geom_text(data = subset(DMR_TF_tall, (Donor == "HuFNSC02" & (Ratio > 3 | Ratio <= 0.5)) | (Donor == "HuFNSC04" & (Ratio > 15 | Ratio <= 0.5))), angle = 45, size = 4, hjust = 0.2, vjust = 0.2) + 
+   facet_wrap(~ Donor) + 
+   scale_x_log10() + 
+   scale_y_log10() + 
+   scale_color_hue(l = 50) + 
+   theme_bw())
+ggsave(DMR_TF_aymmetry, file = "DMR_TF_aymmetry.pdf", height = 6)
+
 save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR, Cortex02_GE02_DMR_figures, Cortex04_GE04_DMR, Cortex04_GE04_DMR_figures, 
      GREAT_Cortex02.UMR, GREAT_GE02.UMR, GREAT_Cortex04.UMR, GREAT_GE04.UMR, valid_boxplot, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
      venn_Cortex_UMR_WGBS, venn_Cortex_UMR_pcGene_WGBS, venn_Cortex_UMR_pcPromoter_WGBS, venn_Cortex_UMR_pcPromoter_DE_WGBS, 
      venn_GE_UMR_WGBS, venn_GE_UMR_pcGene_WGBS, venn_GE_UMR_pcPromoter_WGBS, venn_GE_UMR_pcPromoter_DE_WGBS, 
      Cortex02_UMR_pcPromoter, Cortex02_UMR_pcPromoter_DE, GE02_UMR_pcPromoter, GE02_UMR_pcPromoter_DE, 
      Cortex04_UMR_pcPromoter, Cortex04_UMR_pcPromoter_DE, GE04_UMR_pcPromoter, GE04_UMR_pcPromoter_DE, 
+     DMR_TF, DMR_TF_aymmetry, 
      file = "~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
