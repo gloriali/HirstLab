@@ -6,9 +6,10 @@
 # ~/HirstLab/FetalBrain/MeDIP/MeDIP.DM.sh
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
-require(ggplot2, lib.loc = "~/bin/R-3.0.2/")
-require(VennDiagram, lib.loc = "~/bin/R-3.0.2/")
-source('~/HirstLab/Pipeline/enrich.R')
+library(ggplot2)
+library(labeling)
+library(VennDiagram)
+source('~/HirstLab/Pipeline/R/enrich.R')
 source("~/HirstLab/Pipeline/R/DMR.figures.R")
 
 #' testing DMR script parameters 
@@ -23,14 +24,15 @@ pdf("DMR_parameters.pdf", width = 9)
 (ggplot(DM_test_summary, aes(x = delta, y = log2(Hyper.DM.CpGs/Hypo.DM.CpGs), color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_wrap(~ m) + theme_bw() + xlab("delta cutoff") + ylab("log2(Hyper/Hypo)"))
 (ggplot(DMR_test_summary, aes(x = size, y = Median.length, color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 250)) + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Median DMR length"))
 (ggplot(DMR_test_summary, aes(x = size, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Total No. of DMRs"))
+(ggplot(DMR_test_summary, aes(x = CpG.cut, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + theme_bw() + xlab("min No. of CpGs per DMR") + ylab("Total No. of DMRs"))
 dev.off()
 
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
 # Between MZ twins 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
-Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
-Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
-GE01_GE02_DMR <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c3", as.is = T, head = F)
+Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c4", as.is = T, head = F)
+Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c4", as.is = T, head = F)
+GE01_GE02_DMR <- read.delim("DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c4", as.is = T, head = F)
 DMR_MZ_summary <- data.frame(Total = c(nrow(Brain01_Brain02_DMR), nrow(Cortex01_Cortex02_DMR), nrow(GE01_GE02_DMR)), 
                           Hyper = c(nrow(Brain01_Brain02_DMR[Brain01_Brain02_DMR$V5 == 1, ]), nrow(Cortex01_Cortex02_DMR[Cortex01_Cortex02_DMR$V5 == 1, ]), nrow(GE01_GE02_DMR[GE01_GE02_DMR$V5 == 1, ])), 
                           Hypo = c(nrow(Brain01_Brain02_DMR[Brain01_Brain02_DMR$V5 == -1, ]), nrow(Cortex01_Cortex02_DMR[Cortex01_Cortex02_DMR$V5 == -1, ]), nrow(GE01_GE02_DMR[GE01_GE02_DMR$V5 == -1, ])))
@@ -108,7 +110,7 @@ chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
 DMR_pos_MZ <- rbind(cbind(Brain01_Brain02_DMR_figures$pos$data, cell = "Brain"), cbind(Cortex01_Cortex02_DMR_figures$pos$data, cell = "Cortex"), cbind(GE01_GE02_DMR_figures$pos$data, cell = "GE"))
 DMR_pos_MZ_figure <- ggplot(DMR_pos_MZ) + 
   geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
-  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 0.5, alpha = 0.2) +  
+  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.2) +  
   xlab("") + 
   ylab("Position of DMRs on the chromosome") +
   coord_flip() + 
@@ -217,14 +219,15 @@ save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_f
      Brain01_Brain02_DMR_pcPromoter_DE_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID, GE01_GE02_DMR_pcPromoter_DE_DAVID, 
      file = "DMR_MZ.Rdata")
 
-DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, row.names = 1, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
 # Between Cortex and GE
 rm(list = ls())
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
+DMR_Cortex_GE_summary <- DMR_summary[grepl("Cortex.*_GE", DMR_summary$Sample) & DMR_summary$CpG.cut == 4, grepl("DMR", colnames(DMR_summary)) | colnames(DMR_summary) == "Sample"]
+DMR_Cortex_GE_summary$Sample <- gsub(".m0.75.d0.6", "", DMR_Cortex_GE_summary$Sample)
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
-Cortex01_GE01_DMR <- read.delim("DMR.Cortex-HuFNSC01_GE-HuFNSC01.m0.75.d0.6.s300.c3", head = F, as.is = T, col.names = col)
-Cortex02_GE02_DMR <- read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c3", head = F, as.is = T, col.names = col)
-DMR_Cortex_GE_summary <- DMR_summary[grep("Cortex.*_GE", rownames(DMR_summary)), grep("DMR", colnames(DMR_summary))]
+Cortex01_GE01_DMR <- read.delim("DMR.Cortex-HuFNSC01_GE-HuFNSC01.m0.75.d0.6.s300.c4", head = F, as.is = T, col.names = col)
+Cortex02_GE02_DMR <- read.delim("DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4", head = F, as.is = T, col.names = col)
 Cortex01_GE01_DMR_figures <- DMR_figures(Cortex01_GE01_DMR, sample1 = "Cortex-HuFNSC01", sample2 = "GE-HuFNSC01")
 (Cortex01_GE01_DMR_figures$length)
 (Cortex01_GE01_DMR_figures$count)
@@ -238,5 +241,66 @@ Cortex02_GE02_DMR_figures <- DMR_figures(Cortex02_GE02_DMR, sample1 = "Cortex-Hu
 (Cortex02_GE02_DMR_figures$freq)
 (Cortex02_GE02_DMR_figures$pos)
 
+DMR_length_Cortex_GE <- rbind(cbind(Cortex01_GE01_DMR_figures$length$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$length$data, donor = "HuFNSC02"))
+DMR_length_Cortex_GE_figure <- ggplot(DMR_length_Cortex_GE, aes(x = chr, fill = chr)) + 
+  geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
+  xlab("") + 
+  ylab("DMR length (bp)") + 
+  facet_wrap(DM ~ donor) + 
+  guides(fill = F) + 
+  theme_bw()
+ggsave(DMR_length_Cortex_GE_figure, file = "DMRlength_Cortex_GE.pdf")
+(DMR_length_Cortex_GE_figure + ggtitle("DMR length between Cortex and GE"))
+
+DMR_count_Cortex_GE <- rbind(cbind(Cortex01_GE01_DMR_figures$count$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$count$data, donor = "HuFNSC02"))
+DMR_count_Cortex_GE_figure <- ggplot(DMR_count_Cortex_GE, aes(x = chr, fill = chr)) + 
+  geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
+  xlab("") + 
+  ylab("No. of CpGs per DMR") + 
+  facet_wrap(DM ~ donor) + 
+  guides(fill = F) + 
+  theme_bw()
+ggsave(DMR_count_Cortex_GE_figure, file = "DMRcount_Cortex_GE.pdf")
+(DMR_count_Cortex_GE_figure + ggtitle("No. of CpGs per DMR between Cortex and GE"))
+
+DMR_dis_Cortex_GE <- rbind(cbind(Cortex01_GE01_DMR_figures$dis$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$dis$data, donor = "HuFNSC02"))
+DMR_dis_Cortex_GE_figure <- ggplot(DMR_dis_Cortex_GE, aes(x = chr, fill = chr)) + 
+  geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
+  xlab("") + 
+  ylab("Distance between adjacent DMRs (bp)") + 
+  facet_wrap(DM ~ donor) + 
+  guides(fill = F) + 
+  theme_bw()
+ggsave(DMR_dis_Cortex_GE_figure, file = "DMRdis_Cortex_GE.pdf")
+(DMR_dis_Cortex_GE_figure + ggtitle("Distance between adjacent DMRs between Cortex and GE"))
+
+DMR_freq_Cortex_GE <- rbind(cbind(Cortex01_GE01_DMR_figures$freq$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$freq$data, donor = "HuFNSC02"))
+DMR_freq_Cortex_GE_figure <- ggplot(DMR_freq_Cortex_GE, aes(x = chr, y = freq, fill = DM)) + 
+  geom_bar(position = "identity", stat = "identity", width = 0.8) + 
+  facet_wrap(~ donor) + 
+  xlab("") + 
+  ylab("DMR frequency (bp/MB)") + 
+  coord_flip() + 
+  scale_fill_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+  theme_bw()
+ggsave(DMR_freq_Cortex_GE_figure, file = "DMRfreq_Cortex_GE.pdf")
+(DMR_freq_Cortex_GE_figure + ggtitle("DMR frequency asymmetry between Cortex and GE"))
+
+chrs = c(paste0("chr", as.character(1:22)), "chrX")
+chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
+chrlength <- chrlength[chrlength$chr %in% chrs, ]
+chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
+DMR_pos_Cortex_GE <- rbind(cbind(Cortex01_GE01_DMR_figures$pos$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$pos$data, donor = "HuFNSC02"))
+DMR_pos_Cortex_GE_figure <- ggplot(DMR_pos_Cortex_GE) + 
+  geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
+  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.2) +  
+  xlab("") + 
+  ylab("Position of DMRs on the chromosome") +
+  coord_flip() + 
+  facet_wrap(~ donor) + 
+  scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+  theme_bw()
+ggsave(DMR_pos_Cortex_GE_figure, file = "DMRpos_Cortex_GE.pdf")
+(DMR_pos_Cortex_GE_figure + ggtitle("DMR positions on the chromosomes between Cortex and GE"))
 
 

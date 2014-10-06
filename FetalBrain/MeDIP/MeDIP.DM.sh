@@ -47,7 +47,7 @@ done
 m=0.75    # fractional methylation of one sample need to > m 
 delta=0.6 # minimum difference in fractional calls to call DM CpG
 size=300  # max distance between two consecutive CpGs
-cut=3     # minimum number of CpGs
+cut=4     # minimum number of CpGs
 cd /projects/epigenomics/users/lli/FetalBrain/MeDIP/
 dirIn='/projects/epigenomics/users/lli/FetalBrain/MeDIP/'
 dirOut=$dirIn/DMR/
@@ -115,9 +115,9 @@ Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}}
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
 /home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
-# set parameters to m=0.75, delta=0.6, size=300, cut=3
+# set parameters to m=0.75, delta=0.6, size=300, cut=4
 # Bed files for intersect DMR and GREAT  
-for f in $dirOut/*.m0.75.d0.6.s300.*.hyp*
+for f in $dirOut/*.m$m.d$delta.s$size.c$cut.hyp*
 do
     less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
 done

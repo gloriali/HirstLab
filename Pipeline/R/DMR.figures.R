@@ -1,4 +1,4 @@
-DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/快盘/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)){
+DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)){
   library(ggplot2)
   library(dplyr)
   DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_position_figure <- NULL;
@@ -67,7 +67,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     DMR$chr <- factor(DMR$chr, levels = chrs[length(chrs):1])
     DMR_position_figure <- ggplot(DMR) + 
       geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
-      geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 0.5, alpha = 0.5) +  
+      geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.5) +  
       xlab("") + 
       ylab("Position of DMRs on the chromosome") +
       coord_flip() + 
