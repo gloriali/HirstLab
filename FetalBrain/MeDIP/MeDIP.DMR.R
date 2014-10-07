@@ -11,6 +11,7 @@ library(labeling)
 library(VennDiagram)
 source('~/HirstLab/Pipeline/R/enrich.R')
 source("~/HirstLab/Pipeline/R/DMR.figures.R")
+source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 
 #' testing DMR script parameters 
 DM_test_summary <- read.delim("DM.summary.stats", head = F, as.is = T, col.names = c("Sample", "m", "delta", "Total.DM.CpGs", "Hyper.DM.CpGs", "Hypo.DM.CpGs"))
@@ -26,9 +27,10 @@ pdf("DMR_parameters.pdf", width = 9)
 (ggplot(DMR_test_summary, aes(x = size, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + facet_wrap(~ delta) + theme_bw() + xlab("max distance between adjacent DM CpGs") + ylab("Total No. of DMRs"))
 (ggplot(DMR_test_summary, aes(x = CpG.cut, y = Total.DMR, , color = Sample)) + geom_point() + geom_line() + theme_bw() + xlab("min No. of CpGs per DMR") + ylab("Total No. of DMRs"))
 dev.off()
+# set parameters to m = 0.75, delta = 0.6, size = 300, CpG cut = 4
 
 col <- c("chr", "start", "end", "ID", "DM", "CpG_count", "length") # format of DMR files
-# Between MZ twins 
+#' Between MZ twins 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 Brain01_Brain02_DMR <- read.delim("DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c4", as.is = T, head = F)
 Cortex01_Cortex02_DMR <- read.delim("DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c4", as.is = T, head = F)
@@ -38,7 +40,7 @@ DMR_MZ_summary <- data.frame(Total = c(nrow(Brain01_Brain02_DMR), nrow(Cortex01_
                           Hypo = c(nrow(Brain01_Brain02_DMR[Brain01_Brain02_DMR$V5 == -1, ]), nrow(Cortex01_Cortex02_DMR[Cortex01_Cortex02_DMR$V5 == -1, ]), nrow(GE01_GE02_DMR[GE01_GE02_DMR$V5 == -1, ])))
 rownames(DMR_MZ_summary) <- c("Brain", "Cortex", "GE")
 
-# sanity check and visualization 
+#' sanity check and visualization 
 Brain01_Brain02_DMR_figures <- DMR_figures(Brain01_Brain02_DMR, sample1 = "Brain-HuFNSC01", sample2 = "Brain-HuFNSC02")
 (Brain01_Brain02_DMR_figures$length)
 (Brain01_Brain02_DMR_figures$count)
@@ -120,9 +122,19 @@ DMR_pos_MZ_figure <- ggplot(DMR_pos_MZ) +
 ggsave(DMR_pos_MZ_figure, file = "DMRpos_MZ.pdf")
 (DMR_pos_MZ_figure + ggtitle("DMR positions on the chromosomes between monozygotic twins"))
 
-# intersect DMRs with genomic regions 
+#' GREAT enrichment 
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+(GREAT_HuFNSC01.UMR.Brain <- enrich_GREAT(file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hypo", name = "Brain-HuFNSC01.UMRs", height = 4))
+(GREAT_HuFNSC02.UMR.Brain <- enrich_GREAT(file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hyper", name = "Brain-HuFNSC02.UMRs", height = 6))
+(GREAT_HuFNSC01.UMR.Cortex <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hypo", name = "Cortex-HuFNSC01.UMRs", height = 6))
+(GREAT_HuFNSC02.UMR.Cortex <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hyper", name = "Cortex-HuFNSC02.UMRs", height = 2))
+(GREAT_HuFNSC01.UMR.GE <- enrich_GREAT(file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hypo", name = "GE-HuFNSC01.UMRs", height = 3))
+(GREAT_HuFNSC02.UMR.GE <- enrich_GREAT(file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hyper", name = "GE-HuFNSC02.UMRs", height = 3))
+
+#' intersect DMRs with genomic regions 
 # /home/lli/bin/shell/DMR.intersect.sh -d /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR
-genomicBreak_MZ <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter"))
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/")
+genomicBreak_MZ <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
 genomicBreak_MZ_tall <- genomicBreak_MZ[, -1]
 genomicBreak_MZ_tall <- data.frame(Sample = rep(row.names(genomicBreak_MZ_tall), ncol(genomicBreak_MZ_tall)), Region = factor(rep(colnames(genomicBreak_MZ_tall), each = nrow(genomicBreak_MZ_tall)), levels = colnames(genomicBreak_MZ_tall)), CpG = as.vector(as.matrix(genomicBreak_MZ_tall)))
 genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, fill = Sample)) + 
@@ -135,7 +147,8 @@ genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, 
 ggsave(genomicBreak_MZ_figure, file = "genomicBreak_MZ.pdf")
 (genomicBreak_MZ_figure + ggtitle("DM CpG breakdown between monozygotic twins"))
 
-# proximal DMRs (promoter: TSS+/-1.5Kb) and associated genes
+#' proximal DMRs (promoter: TSS+/-1.5Kb) and associated genes
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/")
 load("~/hg19/hg19v65_genes.Rdata")
 load("~/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 DMR_gene_MZ_summary <- data.frame(matrix(NA, ncol = 7, nrow = 3, dimnames = list(c("Brain", "Cortex", "GE"), c("pc.Genes", "unique.Genes", "pc.Promoters", "unique.Promoters", "proximal.DE.Genes", "same.direction", "unique.DE.Genes"))))
@@ -213,13 +226,14 @@ plot.new()
 grid.draw(venn_DMR_pcPromoter_DE_MZ)
 dev.off()
 
-save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, 
-     DMR_MZ_summary, genomicBreak_MZ, genomicBreak_MZ_figure, DMR_gene_MZ_summary, venn_DMR_pcPromoter_MZ, venn_DMR_pcPromoter_DE_MZ, 
+save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, DMR_MZ_summary, 
+     GREAT_HuFNSC01.UMR.Brain, GREAT_HuFNSC02.UMR.Brain, GREAT_HuFNSC01.UMR.Cortex, GREAT_HuFNSC02.UMR.Cortex, GREAT_HuFNSC01.UMR.GE, GREAT_HuFNSC02.UMR.GE, 
+     genomicBreak_MZ, genomicBreak_MZ_figure, DMR_gene_MZ_summary, venn_DMR_pcPromoter_MZ, venn_DMR_pcPromoter_DE_MZ, 
      Brain01_Brain02_DMR_pcPromoter_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DAVID, GE01_GE02_DMR_pcPromoter_DAVID, 
      Brain01_Brain02_DMR_pcPromoter_DE_DAVID, Cortex01_Cortex02_DMR_pcPromoter_DE_DAVID, GE01_GE02_DMR_pcPromoter_DE_DAVID, 
      file = "DMR_MZ.Rdata")
 
-# Between Cortex and GE
+#' Between Cortex and GE
 rm(list = ls())
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 DMR_summary <- read.delim("DMR.summary.stats", head = F, as.is = T, col.names = c("Sample", "size", "CpG.cut", "Median.length", "Median.CpG", "Total.DMR", "Hyper.DMR", "Hypo.DMR"))
@@ -302,5 +316,17 @@ DMR_pos_Cortex_GE_figure <- ggplot(DMR_pos_Cortex_GE) +
   theme_bw()
 ggsave(DMR_pos_Cortex_GE_figure, file = "DMRpos_Cortex_GE.pdf")
 (DMR_pos_Cortex_GE_figure + ggtitle("DMR positions on the chromosomes between Cortex and GE"))
+
+#' GREAT enrichment 
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+(GREAT_Cortex01.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_GE-HuFNSC01.hypo", name = "HuFNSC01-Cortex.UMRs", height = 12))
+(GREAT_GE01.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_GE-HuFNSC01.hyper", name = "HuFNSC01-GE.UMRs", height = 4))
+(GREAT_Cortex02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo", name = "HuFNSC02-Cortex.UMRs", height = 12))
+(GREAT_GE02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hyper", name = "HuFNSC02-GE.UMRs", height = 8))
+
+
+save(DMR_length_Cortex_GE_figure, DMR_count_Cortex_GE_figure, DMR_dis_Cortex_GE_figure, DMR_freq_Cortex_GE_figure, DMR_pos_Cortex_GE_figure, DMR_Cortex_GE_summary, 
+     GREAT_Cortex01.UMR, GREAT_GE01.UMR, GREAT_Cortex02.UMR, GREAT_GE02.UMR, 
+     file = "DMR_Cortex_GE.Rdata")
 
 
