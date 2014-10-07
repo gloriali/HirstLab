@@ -1,7 +1,7 @@
 #' Compare WGBS and MeDIP DMRs - HuFNSC02 cortex vs GE
-setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP")
-require(ggplot2, lib.loc = "~/bin/R-3.0.2/")
-require(labeling, lib.loc = "~/bin/R-3.0.2/")
+setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/")
+library(ggplot2)
+library(labeling)
 
 #' genomic breakdown 
 genomicBreak <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))

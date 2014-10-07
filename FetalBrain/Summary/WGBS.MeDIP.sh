@@ -35,10 +35,12 @@ do
 done
 
 # intersect DMRs
+dirOut='/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/'
+cd $dirOut
 WGBS_Cortex_UMR='/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed'
 WGBS_GE_UMR='/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed'
-MeDIP_Cortex_UMR='/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c3.hypo.bed'
-MeDIP_GE_UMR='/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c3.hyper.bed'
+MeDIP_Cortex_UMR='/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.hypo.bed'
+MeDIP_GE_UMR='/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.hyper.bed'
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $WGBS_Cortex_UMR -b $MeDIP_Cortex_UMR -wo > $dirOut/Cortex_UMR.intersect
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $WGBS_Cortex_UMR -b $MeDIP_Cortex_UMR -v > $dirOut/Cortex_UMR.WGBS
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $MeDIP_Cortex_UMR -b $WGBS_Cortex_UMR -v > $dirOut/Cortex_UMR.MeDIP
