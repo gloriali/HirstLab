@@ -47,7 +47,9 @@ done
 # Bed files for intersect DMR and GREAT  
 for f in $dirOut/*.m0.75.p0.005.d0.5.s300*.hyp*
 do
+    echo "Processing "$f
     less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $f.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $f.closest.gene
 done
 /home/lli/bin/shell/DMR.intersect.sh -d $dirOut
 
