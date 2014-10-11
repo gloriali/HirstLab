@@ -2,6 +2,7 @@
 setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/")
 library(ggplot2)
 library(labeling)
+library(VennDiagram)
 
 #' genomic breakdown 
 genomicBreak <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
@@ -31,6 +32,16 @@ hypo.WGBS = hypo.intersect + genomicBreak["DM.hypo.WGBS", "Total"]
 hypo.MeDIP = hypo.intersect + genomicBreak["DM.hypo.MeDIP", "Total"]
 phyper(hyper.intersect, hyper.WGBS, total - hyper.WGBS, hyper.MeDIP, lower.tail = F, log = T) 
 phyper(hypo.intersect, hypo.WGBS, total - hypo.WGBS, hypo.MeDIP, lower.tail = F, log = T)
+pdf("Venn_CpG_Cortex_UMR.pdf")
+plot.new()
+grid.text("Intersect of Cortex UMR CpGs between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = hypo.WGBS, area2 = hypo.MeDIP, cross.area = hypo.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+dev.off()
+pdf("Venn_CpG_GE_UMR.pdf")
+plot.new()
+grid.text("Intersect of GE UMR CpGs between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_GE_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = hyper.WGBS, area2 = hyper.MeDIP, cross.area = hyper.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+dev.off()
 
 #' compare GC content 
 GC.hyper.intersect <- read.delim("GC.GE_UMR.intersect.txt", head = F, as.is = T, skip = 1)
@@ -56,4 +67,27 @@ GC <- rbind(data.frame(DM = "hyper", Intersect = "intersect", ID = GC.hyper.inte
 ggsave(GC_figure, file = "WGBS_MeDIP_DMR_GCcontent.pdf")
 t.test(GC.hyper.WGBS$V6, GC.hyper.MeDIP$V6)$p.value
 t.test(GC.hypo.WGBS$V6, GC.hypo.MeDIP$V6)$p.value
+
+#' intersect closest genes
+total = 52475  # wc -l /home/lli/hg19/hg19v65_genes.bed 
+gene.hyper.intersect = as.integer(unlist(strsplit(system("wc -l GE_UMR_closest_gene.intersect", intern = T), " "))[1])
+gene.hyper.WGBS = gene.hyper.intersect + as.integer(unlist(strsplit(system("wc -l GE_UMR_closest_gene.WGBS", intern = T), " "))[1])
+gene.hyper.MeDIP = gene.hyper.intersect + as.integer(unlist(strsplit(system("wc -l GE_UMR_closest_gene.MeDIP", intern = T), " "))[1])
+gene.hypo.intersect = as.integer(unlist(strsplit(system("wc -l Cortex_UMR_closest_gene.intersect", intern = T), " "))[1])
+gene.hypo.WGBS = gene.hypo.intersect + as.integer(unlist(strsplit(system("wc -l Cortex_UMR_closest_gene.WGBS", intern = T), " "))[1])
+gene.hypo.MeDIP = gene.hypo.intersect + as.integer(unlist(strsplit(system("wc -l Cortex_UMR_closest_gene.MeDIP", intern = T), " "))[1])
+phyper(gene.hyper.intersect, gene.hyper.WGBS, total - gene.hyper.WGBS, gene.hyper.MeDIP, lower.tail = F, log = T) 
+phyper(gene.hypo.intersect, gene.hypo.WGBS, total - gene.hypo.WGBS, gene.hypo.MeDIP, lower.tail = F, log = T)
+pdf("Venn_genes_Cortex_UMR.pdf")
+plot.new()
+grid.text("Intersect of Cortex UMR closest genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = gene.hypo.WGBS, area2 = gene.hypo.MeDIP, cross.area = gene.hypo.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+dev.off()
+pdf("Venn_genes_GE_UMR.pdf")
+plot.new()
+grid.text("Intersect of GE UMR closest genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_GE_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = gene.hyper.WGBS, area2 = gene.hyper.MeDIP, cross.area = gene.hyper.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
+dev.off()
+
+
 
