@@ -38,7 +38,7 @@
    + `isoform_valid_gene`: validated genes   
 
 ### Usage:           
-* source on xhost: `source("/home/lli/bin/R-3.0.2/junction.R")`          
+* source on xhost: `source("/home/lli/HirstLab/Pipeline/R/junction.R")`          
 * example:  
 
 ```

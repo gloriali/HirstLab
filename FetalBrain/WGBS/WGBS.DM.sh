@@ -7,11 +7,11 @@ m=0.75 # fractional methylation in at least one sample need to > m
 cd $dirIn
 for file in *.sam.bedGraph
 do
-    /home/lli/bin/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file 
+    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file 
 done
 
-/home/lli/bin/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine -f2 A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine -n Cortex-HuFNSC02_GE-HuFNSC02
-/home/lli/bin/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine -f2 A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine -n Cortex-HuFNSC04_GE-HuFNSC04
+/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine -f2 A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine -n Cortex-HuFNSC02_GE-HuFNSC02
+/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine -f2 A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine -n Cortex-HuFNSC04_GE-HuFNSC04
 
 # Tuning parameters
 cd $dirOut
@@ -39,7 +39,7 @@ do
     for size in 100 200 300 500 
     do
         echo "Processing "$name", size = "$size
-        /home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $file -n $name -s $size
+        /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $file -n $name -s $size
     done
 done
 
@@ -51,7 +51,7 @@ do
     less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $f.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $f.closest.gene
 done
-/home/lli/bin/shell/DMR.intersect.sh -d $dirOut
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
 
 # validate DMR MeDIP/MRE signal
 mkdir -p $dirOut/valid/

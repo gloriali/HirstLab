@@ -65,7 +65,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!
 less $dirOut/$dm | grep 'Bad line'
 Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
-/home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
 ## Cortex01 vs Cortex02
 lib1="HS2775"; cell1="Cortex"; donor1="HuFNSC01"; name1="HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174";
@@ -77,7 +77,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!
 less $dirOut/$dm | grep 'Bad line'
 Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
-/home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
 ## GE01 vs GE02
 lib1="HS2777"; cell1="GE"; donor1="HuFNSC01"; name1="HS2777.MeDIP.NeurospheresGE01.q5.F1028.SET_157";
@@ -89,7 +89,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!
 less $dirOut/$dm | grep 'Bad line'
 Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
-/home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
 ## Cortex01 vs GE01
 lib1="HS2775"; cell1="Cortex"; donor1="HuFNSC01"; name1="HS2775.MeDIP.NeurospheresCortex01.q5.F1028.SET_174";
@@ -101,7 +101,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!
 less $dirOut/$dm | grep 'Bad line'
 Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
-/home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
 ## Cortex02 vs GE02
 lib1="HS2779"; cell1="Cortex"; donor1="HuFNSC02"; name1="HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174";
@@ -113,7 +113,7 @@ paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!
 less $dirOut/$dm | grep 'Bad line'
 Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
-/home/lli/bin/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 
 # set parameters to m=0.75, delta=0.6, size=300, cut=4
 # Bed files for intersect DMR and GREAT  
@@ -123,5 +123,5 @@ do
     less $f | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $f.bed # input for GREAT analysis
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $f.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $f.closest.gene
 done
-/home/lli/bin/shell/DMR.intersect.sh -d $dirOut
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
 

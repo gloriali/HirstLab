@@ -12,8 +12,8 @@ File paths on xhost
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
-* R libraries and functions: `/home/lli/bin/R-3.0.2/`
-* Shell scripts: `/home/lli/bin/shell/`   
+* R libraries and functions: `/home/lli/HirstLab/Pipeline/R/`
+* Shell scripts: `/home/lli/HirstLab/Pipeline/shell/`   
 * Python scripts: `/home/lli/bin/python/`  
 * UCSC scripts: `/home/lli/bin/`  
 

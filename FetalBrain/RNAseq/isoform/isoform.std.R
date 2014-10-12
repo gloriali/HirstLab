@@ -5,7 +5,7 @@
 # DEfine: FDR = 0.01; rmin = 0.005; Nmin = 25
 ##################################################################################
 setwd("~/FetalBrain/RNAseq/isoform/")
-source("/home/lli/bin/R-3.0.2/isoform.R")
+source("/home/lli/HirstLab/Pipeline/R/isoform.R")
 
 # isoform between cortex and GE
 lib1='A03473'; cell1='Cortex'; donor1='HuFNSC01';

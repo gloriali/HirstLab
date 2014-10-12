@@ -13,14 +13,14 @@ mkdir -p $dirOut
 > $dirOut/genomic.breakdown.summary
 cd $dirIn
 echo -e "Intersecting DM CpGs with genomic regions
-Output files: $dirOut/DMR.$name.CpG.bed: chr\tstart\tend\tDMR_ID
-$dirOut/DMR.$name.CpG_gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.$name.CpG_exon.bed: chr\tstart\tend\tDMR_IDtExon_ID
-$dirOut/DMR.$name.CpG_promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.$name.CpG_gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.$name.CpG_promoter_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.$name.CpG_CGI.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/genomic.breakdown.summary: Name\tTotal No. of DM CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI"\n
+Output files: $dirOut/DMR.<name>.CpG.bed: chr\tstart\tend\tDMR_ID
+$dirOut/DMR.<name>.CpG_gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.CpG_exon.bed: chr\tstart\tend\tDMR_IDtExon_ID
+$dirOut/DMR.<name>.CpG_promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.CpG_gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.CpG_promoter_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.CpG_CGI.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/genomic.breakdown.summary: Name\tTotal No. of DM CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\n"
 for dmr in DMR.*.bed
 do
     name=$(echo $dmr | sed -e s/'DMR.'//g)

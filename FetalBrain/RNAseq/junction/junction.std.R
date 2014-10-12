@@ -6,7 +6,7 @@
 
 ##################################################################################
 setwd("~/FetalBrain/RNAseq/junction/")
-source("/home/lli/bin/R-3.0.2/junction.R")
+source("/home/lli/HirstLab/Pipeline/R/junction.R")
 
 Nbrain01 <- 61400917   
 Nbrain02 <- 69798425

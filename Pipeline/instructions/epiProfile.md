@@ -69,6 +69,6 @@ rm <output directory>/exons5p_200/CpG.hg19v65_exons_for_genes.5prime_200.unique_
 * return exon boundaries profile summary for all other marks  
 
 ### Usage:
-* source on xhost: `source("/home/lli/bin/R-3.0.2/epiProfile.R")`          
+* source on xhost: `source("/home/lli/HirstLab/Pipeline/R/epiProfile.R")`          
 * source locally: `source("~/HirstLab/Pipeline/epiProfile.R")`    
 * example: `WGBS_boundaries <- epiProfile(mark = "WGBS", cell1 = "lum", cell2 = "myo", donor1 = "RM066", donor2 = "RM045", dirIn = "~/REMC/epiProfile/", both = both, neither = neither, cell1_specific = lum_specific, cell2_specific = myo_specific)`   

@@ -40,7 +40,7 @@
     * isoform_gene: genes identified as isoforms
 
 ### Usage: 
-  + source on xhost: `source("/home/lli/bin/R-3.0.2/isoform.R")`          
+  + source on xhost: `source("/home/lli/HirstLab/Pipeline/R/isoform.R")`          
   + example:   
 ```
 lib1='A03473'; cell1='Cortex'; donor1='HuFNSC01';

@@ -132,7 +132,7 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 (GREAT_HuFNSC02.UMR.GE <- enrich_GREAT(file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hyper", name = "GE-HuFNSC02.UMRs", height = 3))
 
 #' intersect DMRs with genomic regions 
-# /home/lli/bin/shell/DMR.intersect.sh -d /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR
+# /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/")
 genomicBreak_MZ <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
 genomicBreak_MZ_tall <- genomicBreak_MZ[, -1]
