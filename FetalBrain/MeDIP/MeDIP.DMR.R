@@ -189,10 +189,31 @@ phyper(length(intersect(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene$id, DMR_DE_GE01_
 phyper(length(intersect(DMR_DE_Cortex01_Cortex02_hypo$DMR_gene$id, DMR_DE_GE01_GE02_hypo$DMR_gene$id)), DMR_proximal_MZ_summary["Cortex01_Cortex02_hypo", "unique.genes"], pcgene - DMR_proximal_MZ_summary["Cortex01_Cortex02_hypo", "unique.genes"], DMR_proximal_MZ_summary["GE01_GE02_hypo", "unique.genes"], lower.tail = F, log = T) 
 #' DAVID functional enrichment showed neuron development, but none reached statistical significance.  
  
+#' overlap with TFBSs
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/")
+DMR_MZ_TF <- read.delim("DMR.MZ.m0.75.d0.6.s300.c4.TF.summary", head = F, as.is = T, col.names = c("TF", "Brain.hypo", "Brain.hyper", "Ratio.Brain", "Cortex.hypo", "Cortex.hyper", "Ratio.Cortex", "GE.hypo", "GE.hyper", "Ratio.GE"))
+DMR_MZ_TF_tall <- data.frame(TF = rep(DMR_MZ_TF$TF, 3), Cell = rep(c("Brain", "Cortex", "GE"), each = nrow(DMR_MZ_TF)), hyper = c(DMR_MZ_TF$Brain.hyper, DMR_MZ_TF$Cortex.hyper, DMR_MZ_TF$GE.hyper), hypo = c(DMR_MZ_TF$Brain.hypo, DMR_MZ_TF$Cortex.hypo, DMR_MZ_TF$GE.hypo), Ratio = c(DMR_MZ_TF$Ratio.Brain, DMR_MZ_TF$Ratio.Cortex, DMR_MZ_TF$Ratio.GE))
+DMR_MZ_TF_tall$Asymmetry <- NA
+DMR_MZ_TF_tall[DMR_MZ_TF_tall$Ratio > 1,]$Asymmetry <- "HuFNSC01 enriched"
+DMR_MZ_TF_tall[DMR_MZ_TF_tall$Ratio < 1,]$Asymmetry <- "HuFNSC02 enriched"
+DMR_MZ_TF_tall[DMR_MZ_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
+DMR_MZ_TF_tall$Asymmetry <- factor(DMR_MZ_TF_tall$Asymmetry, levels = c("HuFNSC01 enriched", "Equal", "HuFNSC02 enriched"))
+(DMR_MZ_TF_figure <- ggplot(DMR_MZ_TF_tall, aes(x = hyper, y = hypo, label = TF, color = Asymmetry)) + 
+   geom_point() + 
+   geom_abline(intercept=0, slope=1) + 
+   geom_text(data = subset(DMR_MZ_TF_tall, (Ratio >= 2 | Ratio <= 0.3)), angle = 45, size = 4, hjust = 0.2, vjust = 0.2) + 
+   facet_wrap(~ Cell) + 
+   scale_x_log10() + 
+   scale_y_log10() + 
+   scale_color_hue(l = 50) + 
+   theme_bw())
+ggsave(DMR_MZ_TF_figure, file = "DMR_MZ_TF.pdf", height = 6)
+
 save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, DMR_MZ_summary, 
      GREAT_HuFNSC01.UMR.Brain, GREAT_HuFNSC02.UMR.Brain, GREAT_HuFNSC01.UMR.Cortex, GREAT_HuFNSC02.UMR.Cortex, GREAT_HuFNSC01.UMR.GE, GREAT_HuFNSC02.UMR.GE, 
      genomicBreak_MZ, genomicBreak_MZ_figure, DMR_proximal_MZ_summary, DMR_proximal_MZ_hyper, venn_DMR_proximal_MZ_hyper, DMR_proximal_MZ_hypo, venn_DMR_proximal_MZ_hypo, 
      DMR_DE_Brain01_Brain02_hyper, DMR_DE_Brain01_Brain02_hypo, DMR_DE_Cortex01_Cortex02_hyper, DMR_DE_Cortex01_Cortex02_hypo, DMR_DE_GE01_GE02_hyper, DMR_DE_GE01_GE02_hypo, 
+     DMR_MZ_TF, DMR_MZ_TF_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_MZ.Rdata")
 
 #' Between Cortex and GE
@@ -344,12 +365,31 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 (Cortex02_UMR_proximal_DAVID <- enrich(name = "Cortex-HuFNSC02_GE-HuFNSC02.hypo.proximal", erminej = F, height = 2))
 (GE02_UMR_proximal_DAVID <- enrich(name = "Cortex-HuFNSC02_GE-HuFNSC02.hyper.proximal", erminej = F, height = 5))
 
+#' overlap with TFBSs
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/")
+DMR_neurospheres_TF <- read.delim("DMR.Cortex_GE.m0.75.d0.6.s300.c4.TF.summary", head = F, as.is = T, col.names = c("TF", "Cortex01UMR", "GE01UMR", "Ratio01", "Cortex02UMR", "GE02UMR", "Ratio02"))
+DMR_neurospheres_TF_tall <- data.frame(TF = rep(DMR_neurospheres_TF$TF, 2), Donor = rep(c("HuFNSC01", "HuFNSC02"), each = nrow(DMR_neurospheres_TF)), Cortex_UMR = c(DMR_neurospheres_TF$Cortex01UMR, DMR_neurospheres_TF$Cortex02UMR), GE_UMR = c(DMR_neurospheres_TF$GE01UMR, DMR_neurospheres_TF$GE02UMR), Ratio = c(DMR_neurospheres_TF$Ratio01, DMR_neurospheres_TF$Ratio02))
+DMR_neurospheres_TF_tall$Asymmetry <- NA
+DMR_neurospheres_TF_tall[DMR_neurospheres_TF_tall$Ratio > 1,]$Asymmetry <- "Cortex enriched"
+DMR_neurospheres_TF_tall[DMR_neurospheres_TF_tall$Ratio < 1,]$Asymmetry <- "GE enriched"
+DMR_neurospheres_TF_tall[DMR_neurospheres_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
+(DMR_neurospheres_TF_figure <- ggplot(DMR_neurospheres_TF_tall, aes(x = Cortex_UMR, y = GE_UMR, label = TF, color = Asymmetry)) + 
+   geom_point() + 
+   geom_abline(intercept=0, slope=1) + 
+   geom_text(data = subset(DMR_neurospheres_TF_tall, (Ratio >= 2 | Ratio <= 0.5)), angle = 30, size = 4, hjust = 0.2, vjust = 0.2) + 
+   facet_wrap(~ Donor) + 
+   scale_x_log10() + 
+   scale_y_log10() + 
+   scale_color_hue(l = 50) + 
+   theme_bw())
+ggsave(DMR_neurospheres_TF_figure, file = "DMR_neurospheres_TF.pdf", height = 6)
+
 save(DMR_length_neurospheres_figure, DMR_count_neurospheres_figure, DMR_dis_neurospheres_figure, DMR_freq_neurospheres_figure, DMR_pos_neurospheres_figure, DMR_neurospheres_summary, 
      GREAT_Cortex01.UMR, GREAT_GE01.UMR, GREAT_Cortex02.UMR, GREAT_GE02.UMR, 
      genomicBreak_neurospheres, genomicBreak_neurospheres_figure, DMR_proximal_neurospheres_summary, 
      DMR_DE_Cortex01_GE01_hyper, DMR_DE_Cortex01_GE01_hypo, DMR_DE_Cortex02_GE02_hyper, DMR_DE_Cortex02_GE02_hypo, 
      DMR_proximal_neurospheres_hyper, DMR_proximal_neurospheres_hypo, venn_DMR_proximal_neurospheres_hyper, venn_DMR_proximal_neurospheres_hypo, 
-     Cortex02_UMR_proximal_DAVID, GE02_UMR_proximal_DAVID, 
+     Cortex02_UMR_proximal_DAVID, GE02_UMR_proximal_DAVID, DMR_neurospheres_TF, DMR_neurospheres_TF_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 
 
