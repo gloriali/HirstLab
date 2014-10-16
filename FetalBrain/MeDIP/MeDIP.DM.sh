@@ -125,3 +125,25 @@ do
 done
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
 
+# intersecting with TFBSs
+mkdir -p $dirOut/TF/
+> $dirOut/TF/DMR.TF.summary
+cd $dirOut
+for file in DMR.*.bed
+do
+    name=$(echo $file | sed -e s/'.bed'//g)
+    echo "Processing "$name >> $dirOut/TF/DMR.TF.summary
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $file -b /projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz -wa -wb | awk '{print $4"\t"$5":"$6"-"$7"\t"$8}' > $dirOut/TF/$name.TF
+    less $dirOut/TF/$name.TF | awk '{if(!($1 in h1)){c1=c1+1; h1[$1]=1} if(!($2 in h2)){c2=c2+1; h2[$2]=1} if(!($3 in h3)){c3=c3+1; h3[$3]=1} else{h3[$3]=h3[$3]+1}} END{print "No. of DMRs overlap with TFBSs", c1; print "No. of unique TFBSs", c2; print "No. of unique TFs", c3; for(i in h3){print i"\t"h3[i] >> "'$dirOut'""/TF/""'$name'"".TF.summary"}}' >> $dirOut/TF/DMR.TF.summary
+done
+cd $dirOut/TF
+for file1 in *.hyper.TF.summary
+do
+    name=$(echo $file1 | sed -e s/'.hyper.TF.summary'//g)
+    file2=$name.hypo.TF.summary
+    echo $file1, $file2, $name
+    awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $file1 $file2 | sort -k4,4n > $dirOut/TF/$name.TF.summary
+done
+awk 'NR==FNR {cortex[$1]=$2; ge[$1]=$3; ratio[$1]=$4; next} {if($1 in cortex){print $0"\t"cortex[$1]"\t"ge[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC01_GE-HuFNSC01.m0.75.d0.6.s300.c4.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex_GE.m0.75.d0.6.s300.c4.TF.summary
+awk 'NR==FNR {twin1[$1]=$2; twin2[$1]=$3; ratio[$1]=$4; next} {if($1 in twin1){print $0"\t"twin1[$1]"\t"twin2[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary $dirOut/TF/DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary | sort -k4,4n > $dirOut/TF/DMR.MZ.m0.75.d0.6.s300.c4.TF.summary
+awk 'NR==FNR {twin1[$1]=$2; twin2[$1]=$3; ratio[$1]=$4; next} {if($1 in twin1){print $0"\t"twin1[$1]"\t"twin2[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary $dirOut/TF/DMR.MZ.m0.75.d0.6.s300.c4.TF.summary | sort -k4,4n > $dirOut/TF/DMR.MZ.m0.75.d0.6.s300.c4.TF.summary

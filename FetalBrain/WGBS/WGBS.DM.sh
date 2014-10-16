@@ -84,8 +84,8 @@ name=Cortex02_UMRs_MRE_GE02
 /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx80G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $dirOut/valid/ -s $chr -n $name -t Y 
 
 # intersecting with TFBSs
-> $dirOut/TF/DMR.TF.summary
 mkdir -p $dirOut/TF/
+> $dirOut/TF/DMR.TF.summary
 cd $dirOut
 for file in DMR.*.bed
 do
