@@ -16,6 +16,7 @@ Analysis pipeline
     * [DMR.intersect.sh](./shell/DMR.intersect.sh): intersecting DMRs with genomic regions and report CpG% breakdown in intergenic, intron, exon, gene, promoter regions.     
 + [R](./R): R functions
     * [DMR.figures.R](./R/DMR.figures.R): `DMR_figures` R function for DMR analysis and visualization.
+    * [DMR_DE.R](./R/DMR_DE.R): `DMR_DE` R function for identify DE genes for gene-associated DMRs.  
     * [enrich.R](./R/enrich.R): `enrich` R function to plot enriched terms with `ggplot2`.   
     * [enrich_GREAT.R](./R/enrich_GREAT.R): `enrich_GREAT` R function to plot GREAT enriched terms with `ggplot2`.   
     * [isoform.R](./R/isoform.R): `isoform` R function for identifying isoform genes and cassette exons.

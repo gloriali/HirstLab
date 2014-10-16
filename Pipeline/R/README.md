@@ -1,6 +1,7 @@
 Pipeline R functions 
 =====================
 * [DMR.figures.R](./DMR.figures.R): `DMR_figures` R function for DMR analysis and visualization.
+* [DMR_DE.R](./DMR_DE.R): `DMR_DE` R function for identify DE genes for gene-associated DMRs.  
 * [enrich.R](./enrich.R): `enrich` R function to plot enriched terms with `ggplot2`.   
 * [enrich_GREAT.R](./enrich_GREAT.R): `enrich_GREAT` R function to plot GREAT enriched terms with `ggplot2`.   
 * [isoform.R](./isoform.R): `isoform` R function for identifying isoform genes and cassette exons.
