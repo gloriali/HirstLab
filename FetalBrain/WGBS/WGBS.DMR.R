@@ -6,9 +6,9 @@ setwd("~/快盘/FetalBrain/WGBS/")
 library(ggplot2)
 library(dplyr)
 library(VennDiagram)
-source('~/HirstLab/Pipeline/DMR.figures.R')
-source('~/HirstLab/Pipeline/enrich_GREAT.R')
-source('~/HirstLab/Pipeline/enrich.R')
+source('~/HirstLab/Pipeline/R/DMR.figures.R')
+source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
+source('~/HirstLab/Pipeline/R/enrich.R')
 load("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 
 #' testing DMR script parameters
@@ -59,7 +59,7 @@ ggsave(DMR_freq_neurospheres_figure, file = "DMRfreq_neurospheres.pdf", width = 
 
 
 #` GREAT enrichment analysis
-(GREAT_Cortex02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo", name = "HuFNSC02-Cortex.UMRs", height = 9))
+(GREAT_Cortex02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo", name = "HuFNSC02-Cortex.UMRs", height = 12))
 (GREAT_GE02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hyper", name = "HuFNSC02-GE.UMRs"))
 (GREAT_Cortex04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC04_GE-HuFNSC04.hypo", name = "HuFNSC04-Cortex.UMRs", height = 13))
 (GREAT_GE04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC04_GE-HuFNSC04.hyper", name = "HuFNSC04-GE.UMRs", height = 3))
