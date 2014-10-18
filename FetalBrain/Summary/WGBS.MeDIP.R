@@ -3,6 +3,9 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/")
 library(ggplot2)
 library(labeling)
 library(VennDiagram)
+library(dplyr)
+load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/WGBS/WGBS.DMR.Rdata")
 
 #' genomic breakdown 
 genomicBreak <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
@@ -88,6 +91,72 @@ plot.new()
 grid.text("Intersect of GE UMR closest genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
 venn_GE_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = gene.hyper.WGBS, area2 = gene.hyper.MeDIP, cross.area = gene.hyper.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
 dev.off()
+
+#' differences in DMR length and No. of CpGs
+DMR_length_MeDIP <- select(mutate(filter(DMR_length_neurospheres_figure$data, donor == "HuFNSC02"), assay = "MeDIP"), -min, -max, -donor)
+DMR_count_MeDIP <- select(mutate(filter(DMR_count_neurospheres_figure$data, donor == "HuFNSC02"), assay = "MeDIP"), -min, -max, -donor)
+DMR_length_WGBS <- mutate(Cortex02_GE02_DMR_figures$length$data, assay = "WGBS")
+DMR_count_WGBS <- mutate(Cortex02_GE02_DMR_figures$count$data, assay = "WGBS")
+DMR_length_MeDIP_WGBS <- rbind(DMR_length_MeDIP, DMR_length_WGBS)
+DMR_count_MeDIP_WGBS <- rbind(DMR_count_MeDIP, DMR_count_WGBS)
+(DMR_length_figure <- ggplot(DMR_length_MeDIP_WGBS, aes(x = chr, fill = chr)) + 
+  geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
+  xlab("") + 
+  ylab("DMR length (bp)") + 
+  ggtitle(paste("DMR length - WGBS vs MeDIP")) + 
+  guides(fill = F) + 
+  facet_grid(DM ~ assay, scale = "free") + 
+  theme_bw())
+ggsave(DMR_length_figure, file = "DMRlength_WGBS_MeDIP.pdf")
+(DMR_count_figure <- ggplot(DMR_count_MeDIP_WGBS, aes(x = chr, fill = chr)) + 
+   geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
+   xlab("") + 
+   ylab("No. of CpGs per DMR") + 
+   ggtitle(paste("No. of CpGs per DMR - WGBS vs MeDIP")) + 
+   guides(fill = F) + 
+   facet_grid(DM ~ assay, scale = "free") + 
+   theme_bw())
+ggsave(DMR_count_figure, file = "DMRcount_WGBS_MeDIP.pdf")
+
+#' intersect proximal genes & DE genes 
+load("~/hg19/hg19v65_genes.Rdata")
+WGBS_Cortex_UMR_proximal <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/CpG/DMR_pcPromoter.Cortex-HuFNSC02_GE-HuFNSC02.hypo.txt", head = F, as.is = F)
+WGBS_GE_UMR_proximal <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/CpG/DMR_pcPromoter.Cortex-HuFNSC02_GE-HuFNSC02.hyper.txt", head = F, as.is = F)
+MeDIP_Cortex_UMR_proximal <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/DMR_gene.Cortex-HuFNSC02_GE-HuFNSC02.hypo.proximal.txt", head = F, as.is = F)
+MeDIP_GE_UMR_proximal <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/DMR_gene.Cortex-HuFNSC02_GE-HuFNSC02.hyper.proximal.txt", head = F, as.is = F)
+pdf("Venn_proximal_Cortex_UMR.pdf")
+plot.new()
+grid.text("Intersect of Cortex UMR proximal genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP_proximal <- draw.pairwise.venn(area1 = nrow(WGBS_Cortex_UMR_proximal), area2 = nrow(MeDIP_Cortex_UMR_proximal), cross.area = sum(as.character(WGBS_Cortex_UMR_proximal$V5) %in% as.character(MeDIP_Cortex_UMR_proximal$V2)), category = c("WGBS", "MeDIP"), fill = c("red", "blue"), ext.text = F)
+dev.off()
+pdf("Venn_proximal_GE_UMR.pdf")
+plot.new()
+grid.text("Intersect of GE UMR proximal genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_GE_UMR_WGBS_MeDIP_proximal <- draw.pairwise.venn(area1 = nrow(WGBS_GE_UMR_proximal), area2 = nrow(MeDIP_GE_UMR_proximal), cross.area = sum(as.character(WGBS_GE_UMR_proximal$V5) %in% as.character(MeDIP_GE_UMR_proximal$V2)), category = c("WGBS", "MeDIP"), fill = c("red", "blue"), ext.text = F)
+dev.off()
+
+WGBS_Cortex_UMR_proximal_DE <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/CpG/DMR_pcPromoter_DE.Cortex-HuFNSC02_GE-HuFNSC02.hypo.txt", head = F, as.is = F)
+WGBS_GE_UMR_proximal_DE <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/CpG/DMR_pcPromoter_DE.Cortex-HuFNSC02_GE-HuFNSC02.hyper.txt", head = F, as.is = F)
+MeDIP_Cortex_UMR_proximal_DE <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/DMR_gene_DE.Cortex-HuFNSC02_GE-HuFNSC02.hypo.proximal.txt", head = F, as.is = F)
+MeDIP_GE_UMR_proximal_DE <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/DMR_gene_DE.Cortex-HuFNSC02_GE-HuFNSC02.hyper.proximal.txt", head = F, as.is = F)
+pdf("Venn_proximal_DE_Cortex_UMR.pdf")
+plot.new()
+grid.text("Intersect of Cortex UMR proximal DE genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_Cortex_UMR_WGBS_MeDIP_proximal_DE <- draw.pairwise.venn(area1 = nrow(WGBS_Cortex_UMR_proximal_DE), area2 = nrow(MeDIP_Cortex_UMR_proximal_DE), cross.area = sum(as.character(WGBS_Cortex_UMR_proximal_DE$V6) %in% as.character(MeDIP_Cortex_UMR_proximal_DE$V2)), category = c("WGBS", "MeDIP"), fill = c("red", "blue"), ext.text = F)
+dev.off()
+pdf("Venn_proximal_DE_GE_UMR.pdf")
+plot.new()
+grid.text("Intersect of GE UMR proximal DE genes between MeDIP and WGBS", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+venn_GE_UMR_WGBS_MeDIP_proximal_DE <- draw.pairwise.venn(area1 = nrow(WGBS_GE_UMR_proximal_DE), area2 = nrow(MeDIP_GE_UMR_proximal_DE), cross.area = sum(as.character(WGBS_GE_UMR_proximal_DE$V6) %in% as.character(MeDIP_GE_UMR_proximal_DE$V2)), category = c("WGBS", "MeDIP"), fill = c("red", "blue"), ext.text = F)
+dev.off()
+ensembl[intersect(as.character(WGBS_Cortex_UMR_proximal_DE$V6), as.character(MeDIP_Cortex_UMR_proximal_DE$V2)), ]
+ensembl[intersect(as.character(WGBS_GE_UMR_proximal_DE$V6), as.character(MeDIP_GE_UMR_proximal_DE$V2)),]
+
+#' TF 
+WGBS_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T)
+MeDIP_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary", head = F, as.is = T)
+intersect(WGBS_TF[WGBS_TF$V4 <= 0.5, "V1"], MeDIP_TF[MeDIP_TF$V4 <= 0.5, "V1"])
+intersect(WGBS_TF[WGBS_TF$V4 >= 2, "V1"], MeDIP_TF[MeDIP_TF$V4 >= 2, "V1"])
 
 
 
