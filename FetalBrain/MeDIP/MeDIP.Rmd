@@ -2,7 +2,7 @@
 output: 
   html_document:
     keep_md: true
-    toc: yes
+    toc: true
 ---
 Fetal Brain MeDIP Analysis Summary
 ========================================================
@@ -11,23 +11,132 @@ Gloria Li
 `r date()` 
 
 ```{r include = FALSE}
-library(knitr)
 library(ggplot2)
+library(dplyr)
 library(xtable)
 library(VennDiagram)
 library(grid) 
-load("~/快盘/FetalBrain/MeDIP/DMR/MZ/DMR_MZ.Rdata")
-opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+load("~/快盘/FetalBrain/MeDIP/DMR_MZ.Rdata")
+load("~/快盘/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ```
 
 ## DMR analysis from MeDIP fractional calls
 
-  * DM CpG identification: $\Delta$mC < -0.4: hypomethylated; $\Delta$mC > 0.4: hypermethylated.       
+  * DM CpG identification: 
+    + delta fractional methylation $\ge$ 0.6  
+    + fractional methylation of one sample $\ge$ 0.75   
   * Collapse DM CpGs into DMRs:   
     + adjacent CpGs have the same DM status;    
-    + distance between adjacent CpGs $\le$ 200bp;   
-    + No. of CpGs within each DMR $\ge$ 3.   
-    
+    + distance between adjacent CpGs $\le$ 300bp;   
+    + No. of CpGs within each DMR $\ge$ 4.   
+
+## DMRs between neurospheres Cortex and GE derived
+### Summary and sanity check  
+
+  * On average, there are __`r as.integer(mean(DMR_neurospheres_summary$Hypo.DMR))`__ Cortex UMRs, and __`r as.integer(mean(DMR_neurospheres_summary$Hyper.DMR))`__ GE UMRs. There seems to be an asymmetry between Cortex UMRs and GE UMRs.    
+  * Median DMR length is __`r median(c(Cortex02_GE02_DMR$length, Cortex01_GE01_DMR$length))`__, _much smaller than WGBS_. It's similar in all chromosomes.   
+  * Median No. of CpGs per DMR is __`r median(c(Cortex01_GE01_DMR$CpG_count, Cortex02_GE02_DMR$CpG_count))`__, _larger than WGBS_. Also doesn't fluctuate across chromosomes.  
+
+```{r neurospheres_sanity, results='asis'}
+DMR_neurospheres_summary <- xtable(DMR_neurospheres_summary)
+align(DMR_neurospheres_summary) <- "ccccc"
+print(DMR_neurospheres_summary, type = "html", include.rownames = F)
+
+(DMR_length_neurospheres_figure)
+(DMR_count_neurospheres_figure)
+```
+
+### Asymmetry between Cortex UMRs and GE UMRs  
+
+  * On average, there are , __`r round((DMR_freq_neurospheres_figure$data %>% filter(as.character(DM) == "-1") %>% summarize(abs(mean(freq))))/(DMR_freq_neurospheres_figure$data %>% filter(as.character(DM) == "1") %>% summarize(abs(mean(freq)))), 2)[1, 1]`__-fold enrichment in UMR frequency (bp/MB) in Cortex compared to GE.  
+  * The asymmetry appears to be global, in all chromosomes __except chrX__, and is reproduced in the two individuals.  
+
+```{r neurospheres_asymmetry}
+(DMR_freq_neurospheres_figure)
+(DMR_pos_neurospheres_figure)
+```
+
+### GREAT analysis on Cortex UMRs and GE UMRs  
+
+  * UMRs in both Cortex and GE in both individuals show enrichment in  __neuron fate commitment__ biological process, __transcriptional regulation__ activities, __Homeobox__ protein domain, and __abnormal brain development__ mouse phenotype.  
+  * Cortex UMRs are also enriched in __forebrain regionalization__ and __pattern specification__ processes.   
+
+```{r neurospheres_GREAT1, fig.height=12, fig.width=8}
+(GREAT_Cortex01.UMR)
+```
+```{r neurospheres_GREAT2, fig.height=4, fig.width=8}
+(GREAT_GE01.UMR)
+```
+```{r neurospheres_GREAT3, fig.height=12, fig.width=8}
+(GREAT_Cortex02.UMR)
+```
+```{r neurospheres_GREAT2, fig.height=8, fig.width=8}
+(GREAT_GE02.UMR)
+```
+
+## UMR genomic break down  
+
+  + On average, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, _similar to WGBS_, and __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold__ enriched, _higher than WGBS_. __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random, _slightly higher than WGBS_.        
+
+<!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
+<!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
+
+```{r neurospheres_breakdown}
+(genomicBreak_neurospheres_figure + ggtitle("DM CpG breakdown between WGBS Cortex and GE"))
+```
+
+### Proximal UMRs and DE genes
+
+  + On average, there are __`r as.integer(mean(DMR_proximal_neurospheres_summary[, "DMRs"]))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_proximal_neurospheres_summary[, "DMRs"])/mean(DMR_neurospheres_summary$Total.DMR)*100, 2)`%__ of all DMRs, _higher than WGBS_.         
+  + On average, there are __`r as.integer(mean(DMR_proximal_neurospheres_summary[, "DE.DMRs"]))`__ promoter DMRs associated with DE genes, __`r round(mean(DMR_proximal_neurospheres_summary[, "DE.DMRs"])/mean(DMR_proximal_neurospheres_summary[, "DMRs"])*100, 2)`%__ of all promoter DMRs, _slightly lower than WGBS_. Among them, there are __`r round(mean(DMR_proximal_neurospheres_summary[, "same.direction"])/mean(DMR_proximal_neurospheres_summary[, "unique.DE.genes"])*100, 2)`%__ unique DE genes change in the same direction as the UMRs, _higher than WGBS_.         
+  + The intersect between two individuals are __significant__.  
+
+```{r neurospheres_proximal, results='asis'}
+DMR_proximal_neurospheres_summary <- xtable(DMR_proximal_neurospheres_summary)
+align(DMR_proximal_neurospheres_summary) <- "cccccccc"
+print(DMR_proximal_neurospheres_summary, type = "html", include.rownames = T)
+
+plot.new()
+grid.draw(venn_DMR_proximal_neurospheres_hypo)
+plot.new()
+grid.draw(venn_DMR_proximal_neurospheres_hyper)
+```
+
+#### Cortex UMRs proximal associated DE genes 
+
+```{r neurospheres_DE, results='asis'}
+Cortex_UMR_proximal_DE <- DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE[intersect(DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE$id, DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE$id), c("name", "description", "DM", "DE")]
+align(Cortex_UMR_proximal_DE) <- "crrcc"
+print(Cortex_UMR_proximal_DE, type = "html", include.rownames = F)
+```
+
+#### GE UMRs proximal associated DE genes 
+
+```{r neurospheres_DE, results='asis'}
+GE_UMR_proximal_DE <- DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE[intersect(DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE$id, DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE$id), c("name", "description", "DM", "DE")]
+align(GE_UMR_proximal_DE) <- "crrcc"
+print(GE_UMR_proximal_DE, type = "html", include.rownames = F)
+```
+
+### Overlap UMRs with TFBSs 
+
+* Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed different asymmetry in Cortex and GE.  
+* HuFNSC02 show similar trend as WGBS, with TFBSs enriched in Cortex UMRs for most TFs, and top TFs with highest fold cahnge in No. of TFBS between Cortex and GE have overlaps with WGBS, such as GATA2, FOXA1, ZNF217.   
+* However, HuFNSC01 showed the opposite trend, with most TFs enriched in GE. _Why?_ In general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, `r round(cor(DMR_neurospheres_TF$Ratio01, DMR_neurospheres_TF$Ratio02), 2)`, _similar to WGBS_. Maybe TFBSs trend is individual-specific.   
+* With 1.5-fold change cutoff, there are 6 TFs enriched in Cortex UMRs in both individuals, and 4 in GE UMRs.   
+
+```{r neurospheres_TF}
+(DMR_neurospheres_TF_figure) 
+DMR_neurospheres_TF_Cortex <- xtable(DMR_neurospheres_TF[DMR_neurospheres_TF$Ratio01 >=1.5 & DMR_neurospheres_TF$Ratio02 >=1.5, ])
+align(DMR_neurospheres_TF_Cortex) <- "cccccccc"
+print(DMR_neurospheres_TF_Cortex, type = "html", include.rownames = F)
+DMR_neurospheres_TF_GE <- xtable(DMR_neurospheres_TF[DMR_neurospheres_TF$Ratio01 <=1/1.5 & DMR_neurospheres_TF$Ratio02 <=1/1.5, ])
+align(DMR_neurospheres_TF_GE) <- "cccccccc"
+print(DMR_neurospheres_TF_GE, type = "html", include.rownames = F)
+```
+
+
 ## DMRs between monozygptic twins
 ### Summary and sanity check
 
