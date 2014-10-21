@@ -6,7 +6,7 @@ DMR_DE <- function(DMR_gene, DE, DM, name){
   DMR_gene$DM <- DM
   DMR_gene_DE <- DMR_gene[DMR_gene$id %in% as.character(DE$V1), ]
   DMR_gene_DE$DE <- DE[DMR_gene_DE$id, "DE"]
-  summary <- c(DMRs = length(unique(DMR_gene$DMR)), unique.genes = length(unique(DMR_gene$id)), 
+  summary <- c(proximal.DMRs = length(unique(DMR_gene$DMR)), unique.genes = length(unique(DMR_gene$id)), 
                DE.DMRs = length(unique(DMR_gene_DE$DMR)), unique.DE.genes = length(unique(DMR_gene_DE$id)), 
                same.direction = sum((DMR_gene_DE$DM == "hyper" & DMR_gene_DE$DE == "DN")|(DMR_gene_DE$DM == "hypo" & DMR_gene_DE$DE == "UP")))
   write.table(DMR_gene, file = paste0("DMR_gene.", name, ".txt"), sep = "\t", quote = F, col.names = F, row.names = F)

@@ -10,7 +10,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 Gloria Li         
 `r date()` 
 
-```{r include = FALSE}
+```{r setup, include = FALSE}
 library(knitr)
 library(ggplot2)
 library(dplyr)
@@ -34,8 +34,8 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ## Summary and sanity check  
 
   * On average, there are __`r as.integer(mean(DMR_WGBS_summary$Hypo.DMR))`__ Cortex UMRs, 179 intersect between two individuals, and __`r as.integer(mean(DMR_WGBS_summary$Hyper.DMR))`__ GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
-  * Median DMR length is __`r median(c(Cortex02_GE02_DMR$V7, Cortex04_GE04_DMR$V7))`__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
-  * Median No. of CpGs per DMR is __`r median(c(Cortex02_GE02_DMR$V6, Cortex04_GE04_DMR$V6))`__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
+  * Median DMR length is __`r median(c(Cortex02_GE02_DMR_WGBS$V7, Cortex04_GE04_DMR_WGBS$V7))`__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
+  * Median No. of CpGs per DMR is __`r median(c(Cortex02_GE02_DMR_WGBS$V6, Cortex04_GE04_DMR_WGBS$V6))`__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 ```{r WGBS_sanity, results='asis'}
 DMR_WGBS_summary <- xtable(DMR_WGBS_summary)
@@ -44,8 +44,8 @@ print(DMR_WGBS_summary, type = "html", include.rownames = F)
 
 (valid_boxplot + ggtitle("Validate WGBS UMRs with MeDIP/MRE in HuFNSC02"))
 
-(Cortex02_GE02_DMR_figures$length)
-(Cortex02_GE02_DMR_figures$count)
+(Cortex02_GE02_DMR_WGBS_figures$length)
+(Cortex02_GE02_DMR_WGBS_figures$count)
 plot.new()
 grid.text("Venn diagram of Cortex UMRs", x = unit(0.5, "npc"), y = unit(0.9, "npc"))
 grid.draw(venn_Cortex_UMR_WGBS)
@@ -61,10 +61,10 @@ grid.draw(venn_GE_UMR_WGBS)
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on UMR level can be reproduced with __different cutoffs__. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
 ```{r WGBS_asymmetry}
-(Cortex02_GE02_DMR_figures$freq)
-(Cortex04_GE04_DMR_figures$freq)
-(Cortex02_GE02_DMR_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
-(Cortex04_GE04_DMR_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
+(Cortex02_GE02_DMR_WGBS_figures$freq)
+(Cortex04_GE04_DMR_WGBS_figures$freq)
+(Cortex02_GE02_DMR_WGBS_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
+(Cortex04_GE04_DMR_WGBS_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
 (ggplot(DM_test_summary, aes(x = p, y = log2(Hyper.DM.CpGs/Hypo.DM.CpGs), color = Sample)) + scale_x_log10(breaks = c(0.05, 0.005, 0.0005)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_wrap(~ delta) + theme_bw() + xlab("p-value cutoff") + ylab("log2(Hyper/Hypo)"))
 (ggplot(DMR_test_summary, aes(x = size, y = log2(Hyper.DMR/Hypo.DMR), color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_grid(p ~ delta) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("log2(Hyper/Hypo)"))
 ```
@@ -76,16 +76,16 @@ grid.draw(venn_GE_UMR_WGBS)
   * In HuFNSC04, Cortex UMRs show __abnormal brain development__ in Mouse Phenotype, but are also enriched in __kidney-related processes__.   
 
 ```{r WGBS_GREAT1, fig.height=10, fig.width=8}
-(GREAT_Cortex02.UMR)
+(GREAT_Cortex02.UMR_WGBS)
 ```
 ```{r WGBS_GREAT2, fig.width=8}
-(GREAT_GE02.UMR)
+(GREAT_GE02.UMR_WGBS)
 ```
 ```{r WGBS_GREAT3, fig.height=12, fig.width=8}
-(GREAT_Cortex04.UMR)
+(GREAT_Cortex04.UMR_WGBS)
 ```
 ```{r WGBS_GREAT4, fig.height=4, fig.width=8}
-(GREAT_GE04.UMR)
+(GREAT_GE04.UMR_WGBS)
 ```
 
 ## UMR genomic break down  
@@ -106,7 +106,7 @@ grid.draw(venn_GE_UMR_WGBS)
   + The intersect between two individuals are __significant__ when there are common genes. There are no intersect in pc genes with promoter GE UMRs.  
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
-```{r WGBS_pc, results='asis'}
+```{r WGBS_proximal, results='asis'}
 DMR_WGBS_gene_summary <- xtable(DMR_WGBS_gene_summary)
 align(DMR_WGBS_gene_summary) <- "cccccccc"
 print(DMR_WGBS_gene_summary, type = "html", include.rownames = T)
@@ -124,31 +124,49 @@ grid.draw(venn_Cortex_UMR_pcPromoter_DE_WGBS)
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 ```{r WGBS_DE_Cortex02_UMR, results='asis'}
-Cortex02_UMR_pcPromoter_DE_print <- xtable(select(Cortex02_UMR_pcPromoter_DE, name, description))
-align(Cortex02_UMR_pcPromoter_DE_print) <- "rrr"
+Cortex02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex02_UMR_pcPromoter_DE$description)
+Cortex02_UMR_pcPromoter_DE_print <- xtable(select(Cortex02_UMR_pcPromoter_DE, name, description, DE))
+align(Cortex02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(Cortex02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 #### HuFNSC04  
 ```{r WGBS_DE_Cortex04_UMR, results='asis'}
-Cortex04_UMR_pcPromoter_DE_print <- xtable(select(Cortex04_UMR_pcPromoter_DE, name, description))
-align(Cortex04_UMR_pcPromoter_DE_print) <- "rrr"
+Cortex04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex04_UMR_pcPromoter_DE$description)
+Cortex04_UMR_pcPromoter_DE_print <- xtable(select(Cortex04_UMR_pcPromoter_DE, name, description, DE))
+align(Cortex04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(Cortex04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 ```{r WGBS_DE_GE02_UMR, results='asis'}
-GE02_UMR_pcPromoter_DE_print <- xtable(select(GE02_UMR_pcPromoter_DE, name, description))
-align(GE02_UMR_pcPromoter_DE_print) <- "rrr"
+GE02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE02_UMR_pcPromoter_DE$description)
+GE02_UMR_pcPromoter_DE_print <- xtable(select(GE02_UMR_pcPromoter_DE, name, description, DE))
+align(GE02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 #### HuFNSC04  
 ```{r WGBS_DE_GE04_UMR, results='asis'}
-GE04_UMR_pcPromoter_DE_print <- xtable(select(GE04_UMR_pcPromoter_DE, name, description))
-align(GE04_UMR_pcPromoter_DE_print) <- "rrr"
+GE04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE04_UMR_pcPromoter_DE$description)
+GE04_UMR_pcPromoter_DE <- GE04_UMR_pcPromoter_DE[GE04_UMR_pcPromoter_DE$description != "", ]
+GE04_UMR_pcPromoter_DE_print <- xtable(select(GE04_UMR_pcPromoter_DE, name, description, DE))
+align(GE04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
+```
+
+## Overlap UMRs with TFBSs 
+
+* Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry between Cortex and GE in both individuals, with TFBSs enriched in Cortex UMRs for most TFs.   
+* However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, `r round(cor(DMR_TF$Ratio02, DMR_TF$Ratio04), 2)`.  
+* There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
+
+```{r WGBS_TF, results='asis'}
+(DMR_TF_figure) 
+DMR_TF_3fold <- xtable(DMR_TF[DMR_TF$Ratio02 >=3 & DMR_TF$Ratio04 >=3, ])
+align(DMR_TF_3fold) <- "cccccccc"
+print(DMR_TF_3fold, type = "html", include.rownames = F)
 ```
 
 
