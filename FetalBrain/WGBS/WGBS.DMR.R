@@ -278,7 +278,7 @@ valid <- mutate(valid, Asymmetry = (Cortex - GE)/(Cortex + GE))
    coord_flip() + 
    xlab("") + 
    ylab("(Cortex - GE)/(Cortex + GE)") + 
-   scale_color_hue(l = 40) + 
+   scale_color_manual(values = c("blue", "red")) + 
    theme_bw())
 ggsave(valid_boxplot, file = "valid_boxplot.pdf")
 

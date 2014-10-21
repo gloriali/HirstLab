@@ -10,7 +10,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 Gloria Li         
 `r date()` 
 
-```{r include = FALSE}
+```{r setup, include = FALSE}
 library(knitr)
 library(ggplot2)
 library(dplyr)
@@ -106,7 +106,7 @@ grid.draw(venn_GE_UMR_WGBS)
   + The intersect between two individuals are __significant__ when there are common genes. There are no intersect in pc genes with promoter GE UMRs.  
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
-```{r WGBS_pc, results='asis'}
+```{r WGBS_proximal, results='asis'}
 DMR_WGBS_gene_summary <- xtable(DMR_WGBS_gene_summary)
 align(DMR_WGBS_gene_summary) <- "cccccccc"
 print(DMR_WGBS_gene_summary, type = "html", include.rownames = T)
@@ -124,30 +124,34 @@ grid.draw(venn_Cortex_UMR_pcPromoter_DE_WGBS)
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 ```{r WGBS_DE_Cortex02_UMR, results='asis'}
-Cortex02_UMR_pcPromoter_DE_print <- xtable(select(Cortex02_UMR_pcPromoter_DE, name, description))
-align(Cortex02_UMR_pcPromoter_DE_print) <- "rrr"
+Cortex02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex02_UMR_pcPromoter_DE$description)
+Cortex02_UMR_pcPromoter_DE_print <- xtable(select(Cortex02_UMR_pcPromoter_DE, name, description, DE))
+align(Cortex02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(Cortex02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 #### HuFNSC04  
 ```{r WGBS_DE_Cortex04_UMR, results='asis'}
-Cortex04_UMR_pcPromoter_DE_print <- xtable(select(Cortex04_UMR_pcPromoter_DE, name, description))
-align(Cortex04_UMR_pcPromoter_DE_print) <- "rrr"
+Cortex04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex04_UMR_pcPromoter_DE$description)
+Cortex04_UMR_pcPromoter_DE_print <- xtable(select(Cortex04_UMR_pcPromoter_DE, name, description, DE))
+align(Cortex04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(Cortex04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 ```{r WGBS_DE_GE02_UMR, results='asis'}
-GE02_UMR_pcPromoter_DE_print <- xtable(select(GE02_UMR_pcPromoter_DE, name, description))
-align(GE02_UMR_pcPromoter_DE_print) <- "rrr"
+GE02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE02_UMR_pcPromoter_DE$description)
+GE02_UMR_pcPromoter_DE_print <- xtable(select(GE02_UMR_pcPromoter_DE, name, description, DE))
+align(GE02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
 #### HuFNSC04  
 ```{r WGBS_DE_GE04_UMR, results='asis'}
-GE04_UMR_pcPromoter_DE_print <- xtable(select(GE04_UMR_pcPromoter_DE, name, description))
-align(GE04_UMR_pcPromoter_DE_print) <- "rrr"
+GE04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE04_UMR_pcPromoter_DE$description)
+GE04_UMR_pcPromoter_DE_print <- xtable(select(GE04_UMR_pcPromoter_DE, name, description, DE))
+align(GE04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
@@ -157,7 +161,7 @@ print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 * However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, `r round(cor(DMR_TF$Ratio02, DMR_TF$Ratio04), 2)`.  
 * There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
 
-```{r neurospheres_TF, results='asis'}
+```{r WGBS_TF, results='asis'}
 (DMR_TF_figure) 
 DMR_TF_3fold <- xtable(DMR_TF[DMR_TF$Ratio02 >=3 & DMR_TF$Ratio04 >=3, ])
 align(DMR_TF_3fold) <- "cccccccc"

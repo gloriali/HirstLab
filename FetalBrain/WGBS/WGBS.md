@@ -2,7 +2,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 ========================================================
 
 Gloria Li         
-Mon Oct 20 15:00:42 2014 
+Tue Oct 21 14:31:49 2014 
 
 
 
@@ -24,7 +24,7 @@ Mon Oct 20 15:00:42 2014
   * Median No. of CpGs per DMR is __5__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:44 2014 -->
+<!-- Tue Oct 21 14:31:51 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </TD> <TD align="center"> 2178 </TD> <TD align="center"> 420 </TD> <TD align="center"> 1758 </TD> </TR>
@@ -68,7 +68,7 @@ Mon Oct 20 15:00:42 2014
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+<!-- Tue Oct 21 14:31:57 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> pc.Genes </TH> <TH> unique.Genes </TH> <TH> pc.Promoters </TH> <TH> unique.Promoters </TH> <TH> proximal.DE.Genes </TH> <TH> same.direction </TH> <TH> unique.DE.Genes </TH>  </TR>
   <TR> <TD align="center"> GE_UMRs-HuFNSC02 </TD> <TD align="center"> 222 </TD> <TD align="center"> 210 </TD> <TD align="center">  17 </TD> <TD align="center">  17 </TD> <TD align="center">   4 </TD> <TD align="center">   1 </TD> <TD align="center">   4 </TD> </TR>
@@ -76,66 +76,66 @@ Mon Oct 20 15:00:42 2014
   <TR> <TD align="center"> GE_UMRs-HuFNSC04 </TD> <TD align="center">  47 </TD> <TD align="center">  46 </TD> <TD align="center">   9 </TD> <TD align="center">  11 </TD> <TD align="center">   3 </TD> <TD align="center">   2 </TD> <TD align="center">   3 </TD> </TR>
   <TR> <TD align="center"> Cortex_UMRs-HuFNSC04 </TD> <TD align="center"> 286 </TD> <TD align="center"> 287 </TD> <TD align="center">  82 </TD> <TD align="center">  84 </TD> <TD align="center">  10 </TD> <TD align="center">   3 </TD> <TD align="center">   9 </TD> </TR>
    </TABLE>
-![](./WGBS_files/figure-html/WGBS_pc-1.png) ![](./WGBS_files/figure-html/WGBS_pc-2.png) ![](./WGBS_files/figure-html/WGBS_pc-3.png) ![](./WGBS_files/figure-html/WGBS_pc-4.png) 
+![](./WGBS_files/figure-html/WGBS_proximal-1.png) ![](./WGBS_files/figure-html/WGBS_proximal-2.png) ![](./WGBS_files/figure-html/WGBS_proximal-3.png) ![](./WGBS_files/figure-html/WGBS_proximal-4.png) 
 
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+<!-- Tue Oct 21 14:31:57 2014 -->
 <TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule_[Source:HGNC_Symbol;Acc:1688] </TD> </TR>
-  <TR> <TD align="right"> RGS10 </TD> <TD align="right"> regulator_of_G-protein_signaling_10_[Source:HGNC_Symbol;Acc:9992] </TD> </TR>
-  <TR> <TD align="right"> ADM </TD> <TD align="right"> adrenomedullin_[Source:HGNC_Symbol;Acc:259] </TD> </TR>
-  <TR> <TD align="right"> NKX2-1 </TD> <TD align="right"> NK2_homeobox_1_[Source:HGNC_Symbol;Acc:11825] </TD> </TR>
-  <TR> <TD align="right"> OTX2 </TD> <TD align="right"> orthodenticle_homeobox_2_[Source:HGNC_Symbol;Acc:8522] </TD> </TR>
-  <TR> <TD align="right"> USP43 </TD> <TD align="right"> ubiquitin_specific_peptidase_43_[Source:HGNC_Symbol;Acc:20072] </TD> </TR>
-  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein_[Source:HGNC_Symbol;Acc:4235] </TD> </TR>
-  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor)_[Source:HGNC_Symbol;Acc:7788] </TD> </TR>
-  <TR> <TD align="right"> GAD1 </TD> <TD align="right"> glutamate_decarboxylase_1_(brain,_67kDa)_[Source:HGNC_Symbol;Acc:4092] </TD> </TR>
-  <TR> <TD align="right"> FZD7 </TD> <TD align="right"> frizzled_family_receptor_7_[Source:HGNC_Symbol;Acc:4045] </TD> </TR>
-  <TR> <TD align="right"> FZD5 </TD> <TD align="right"> frizzled_family_receptor_5_[Source:HGNC_Symbol;Acc:4043] </TD> </TR>
-  <TR> <TD align="right"> CXCR7 </TD> <TD align="right"> chemokine_(C-X-C_motif)_receptor_7_[Source:HGNC_Symbol;Acc:23692] </TD> </TR>
-  <TR> <TD align="right"> ZAR1 </TD> <TD align="right"> zygote_arrest_1_[Source:HGNC_Symbol;Acc:20436] </TD> </TR>
-  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1_[Source:HGNC_Symbol;Acc:22788] </TD> </TR>
+<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
+  <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> RGS10 </TD> <TD align="right"> regulator_of_G-protein_signaling_10 </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> ADM </TD> <TD align="right"> adrenomedullin </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> NKX2-1 </TD> <TD align="right"> NK2_homeobox_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> OTX2 </TD> <TD align="right"> orthodenticle_homeobox_2 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> USP43 </TD> <TD align="right"> ubiquitin_specific_peptidase_43 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> GAD1 </TD> <TD align="right"> glutamate_decarboxylase_1_(brain,_67kDa) </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> FZD7 </TD> <TD align="right"> frizzled_family_receptor_7 </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> FZD5 </TD> <TD align="right"> frizzled_family_receptor_5 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> CXCR7 </TD> <TD align="right"> chemokine_(C-X-C_motif)_receptor_7 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> ZAR1 </TD> <TD align="right"> zygote_arrest_1 </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1 </TD> <TD align="center"> DN </TD> </TR>
    </TABLE>
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+<!-- Tue Oct 21 14:31:57 2014 -->
 <TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C_[Source:HGNC_Symbol;Acc:22393] </TD> </TR>
-  <TR> <TD align="right"> STXBP6 </TD> <TD align="right"> syntaxin_binding_protein_6_(amisyn)_[Source:HGNC_Symbol;Acc:19666] </TD> </TR>
-  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein_[Source:HGNC_Symbol;Acc:4235] </TD> </TR>
-  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor)_[Source:HGNC_Symbol;Acc:7788] </TD> </TR>
-  <TR> <TD align="right"> MEIS1 </TD> <TD align="right"> Meis_homeobox_1_[Source:HGNC_Symbol;Acc:7000] </TD> </TR>
-  <TR> <TD align="right"> FSIP2 </TD> <TD align="right"> fibrous_sheath_interacting_protein_2_[Source:HGNC_Symbol;Acc:21675] </TD> </TR>
-  <TR> <TD align="right"> INSM1 </TD> <TD align="right"> insulinoma-associated_1_[Source:HGNC_Symbol;Acc:6090] </TD> </TR>
-  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1_[Source:HGNC_Symbol;Acc:22788] </TD> </TR>
-  <TR> <TD align="right"> C9orf172 </TD> <TD align="right"> chromosome_9_open_reading_frame_172_[Source:HGNC_Symbol;Acc:37284] </TD> </TR>
+<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
+  <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> STXBP6 </TD> <TD align="right"> syntaxin_binding_protein_6_(amisyn) </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> MEIS1 </TD> <TD align="right"> Meis_homeobox_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> FSIP2 </TD> <TD align="right"> fibrous_sheath_interacting_protein_2 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> INSM1 </TD> <TD align="right"> insulinoma-associated_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> C9orf172 </TD> <TD align="right"> chromosome_9_open_reading_frame_172 </TD> <TD align="center"> DN </TD> </TR>
    </TABLE>
 
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+<!-- Tue Oct 21 14:31:57 2014 -->
 <TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6_[Source:HGNC_Symbol;Acc:8620] </TD> </TR>
-  <TR> <TD align="right"> TMEM132B </TD> <TD align="right"> transmembrane_protein_132B_[Source:HGNC_Symbol;Acc:29397] </TD> </TR>
-  <TR> <TD align="right"> PID1 </TD> <TD align="right"> phosphotyrosine_interaction_domain_containing_1_[Source:HGNC_Symbol;Acc:26084] </TD> </TR>
-  <TR> <TD align="right"> ZIC3 </TD> <TD align="right"> Zic_family_member_3_[Source:HGNC_Symbol;Acc:12874] </TD> </TR>
+<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
+  <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6 </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> TMEM132B </TD> <TD align="right"> transmembrane_protein_132B </TD> <TD align="center"> UP </TD> </TR>
+  <TR> <TD align="right"> PID1 </TD> <TD align="right"> phosphotyrosine_interaction_domain_containing_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> ZIC3 </TD> <TD align="right"> Zic_family_member_3 </TD> <TD align="center"> UP </TD> </TR>
    </TABLE>
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+<!-- Tue Oct 21 14:31:57 2014 -->
 <TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="right">  </TD> <TD align="right">  </TD> </TR>
-  <TR> <TD align="right"> MN1 </TD> <TD align="right"> meningioma_(disrupted_in_balanced_translocation)_1_[Source:HGNC_Symbol;Acc:7180] </TD> </TR>
-  <TR> <TD align="right"> PNCK </TD> <TD align="right"> pregnancy_up-regulated_non-ubiquitously_expressed_CaM_kinase_[Source:HGNC_Symbol;Acc:13415] </TD> </TR>
+<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
+  <TR> <TD align="right">  </TD> <TD align="right">  </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> MN1 </TD> <TD align="right"> meningioma_(disrupted_in_balanced_translocation)_1 </TD> <TD align="center"> DN </TD> </TR>
+  <TR> <TD align="right"> PNCK </TD> <TD align="right"> pregnancy_up-regulated_non-ubiquitously_expressed_CaM_kinase </TD> <TD align="center"> UP </TD> </TR>
    </TABLE>
 
 ## Overlap UMRs with TFBSs 
@@ -144,8 +144,8 @@ Mon Oct 20 15:00:42 2014
 * However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, 0.2.  
 * There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
 
-![](./WGBS_files/figure-html/neurospheres_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Mon Oct 20 15:00:51 2014 -->
+![](./WGBS_files/figure-html/WGBS_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
+<!-- Tue Oct 21 14:31:58 2014 -->
 <TABLE border=1>
 <TR> <TH> TF </TH> <TH> Cortex02UMR </TH> <TH> GE02UMR </TH> <TH> Ratio02 </TH> <TH> Cortex04UMR </TH> <TH> GE04UMR </TH> <TH> Ratio04 </TH>  </TR>
   <TR> <TD align="center"> TAF7 </TD> <TD align="center">  12 </TD> <TD align="center">   4 </TD> <TD align="center"> 3.00 </TD> <TD align="center">  10 </TD> <TD align="center">   1 </TD> <TD align="center"> 10.00 </TD> </TR>
