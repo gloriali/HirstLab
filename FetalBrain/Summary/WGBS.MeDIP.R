@@ -153,10 +153,10 @@ ensembl[intersect(as.character(WGBS_Cortex_UMR_proximal_DE$V6), as.character(MeD
 ensembl[intersect(as.character(WGBS_GE_UMR_proximal_DE$V6), as.character(MeDIP_GE_UMR_proximal_DE$V2)),]
 
 #' TF 
-WGBS_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T)
-MeDIP_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary", head = F, as.is = T)
-intersect(WGBS_TF[WGBS_TF$V4 <= 0.5, "V1"], MeDIP_TF[MeDIP_TF$V4 <= 0.5, "V1"])
-intersect(WGBS_TF[WGBS_TF$V4 >= 2, "V1"], MeDIP_TF[MeDIP_TF$V4 >= 2, "V1"])
-
-
+WGBS_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T, col.names = c("TF", "Cortex02UMR", "GE02UMR", "Ratio02"))
+MeDIP_TF <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.TF.summary", head = F, as.is = T, col.names = c("TF", "Cortex02UMR", "GE02UMR", "Ratio02"))
+cat(intersect(WGBS_TF[WGBS_TF$Ratio02 <= 1/2, "TF"], MeDIP_TF[MeDIP_TF$Ratio02 <= 1/2, "TF"]), sep = ", ")
+cat(intersect(WGBS_TF[WGBS_TF$Ratio02 >= 2, "TF"], MeDIP_TF[MeDIP_TF$Ratio02 >= 2, "TF"]), sep = ", ")
+combined <- merge(WGBS_TF, MeDIP_TF, by = "TF")
+cor(combined$Ratio02.x, combined$Ratio02.y)
 
