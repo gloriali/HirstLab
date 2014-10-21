@@ -2,7 +2,7 @@ Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 ========================================================
 
 Gloria Li         
-Tue Oct 21 14:31:49 2014 
+Tue Oct 21 14:45:30 2014 
 
 
 
@@ -24,7 +24,7 @@ Tue Oct 21 14:31:49 2014
   * Median No. of CpGs per DMR is __5__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:51 2014 -->
+<!-- Tue Oct 21 14:45:32 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </TD> <TD align="center"> 2178 </TD> <TD align="center"> 420 </TD> <TD align="center"> 1758 </TD> </TR>
@@ -68,7 +68,7 @@ Tue Oct 21 14:31:49 2014
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:57 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> pc.Genes </TH> <TH> unique.Genes </TH> <TH> pc.Promoters </TH> <TH> unique.Promoters </TH> <TH> proximal.DE.Genes </TH> <TH> same.direction </TH> <TH> unique.DE.Genes </TH>  </TR>
   <TR> <TD align="center"> GE_UMRs-HuFNSC02 </TD> <TD align="center"> 222 </TD> <TD align="center"> 210 </TD> <TD align="center">  17 </TD> <TD align="center">  17 </TD> <TD align="center">   4 </TD> <TD align="center">   1 </TD> <TD align="center">   4 </TD> </TR>
@@ -81,7 +81,7 @@ Tue Oct 21 14:31:49 2014
 ### DE genes with promoter Cortex UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:57 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule </TD> <TD align="center"> UP </TD> </TR>
@@ -102,7 +102,7 @@ Tue Oct 21 14:31:49 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:57 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C </TD> <TD align="center"> UP </TD> </TR>
@@ -119,7 +119,7 @@ Tue Oct 21 14:31:49 2014
 ### DE genes with promoter GE UMRs  
 #### HuFNSC02  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:57 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6 </TD> <TD align="center"> UP </TD> </TR>
@@ -130,10 +130,9 @@ Tue Oct 21 14:31:49 2014
 
 #### HuFNSC04  
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:57 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="right">  </TD> <TD align="right">  </TD> <TD align="center"> DN </TD> </TR>
   <TR> <TD align="right"> MN1 </TD> <TD align="right"> meningioma_(disrupted_in_balanced_translocation)_1 </TD> <TD align="center"> DN </TD> </TR>
   <TR> <TD align="right"> PNCK </TD> <TD align="right"> pregnancy_up-regulated_non-ubiquitously_expressed_CaM_kinase </TD> <TD align="center"> UP </TD> </TR>
    </TABLE>
@@ -145,7 +144,7 @@ Tue Oct 21 14:31:49 2014
 * There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
 
 ![](./WGBS_files/figure-html/WGBS_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:31:58 2014 -->
+<!-- Tue Oct 21 14:45:39 2014 -->
 <TABLE border=1>
 <TR> <TH> TF </TH> <TH> Cortex02UMR </TH> <TH> GE02UMR </TH> <TH> Ratio02 </TH> <TH> Cortex04UMR </TH> <TH> GE04UMR </TH> <TH> Ratio04 </TH>  </TR>
   <TR> <TD align="center"> TAF7 </TD> <TD align="center">  12 </TD> <TD align="center">   4 </TD> <TD align="center"> 3.00 </TD> <TD align="center">  10 </TD> <TD align="center">   1 </TD> <TD align="center"> 10.00 </TD> </TR>

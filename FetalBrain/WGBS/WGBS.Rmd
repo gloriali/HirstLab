@@ -150,6 +150,7 @@ print(GE02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 #### HuFNSC04  
 ```{r WGBS_DE_GE04_UMR, results='asis'}
 GE04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE04_UMR_pcPromoter_DE$description)
+GE04_UMR_pcPromoter_DE <- GE04_UMR_pcPromoter_DE[GE04_UMR_pcPromoter_DE$description != "", ]
 GE04_UMR_pcPromoter_DE_print <- xtable(select(GE04_UMR_pcPromoter_DE, name, description, DE))
 align(GE04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
