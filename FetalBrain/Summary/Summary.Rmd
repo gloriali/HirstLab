@@ -29,23 +29,23 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ## Introduction
 ### Neurospheres Cortex vs GE
 
-* Genetic mutations to epigenetic regulators and epigenomic alterations are amongst the earliest events in brain cell transformation. [PMID: 18772396](http://www.ncbi.nlm.nih.gov/pubmed/18772396) 
-* Defining the epigenomic landscape of normal human brain cells is an important first step towards defining the degree of epigenomic deregulation associated with transformation.
-* Neurospheres provide a powerful model to study neural stem cells, which are thought to be population from which malignant clones arise. 
-* Little is known about epigenetic differences that define neurospheres emerged from distinct brain regions. 
+  * Genetic mutations to epigenetic regulators and epigenomic alterations are amongst the earliest events in brain cell transformation. [PMID: 18772396](http://www.ncbi.nlm.nih.gov/pubmed/18772396) 
+  * Defining the epigenomic landscape of normal human brain cells is an important first step towards defining the degree of epigenomic deregulation associated with transformation.
+  * Neurospheres provide a powerful model to study neural stem cells, which are thought to be population from which malignant clones arise. 
+  * Little is known about epigenetic differences that define neurospheres emerged from distinct brain regions. 
 
 ### MZ twins 
 
-* The genomes of monozygotic twins are genetically identical but epigenetically distinct providing evidence for the influence of environment on the phenotype. 
-* When these epigenetic differences arise during development and their consequence is still unknown. 
+  * The genomes of monozygotic twins are genetically identical but epigenetically distinct providing evidence for the influence of environment on the phenotype. 
+  * When these epigenetic differences arise during development and their consequence is still unknown. 
 
 ## Results
 ### Neurospheres Cortex derived vs GE derived 
 #### Asymmetry between Cortex and GE UMRs  
 
-* On average, there are , __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__-fold enrichment in total UMR length in Cortex compared to GE, __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC04.    
-* The asymmetry appears to be global, in all chromosomes. It is reproduced in the two individuals, and __supported in MeDIP UMRs__.  
-* __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on __UMR level__ can be reproduced with different cutoffs. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
+  * On average, there are , __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__-fold enrichment in total UMR length in Cortex compared to GE, __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC04.    
+  * The asymmetry appears to be global, in all chromosomes. It is reproduced in the two individuals, and __supported in MeDIP UMRs__.  
+  * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on __UMR level__ can be reproduced with different cutoffs. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
 ```{r WGBS_asymmetry, results='asis'}
 DMR_WGBS_summary <- xtable(DMR_WGBS_summary)
@@ -61,10 +61,10 @@ print(DMR_WGBS_summary, type = "html", include.rownames = F)
 
 #### GREAT analysis on Cortex and GE UMRs show brain development terms  
 
-* UMRs in both Cortex and GE show enrichment in __neuron fate commitment__ biological process, __transcriptional regulation__ activities, __Homeobox__ protein domain, and __abnormal brain development__ mouse phenotype.    
-* Cortex UMRs are also enriched in __forebrain regionalization__ and __pattern specification__ processes.   
-* GREAT enriched terms are also __supported by MeDIP__.    
-* In HuFNSC04, Cortex UMRs show __abnormal brain development__ in Mouse Phenotype, but are also enriched in __kidney-related processes__.   
+  * UMRs in both Cortex and GE show enrichment in __neuron fate commitment__ biological process, __transcriptional regulation__ activities, __Homeobox__ protein domain, and __abnormal brain development__ mouse phenotype.    
+  * Cortex UMRs are also enriched in __forebrain regionalization__ and __pattern specification__ processes.   
+  * GREAT enriched terms are also __supported by MeDIP__.    
+  * In HuFNSC04, Cortex UMRs show __abnormal brain development__ in Mouse Phenotype, but are also enriched in __kidney-related processes__.   
 
 ```{r WGBS_GREAT1, fig.height=10, fig.width=8}
 (GREAT_Cortex02.UMR_WGBS)
@@ -81,19 +81,19 @@ print(DMR_WGBS_summary, type = "html", include.rownames = F)
 
 #### UMR breakdown in chromatin states 
 
-* __Pending: ChromHMM__
+  * __Pending: ChromHMM__
 
 #### DE genes with proximal UMRs show key factors in brain development 
 
-+ On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$pc.Promoters))`__ UMRs proximally associated with protein-coding genes (TSS +/- 1500bp), __`r round(mean(DMR_WGBS_gene_summary$pc.Promoters)/mean(DMR_WGBS_summary$Total.DMR)*100, 2)`%__ of all UMRs.         
-+ There are average __`r as.integer(mean(DMR_WGBS_gene_summary$proximal.DE.Genes))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_WGBS_gene_summary$proximal.DE.Genes)/mean(DMR_WGBS_gene_summary$pc.Promoters)*100, 2)`%__ of all proximal UMRs, __much lower than observed in breast and supported by MeDIP__, _maybe more UMRs in enhancers? (ChromHMM)_. Among them, there are __`r round(mean(DMR_WGBS_gene_summary$same.direction)/mean(DMR_WGBS_gene_summary$unique.DE.Genes)*100, 2)`%__ unique DE genes change in the same direction as the UMRs, __also lower than observed in breast and supported by MeDIP__.         
-+ The intersect between two individuals are __significant__ in Cortex UMRs. There are 3 DE genes with proximal Cortex UMR that are shared by both individual: __GFAP, NFIX, FEZF1__.   
-+ __GFAP__: Glial Fibrillary Acidic Protein. It is used as a marker to distinguish astrocytes from other glial cells during development. Reported associated with many brain disease, including alexanders disease, [PMID: 11567214](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=11567214&dopt=b); gliomas, UP reduce tumor and induce differentiation, [PMID: 15498217](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=15498217&dopt=b), and astrocytoma, tumor suppressor [PMID: 8339269](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=8339269&dopt=b) etc.    
-+ __NFIX__: Nuclear Factor I/X (CCAAT-Binding Transcription Factor). _Also supported by MeDIP._ A transcription factor that binds the palindromic sequence in viral and cellular promoters, capable of activating transcription and replication. It is essential for the development of a number of organ systems including brain and bone, e.g. severe neuroanatomical defects (may function in the repression of neural stem cell proliferation or in cell migration) [PMID: 18477394](http://www.ncbi.nlm.nih.gov/pubmed/18477394), [PMID: 19058033](http://www.ncbi.nlm.nih.gov/pubmed/19058033). 
-+ __FEZF1__: FEZ Family Zinc Finger 1 (ZNF312B). Transcription repressor. Involved in the axonal projection and proper termination of olfactory sensory neurons. Regulates non-cell-autonomously the layer formation of the olfactory bulb development and the interneurons. May be required for correct rostral migration of the interneuron progenitors. DNA demethylation and histone acetylation in its promoter activates its expression and oncogene effect in gastric cancer [PMID: 19318583](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=19318583&dopt=b). _We observe DN-regulation in Cortex and Cortex UMR though._     
-+ There are no intersect in pc genes with proximal GE UMRs between the two individual.  
-+ There are __no significant__ DAVID enrichment terms due to the small number of genes.  
-
+  + On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$pc.Promoters))`__ UMRs proximally associated with protein-coding genes (TSS +/- 1500bp), __`r round(mean(DMR_WGBS_gene_summary$pc.Promoters)/mean(DMR_WGBS_summary$Total.DMR)*100, 2)`%__ of all UMRs.         
+  + There are average __`r as.integer(mean(DMR_WGBS_gene_summary$proximal.DE.Genes))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_WGBS_gene_summary$proximal.DE.Genes)/mean(DMR_WGBS_gene_summary$pc.Promoters)*100, 2)`%__ of all proximal UMRs, __much lower than observed in breast and supported by MeDIP__, _maybe more UMRs in enhancers? (ChromHMM)_. Among them, there are __`r round(mean(DMR_WGBS_gene_summary$same.direction)/mean(DMR_WGBS_gene_summary$unique.DE.Genes)*100, 2)`%__ unique DE genes change in the same direction as the UMRs, __also lower than observed in breast and supported by MeDIP__.         
+  + The intersect between two individuals are __significant__ in Cortex UMRs. There are 3 DE genes with proximal Cortex UMR that are shared by both individual: __GFAP, NFIX, FEZF1__.   
+    * __GFAP__: Glial Fibrillary Acidic Protein. It is used as a marker to distinguish astrocytes from other glial cells during development. Reported associated with many brain disease, including alexanders disease, [PMID: 11567214](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=11567214&dopt=b); gliomas, UP reduce tumor and induce differentiation, [PMID: 15498217](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=15498217&dopt=b), and astrocytoma, tumor suppressor [PMID: 8339269](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=8339269&dopt=b) etc.    
+    * __NFIX__: Nuclear Factor I/X (CCAAT-Binding Transcription Factor). _Also supported by MeDIP._ A transcription factor that binds the palindromic sequence in viral and cellular promoters, capable of activating transcription and replication. It is essential for the development of a number of organ systems including brain and bone, e.g. severe neuroanatomical defects (may function in the repression of neural stem cell proliferation or in cell migration) [PMID: 18477394](http://www.ncbi.nlm.nih.gov/pubmed/18477394), [PMID: 19058033](http://www.ncbi.nlm.nih.gov/pubmed/19058033). 
+    * __FEZF1__: FEZ Family Zinc Finger 1 (ZNF312B). Transcription repressor. Involved in the axonal projection and proper termination of olfactory sensory neurons. Regulates non-cell-autonomously the layer formation of the olfactory bulb development and the interneurons. May be required for correct rostral migration of the interneuron progenitors. DNA demethylation and histone acetylation in its promoter activates its expression and oncogene effect in gastric cancer [PMID: 19318583](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=19318583&dopt=b). _We observe DN-regulation in Cortex and Cortex UMR though._     
+  + There are no intersect in pc genes with proximal GE UMRs between the two individual.  
+  + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
+  
 ```{r WGBS_proximal, results='asis', fig.height=5, fig.width=5}
 DMR_WGBS_gene_summary <- DMR_WGBS_gene_summary[, c(3:5, 7, 6)]
 colnames(DMR_WGBS_gene_summary) <- c("proximal.UMRs", "unique.genes", "DE.DMRs", "unique.DE.genes", "same.direction")
@@ -109,7 +109,7 @@ grid.draw(venn_Cortex_UMR_pcPromoter_DE_WGBS)
 
 ##### DE genes with proximal Cortex UMRs  
 
-* HuFNSC02    
+  * HuFNSC02    
 
 ```{r WGBS_DE_Cortex02_UMR, results='asis'}
 Cortex02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex02_UMR_pcPromoter_DE$description)
@@ -118,7 +118,7 @@ align(Cortex02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(Cortex02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
-* HuFNSC04    
+  * HuFNSC04    
 
 ```{r WGBS_DE_Cortex04_UMR, results='asis'}
 Cortex04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", Cortex04_UMR_pcPromoter_DE$description)
@@ -129,7 +129,7 @@ print(Cortex04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 
 ##### DE genes with proximal GE UMRs  
 
-* HuFNSC02    
+  * HuFNSC02    
 
 ```{r WGBS_DE_GE02_UMR, results='asis'}
 GE02_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE02_UMR_pcPromoter_DE$description)
@@ -138,7 +138,7 @@ align(GE02_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE02_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
-* HuFNSC04    
+  * HuFNSC04    
 
 ```{r WGBS_DE_GE04_UMR, results='asis'}
 GE04_UMR_pcPromoter_DE$description <- gsub("_\\[.+", "", GE04_UMR_pcPromoter_DE$description)
@@ -150,13 +150,13 @@ print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 
 #### UMR distal associated genes  
 
-* __PENDING__   
+  * __PENDING__   
 
 #### Asymmetry in overlapping UMRs with TFBSs 
 
-* Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry between Cortex and GE in both individuals, with TFBSs enriched in Cortex UMRs for most TFs.  __Opposite trend in HuFNSC01 MeDIP__.     
-* However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, only `r round(cor(DMR_TF$Ratio02, DMR_TF$Ratio04), 2)`. __Same in MeDIP__.     
-* There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
+  * Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry between Cortex and GE in both individuals, with TFBSs enriched in Cortex UMRs for most TFs.  __Opposite trend in HuFNSC01 MeDIP__.     
+  * However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, only `r round(cor(DMR_TF$Ratio02, DMR_TF$Ratio04), 2)`. __Same in MeDIP__.     
+  * There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
 
 ```{r WGBS_TF, results='asis'}
 (DMR_TF_figure) 
@@ -167,9 +167,30 @@ print(DMR_TF_3fold, type = "html", include.rownames = F)
 
 #### DE genes between Cortex and GE are enriched in neuron development and cell migration   
 
-* On average, there are __`r mean(cortex_GE_DE_summary$DE)`__ genes differentially expressed between cortex and GE, among them, __`r mean(cortex_GE_DE_summary$UP)`__ are upregulated in cortex, and __`r mean(cortex_GE_DE_summary$DN)`__ are downregulated.    
-* __`r nrow(cortex_GE_UP_duplicated)`__ Cortex up-regulated genes, and __`r nrow(cortex_GE_DN_duplicated)`__ GE up-regulated genes are shared by at least two individuals.    
-* DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, GE up-regulated genes are enriched in __EGF-related__ protein domains as well. 
+  * On average, there are __`r mean(cortex_GE_DE_summary$DE)`__ genes differentially expressed between cortex and GE, among them, __`r mean(cortex_GE_DE_summary$UP)`__ are upregulated in cortex, and __`r mean(cortex_GE_DE_summary$DN)`__ are downregulated.    
+  * __`r nrow(cortex_GE_UP_duplicated)`__ Cortex up-regulated genes, and __`r nrow(cortex_GE_DN_duplicated)`__ GE up-regulated genes are shared by at least two individuals.    
+  * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, GE up-regulated genes are enriched in __EGF-related__ protein domains as well. 
+  * There are __`r nrow(cortex_GE_UP_shared)`__ Cortex up-regulated genes, and __`r nrow(cortex_GE_DN_shared)`__ GE up-regulated genes shared by all four individuals.   
+  * Brain / neuron development related Cortex up-regulated genes (shared by all):    
+    + SLC1A6: Solute Carrier Family 1 Member 6. Glutamate transporter in cerebellar Purkinje neurons, related to traumatic brain injury.    
+    + PCDH20: Protocadherin 20. Although its specific function is undetermined, the cadherin-related neuronal receptor is thought to play a role in the establishment and function of specific cell-cell connections in the brain.   
+    + __GFAP__: _see above._   
+    + __ZIC5__: Zic Family Member 5. Essential for neural crest development, converting cells from an epidermal fate to a neural crest cell fate, associated with meningiomas [PMID: 20199689](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20199689&dopt=b). 
+    + __ZIC2__: Zic Family Member 2. Related to structural anomaly of the forebrain, and neural tube defects.  
+    + NEFM: Neurofilament, Medium Polypeptide. Neurofilaments comprise the axoskeleton and functionally maintain neuronal caliber. They may also play a role in intracellular transport to axons and dendrites. This protein
+  is commonly used as a biomarker of neuronal damage.   
+    + UNC5C: Unc-5 Homolog C. Receptor for netrin required for axon guidance. Mediates axon repulsion of neuronal growth cones in the developing nervous system upon ligand binding.    
+    + __ADAM19__: ADAM Metallopeptidase Domain 19. Involved in neurogenesis, cell migration, cell adhesion, cell-cell and cell-matrix interactions, serves as a marker for dendritic cell differentiation. UP in primary brain tumors [PMID: 16772875](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=16772875&dopt=b).   
+  * Brain / neuron development related GE up-regulated genes (shared by all):    
+    + VAX1: Ventral Anterior Homeobox 1. Transcription factor that may function in dorsoventral specification of the forebrain. Required for axon
+  guidance and major tract formation in the developing forebrain.   
+    + NRXN3: Neurexin 3. Neuronal cell surface protein that may be involved in cell recognition and cell adhesion.   
+    + __FEZF1__: _see above._  
+    + SIX3: SIX Homeobox 3. Plays a role in eye development.   
+    + ODZ1: Odz, Odd Oz/Ten-M Homolog 1. Involved in neural development, regulating the establishment of proper connectivity within the nervous system.   
+    + __EPHA3__: EPH Receptor A3. Involved in short-range contact-mediated axon guidance. UP in glioblastoma [PMID: 23410976](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=23410976&dopt=b).   
+    + __OTX2__: Orthodenticle Homeobox 2. Plays a role in the development of the brain and the sense organs, also influences the proliferation and differentiation of dopaminergic neuronal progenitor cells during mitosis. UP in medulloblastomas [PMID: 20028867](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20028867&dopt=b).  
+    + ASTN1: Astrotactin 1. A neuronal adhesion molecule required for glial-guided migration of young postmitotic neuroblasts in cortical regions of developing brain, including cerebrum, hippocampus, cerebellum, and olfactory bulb (Fink et al., 1995).   
 
 ```{r DE_Cortex_GE, results='asis', fig.height = 8, fig.width = 8}
 cortex_GE_DE_summary <- xtable(cortex_GE_DE_summary)
@@ -177,13 +198,21 @@ align(cortex_GE_DE_summary) <- "lccc"
 print(cortex_GE_DE_summary, type = "html", include.rownames = T)
 (enrich_UP_cortex_GE + ggtitle("DAVID enrichment for Cortex up-regulated genes"))
 (enrich_DN_cortex_GE + ggtitle("DAVID enrichment for GE up-regulated genes"))
+
+cortex_GE_UP_shared <- xtable(cortex_GE_UP_shared)
+align(cortex_GE_UP_shared) <- "ccrr"
+print(cortex_GE_UP_shared, type = "html", include.rownames = F)
+
+cortex_GE_DN_shared <- xtable(cortex_GE_DN_shared)
+align(cortex_GE_DN_shared) <- "ccrr"
+print(cortex_GE_DN_shared, type = "html", include.rownames = F)
 ```
 
 #### Isoforms between Cortex and GE are enriched in cell signaling proteins
 
-* On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r nrow(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
-* Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
-* Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro shows enrichment in __EGF protein domain__.         
+  * On average, __`r round(mean(cortex_GE_summary[, ncol(cortex_GE_summary)]), 0)`__ genes are identified as isoforms between cortex and GE in each individual. __`r nrow(isoform_cortex_GE_gene_dup)`__ genes are shared in at least two individuals.       
+  * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
+  * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro shows enrichment in __EGF protein domain__.         
 
 ```{r Isoform_Cortex_GE, results='asis', fig.width=10, fig.height = 8}
 cortex_GE_summary <- xtable(cortex_GE_summary)
@@ -195,10 +224,10 @@ print(cortex_GE_summary, type = "html", include.rownames = T)
 
 #### mCpG is a stable mark for exon transcription during development     
 
-* mCpG at cassette exon boundaries has similar pattern to expressed in both exons.   
-* mCpG for cassette exons between cortex and GE neurospheres shows no significant differences.   
-* Results from both WGBS (HuFNSC02 & HuFNSC04) and MeDIP (HuFNSC01 & HuFNSC02) support the assumption that mCpG is a stable mark for exon transcription during development.   
-* mCpG exon marking is established between neurospheres. _Needs further validation against H1_.   
+  * mCpG at cassette exon boundaries has similar pattern to expressed in both exons.   
+  * mCpG for cassette exons between cortex and GE neurospheres shows no significant differences.   
+  * Results from both WGBS (HuFNSC02 & HuFNSC04) and MeDIP (HuFNSC01 & HuFNSC02) support the assumption that mCpG is a stable mark for exon transcription during development.   
+  * mCpG exon marking is established between neurospheres. _Needs further validation against H1_.   
 
 ```{r mCpG_Cortex_GE}
 gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC02 + ggtitle("WGBS HuFNSC02 cortex vs GE"))) 
@@ -222,8 +251,8 @@ grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90
 
 #### H3K36me3 in exon bodies - normalization issue? 
 
-* H3K36me3 in expressed in both / not expressed exons shows no significant differences between HuFNSC01 and HuFNSC02.    
-* H3K36me3 in cassette exons in HuFNSC01 are enriched in GE compared to cortex. However, it is not reproduced in HuFNSC02, where there is no significant differences between cortex and GE. _Not sure what to make of this. Are there any potential bias?_    
+  * H3K36me3 in expressed in both / not expressed exons shows no significant differences between HuFNSC01 and HuFNSC02.    
+  * H3K36me3 in cassette exons in HuFNSC01 are enriched in GE compared to cortex. However, it is not reproduced in HuFNSC02, where there is no significant differences between cortex and GE. _Not sure what to make of this. Are there any potential bias?_    
 
 ```{r H3K36me3_Cortex_GE}
 (H3K36me3_figure_HuFNSC01 + ggtitle("H3K36me3 HuFNSC01 Cortex vs GE"))
@@ -233,7 +262,7 @@ grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90
 ### MZ twins  
 #### UMR asymmetry between MZ twins in Brain and Cortex 
 
-+ There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in total UMR length HuFNSC02/HuFNSC01 in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.    
+  + There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in total UMR length HuFNSC02/HuFNSC01 in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.    
   
 ```{r MeDIP_MZ_asymmetry, fig.width = 10, fig.height = 8, results='asis'}
 DMR_MZ_summary <- xtable(DMR_MZ_summary)
@@ -246,8 +275,8 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 
 #### GREAT analysis on MZ UMRs are enriched in Homeobox and brain development  
 
-* __Homeobox__ protein domain is enriched in all UMR lists.   
-* __Brain development related__ biological processes are enriched in most lists.   
+  * __Homeobox__ protein domain is enriched in all UMR lists.   
+  * __Brain development related__ biological processes are enriched in most lists.   
 
 ```{r MeDIP_MZ_GREAT1, fig.height=6}
 (GREAT_HuFNSC01.UMR.Brain)
@@ -262,7 +291,7 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 
 #### UMR breakdown in chromatin states 
 
-* __Pending: ChromHMM__
+  * __Pending: ChromHMM__
 
 #### MZ UMRs in Brain have less CpGs in CGIs  
 
@@ -317,12 +346,12 @@ print(HuFNSC02_UMR_proximal_DE, type = "html", include.rownames = F)
 
 #### UMR distal associated genes  
 
-* __PENDING__   
+  * __PENDING__   
 
 #### Overlapping UMRs with TFBSs show asymmetric in Brain and Cortex  
 
-* Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry in Brain and Cortex, but is symmetric in GE. The correlation between Brain and Cortex is also very low, __`r round(cor(DMR_MZ_TF$Ratio.Brain, DMR_MZ_TF$Ratio.Cortex), 2)`__.    
-* With 2-fold change cutoff, there are `r nrow(DMR_MZ_TF[DMR_MZ_TF$Ratio.Brain <=1/2 & DMR_MZ_TF$Ratio.Cortex <=1/2, ])` TFs enriched in HuFNSC02 in both Brain and Cortex.   
+  * Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry in Brain and Cortex, but is symmetric in GE. The correlation between Brain and Cortex is also very low, __`r round(cor(DMR_MZ_TF$Ratio.Brain, DMR_MZ_TF$Ratio.Cortex), 2)`__.    
+  * With 2-fold change cutoff, there are `r nrow(DMR_MZ_TF[DMR_MZ_TF$Ratio.Brain <=1/2 & DMR_MZ_TF$Ratio.Cortex <=1/2, ])` TFs enriched in HuFNSC02 in both Brain and Cortex.   
 
 ```{r MeDIP_MZ_TF, results='asis'}
 (DMR_MZ_TF_figure) 
@@ -333,11 +362,11 @@ print(DMR_MZ_TF_GE, type = "html", include.rownames = F)
 
 #### DE genes are cell type specific
 
-* On average, there are __`r as.integer(mean(individual_DE_summary$DE[1:3]))`__ DE genes across three cells types.   
-* Majority of DE genes are cell type specific, only __`r sum(duplicated(c(rownames(brain01_brain02DE), rownames(cortex01_cortex02DE), rownames(GE01_GE02DE))))`__ are shared between any two cell types.   
-* DE genes in Brain is asymmetric, _maybe due to cell heterogenity?_   
-* There are much fewer DE genes in GE.    
-* DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
+  * On average, there are __`r as.integer(mean(individual_DE_summary$DE[1:3]))`__ DE genes across three cells types.   
+  * Majority of DE genes are cell type specific, only __`r sum(duplicated(c(rownames(brain01_brain02DE), rownames(cortex01_cortex02DE), rownames(GE01_GE02DE))))`__ are shared between any two cell types.   
+  * DE genes in Brain is asymmetric, _maybe due to cell heterogenity?_   
+  * There are much fewer DE genes in GE.    
+  * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
 ```{r DE_MZ, results='asis', fig.height = 5, fig.width = 5}
 individual_DE_summary <- xtable(individual_DE_summary[1:3,])
@@ -355,12 +384,18 @@ grid.draw(venn_DE_HuFNSC01_HuFNSC02)
 (enrich_cortex01_cortex02DE)
 ```
 
+```{r DE_MZ_shared, results='asis'}
+individual_DE_shared <- xtable(individual_DE_shared)
+align(individual_DE_shared) <- "crrccc"
+print(individual_DE_shared, type = "html", include.rownames = F)
+```
+
 #### Isoforms between MZ are enriched in cell signaling in neurospheres and immune response in Brain
 
-* On average, __`r round(mean(individual_summary[1:3, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r length(isoform_HuFNSC01_HuFNSC02_gene_shared)`__ genes are shared by all three cell types.              
-* On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.            
-* Different regions on the Venn diagram have __no__ significantly enriched terms.     
-* Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
+  * On average, __`r round(mean(individual_summary[1:3, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC01 and HuFNSC02 in each cell type. __`r length(isoform_HuFNSC01_HuFNSC02_gene_shared)`__ genes are shared by all three cell types.              
+  * On average, __`r round(mean(individual_summary[4:5, ncol(individual_summary)]), 0)`__ genes are identified as isoforms between HuFNSC03 and HuFNSC04 in each cell type. __`r length(isoform_HuFNSC03_HuFNSC04_gene_shared)`__ genes are shared between two cell types.            
+  * Different regions on the Venn diagram have __no__ significantly enriched terms.     
+  * Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
 
 ```{r Isoform_MZ, results='asis', fig.width=10, fig.height = 4}
 library(xtable)
