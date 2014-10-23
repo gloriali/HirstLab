@@ -45,8 +45,8 @@ Cortex04_GE04_DMR_WGBS_figures <- DMR_figures(Cortex04_GE04_DMR_WGBS, sample1 = 
 (Cortex04_GE04_DMR_WGBS_figures$dis)
 (Cortex04_GE04_DMR_WGBS_figures$freq)
 (Cortex04_GE04_DMR_WGBS_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
-DMR_freq_neurospheres <- rbind(cbind(Cortex02_GE02_DMR_WGBS_figures$freq$data, donor = "HuFNSC02"), cbind(Cortex04_GE04_DMR_WGBS_figures$freq$data, donor = "HuFNSC04"))
-DMR_freq_neurospheres_figure <- ggplot(DMR_freq_neurospheres, aes(x = chr, y = freq, fill = DM)) + 
+DMR_freq_WGBS <- rbind(cbind(Cortex02_GE02_DMR_WGBS_figures$freq$data, donor = "HuFNSC02"), cbind(Cortex04_GE04_DMR_WGBS_figures$freq$data, donor = "HuFNSC04"))
+DMR_freq_WGBS_figure <- ggplot(DMR_freq_WGBS, aes(x = chr, y = freq, fill = DM)) + 
   geom_bar(position = "identity", stat = "identity", width = 0.8) + 
   facet_wrap(~ donor) + 
   xlab("") + 
@@ -54,9 +54,27 @@ DMR_freq_neurospheres_figure <- ggplot(DMR_freq_neurospheres, aes(x = chr, y = f
   coord_flip() + 
   scale_fill_manual(values = c("red", "blue"), labels = c("GE UMRs","Cortex UMRs"), name = "") + 
   theme_bw()
-ggsave(DMR_freq_neurospheres_figure, file = "DMRfreq_neurospheres.pdf", width = 14, height = 9)
-(DMR_freq_neurospheres_figure + ggtitle("DMR frequency asymmetry between cortex an GE neurospheres"))
+ggsave(DMR_freq_WGBS_figure, file = "DMRfreq_neurospheres.pdf", width = 14, height = 9)
+(DMR_freq_WGBS_figure + ggtitle("DMR frequency asymmetry between cortex an GE neurospheres"))
 
+chrs = c(paste0("chr", as.character(1:22)), "chrX")
+chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
+chrlength <- chrlength[chrlength$chr %in% chrs, ]
+chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
+DMR_pos_WGBS <- rbind(cbind(Cortex02_GE02_DMR_WGBS_figures$pos$data, donor = "HuFNSC02"), cbind(Cortex04_GE04_DMR_WGBS_figures$pos$data, donor = "HuFNSC04"))
+DMR_pos_WGBS$chr <- factor(DMR_pos_WGBS$chr, levels = chrs[length(chrs):1])
+DMR_pos_WGBS_figure <- ggplot(DMR_pos_WGBS) + 
+  geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
+  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.5) +  
+  xlab("") + 
+  ylab("Position of DMRs on the chromosome") +
+  coord_flip() + 
+  facet_wrap(~ donor) + 
+  ggtitle(paste("DMR position - Cortex vs GE DMRs")) + 
+  scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+  theme_bw()
+ggsave(DMR_pos_WGBS_figure, file = "DMRpos_neurospheres.pdf", width = 14, height = 9)
+(DMR_pos_WGBS_figure + ggtitle("DMR positions on the chromosomes between cortex an GE neurospheres"))
 
 #` GREAT enrichment analysis
 (GREAT_Cortex02.UMR_WGBS <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo", name = "HuFNSC02-Cortex.UMRs", height = 12))
@@ -301,7 +319,7 @@ DMR_TF_tall[DMR_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
    theme_bw())
 ggsave(DMR_TF_figure, file = "DMR_TF_WGBS.pdf", height = 6)
 
-save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR_WGBS, Cortex02_GE02_DMR_WGBS_figures, Cortex04_GE04_DMR_WGBS, Cortex04_GE04_DMR_WGBS_figures, 
+save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR_WGBS, Cortex02_GE02_DMR_WGBS_figures, Cortex04_GE04_DMR_WGBS, Cortex04_GE04_DMR_WGBS_figures, DMR_freq_WGBS_figure, DMR_pos_WGBS_figure, 
      GREAT_Cortex02.UMR_WGBS, GREAT_GE02.UMR_WGBS, GREAT_Cortex04.UMR_WGBS, GREAT_GE04.UMR_WGBS, valid_boxplot, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
      venn_Cortex_UMR_WGBS, venn_Cortex_UMR_pcGene_WGBS, venn_Cortex_UMR_pcPromoter_WGBS, venn_Cortex_UMR_pcPromoter_DE_WGBS, 
      venn_GE_UMR_WGBS, venn_GE_UMR_pcGene_WGBS, venn_GE_UMR_pcPromoter_WGBS, venn_GE_UMR_pcPromoter_DE_WGBS, 

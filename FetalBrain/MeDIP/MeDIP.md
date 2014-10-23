@@ -2,7 +2,7 @@ Fetal Brain MeDIP Analysis Summary
 ========================================================
 
 Gloria Li         
-Tue Oct 21 14:26:54 2014 
+Updated: Wed Oct 22 09:49:04 2014 
 
 
 
@@ -24,7 +24,7 @@ Tue Oct 21 14:26:54 2014
   * Median No. of CpGs per DMR is __6__, _larger than WGBS_. Also doesn't fluctuate across chromosomes.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:26:56 2014 -->
+<!-- Wed Oct 22 09:49:05 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD align="center"> Cortex-HuFNSC01_GE-HuFNSC01 </TD> <TD align="center"> 3228 </TD> <TD align="center"> 1474 </TD> <TD align="center"> 1754 </TD> </TR>
@@ -65,7 +65,7 @@ Tue Oct 21 14:26:54 2014
   + The intersect between two individuals are __significant__.  
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:01 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DMRs </TH> <TH> unique.genes </TH> <TH> DE.DMRs </TH> <TH> unique.DE.genes </TH> <TH> same.direction </TH>  </TR>
   <TR> <TD align="center"> GE01.UMRs </TD> <TD align="center"> 419 </TD> <TD align="center"> 466 </TD> <TD align="center">  35 </TD> <TD align="center">  35 </TD> <TD align="center">  20 </TD> </TR>
@@ -78,7 +78,7 @@ Tue Oct 21 14:26:54 2014
 #### Cortex UMRs proximal associated DE genes 
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:02 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="right"> BMP8B </TD> <TD align="right"> bone_morphogenetic_protein_8b </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
@@ -104,7 +104,7 @@ Tue Oct 21 14:26:54 2014
 #### GE UMRs proximal associated DE genes 
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:02 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="right"> C10orf90 </TD> <TD align="right"> chromosome_10_open_reading_frame_90 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
@@ -120,7 +120,7 @@ Tue Oct 21 14:26:54 2014
 * With 1.5-fold change cutoff, there are 6 TFs enriched in Cortex UMRs in both individuals, and 4 in GE UMRs.   
 
 ![](./MeDIP_files/figure-html/MeDIP_neurospheres_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:02 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH> TF </TH> <TH> Cortex01UMR </TH> <TH> GE01UMR </TH> <TH> Ratio01 </TH> <TH> Cortex02UMR </TH> <TH> GE02UMR </TH> <TH> Ratio02 </TH>  </TR>
   <TR> <TD align="center"> SUZ12 </TD> <TD align="center"> 173 </TD> <TD align="center">  98 </TD> <TD align="center"> 1.77 </TD> <TD align="center"> 256 </TD> <TD align="center"> 160 </TD> <TD align="center"> 1.60 </TD> </TR>
@@ -131,7 +131,7 @@ Tue Oct 21 14:26:54 2014
   <TR> <TD align="center"> ESRRA </TD> <TD align="center">   5 </TD> <TD align="center">   2 </TD> <TD align="center"> 2.50 </TD> <TD align="center">   7 </TD> <TD align="center">   4 </TD> <TD align="center"> 1.75 </TD> </TR>
    </TABLE>
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:02 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH> TF </TH> <TH> Cortex01UMR </TH> <TH> GE01UMR </TH> <TH> Ratio01 </TH> <TH> Cortex02UMR </TH> <TH> GE02UMR </TH> <TH> Ratio02 </TH>  </TR>
   <TR> <TD align="center"> SIRT6 </TD> <TD align="center">   2 </TD> <TD align="center">   9 </TD> <TD align="center"> 0.22 </TD> <TD align="center">   3 </TD> <TD align="center">  12 </TD> <TD align="center"> 0.25 </TD> </TR>
@@ -149,7 +149,7 @@ Tue Oct 21 14:26:54 2014
   * Median No. of CpGs per DMR is __6__, _larger_ than WGBS.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:02 2014 -->
+<!-- Wed Oct 22 09:49:11 2014 -->
 <TABLE border=1>
 <TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
   <TR> <TD> Brain-HuFNSC01_Brain-HuFNSC02 </TD> <TD align="center"> 4472 </TD> <TD align="center"> 2750 </TD> <TD align="center"> 1722 </TD> </TR>
@@ -175,6 +175,7 @@ Tue Oct 21 14:26:54 2014
 ### MZ UMR breakdown
 
   + Majority of UMR CpGs overlap with genebody, on average __62.59%__. And UMR CpGs are __3-fold__ enriched in promoter regions, with on average __34.29%__ UMR CpGs are in promoter regions, __39.54%__ of CpGs in UMRs overlap with CGIs, __5.34-fold__ than expected by random. 
+  + Brain seems to have less CGI/promoter UMRs.   
   
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->  
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
@@ -185,11 +186,11 @@ Tue Oct 21 14:26:54 2014
 
   + On average, there are __405__ UMRs proximally (TSS +/- 1500bp) associated with protein-coding genes, __11.75%__ of all UMRs, _similar to UMRs between Cortex and GE_.         
   + On average, there are __17__ proximal UMRs associated with DE genes, __4.24%__ of all proximal DMRs, _much less than UMRs between Cortex and GE (less functional?)_. Among them, there are __52.53%__ unique DE genes change in the same direction as the UMRs, _similar to UMRs between Cortex and GE_.         
-  + Proximal UMR genes are mostly cell type specific, but the overlap is still __statistically significant__.  
-  + No overlap across cell types for proximal HuFNSC01 UMR DE genes, only one for HuFNSC02, __neuropeptide_Y__.   
+  + Proximal UMR genes are mostly __cell type specific__, but the overlap is still statistically significant.  
+  + No overlap between Brain and Cortex for proximal HuFNSC01 UMR DE genes, only one for HuFNSC02, __neuropeptide_Y__.   
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:09 2014 -->
+<!-- Wed Oct 22 09:49:19 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DMRs </TH> <TH> unique.genes </TH> <TH> DE.DMRs </TH> <TH> unique.DE.genes </TH> <TH> same.direction </TH>  </TR>
   <TR> <TD> Brain01_Brain02_hyper </TD> <TD align="center"> 432 </TD> <TD align="center"> 473 </TD> <TD align="center">  26 </TD> <TD align="center">  26 </TD> <TD align="center">  10 </TD> </TR>
@@ -204,7 +205,7 @@ Tue Oct 21 14:26:54 2014
 #### HuFNSC01 UMRs proximal associated DE genes
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:09 2014 -->
+<!-- Wed Oct 22 09:49:19 2014 -->
 <TABLE border=1>
 <TR> <TH> CellType </TH> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="center"> Brain </TD> <TD align="right"> SAMD11 </TD> <TD align="right"> sterile_alpha_motif_domain_containing_11 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
@@ -255,7 +256,7 @@ Tue Oct 21 14:26:54 2014
 #### HuFNSC02 UMRs proximal associated DE genes
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:09 2014 -->
+<!-- Wed Oct 22 09:49:19 2014 -->
 <TABLE border=1>
 <TR> <TH> CellType </TH> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
   <TR> <TD align="center"> Brain </TD> <TD align="right"> EPHA8 </TD> <TD align="right"> EPH_receptor_A8 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
@@ -321,7 +322,7 @@ Tue Oct 21 14:26:54 2014
 * With 2-fold change cutoff, there are 18 TFs enriched in HuFNSC02 in both Brain and Cortex.   
 
 ![](./MeDIP_files/figure-html/MeDIP_MZ_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Tue Oct 21 14:27:10 2014 -->
+<!-- Wed Oct 22 09:49:19 2014 -->
 <TABLE border=1>
 <TR> <TH> TF </TH> <TH> Brain.hypo </TH> <TH> Brain.hyper </TH> <TH> Ratio.Brain </TH> <TH> Cortex.hypo </TH> <TH> Cortex.hyper </TH> <TH> Ratio.Cortex </TH>  </TR>
   <TR> <TD align="center"> ESRRA </TD> <TD align="center">   1 </TD> <TD align="center">   7 </TD> <TD align="center"> 0.14 </TD> <TD align="center">   1 </TD> <TD align="center">   5 </TD> <TD align="center"> 0.20 </TD> </TR>

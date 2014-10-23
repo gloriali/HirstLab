@@ -3,12 +3,13 @@ output:
   html_document:
     keep_md: true
     toc: yes
+    toc_depth: 4
 ---
 Fetal Brain WGBS Analysis Summary - DMRs between Cortex and GE
 ========================================================
 
 Gloria Li         
-`r date()` 
+Updated: `r date()` 
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -56,15 +57,14 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## Asymmetry between Cortex UMRs and GE UMRs  
 
-  * On average, there are , __`r as.integer(mean(DMR_WGBS_summary$Hypo.DMR)/mean(DMR_WGBS_summary$Hyper.DMR))`__-times more UMRs in Cortex than GE.  
-  * The asymmetry appears to be global, in all chromosomes, and is reproduced in the two individuals.  
+  * On average, there are , __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__-fold enrichment in total UMR length in Cortex compared to GE, __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC04.    
+  * The asymmetry appears to be global, in all chromosomes. It is reproduced within the two individuals.  
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on UMR level can be reproduced with __different cutoffs__. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
 ```{r WGBS_asymmetry}
-(Cortex02_GE02_DMR_WGBS_figures$freq)
-(Cortex04_GE04_DMR_WGBS_figures$freq)
-(Cortex02_GE02_DMR_WGBS_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
-(Cortex04_GE04_DMR_WGBS_figures$pos + geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1.5, alpha = 0.5))
+(DMR_freq_WGBS_figure + ggtitle("DMR frequency asymmetry between cortex an GE neurospheres"))
+(DMR_pos_WGBS_figure + ggtitle("DMR positions on the chromosomes between cortex an GE neurospheres"))
+
 (ggplot(DM_test_summary, aes(x = p, y = log2(Hyper.DM.CpGs/Hypo.DM.CpGs), color = Sample)) + scale_x_log10(breaks = c(0.05, 0.005, 0.0005)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_wrap(~ delta) + theme_bw() + xlab("p-value cutoff") + ylab("log2(Hyper/Hypo)"))
 (ggplot(DMR_test_summary, aes(x = size, y = log2(Hyper.DMR/Hypo.DMR), color = Sample)) + geom_point() + geom_line() + geom_hline(aes(yintercept = 0)) + facet_grid(p ~ delta) + theme_bw() + xlab("Max distance between adjacent DM CpGs") + ylab("log2(Hyper/Hypo)"))
 ```
@@ -101,9 +101,10 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## UMRs intersecting with protein-coding genes and DE genes
 
-  + On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$pc.Promoters))`__ DMRs associated with promoters of protein-coding genes, __`r round(mean(DMR_WGBS_gene_summary$pc.Promoters)/mean(DMR_WGBS_summary$Total.DMR)*100, 2)`%__ of all DMRs.         
-  + On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$proximal.DE.Genes))`__ promoter DMRs associated with DE genes, __`r round(mean(DMR_WGBS_gene_summary$proximal.DE.Genes)/mean(DMR_WGBS_gene_summary$pc.Promoters)*100, 2)`%__ of all promoter DMRs. Among them, there are __`r round(mean(DMR_WGBS_gene_summary$same.direction)/mean(DMR_WGBS_gene_summary$unique.DE.Genes)*100, 2)`%__ unique DE genes change in the same direction as the UMRs.         
-  + The intersect between two individuals are __significant__ when there are common genes. There are no intersect in pc genes with promoter GE UMRs.  
+  + On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$pc.Promoters))`__ UMRs proximally associated with protein-coding genes, __`r round(mean(DMR_WGBS_gene_summary$pc.Promoters)/mean(DMR_WGBS_summary$Total.DMR)*100, 2)`%__ of all UMRs.         
+  + There are average __`r as.integer(mean(DMR_WGBS_gene_summary$proximal.DE.Genes))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_WGBS_gene_summary$proximal.DE.Genes)/mean(DMR_WGBS_gene_summary$pc.Promoters)*100, 2)`%__ of all proximal UMRs, __much lower than observed in breast__, _maybe more UMRs in enhancers? (ChromHMM)_. Among them, there are __`r round(mean(DMR_WGBS_gene_summary$same.direction)/mean(DMR_WGBS_gene_summary$unique.DE.Genes)*100, 2)`%__ unique DE genes change in the same direction as the UMRs, __also lower than observed in breast__.         
+  + The intersect between two individuals are __significant__ in Cortex UMRs. There are 3 DE genes with proximal Cortex UMR that are shared by both individual: __GFAP, NFIX, FEZF1__.     
+  + There are no intersect in pc genes with proximal GE UMRs between the two individual.  
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
 
 ```{r WGBS_proximal, results='asis'}

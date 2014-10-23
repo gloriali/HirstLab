@@ -3,12 +3,13 @@ output:
   html_document:
     keep_md: true
     toc: true
+    toc_depth: 4
 ---
 Fetal Brain MeDIP Analysis Summary
 ========================================================
 
 Gloria Li         
-`r date()` 
+Updated: `r date()` 
 
 ```{r setup, include = FALSE}
 library(ggplot2)
@@ -185,6 +186,7 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 ### MZ UMR breakdown
 
   + Majority of UMR CpGs overlap with genebody, on average __`r round(mean(genomicBreak_MZ$Gene)*100, 2)`%__. And UMR CpGs are __`r round(mean(genomicBreak_MZ$Promoter)/(3727169/28217448), 0)`-fold__ enriched in promoter regions, with on average __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "Promoter", "CpG"])*100, 2)`%__ UMR CpGs are in promoter regions, __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "CGI", "CpG"])*100, 2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "CGI", "CpG"])/(2089538/28217448), 2)`-fold__ than expected by random. 
+  + Brain seems to have less CGI/promoter UMRs.   
   
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->  
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
@@ -197,8 +199,8 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 
   + On average, there are __`r as.integer(mean(DMR_proximal_MZ_summary[,"DMRs"]))`__ UMRs proximally (TSS +/- 1500bp) associated with protein-coding genes, __`r round(mean(DMR_proximal_MZ_summary[, "DMRs"])/mean(DMR_MZ_summary$Total.DMR)*100, 2)`%__ of all UMRs, _similar to UMRs between Cortex and GE_.         
   + On average, there are __`r as.integer(mean(DMR_proximal_MZ_summary[, "DE.DMRs"]))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_proximal_MZ_summary[, "DE.DMRs"])/mean(DMR_proximal_MZ_summary[, "DMRs"])*100, 2)`%__ of all proximal DMRs, _much less than UMRs between Cortex and GE (less functional?)_. Among them, there are __`r round(mean(DMR_proximal_MZ_summary[, "same.direction"])/mean(DMR_proximal_MZ_summary[, "unique.DE.genes"])*100, 2)`%__ unique DE genes change in the same direction as the UMRs, _similar to UMRs between Cortex and GE_.         
-  + Proximal UMR genes are mostly cell type specific, but the overlap is still __statistically significant__.  
-  + No overlap across cell types for proximal HuFNSC01 UMR DE genes, only one for HuFNSC02, __`r gsub("_\\[.+", "", DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[intersect(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE$id), "description"])`__.   
+  + Proximal UMR genes are mostly __cell type specific__, but the overlap is still statistically significant.  
+  + No overlap between Brain and Cortex for proximal HuFNSC01 UMR DE genes, only one for HuFNSC02, __`r gsub("_\\[.+", "", DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[intersect(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE$id), "description"])`__.   
 
 ```{r MeDIP_MZ_proximal, results='asis', fig.width = 8, fig.height = 8}
 DMR_proximal_MZ_summary <- xtable(DMR_proximal_MZ_summary)

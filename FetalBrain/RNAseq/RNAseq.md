@@ -2,7 +2,7 @@ Fetal Brain RNA-seq Analysis Summary
 ========================================================
 
 Gloria Li         
-Sat Sep 27 15:30:34 2014 
+Updated: Wed Oct 22 09:44:29 2014 
 
 
 
@@ -20,7 +20,7 @@ Sat Sep 27 15:30:34 2014
   * DAVID enrichment analysis show significant enrichment in __neuronal development__ and __cell migration__ terms, GE up-regulated genes are enriched in __EGF-related__ protein domains as well. 
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:16 2014 -->
+<!-- Wed Oct 22 09:45:07 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
@@ -28,36 +28,29 @@ Sat Sep 27 15:30:34 2014
   <TR> <TD> HuFNSC03 </TD> <TD align="center"> 447 </TD> <TD align="center"> 227 </TD> <TD align="center"> 674 </TD> </TR>
   <TR> <TD> HuFNSC04 </TD> <TD align="center"> 378 </TD> <TD align="center"> 249 </TD> <TD align="center"> 627 </TD> </TR>
    </TABLE>
-![plot of chunk cortex_GE](./RNAseq_files/figure-html/cortex_GE1.png) ![plot of chunk cortex_GE](./RNAseq_files/figure-html/cortex_GE2.png) 
+![](./RNAseq_files/figure-html/cortex_GE-1.png) ![](./RNAseq_files/figure-html/cortex_GE-2.png) 
 
-![plot of chunk cortex_GE_enrich](./RNAseq_files/figure-html/cortex_GE_enrich1.png) ![plot of chunk cortex_GE_enrich](./RNAseq_files/figure-html/cortex_GE_enrich2.png) 
+![](./RNAseq_files/figure-html/cortex_GE_enrich-1.png) ![](./RNAseq_files/figure-html/cortex_GE_enrich-2.png) 
 
 ### Between MZ twins - HuFNSC01 vs HuFNSC02
 
   * On average, there are __470__ DE genes across three cells types.   
   * Majority of DE genes are cell type specific, only __98__ are shared between any two cell types.   
+  * DE genes in Brain is asymmetric, _maybe due to cell heterogenity?_   
+  * There are much fewer DE genes in GE.    
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:19 2014 -->
+<!-- Wed Oct 22 09:45:13 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
   <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>
   <TR> <TD> cortex01_cortex02 </TD> <TD align="center"> 248 </TD> <TD align="center"> 348 </TD> <TD align="center"> 596 </TD> </TR>
   <TR> <TD> GE01_GE02 </TD> <TD align="center">  99 </TD> <TD align="center">  74 </TD> <TD align="center"> 173 </TD> </TR>
-  <TR> <TD> cortex03_GE03 </TD> <TD align="center"> 459 </TD> <TD align="center"> 183 </TD> <TD align="center"> 642 </TD> </TR>
-  <TR> <TD> cortex04_GE04 </TD> <TD align="center"> 313 </TD> <TD align="center"> 232 </TD> <TD align="center"> 545 </TD> </TR>
    </TABLE>
-![plot of chunk individual](./RNAseq_files/figure-html/individual1.png) ![plot of chunk individual](./RNAseq_files/figure-html/individual2.png) 
+![](./RNAseq_files/figure-html/individual-1.png) 
 
-
-```
-## NULL
-```
-
-```
-## NULL
-```
+![](./RNAseq_files/figure-html/individual_enrich-1.png) ![](./RNAseq_files/figure-html/individual_enrich-2.png) 
 
 
 ## Isoform analysis
@@ -79,7 +72,7 @@ Sat Sep 27 15:30:34 2014
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro protein domain enrichment show enriched terms similar to those observed in breast isoforms.         
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:19 2014 -->
+<!-- Wed Oct 22 09:45:14 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
@@ -87,9 +80,9 @@ Sat Sep 27 15:30:34 2014
   <TR> <TD> cortex03_GE03_summary </TD> <TD align="center"> 674 </TD> <TD align="center"> 29617 </TD> <TD align="center"> 13746 </TD> <TD align="center"> 6401 </TD> <TD align="center"> 6022 </TD> <TD align="center"> 2086 </TD> </TR>
   <TR> <TD> cortex04_GE04_summary </TD> <TD align="center"> 627 </TD> <TD align="center"> 22386 </TD> <TD align="center"> 11253 </TD> <TD align="center"> 4323 </TD> <TD align="center"> 4259 </TD> <TD align="center"> 1386 </TD> </TR>
    </TABLE>
-![plot of chunk isoform_cortex_ge](./RNAseq_files/figure-html/isoform_cortex_ge.png) 
+![](./RNAseq_files/figure-html/isoform_cortex_ge-1.png) 
 
-![plot of chunk isoform_enrich_cortex_ge](./RNAseq_files/figure-html/isoform_enrich_cortex_ge.png) 
+![](./RNAseq_files/figure-html/isoform_enrich_cortex_ge-1.png) 
 
 #### Between MZ twins - HuFNSC01 vs HuFNSC02
 
@@ -99,7 +92,7 @@ Sat Sep 27 15:30:34 2014
   * Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:20 2014 -->
+<!-- Wed Oct 22 09:45:15 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>
@@ -108,9 +101,9 @@ Sat Sep 27 15:30:34 2014
   <TR> <TD> cortex03_cortex04_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 26826 </TD> <TD align="center"> 12185 </TD> <TD align="center"> 5818 </TD> <TD align="center"> 5479 </TD> <TD align="center"> 1994 </TD> </TR>
   <TR> <TD> GE03_GE04_summary </TD> <TD align="center"> 545 </TD> <TD align="center"> 24752 </TD> <TD align="center"> 12223 </TD> <TD align="center"> 4582 </TD> <TD align="center"> 4422 </TD> <TD align="center"> 1454 </TD> </TR>
    </TABLE>
-![plot of chunk isoform_HuFNSC01_02](./RNAseq_files/figure-html/isoform_HuFNSC01_021.png) ![plot of chunk isoform_HuFNSC01_02](./RNAseq_files/figure-html/isoform_HuFNSC01_022.png) 
+![](./RNAseq_files/figure-html/isoform_HuFNSC01_02-1.png) ![](./RNAseq_files/figure-html/isoform_HuFNSC01_02-2.png) 
 
-![plot of chunk isoform_enrich_HuFNSC01_02](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_021.png) ![plot of chunk isoform_enrich_HuFNSC01_02](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_022.png) ![plot of chunk isoform_enrich_HuFNSC01_02](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_023.png) 
+![](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_02-1.png) ![](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_02-2.png) ![](./RNAseq_files/figure-html/isoform_enrich_HuFNSC01_02-3.png) 
 
 #### Junction validation
   + For cortex vs GE, on average, __36.4%__ isoform genes have enough junction coverage. Among them, __89.8%__ have support from junction reads.    
@@ -118,7 +111,7 @@ Sat Sep 27 15:30:34 2014
   + Between strand specific and non-strand specific libraries, the percentage of isoforms with enough junction coverage are __similar__, however, strand specific libraries have __higher__ percentage of having junction support (> 98% compared to ~ 80%).   
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:22 2014 -->
+<!-- Wed Oct 22 09:45:17 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> <TD align="center"> 1900 </TD> <TD align="center"> 832 </TD> <TD align="center"> 1543 </TD> <TD align="center"> 697 </TD> </TR>
@@ -127,7 +120,7 @@ Sat Sep 27 15:30:34 2014
   <TR> <TD> cortex04_GE04_summary </TD> <TD align="center"> 4259 </TD> <TD align="center"> 1386 </TD> <TD align="center"> 941 </TD> <TD align="center"> 483 </TD> <TD align="center"> 935 </TD> <TD align="center"> 478 </TD> </TR>
    </TABLE>
 <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Sat Sep 27 15:31:22 2014 -->
+<!-- Wed Oct 22 09:45:17 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> isoform exons </TH> <TH> isoform genes </TH> <TH> exons with junction coverage </TH> <TH> genes with junction coverage </TH> <TH> exons with junction support </TH> <TH> genes with junction support </TH>  </TR>
   <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> <TD align="center"> 1791 </TD> <TD align="center"> 921 </TD> <TD align="center"> 1520 </TD> <TD align="center"> 808 </TD> </TR>
@@ -142,12 +135,12 @@ Sat Sep 27 15:30:34 2014
   * Identified isoforms have slightly more No. of exons than DE genes and all expressed genes.  
   * Compared to DE genes, the distribution in No. of exons for isoforms are __much similar__ between different individuals, _not observed in breast libraries_.    
   
-![plot of chunk isoform_Nexon](./RNAseq_files/figure-html/isoform_Nexon.png) 
+![](./RNAseq_files/figure-html/isoform_Nexon-1.png) 
 
 ### Position of isoform exons on the gene   
   * In general, there are more alternative spliced exons at the __two ends__ of genes, _similar to observed in breast libraries_.         
   
-![plot of chunk isoform_exon_pos](./RNAseq_files/figure-html/isoform_exon_pos.png) 
+![](./RNAseq_files/figure-html/isoform_exon_pos-1.png) 
 
 ### Venn Diagram with average expression level, average No. of exons and average exon length   
   * Isoforms have __much lower__ expression level than all expressed genes.          
@@ -156,7 +149,7 @@ Sat Sep 27 15:30:34 2014
   * Average No. of exons are very __similar__ in different sections of the Venn diagram, between all, validated isoforms and all expressed genes.        
   * Average length of isoform exons are __shorter__ than all expressed genes. Validated isoform exons are also __shorter__ than all isoforms in general, _not observed in breast libraries_.         
   
-![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn1.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn2.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn3.png) ![plot of chunk isoform_venn](./RNAseq_files/figure-html/isoform_venn4.png) 
+![](./RNAseq_files/figure-html/isoform_venn-1.png) ![](./RNAseq_files/figure-html/isoform_venn-2.png) ![](./RNAseq_files/figure-html/isoform_venn-3.png) ![](./RNAseq_files/figure-html/isoform_venn-4.png) 
 
 
 ## Epigenetic signature marking 
@@ -167,13 +160,13 @@ Sat Sep 27 15:30:34 2014
 * Results from both WGBS (HuFNSC02 & HuFNSC04) and MeDIP (HuFNSC01 & HuFNSC02) support the assumption that 5mC is a stable mark for exon transcription during development.   
 * 5mC exon marking is established between neurospheres. _Needs further validation against H1_.   
 
-![plot of chunk epiProfile_5mC_cortexge](./RNAseq_files/figure-html/epiProfile_5mC_cortexge1.png) ![plot of chunk epiProfile_5mC_cortexge](./RNAseq_files/figure-html/epiProfile_5mC_cortexge2.png) ![plot of chunk epiProfile_5mC_cortexge](./RNAseq_files/figure-html/epiProfile_5mC_cortexge3.png) ![plot of chunk epiProfile_5mC_cortexge](./RNAseq_files/figure-html/epiProfile_5mC_cortexge4.png) 
+![](./RNAseq_files/figure-html/epiProfile_5mC_cortexge-1.png) ![](./RNAseq_files/figure-html/epiProfile_5mC_cortexge-2.png) ![](./RNAseq_files/figure-html/epiProfile_5mC_cortexge-3.png) ![](./RNAseq_files/figure-html/epiProfile_5mC_cortexge-4.png) 
 
 #### H3K36me3 in exon bodies
 * H3K36me3 in expressed in both / not expressed exons shows no significant differences between HuFNSC01 and HuFNSC02.    
 * H3K36me3 in cassette exons in HuFNSC01 are enriched in GE compared to cortex. However, it is not reproduced in HuFNSC02, where there is no significant differences between cortex and GE. _Not sure what to make of this. Are there any potential bias?_    
 
-![plot of chunk epiProfile_H3K36me3_cortexge](./RNAseq_files/figure-html/epiProfile_H3K36me3_cortexge1.png) ![plot of chunk epiProfile_H3K36me3_cortexge](./RNAseq_files/figure-html/epiProfile_H3K36me3_cortexge2.png) 
+![](./RNAseq_files/figure-html/epiProfile_H3K36me3_cortexge-1.png) ![](./RNAseq_files/figure-html/epiProfile_H3K36me3_cortexge-2.png) 
 
 ### Between MZ twins - HuFNSC01 vs HuFNSC02
 #### DNA methylation at exon boundaries 
@@ -181,13 +174,13 @@ Sat Sep 27 15:30:34 2014
 * There are significant differences in 5mC between HuFNSC01 and HuFNSC02 specific exons in all three cell types.   
 * In brain, 5mC in HuFNSC02 specific exons are closer to expressed in both, and HuFNSC01 specific exons are closer to not expressed exons. However, we observe the opposite trend in cortex and GE. _Is this a reflection of developmental stages differences between MZ twins? Are the opposite trends between brain and cortex/GE because of cell culture? Or could all these differences be technical bias / noise?_    
 
-![plot of chunk epiProfile_5mC_MZ](./RNAseq_files/figure-html/epiProfile_5mC_MZ1.png) ![plot of chunk epiProfile_5mC_MZ](./RNAseq_files/figure-html/epiProfile_5mC_MZ2.png) ![plot of chunk epiProfile_5mC_MZ](./RNAseq_files/figure-html/epiProfile_5mC_MZ3.png) 
+![](./RNAseq_files/figure-html/epiProfile_5mC_MZ-1.png) ![](./RNAseq_files/figure-html/epiProfile_5mC_MZ-2.png) ![](./RNAseq_files/figure-html/epiProfile_5mC_MZ-3.png) 
 
 #### H3K36me3 in exon bodies
 * There are some differences between HuFNSC01 and HuFNSC02 in expressed in both and not expressed exons, less so in GE.   
 * For cassette exons, HuFNSC02 have enriched H3K36me3 compared to HuFNSC01 in both brain and cortex, but __not__ in GE. _Could this be related to the asymmetry we observed in DNA methylation in brain and cortex?_   
 
-![plot of chunk epiProfile_H3K36me3_MZ](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ1.png) ![plot of chunk epiProfile_H3K36me3_MZ](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ2.png) ![plot of chunk epiProfile_H3K36me3_MZ](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ3.png) 
+![](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ-1.png) ![](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ-2.png) ![](./RNAseq_files/figure-html/epiProfile_H3K36me3_MZ-3.png) 
 
 
 

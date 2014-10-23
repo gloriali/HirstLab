@@ -3,12 +3,13 @@ output:
   html_document:
     keep_md: true
     toc: yes
+    toc_depth: 4
 ---
 Fetal Brain RNA-seq Analysis Summary
 ========================================================
 
 Gloria Li         
-`r date()` 
+Updated: `r date()` 
 
 ```{r include = FALSE}
 library(knitr)
@@ -56,22 +57,24 @@ grid.draw(venn_DN_cortex_GE)
 
   * On average, there are __`r as.integer(mean(individual_DE_summary$DE[1:3]))`__ DE genes across three cells types.   
   * Majority of DE genes are cell type specific, only __`r sum(duplicated(c(rownames(brain01_brain02DE), rownames(cortex01_cortex02DE), rownames(GE01_GE02DE))))`__ are shared between any two cell types.   
+  * DE genes in Brain is asymmetric, _maybe due to cell heterogenity?_   
+  * There are much fewer DE genes in GE.    
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
 ```{r individual, results='asis', fig.height = 6, fig.width = 6}
-individual_DE_summary <- xtable(individual_DE_summary)
+individual_DE_summary <- xtable(individual_DE_summary[1:3,])
 align(individual_DE_summary) <- "lccc"
 print(individual_DE_summary, type = "html", include.rownames = T)
 
 plot.new()
 grid.draw(venn_DE_HuFNSC01_HuFNSC02)
-plot.new()
-grid.draw(venn_DE_HuFNSC03_HuFNSC04)
+# plot.new()
+# grid.draw(venn_DE_HuFNSC03_HuFNSC04)
 ```
 
 ```{r individual_enrich, fig.height = 4, fig.width = 8}
-(enrich_brain01_brain02DE$figure)
-(enrich_cortex01_cortex02DE$figure)
+(enrich_brain01_brain02DE)
+(enrich_cortex01_cortex02DE)
 ```
 
 
