@@ -209,7 +209,8 @@ DMR_MZ_TF_tall$Asymmetry <- factor(DMR_MZ_TF_tall$Asymmetry, levels = c("HuFNSC0
    theme_bw())
 ggsave(DMR_MZ_TF_figure, file = "DMR_MZ_TF.pdf", height = 6)
 
-save(DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, DMR_MZ_summary, 
+save(Brain01_Brain02_DMR, Cortex01_Cortex02_DMR, GE01_GE02_DMR, 
+     DMR_length_MZ_figure, DMR_count_MZ_figure, DMR_dis_MZ_figure, DMR_freq_MZ_figure, DMR_pos_MZ_figure, DMR_MZ_summary, 
      GREAT_HuFNSC01.UMR.Brain, GREAT_HuFNSC02.UMR.Brain, GREAT_HuFNSC01.UMR.Cortex, GREAT_HuFNSC02.UMR.Cortex, GREAT_HuFNSC01.UMR.GE, GREAT_HuFNSC02.UMR.GE, 
      genomicBreak_MZ, genomicBreak_MZ_figure, DMR_proximal_MZ_summary, DMR_proximal_MZ_hyper, venn_DMR_proximal_MZ_hyper, DMR_proximal_MZ_hypo, venn_DMR_proximal_MZ_hypo, 
      DMR_DE_Brain01_Brain02_hyper, DMR_DE_Brain01_Brain02_hypo, DMR_DE_Cortex01_Cortex02_hyper, DMR_DE_Cortex01_Cortex02_hypo, DMR_DE_GE01_GE02_hyper, DMR_DE_GE01_GE02_hypo, 
@@ -384,7 +385,8 @@ DMR_neurospheres_TF_tall[DMR_neurospheres_TF_tall$Ratio == 1,]$Asymmetry <- "Equ
    theme_bw())
 ggsave(DMR_neurospheres_TF_figure, file = "DMR_neurospheres_TF.pdf", height = 6)
 
-save(DMR_length_neurospheres_figure, DMR_count_neurospheres_figure, DMR_dis_neurospheres_figure, DMR_freq_neurospheres_figure, DMR_pos_neurospheres_figure, DMR_neurospheres_summary, 
+save(Cortex01_GE01_DMR, Cortex02_GE02_DMR, 
+     DMR_length_neurospheres_figure, DMR_count_neurospheres_figure, DMR_dis_neurospheres_figure, DMR_freq_neurospheres_figure, DMR_pos_neurospheres_figure, DMR_neurospheres_summary, 
      GREAT_Cortex01.UMR, GREAT_GE01.UMR, GREAT_Cortex02.UMR, GREAT_GE02.UMR, 
      genomicBreak_neurospheres, genomicBreak_neurospheres_figure, DMR_proximal_neurospheres_summary, 
      DMR_DE_Cortex01_GE01_hyper, DMR_DE_Cortex01_GE01_hypo, DMR_DE_Cortex02_GE02_hyper, DMR_DE_Cortex02_GE02_hypo, 
