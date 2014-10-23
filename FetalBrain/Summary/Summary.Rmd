@@ -178,19 +178,19 @@ print(DMR_TF_3fold, type = "html", include.rownames = F)
     + __ZIC5__: Zic Family Member 5. Essential for neural crest development, converting cells from an epidermal fate to a neural crest cell fate, associated with meningiomas [PMID: 20199689](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20199689&dopt=b). 
     + __ZIC2__: Zic Family Member 2. Related to structural anomaly of the forebrain, and neural tube defects.  
     + NEFM: Neurofilament, Medium Polypeptide. Neurofilaments comprise the axoskeleton and functionally maintain neuronal caliber. They may also play a role in intracellular transport to axons and dendrites. This protein
-  is commonly used as a biomarker of neuronal damage.   
-    + UNC5C: Unc-5 Homolog C. Receptor for netrin required for axon guidance. Mediates axon repulsion of neuronal growth cones in the developing nervous system upon ligand binding.    
-    + __ADAM19__: ADAM Metallopeptidase Domain 19. Involved in neurogenesis, cell migration, cell adhesion, cell-cell and cell-matrix interactions, serves as a marker for dendritic cell differentiation. UP in primary brain tumors [PMID: 16772875](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=16772875&dopt=b).   
-  * Brain / neuron development related GE up-regulated genes (shared by all):    
+  is commonly used as a biomarker of neuronal damage.         
+    + UNC5C: Unc-5 Homolog C. Receptor for netrin required for axon guidance. Mediates axon repulsion of neuronal growth cones in the developing nervous system upon ligand binding.       
+    + __ADAM19__: ADAM Metallopeptidase Domain 19. Involved in neurogenesis, cell migration, cell adhesion, cell-cell and cell-matrix interactions, serves as a marker for dendritic cell differentiation. UP in primary brain tumors [PMID: 16772875](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=16772875&dopt=b).       
+  * Brain / neuron development related GE up-regulated genes (shared by all):     
     + VAX1: Ventral Anterior Homeobox 1. Transcription factor that may function in dorsoventral specification of the forebrain. Required for axon
-  guidance and major tract formation in the developing forebrain.   
-    + NRXN3: Neurexin 3. Neuronal cell surface protein that may be involved in cell recognition and cell adhesion.   
-    + __FEZF1__: _see above._  
-    + SIX3: SIX Homeobox 3. Plays a role in eye development.   
-    + ODZ1: Odz, Odd Oz/Ten-M Homolog 1. Involved in neural development, regulating the establishment of proper connectivity within the nervous system.   
-    + __EPHA3__: EPH Receptor A3. Involved in short-range contact-mediated axon guidance. UP in glioblastoma [PMID: 23410976](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=23410976&dopt=b).   
-    + __OTX2__: Orthodenticle Homeobox 2. Plays a role in the development of the brain and the sense organs, also influences the proliferation and differentiation of dopaminergic neuronal progenitor cells during mitosis. UP in medulloblastomas [PMID: 20028867](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20028867&dopt=b).  
-    + ASTN1: Astrotactin 1. A neuronal adhesion molecule required for glial-guided migration of young postmitotic neuroblasts in cortical regions of developing brain, including cerebrum, hippocampus, cerebellum, and olfactory bulb (Fink et al., 1995).   
+  guidance and major tract formation in the developing forebrain.     
+    + NRXN3: Neurexin 3. Neuronal cell surface protein that may be involved in cell recognition and cell adhesion.      
+    + __FEZF1__: _see above._     
+    + SIX3: SIX Homeobox 3. Plays a role in eye development.      
+    + ODZ1: Odz, Odd Oz/Ten-M Homolog 1. Involved in neural development, regulating the establishment of proper connectivity within the nervous system.     
+    + __EPHA3__: EPH Receptor A3. Involved in short-range contact-mediated axon guidance. UP in glioblastoma [PMID: 23410976](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=23410976&dopt=b).      
+    + __OTX2__: Orthodenticle Homeobox 2. Plays a role in the development of the brain and the sense organs, also influences the proliferation and differentiation of dopaminergic neuronal progenitor cells during mitosis. UP in medulloblastomas [PMID: 20028867](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20028867&dopt=b).     
+    + ASTN1: Astrotactin 1. A neuronal adhesion molecule required for glial-guided migration of young postmitotic neuroblasts in cortical regions of developing brain, including cerebrum, hippocampus, cerebellum, and olfactory bulb (Fink et al., 1995).      
 
 ```{r DE_Cortex_GE, results='asis', fig.height = 8, fig.width = 8}
 cortex_GE_DE_summary <- xtable(cortex_GE_DE_summary)
