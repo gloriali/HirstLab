@@ -79,7 +79,7 @@ print(DMR_WGBS_summary, type = "html", include.rownames = F)
 (GREAT_GE04.UMR_WGBS)
 ```
 
-#### UMR breakdown in chromatin states 
+#### UMR breakdown in chromatin states - _TBC_
 
   * __Pending: ChromHMM__
 
@@ -87,7 +87,7 @@ print(DMR_WGBS_summary, type = "html", include.rownames = F)
 
   + On average, there are __`r as.integer(mean(DMR_WGBS_gene_summary$pc.Promoters))`__ UMRs proximally associated with protein-coding genes (TSS +/- 1500bp), __`r round(mean(DMR_WGBS_gene_summary$pc.Promoters)/mean(DMR_WGBS_summary$Total.DMR)*100, 2)`%__ of all UMRs.         
   + There are average __`r as.integer(mean(DMR_WGBS_gene_summary$proximal.DE.Genes))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_WGBS_gene_summary$proximal.DE.Genes)/mean(DMR_WGBS_gene_summary$pc.Promoters)*100, 2)`%__ of all proximal UMRs, __much lower than observed in breast and supported by MeDIP__, _maybe more UMRs in enhancers? (ChromHMM)_. Among them, there are __`r round(mean(DMR_WGBS_gene_summary$same.direction)/mean(DMR_WGBS_gene_summary$unique.DE.Genes)*100, 2)`%__ unique DE genes change in the same direction as the UMRs, __also lower than observed in breast and supported by MeDIP__.         
-  + The intersect between two individuals are __significant__ in Cortex UMRs. There are 3 DE genes with proximal Cortex UMR that are shared by both individual: __GFAP, NFIX, FEZF1__.   
+  + The intersect between two individuals are __significant__ in Cortex UMRs. There are 3 DE genes with proximal Cortex UMR that are shared by both individual:       
     * __GFAP__: Glial Fibrillary Acidic Protein. It is used as a marker to distinguish astrocytes from other glial cells during development. Reported associated with many brain disease, including alexanders disease, [PMID: 11567214](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=11567214&dopt=b); gliomas, UP reduce tumor and induce differentiation, [PMID: 15498217](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=15498217&dopt=b), and astrocytoma, tumor suppressor [PMID: 8339269](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=8339269&dopt=b) etc.    
     * __NFIX__: Nuclear Factor I/X (CCAAT-Binding Transcription Factor). _Also supported by MeDIP._ A transcription factor that binds the palindromic sequence in viral and cellular promoters, capable of activating transcription and replication. It is essential for the development of a number of organ systems including brain and bone, e.g. severe neuroanatomical defects (may function in the repression of neural stem cell proliferation or in cell migration) [PMID: 18477394](http://www.ncbi.nlm.nih.gov/pubmed/18477394), [PMID: 19058033](http://www.ncbi.nlm.nih.gov/pubmed/19058033). 
     * __FEZF1__: FEZ Family Zinc Finger 1 (ZNF312B). Transcription repressor. Involved in the axonal projection and proper termination of olfactory sensory neurons. Regulates non-cell-autonomously the layer formation of the olfactory bulb development and the interneurons. May be required for correct rostral migration of the interneuron progenitors. DNA demethylation and histone acetylation in its promoter activates its expression and oncogene effect in gastric cancer [PMID: 19318583](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=19318583&dopt=b). _We observe DN-regulation in Cortex and Cortex UMR though._     
@@ -148,7 +148,7 @@ align(GE04_UMR_pcPromoter_DE_print) <- "rrrc"
 print(GE04_UMR_pcPromoter_DE_print, type = "html", include.rownames = F)
 ```
 
-#### UMR distal associated genes  
+#### UMR distal associated genes - _TBC_  
 
   * __PENDING__   
 
@@ -222,6 +222,10 @@ print(cortex_GE_summary, type = "html", include.rownames = T)
 (isoform_cortex_GE_enrich$figure)
 ```
 
+#### Intron retention between Cortex and GE - _TBC_
+
+  * _PENDING_
+
 #### mCpG is a stable mark for exon transcription during development     
 
   * mCpG at cassette exon boundaries has similar pattern to expressed in both exons.   
@@ -289,7 +293,7 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 (GREAT_HuFNSC02.UMR.GE)
 ```
 
-#### UMR breakdown in chromatin states 
+#### UMR breakdown in chromatin states - _TBC_
 
   * __Pending: ChromHMM__
 
@@ -311,6 +315,21 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
   + On average, there are __`r as.integer(mean(DMR_proximal_MZ_summary[, "DE.DMRs"]))`__ proximal UMRs associated with DE genes, __`r round(mean(DMR_proximal_MZ_summary[, "DE.DMRs"])/mean(DMR_proximal_MZ_summary[, "DMRs"])*100, 2)`%__ of all proximal DMRs, _much less than UMRs between Cortex and GE (less functional?)_. Among them, there are __`r round(mean(DMR_proximal_MZ_summary[, "same.direction"])/mean(DMR_proximal_MZ_summary[, "unique.DE.genes"])*100, 2)`%__ unique DE genes change in the same direction as the UMRs, _similar to UMRs between Cortex and GE_.         
   + Proximal UMR genes are mostly __cell type specific__, but the overlap is still statistically significant.  
   + No overlap between Brain and Cortex for proximal HuFNSC01 UMR DE genes, only one for HuFNSC02, __`r gsub("_\\[.+", "", DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[intersect(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE$id), "description"])`__.   
+  + HuFNSC01 UMR DE genes associated with brain development:   
+    * __WNT pathway__: SFRP2, WNT3.      
+    * EMX2: Empty Spiracles Homeobox 2. Transcription factor. Acts to generate the boundary between the roof and archipallium in the developing brain. May function in combinations with OTX1/2 to specify cell fates in the developing central nervous system.     
+    * MDGA1: MAM Domain-Containing Glycosylphosphatidylinositol Anchor Protein 1. Required for radial migration of cortical neurons in the superficial layer of the neocortex.   
+    * VAX1: _see above._   
+    * DLX1: Distal-Less Homeobox 1. Play a role in the control of craniofacial patterning and the differentiation and survival of inhibitory neurons in the forebrain.    
+    * __OLIG1__: Oligodendrocyte Transcription Factor 1. Promotes formation and maturation of oligodendrocytes, especially within the brain. Associated with human glial brain tumors [PMID: 11526205](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=11526205&dopt=b).   
+  + HuFNSC02 UMR DE genes associated with brain development:   
+    * __WNT pathway__: SFRP1, SFRP2, WNT7A.        
+    * EPHA8: EPH Receptor A8. Plays a role in short-range contact-mediated axonal guidance during development of the mammalian nervous system.    
+    * NRGN: Neurogranin (Protein Kinase C Substrate, RC3). Acts as a "third messenger" substrate of protein kinase C-mediated molecular cascades during synaptic development and remodeling.    
+    * C1QL4: Complement Component 1, Q Subcomponent-Like 4. May regulate the number of excitatory synapses that are formed on hippocampus neurons.       
+    * SNCB: Synuclein, Beta. May play a role in neuronal plasticity.       
+    * SEMA3D: Sema Domain, Immunoglobulin Domain (Ig), Short Basic Domain, Secreted, (Semaphorin) 3D. Induces the collapse and paralysis of neuronal growth cones. Could potentially act as repulsive cues toward specific neuronal populations.    
+    * VGF: May be involved in the regulation of cell-cell interactions or in synatogenesis during the maturation of the nervous system.   
 
 ```{r MeDIP_MZ_proximal, results='asis', fig.width = 5, fig.height = 5}
 DMR_proximal_MZ_summary <- xtable(DMR_proximal_MZ_summary)
@@ -344,7 +363,7 @@ align(HuFNSC02_UMR_proximal_DE) <- "ccrrcc"
 print(HuFNSC02_UMR_proximal_DE, type = "html", include.rownames = F)
 ```
 
-#### UMR distal associated genes  
+#### UMR distal associated genes - _TBC_  
 
   * __PENDING__   
 
@@ -407,6 +426,10 @@ print(individual_summary, type = "html", include.rownames = T)
 (isoform_cortex01_cortex02_enrich$figure)
 (isoform_GE01_GE02_enrich$figure)
 ```
+
+#### Intron retention in MZ twins - _TBC_
+
+  * _PENDING_
 
 ## Methods
 ### DMR identification 
