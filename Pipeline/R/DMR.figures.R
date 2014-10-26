@@ -1,6 +1,8 @@
 DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)){
   library(ggplot2)
   library(dplyr)
+  library(ggbio)
+  library(GenomicRanges)
   DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_position_figure <- NULL;
   chrlength <- chrlength[chrlength$chr %in% chrs, ]
   chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
@@ -64,19 +66,23 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_freq_figure, file = paste0(dirOut, "/DMRfreq_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("position" %in% figures){
-    DMR$chr <- factor(DMR$chr, levels = chrs[length(chrs):1])
-    DMR_position_figure <- ggplot(DMR) + 
-      geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
-      geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.5) +  
-      xlab("") + 
-      ylab("Position of DMRs on the chromosome") +
-      coord_flip() + 
-      ggtitle(paste("DMR position -", sample1, "vs", sample2, "DMRs")) + 
-      scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
-      theme_bw()
-    ggsave(DMR_position_figure, file = paste0(dirOut, "/DMRpos_", sample1, "_", sample2, ".pdf"), width = width, height = height)
+    DMR$y <- DMR$DM * 15 + 5
+    DMR_gr <- keepSeqlevels(as(DMR, "GRanges"), paste0("chr", c(1:22, "X")))
+    data(hg19IdeogramCyto, package = "biovizBase")
+    hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X")))
+    DMR_pos_figure <- ggplot(hg19) + 
+       layout_karyogram(cytoband = TRUE) + 
+       layout_karyogram(data = DMR_gr, geom = "point", aes(y = y, x = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(height = 2), size = 1.5, alpha = 0.5) + 
+       ylab("") + 
+       xlab("Position of DMRs on the chromosome") +
+       coord_cartesian(ylim = c(-15, 25)) + 
+       ggtitle(paste("DMR positions -", sample1, "vs", sample2, "DMRs")) + 
+       scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+       theme_bw() + 
+       theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.y = element_line(color = "transparent"), panel.grid.minor.y = element_line(color = "transparent"))
+    ggsave(DMR_pos_figure@ggplot, file = paste0(dirOut, "/DMRpos_", sample1, "_", sample2, ".pdf"), width = width, height = height)    
   }
-  return(list(length = DMR_length_figure, count = DMR_count_figure, dis = DMR_dis_figure, freq = DMR_freq_figure, pos = DMR_position_figure))
+  return(list(length = DMR_length_figure, count = DMR_count_figure, dis = DMR_dis_figure, freq = DMR_freq_figure, pos = DMR_pos_figure@ggplot))
 }
 # DMR analysis and visualization  
 # Required input: 
