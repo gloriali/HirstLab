@@ -7,6 +7,9 @@
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 library(ggplot2)
+library(dplyr)
+library(ggbio)
+library(GenomicRanges)
 library(labeling)
 library(VennDiagram)
 source('~/HirstLab/Pipeline/R/enrich.R')
@@ -106,22 +109,22 @@ DMR_freq_MZ_figure <- ggplot(DMR_freq_MZ, aes(x = chr, y = freq, fill = DM)) +
 ggsave(DMR_freq_MZ_figure, file = "DMRfreq_MZ.pdf")
 (DMR_freq_MZ_figure + ggtitle("DMR frequency asymmetry between monozygotic twins"))
 
-chrs = c(paste0("chr", as.character(1:22)), "chrX")
-chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
-chrlength <- chrlength[chrlength$chr %in% chrs, ]
-chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
-DMR_pos_MZ <- rbind(cbind(Brain01_Brain02_DMR_figures$pos$data, cell = "Brain"), cbind(Cortex01_Cortex02_DMR_figures$pos$data, cell = "Cortex"), cbind(GE01_GE02_DMR_figures$pos$data, cell = "GE"))
-DMR_pos_MZ_figure <- ggplot(DMR_pos_MZ) + 
-  geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
-  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.2) +  
-  xlab("") + 
-  ylab("Position of DMRs on the chromosome") +
-  coord_flip() + 
-  facet_wrap(~ cell) + 
-  scale_color_manual(values = c("red", "blue"), labels = c("HuFNSC02 UMRs", "HuFNSC01UMRs"), name = "") + 
-  theme_bw()
-ggsave(DMR_pos_MZ_figure, file = "DMRpos_MZ.pdf")
-(DMR_pos_MZ_figure + ggtitle("DMR positions on the chromosomes between monozygotic twins"))
+DMR_pos_MZ <- mutate(rbind(cbind(Brain01_Brain02_DMR, cell = "Brain"), cbind(Cortex01_Cortex02_DMR, cell = "Cortex"), cbind(GE01_GE02_DMR, cell = "GE")), pos = (start + end)/2, y = DM * 15 + 5)
+DMR_pos_MZ_gr <- keepSeqlevels(as(DMR_pos_MZ, "GRanges"), paste0("chr", c(1:22, "X")))
+data(hg19IdeogramCyto, package = "biovizBase")
+hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X")))
+(DMR_pos_MZ_figure <- ggplot(hg19) + 
+   layout_karyogram(cytoband = TRUE) + 
+   layout_karyogram(data = DMR_pos_MZ_gr, geom = "point", aes(y = y, x = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(height = 2), size = 1, alpha = 0.2) + 
+   ylab("") + 
+   xlab("Position of DMRs on the chromosome") +
+   facet_grid(seqnames ~ cell) + 
+   coord_cartesian(ylim = c(-15, 25)) + 
+   ggtitle(paste("DMR position - HuFNSC01 vs HuFNSC02 DMRs")) + 
+   scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+   theme_bw() + 
+   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.y = element_line(color = "transparent"), panel.grid.minor.y = element_line(color = "transparent")))
+ggsave(DMR_pos_MZ_figure@ggplot, file = "DMRpos_MZ.pdf", width = 10, height = 10)
 
 #' GREAT enrichment 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
@@ -289,22 +292,22 @@ DMR_freq_neurospheres_figure <- ggplot(DMR_freq_neurospheres, aes(x = chr, y = f
 ggsave(DMR_freq_neurospheres_figure, file = "DMRfreq_neurospheres.pdf")
 (DMR_freq_neurospheres_figure + ggtitle("DMR frequency asymmetry between Cortex and GE"))
 
-chrs = c(paste0("chr", as.character(1:22)), "chrX")
-chrlength <- read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)
-chrlength <- chrlength[chrlength$chr %in% chrs, ]
-chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
-DMR_pos_neurospheres <- rbind(cbind(Cortex01_GE01_DMR_figures$pos$data, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR_figures$pos$data, donor = "HuFNSC02"))
-DMR_pos_neurospheres_figure <- ggplot(DMR_pos_neurospheres) + 
-  geom_linerange(aes(x = factor(chr, levels = chr[length(chr):1]), ymin = 0, ymax = length), data = chrlength, alpha = 0.5) + 
-  geom_point(aes(x = (as.numeric(chr) + 0.25*DM), y = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(width = 0.05), size = 1, alpha = 0.2) +  
-  xlab("") + 
-  ylab("Position of DMRs on the chromosome") +
-  coord_flip() + 
-  facet_wrap(~ donor) + 
-  scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
-  theme_bw()
-ggsave(DMR_pos_neurospheres_figure, file = "DMRpos_neurospheres.pdf")
-(DMR_pos_neurospheres_figure + ggtitle("DMR positions on the chromosomes between Cortex and GE"))
+DMR_pos_neurospheres <- mutate(rbind(cbind(Cortex01_GE01_DMR, donor = "HuFNSC01"), cbind(Cortex02_GE02_DMR, donor = "HuFNSC02")), pos = (start + end)/2, y = DM * 15 + 5)
+DMR_pos_neurospheres_gr <- keepSeqlevels(as(DMR_pos_neurospheres, "GRanges"), paste0("chr", c(1:22, "X")))
+data(hg19IdeogramCyto, package = "biovizBase")
+hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X")))
+(DMR_pos_neurospheres_figure <- ggplot(hg19) + 
+   layout_karyogram(cytoband = TRUE) + 
+   layout_karyogram(data = DMR_pos_neurospheres_gr, geom = "point", aes(y = y, x = pos, color = factor(DM, levels = c("1", "-1"))), position = position_jitter(height = 2), size = 1, alpha = 0.2) + 
+   ylab("") + 
+   xlab("Position of DMRs on the chromosome") +
+   facet_grid(seqnames ~ donor) + 
+   coord_cartesian(ylim = c(-15, 25)) + 
+   ggtitle(paste("DMR position - Cortex vs GE DMRs")) + 
+   scale_color_manual(values = c("red", "blue"), labels = c("hyper", "hypo"), name = "") + 
+   theme_bw() + 
+   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.y = element_line(color = "transparent"), panel.grid.minor.y = element_line(color = "transparent")))
+ggsave(DMR_pos_neurospheres_figure@ggplot, file = "DMRpos_neurospheres.pdf", width = 10, height = 10)
 
 #' GREAT enrichment 
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
