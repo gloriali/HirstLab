@@ -92,7 +92,7 @@ grid.text("Intersect of GE UMR closest genes between MeDIP and WGBS", x = unit(0
 venn_GE_UMR_WGBS_MeDIP <- draw.pairwise.venn(area1 = gene.hyper.WGBS, area2 = gene.hyper.MeDIP, cross.area = gene.hyper.intersect, category = c("WGBS", "MeDIP"), fill = c("red", "blue"))
 dev.off()
 
-#' differences in DMR length and No. of CpGs
+#' differences in DMR length and No. of CpGs 
 DMR_length_MeDIP <- select(mutate(filter(DMR_length_neurospheres_figure$data, donor == "HuFNSC02"), assay = "MeDIP"), -min, -max, -donor)
 DMR_count_MeDIP <- select(mutate(filter(DMR_count_neurospheres_figure$data, donor == "HuFNSC02"), assay = "MeDIP"), -min, -max, -donor)
 DMR_length_WGBS <- mutate(Cortex02_GE02_DMR_figures$length$data, assay = "WGBS")
@@ -159,4 +159,30 @@ cat(intersect(WGBS_TF[WGBS_TF$Ratio02 <= 1/2, "TF"], MeDIP_TF[MeDIP_TF$Ratio02 <
 cat(intersect(WGBS_TF[WGBS_TF$Ratio02 >= 2, "TF"], MeDIP_TF[MeDIP_TF$Ratio02 >= 2, "TF"]), sep = ", ")
 combined <- merge(WGBS_TF, MeDIP_TF, by = "TF")
 cor(combined$Ratio02.x, combined$Ratio02.y)
+
+#' Distance to nearest genes
+MeDIP_closestGene_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.hyper.closest.gene", head = F, as.is = T)
+MeDIP_closestGene_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.s300.c4.hypo.closest.gene", head = F, as.is = T)
+WGBS_closestGene_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.closest.gene", head = F, as.is = T)
+WGBS_closestGene_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.closest.gene", head = F, as.is = T)
+dis_closestGene <- rbind(mutate(select(MeDIP_closestGene_hyper, V8, V9), Assay = "MeDIP", DM = "hyper"), 
+                         mutate(select(MeDIP_closestGene_hypo, V8, V9), Assay = "MeDIP", DM = "hypo"), 
+                         mutate(select(WGBS_closestGene_hyper, V8, V9), Assay = "WGBS", DM = "hyper"), 
+                         mutate(select(WGBS_closestGene_hypo, V8, V9), Assay = "WGBS", DM = "hypo"))
+(non_genebody <- nrow(filter(dis_closestGene, V9 > 0)) / nrow(dis_closestGene))
+(non_genebody_MeDIP <- nrow(filter(dis_closestGene, V9 > 0, Assay == "MeDIP")) / nrow(filter(dis_closestGene, Assay == "MeDIP")))
+(non_genebody_WGBS <- nrow(filter(dis_closestGene, V9 > 0, Assay == "WGBS")) / nrow(filter(dis_closestGene, Assay == "WGBS")))
+dis_closestGene <- filter(dis_closestGene, V9 > 0)
+(dis_closestGene_figure <- ggplot(dis_closestGene, aes(color = Assay)) + 
+   geom_boxplot(aes(Assay, V9), outlier.shape = NA) + 
+   # geom_density(aes(V9)) + 
+   facet_wrap(~ DM) + 
+   xlab("") + 
+   ylab("Distance to nearest genes") + 
+   coord_cartesian(ylim = c(0, 1.5e+5)) + 
+   # coord_cartesian(xlim = c(0, 0.5e+5)) + 
+   theme_bw())
+ggsave(dis_closestGene_figure, file = "dis_closestGene_figure.pdf", height = 8, width = 10)
+t.test(select(filter(dis_closestGene, DM == "hyper", Assay == "MeDIP"), V9), select(filter(dis_closestGene, DM == "hyper", Assay == "WGBS"), V9))
+t.test(select(filter(dis_closestGene, DM == "hypo", Assay == "MeDIP"), V9), select(filter(dis_closestGene, DM == "hypo", Assay == "WGBS"), V9))
 
