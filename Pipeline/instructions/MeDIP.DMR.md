@@ -97,47 +97,45 @@ done
 
 ## Step2. DMR identification for pairwise comparisons
 + Parameters:
+    * m: fractional methylation of one sample need to >= m 
     * delta: minimum difference in fractional calls to call DM CpG    
     * size: max distance between two consecutive CpGs     
     * cut: minimum number of CpGs per DMR
 + Input files: `<name>.dip` file from each library
 + Output files:
-    * `DMR.summary.stats`: `Samples   Delta   Size    Cut   Average length of DMRs    Average No.of CpGs per DMR    Total No.of DMRs      No.of hypermethylated DMRs    No.of hypomethylated DMRs`
-    * `DM.<cell1>-<donor1>_<cell2>-<donor2>.d<delta>.bed `: DM CpGs: `chr   start   end     DM (hyper:1; hypo:-1)   mC1     mC2`
-    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.d<delta>.s<size>.c<cut>`: DMRs: `chr   start   end     ID  DM (hyper:1; hypo:-1)   No.of CpGs     length`
-    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.d<delta>.s<size>.c<cut>.hyper`: hypermethylated DMRs     
-    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.d<delta>.s<size>.c<cut>.hypo`: hypomethylated DMRs     
+    * `DM.summary.stats`: `samples, m, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs`
+    * `DMR.summary.stats`: `samples, size, cut, Average length of DMRs, Average No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs`
+    * `DM.<cell1>-<donor1>_<cell2>-<donor2>.m<m>.d<delta>.bed `: DM CpGs: `chr   start   end     DM (hyper:1; hypo:-1)   mC1     mC2`
+    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.m<m>.d<delta>.s<size>.c<cut>`: DMRs: `chr   start   end     ID  DM (hyper:1; hypo:-1)   No.of CpGs     length`
+    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.m<m>.d<delta>.s<size>.c<cut>.hyper`: hypermethylated DMRs     
+    * `DMR.<cell1>-<donor1>_<cell2>-<donor2>.m<m>.d<delta>.s<size>.c<cut>.hypo`: hypomethylated DMRs
++ Dependency:
+    * `/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh`: Shell script to collapse DM CpGs into DMRs        
 + Sample code:
 ```
+################### initial set up ###################
+m=0.75    # fractional methylation of one sample need to > m 
 delta=0.6 # minimum difference in fractional calls to call DM CpG
-size=500  # max distance between two consecutive CpGs
-cut=3     # minimum number of CpGs
+size=300  # max distance between two consecutive CpGs
+cut=4     # minimum number of CpGs
 cd /projects/epigenomics/users/lli/FetalBrain/MeDIP/
-dirIn='/projects/epigenomics/users/lli/FetalBrain/MeDIP'
-dirDM=$dirIn/DMR
-mkdir -p $dirDM
->$dirDM/DMR.summary.stats # samples, delta, size, cut, Average length of DMRs, Average No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    
->$dirDM/DM.summary.stats # samples, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs    
+dirIn='/projects/epigenomics/users/lli/FetalBrain/MeDIP/'
+dirOut=$dirIn/DMR/
+mkdir -p $dirOut
+> $dirOut/DMR.summary.stats  
+> $dirOut/DM.summary.stats       
+################### library information ###################
 lib1="HS2788"; cell1="Brain"; donor1="HuFNSC01"; name1="HS2788.MeDIP.Brain01.q5.F1028.SET_174";
 lib2="HS2790"; cell2="Brain"; donor2="HuFNSC02"; name2="HS2790.MeDIP.Brain02.q5.F1028.SET_174";
-dm=DM.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.bed 
-echo -e DMRs between $cell1"-"$donor1 and $cell2"-"$donor2: delta=$delta, size=$size, cut=$cut, output: chr"\t"start"\t"end"\t"ID"\t"DM"\t"No.of CpGs"\t"length
-paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta '{if($1!=$3)print "Bad line", $0; chr="chr"gensub("_[0-9]+", "", "g", $1); start=gensub("[0-9XY]+_", "", "g", $1)+23; end=start+2; if($2-$4 > delta)print chr"\t"start"\t"end"\t1\t"$2"\t"$4; else if($2-$4 < -delta)print chr"\t"start"\t"end"\t-1\t"$2"\t"$4}' | sort -k1,1 -k2,2n > $dirDM/$dm
-less $dirDM/$dm | grep 'Bad line'
-Ndm=($(wc -l $dirDM/$dm))
-Nhyper=($(less $dirDM/$dm | awk '{if($4==1){c=c+1}} END{print c}'))
-Nhypo=($(less $dirDM/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
-echo -e $cell1"-"$donor1"_"$cell2"-"$donor2"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirDM/DM.summary.stats
-less $dirDM/$dm | awk 'BEGIN{size="'$size'"+0; cut="'$cut'"+0} {if($2<end+size && $4==dm && $1==chr){end=$3;c=c+1} else {if(end!=null){if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"dm"\t"c"\t"l}}; chr=$1;start=$2;end=$3;c=1;dm=$4}}END{if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"dm"\t"c"\t"l}}' > $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut
-dmr=($(less $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut | awk '{count++; if($5==1){hyper++;hyperlen=hyperlen+$7; print $0 >> "'$dirDM'""/DMR.""'$cell1'""-""'$donor1'""_""'$cell2'""-""'$donor2'"".d""'$delta'"".s""'$size'"".c""'$cut'"".hyper"} else {print $0 >> "'$dirDM'""/DMR.""'$cell1'""-""'$donor1'""_""'$cell2'""-""'$donor2'"".d""'$delta'"".s""'$size'"".c""'$cut'"".hypo"}} END {print count}'))
-hyper=($(wc -l $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut.hyper))
-hypo=($(wc -l $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut.hypo))
-length=($(less $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut | sort -k7,7n | awk '{len[NR]=$7} END{if(NR%2){print len[(NR+1)/2]} else{print (len[(NR/2)]+len[(NR/2)+1])/2}}'))
-count=($(less $dirDM/DMR.$cell1"-"$donor1"_"$cell2"-"$donor2.d$delta.s$size.c$cut | sort -k6,6n | awk '{count[NR]=$6} END{if(NR%2){print count[(NR+1)/2]} else{print (count[(NR/2)]+count[(NR/2)+1])/2}}')) 
-echo -e $cell1"-"$donor1"_"$cell2"-"$donor2"\t"$delta"\t"$size"\t"$cut"\t"$length"\t"$count"\t"$dmr"\t"$hyper"\t"$hypo >> $dirDM/DMR.summary.stats.test
+################### fixed code for each pairwise comparison from here on ###################
+name=$cell1"-"$donor1"_"$cell2"-"$donor2
+dm=DM.$name.m$m.d$delta.bed
+echo -e DMRs between $cell1"-"$donor1 and $cell2"-"$donor2: m=$m, delta=$delta, size=$size, cut=$cut, output: chr"\t"start"\t"end"\t"ID"\t"DM"\t"No.of CpGs"\t"length
+paste $dirIn/$name1.dip $dirIn/$name2.dip | awk -v delta=$delta -v m=$m '{if($1!=$3)print "Bad line", $0; chr="chr"gensub("_[0-9]+", "", "g", $1); start=gensub("[0-9XY]+_", "", "g", $1)+23; end=start+2; if($2-$4 > delta && $2>m)print chr"\t"start"\t"end"\t1\t"$2"\t"$4; else if($2-$4 < -delta && $4>m)print chr"\t"start"\t"end"\t-1\t"$2"\t"$4}' | sort -k1,1 -k2,2n > $dirOut/$dm
+less $dirOut/$dm | grep 'Bad line'
+Ndm=($(wc -l $dirOut/$dm)); Nhyper=($(less $dirOut/$dm | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/$dm | awk '{if($4==-1){c=c+1}} END{print c}'))
+echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $dm -n $name.m$m.d$delta -s $size -c $cut
 ```
-
-
-
 
 
