@@ -121,7 +121,7 @@ GOBP_Cortex02_GE02_WGBS_figure <- ggplot(data = GOBP_Cortex02_GE02_WGBS, aes(Ter
   scale_fill_manual(values = c("blue", "red"), name = "") + 
   theme_bw()
 (GOBP_Cortex02_GE02_WGBS_figure + ggtitle("GOBP GREAT enrichment for Cortex and GE UMRs"))
-ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "./enrich/GOBP_Cortex02_GE02_WGBS_figure.pdf", height = 3, width = 6)
+ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "./enrich/GOBP_Cortex02_GE02_WGBS_figure.pdf", height = 6, width = 8)
 
 #' genomic break down  
 genomicBreak_WGBS <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
@@ -342,5 +342,5 @@ save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR_WGBS
      venn_GE_UMR_WGBS, venn_GE_UMR_pcGene_WGBS, venn_GE_UMR_pcPromoter_WGBS, venn_GE_UMR_pcPromoter_DE_WGBS, 
      Cortex02_UMR_pcPromoter, Cortex02_UMR_pcPromoter_DE, GE02_UMR_pcPromoter, GE02_UMR_pcPromoter_DE, 
      Cortex04_UMR_pcPromoter, Cortex04_UMR_pcPromoter_DE, GE04_UMR_pcPromoter, GE04_UMR_pcPromoter_DE, 
-     DMR_TF, DMR_TF_figure, 
+     DMR_TF, DMR_TF_figure, GOBP_Cortex02_GE02_WGBS_figure, 
      file = "~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
