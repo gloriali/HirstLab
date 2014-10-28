@@ -186,3 +186,16 @@ ggsave(dis_closestGene_figure, file = "dis_closestGene_figure.pdf", height = 8, 
 t.test(select(filter(dis_closestGene, DM == "hyper", Assay == "MeDIP"), V9), select(filter(dis_closestGene, DM == "hyper", Assay == "WGBS"), V9))
 t.test(select(filter(dis_closestGene, DM == "hypo", Assay == "MeDIP"), V9), select(filter(dis_closestGene, DM == "hypo", Assay == "WGBS"), V9))
 
+#' hydroxymethylation: high WGBS & low MeDIP
+## WGBS-MeDIP distribution
+Cortex02_diff_summary <- read.delim("Cortex02_WGBS_MeDIP.diff.summary", head = F, as.is = T)
+GE02_diff_summary <- read.delim("GE02_WGBS_MeDIP.diff.summary", head = F, as.is = T)
+WGBS_MeDIP_diff_summary <- rbind(data.frame(Cortex02_diff_summary, Cell = "Cortex"), data.frame(GE02_diff_summary, Cell = "GE"))
+(WGBS_MeDIP_diff_summary_figure <- ggplot(WGBS_MeDIP_diff_summary, aes(x = V1, y = V2, fill = Cell)) + 
+   geom_bar(stat = "identity", position = "dodge") + 
+   xlab("WGBS-MeDIP") + 
+   ylab("No. of CpGs") + 
+   scale_fill_manual(values = c("blue", "red"), name = "") + 
+   theme_bw())
+ggsave(WGBS_MeDIP_diff_summary_figure, file = "WGBS_MeDIP_diff_summary_figure.pdf")
+
