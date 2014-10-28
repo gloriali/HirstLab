@@ -69,5 +69,56 @@ awk 'NR==FNR {h[$8]=$4'_'$9; next} {if($8 in h){print $8"\t"h[$8]"\t"$4'_'$9}}' 
 awk 'NR==FNR {h[$8]=$4'_'$9; next} {if(!($8 in h)){print $8"\t"$4'_'$9}}' $Gene_MeDIP_GE_UMR $Gene_WGBS_GE_UMR > $dirOut/GE_UMR_closest_gene.WGBS
 awk 'NR==FNR {h[$8]=$4'_'$9; next} {if(!($8 in h)){print $8"\t"$4'_'$9}}' $Gene_WGBS_GE_UMR $Gene_MeDIP_GE_UMR > $dirOut/GE_UMR_closest_gene.MeDIP
 
-
+# hydroxymethylation: high mC in WGBS & low in MeDIP - HuFNSC02
+dirOut='/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/'
+cutoff=0.8
+## potential CpGs
+### Cortex
+cd $dirOut
+Cortex02_WGBS='/projects/epigenomics/users/lli/FetalBrain/WGBS/A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine'
+Cortex02_MeDIP='/projects/epigenomics/users/lli/FetalBrain/MeDIP/HS2779.MeDIP.NeurospheresCortex02.q5.F1028.SET_174.dip'
+awk 'NR==FNR {h[$1]=$4; next} {chr="chr"gensub("_[0-9]+", "", "g", $1); start=gensub("[0-9XY]+_", "", "g", $1)+23; end=start+2; id=chr":"start"-"end; if(id in h){diff=h[id]-$2; print chr"\t"start"\t"end"\t"h[id]"\t"$2"\t"diff;}}' $Cortex02_WGBS $Cortex02_MeDIP > $dirOut/Cortex02_WGBS_MeDIP.fractional
+less $dirOut/Cortex02_WGBS_MeDIP.fractional | awk '{s=s+1; diff[int($6*10)]=diff[int($6*10)]+1; } END{for(key in diff){print key"\t"diff[key]; sum=sum+diff[key]}; if(s!=sum){print "ERROR!";}}' | sort -k1,1n > $dirOut/Cortex02_WGBS_MeDIP.diff.summary
+less $dirOut/Cortex02_WGBS_MeDIP.fractional | awk '{if($6>="'$cutoff'"){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' | sort -k1,1 -k2,2n > $dirOut/Cortex02_WGBS_MeDIP.diff.bed
+### GE
+GE02_WGBS='/projects/epigenomics/users/lli/FetalBrain/WGBS/A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine'
+GE02_MeDIP='/projects/epigenomics/users/lli/FetalBrain/MeDIP/HS2781.MeDIP.NeurospheresGE02.q5.F1028.SET_166.dip'
+awk 'NR==FNR {h[$1]=$4; next} {chr="chr"gensub("_[0-9]+", "", "g", $1); start=gensub("[0-9XY]+_", "", "g", $1)+23; end=start+2; id=chr":"start"-"end; if(id in h){diff=h[id]-$2; print chr"\t"start"\t"end"\t"h[id]"\t"$2"\t"diff;}}' $GE02_WGBS $GE02_MeDIP > $dirOut/GE02_WGBS_MeDIP.fractional
+less $dirOut/GE02_WGBS_MeDIP.fractional | awk '{s=s+1; diff[int($6*10)]=diff[int($6*10)]+1; } END{for(key in diff){print key"\t"diff[key]; sum=sum+diff[key]}; if(s!=sum){print "ERROR!";}}' | sort -k1,1n > $dirOut/GE02_WGBS_MeDIP.diff.summary
+less $dirOut/GE02_WGBS_MeDIP.fractional | awk '{if($6>="'$cutoff'"){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' | sort -k1,1 -k2,2n > $dirOut/GE02_WGBS_MeDIP.diff.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/Cortex02_WGBS_MeDIP.diff.bed -b $dirOut/GE02_WGBS_MeDIP.diff.bed | wc -l 
+## intersect with Cortex02 vs GE02 DM CpGs and UMRs
+### WGBS DM CpGs 
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/Cortex02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DM.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.bed | wc -l
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/GE02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DM.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.bed | wc -l
+### WGBS UMRs
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/Cortex02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed | wc -l
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/GE02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed | wc -l
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed -b $dirOut/Cortex02_WGBS_MeDIP.diff.bed -u | wc -l
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b $dirOut/GE02_WGBS_MeDIP.diff.bed -u | wc -l
+### MeDIP DM CpGs 
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/Cortex02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DM.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.bed | wc -l
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/GE02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DM.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.d0.6.bed | wc -l
+## genomic breakdown
+> $dirOut/hydroxy.breakdown.summary
+for file in Cortex02_WGBS_MeDIP.diff.bed GE02_WGBS_MeDIP.diff.bed
+do
+    name=$(echo $file | sed -e s/'_.*'//g)
+    echo 'Processing '$name
+    total=`wc -l $dirOut/$file | cut -d' ' -f 1`
+    gene=`/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/$file -b /home/lli/hg19/hg19v65_genes.bed -u | wc -l | cut -d' ' -f 1`
+    exon=`/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/$file -b /home/lli/hg19/hg19v65_exons.bed -u | wc -l | cut -d' ' -f 1`
+    promoter=`/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/$file -b /home/lli/hg19/hg19v65_genes_TSS_1500.bed -u | wc -l | cut -d' ' -f 1`
+    CGI=`/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/$file -b /projects/epigenomics/resources/UCSC_hg19/CGI/CGI.forProfiles.BED -u | wc -l | cut -d' ' -f 1`
+    echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI" | awk '{print $1"\t"$2"\t"($2-$3)/$2"\t"($3-$4)/$2"\t"$4/$2"\t"$3/$2"\t"$5/$2"\t"$6/$2}' >> $dirOut/hydroxy.breakdown.summary
+done
+## Collapse potential hydroxy CpGs into regions
+less $dirOut/Cortex02_WGBS_MeDIP.diff.bed | awk 'BEGIN{size=300; cut=3} {if($2<end+size && $1==chr){end=$3;c=c+1} else {if(end!=null){if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"c"\t"l}}; chr=$1;start=$2;end=$3;c=1}}END{if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"c"\t"l}}' > $dirOut/Cortex02_WGBS_MeDIP.region
+less $dirOut/GE02_WGBS_MeDIP.diff.bed | awk 'BEGIN{size=300; cut=3} {if($2<end+size && $1==chr){end=$3;c=c+1} else {if(end!=null){if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"c"\t"l}}; chr=$1;start=$2;end=$3;c=1}}END{if(c>cut){l=end-start;print chr"\t"start"\t"end"\t"chr":"start"-"end"\t"c"\t"l}}' > $dirOut/GE02_WGBS_MeDIP.region
+less $dirOut/Cortex02_WGBS_MeDIP.region | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/Cortex02_WGBS_MeDIP.region.bed
+less $dirOut/GE02_WGBS_MeDIP.region | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/GE02_WGBS_MeDIP.region.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/Cortex02_WGBS_MeDIP.region.bed -b $dirOut/GE02_WGBS_MeDIP.region.bed | wc -l
+## Closest gene for potential hydroxy regions
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $dirOut/Cortex02_WGBS_MeDIP.region.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $dirOut/Cortex02_WGBS_MeDIP.region.closest.gene
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $dirOut/GE02_WGBS_MeDIP.region.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $dirOut/GE02_WGBS_MeDIP.region.closest.gene
 

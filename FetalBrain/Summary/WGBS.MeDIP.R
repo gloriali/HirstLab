@@ -4,6 +4,7 @@ library(ggplot2)
 library(labeling)
 library(VennDiagram)
 library(dplyr)
+source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/WGBS/WGBS.DMR.Rdata")
 
@@ -198,4 +199,47 @@ WGBS_MeDIP_diff_summary <- rbind(data.frame(Cortex02_diff_summary, Cell = "Corte
    scale_fill_manual(values = c("blue", "red"), name = "") + 
    theme_bw())
 ggsave(WGBS_MeDIP_diff_summary_figure, file = "WGBS_MeDIP_diff_summary_figure.pdf")
+
+## intersect Cortex and GE potential hydroxy sites
+Cortex_hydroxy_CpG <- as.numeric(system("less /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.diff.bed | wc -l", intern = T))
+GE_hydroxy_CpG <- as.numeric(system("less /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.diff.bed | wc -l", intern = T))
+Cortex_GE_hydroxy_CpG <- as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.diff.bed | wc -l", intern = T))
+pdf("Venn_Cortex_GE_hydroxy_CpG.pdf")
+plot.new()
+grid.text("Intersect of Cortex and GE potential hydroxymethylation CpGs", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+Venn_Cortex_GE_hydroxy_CpG <- draw.pairwise.venn(area1 = Cortex_hydroxy_CpG, area2 = GE_hydroxy_CpG, cross.area = Cortex_GE_hydroxy_CpG, category = c("Cortex", "GE"), fill = c("blue", "red"), ext.text = F)
+dev.off()
+total = 28217448    # Total No. of CpGs
+phyper(Cortex_GE_hydroxy_CpG, Cortex_hydroxy_CpG, total - Cortex_hydroxy_CpG, GE_hydroxy_CpG, lower.tail = F, log = T) 
+
+Cortex_hydroxy_region <- as.numeric(system("less /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.region.bed | wc -l", intern = T))
+GE_hydroxy_region <- as.numeric(system("less /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.region.bed | wc -l", intern = T))
+Cortex_GE_hydroxy_region <- as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.region.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.region.bed | wc -l", intern = T))
+pdf("Venn_Cortex_GE_hydroxy_region.pdf")
+plot.new()
+grid.text("Intersect of Cortex and GE potential hydroxymethylation regions", x = unit(0.5, "npc"), y = unit(0.95, "npc"))
+Venn_Cortex_GE_hydroxy_region <- draw.pairwise.venn(area1 = Cortex_hydroxy_region, area2 = GE_hydroxy_region, cross.area = Cortex_GE_hydroxy_region, category = c("Cortex", "GE"), fill = c("blue", "red"), ext.text = F)
+dev.off()
+
+## genomic breakdown of potential hydroxy CpGs
+genomicBreak_hydroxy <- read.delim("hydroxy.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
+genomicBreak_hydroxy_tall <- data.frame(Sample = rep(row.names(genomicBreak_hydroxy), ncol(genomicBreak_hydroxy[,-1])), Region = factor(rep(colnames(genomicBreak_hydroxy[,-1]), each = nrow(genomicBreak_hydroxy[,-1])), levels = colnames(genomicBreak_hydroxy[,-1])), CpG = as.vector(as.matrix(genomicBreak_hydroxy[,-1])))
+genomicBreak_hydroxy_figure <- ggplot(genomicBreak_hydroxy_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+  geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+  xlab("") + 
+  ylab("Fraction of CpG") + 
+  coord_flip() + 
+  scale_fill_manual(values = c("blue", "red"), name = "") + 
+  theme_bw()
+ggsave(genomicBreak_hydroxy_figure, file = "genomicBreak_hydroxy.pdf")
+(genomicBreak_hydroxy_figure + ggtitle("Genomic breakdown of potential hydroxy CpGs in Cortex02 and GE02"))
+
+## GREAT on potential hdroxy regions
+(GREAT_Cortex02.hydroxy <- enrich_GREAT(file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", height = 12))
+(GREAT_GE02.hydroxy <- enrich_GREAT(file = "hydroxy_GE02", name = "GE02.hydroxy", height = 12))
+
+
+
+
+
 
