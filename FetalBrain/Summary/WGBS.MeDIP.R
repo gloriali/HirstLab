@@ -192,7 +192,7 @@ t.test(select(filter(dis_closestGene, DM == "hypo", Assay == "MeDIP"), V9), sele
 Cortex02_diff_summary <- read.delim("Cortex02_WGBS_MeDIP.diff.summary", head = F, as.is = T)
 GE02_diff_summary <- read.delim("GE02_WGBS_MeDIP.diff.summary", head = F, as.is = T)
 WGBS_MeDIP_diff_summary <- rbind(data.frame(Cortex02_diff_summary, Cell = "Cortex"), data.frame(GE02_diff_summary, Cell = "GE"))
-(WGBS_MeDIP_diff_summary_figure <- ggplot(WGBS_MeDIP_diff_summary, aes(x = V1, y = V2, fill = Cell)) + 
+(WGBS_MeDIP_diff_summary_figure <- ggplot(WGBS_MeDIP_diff_summary, aes(x = V1/10, y = V2, fill = Cell)) + 
    geom_bar(stat = "identity", position = "dodge") + 
    xlab("WGBS-MeDIP") + 
    ylab("No. of CpGs") + 
@@ -238,7 +238,14 @@ ggsave(genomicBreak_hydroxy_figure, file = "genomicBreak_hydroxy.pdf")
 (GREAT_Cortex02.hydroxy <- enrich_GREAT(file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", height = 12))
 (GREAT_GE02.hydroxy <- enrich_GREAT(file = "hydroxy_GE02", name = "GE02.hydroxy", height = 12))
 
-
+hydroxy.summary <- data.frame(CpG = c(Cortex_hydroxy_CpG, GE_hydroxy_CpG), Region = c(Cortex_hydroxy_region, GE_hydroxy_region), 
+                      CpG.in.WGBS.UMRs = c(as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed | wc -l", intern = T)), 
+                                           as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.diff.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed | wc -l", intern = T))), 
+                      WGBS.UMRs.with.CpG = c(as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/Cortex02_WGBS_MeDIP.diff.bed -u | wc -l", intern = T)), 
+                                             as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b /projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/GE02_WGBS_MeDIP.diff.bed -u | wc -l", intern = T))))
+rownames(hydroxy.summary) <- c("Cortex02", "GE02")
+save(hydroxy.summary, Cortex_GE_hydroxy_CpG, Cortex_GE_hydroxy_region, WGBS_MeDIP_diff_summary_figure, Venn_Cortex_GE_hydroxy_CpG, genomicBreak_hydroxy_figure, GREAT_Cortex02.hydroxy, GREAT_GE02.hydroxy, 
+     file = "hydroxy.Rdata")
 
 
 
