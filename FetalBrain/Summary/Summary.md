@@ -2,7 +2,7 @@
 Gloria Li  
 October 21, 2014  
 
-Updated: Thu Oct 23 11:59:50 2014
+Updated: Tue Nov  4 17:59:00 2014
 
 
 
@@ -23,17 +23,17 @@ Updated: Thu Oct 23 11:59:50 2014
 ### Neurospheres Cortex derived vs GE derived 
 #### Asymmetry between Cortex and GE UMRs  
 
-  * On average, there are , __4.26__-fold enrichment in total UMR length in Cortex compared to GE, __3.86__ in HuFNSC02, and __6.29__ in HuFNSC04.    
+  * On average, there are , __4.31__-fold enrichment in total UMR frequency in Cortex compared to GE, __4.07__ in HuFNSC02, and __5.31__ in HuFNSC04.    
   * The asymmetry appears to be global, in all chromosomes. It is reproduced in the two individuals, and __supported in MeDIP UMRs__.  
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on __UMR level__ can be reproduced with different cutoffs. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:33 2014 -->
-<TABLE border=1>
-<TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
-  <TR> <TD align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </TD> <TD align="center"> 2178 </TD> <TD align="center"> 420 </TD> <TD align="center"> 1758 </TD> </TR>
-  <TR> <TD align="center"> Cortex-HuFNSC04_GE-HuFNSC04 </TD> <TD align="center"> 646 </TD> <TD align="center">  91 </TD> <TD align="center"> 555 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:18 2014 -->
+<table border=1>
+<tr> <th> Sample </th> <th> Total.DMR </th> <th> Hyper.DMR </th> <th> Hypo.DMR </th>  </tr>
+  <tr> <td align="center"> Cortex-HuFNSC02_GE-HuFNSC02 </td> <td align="center"> 2178 </td> <td align="center"> 420 </td> <td align="center"> 1758 </td> </tr>
+  <tr> <td align="center"> Cortex-HuFNSC04_GE-HuFNSC04 </td> <td align="center"> 646 </td> <td align="center">  91 </td> <td align="center"> 555 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/WGBS_asymmetry-1.png) ![](./Summary_files/figure-html/WGBS_asymmetry-2.png) 
 
 #### GREAT analysis on Cortex and GE UMRs show brain development terms  
@@ -63,81 +63,81 @@ Updated: Thu Oct 23 11:59:50 2014
   + There are no intersect in pc genes with proximal GE UMRs between the two individual.  
   + There are __no significant__ DAVID enrichment terms due to the small number of genes.  
   
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:42 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> proximal.UMRs </TH> <TH> unique.genes </TH> <TH> DE.DMRs </TH> <TH> unique.DE.genes </TH> <TH> same.direction </TH>  </TR>
-  <TR> <TD align="center"> GE_UMRs-HuFNSC02 </TD> <TD align="center">  17 </TD> <TD align="center">  17 </TD> <TD align="center">   4 </TD> <TD align="center">   4 </TD> <TD align="center">   1 </TD> </TR>
-  <TR> <TD align="center"> Cortex_UMRs-HuFNSC02 </TD> <TD align="center">  53 </TD> <TD align="center">  52 </TD> <TD align="center">  15 </TD> <TD align="center">  14 </TD> <TD align="center">   8 </TD> </TR>
-  <TR> <TD align="center"> GE_UMRs-HuFNSC04 </TD> <TD align="center">   9 </TD> <TD align="center">  11 </TD> <TD align="center">   3 </TD> <TD align="center">   3 </TD> <TD align="center">   2 </TD> </TR>
-  <TR> <TD align="center"> Cortex_UMRs-HuFNSC04 </TD> <TD align="center">  82 </TD> <TD align="center">  84 </TD> <TD align="center">  10 </TD> <TD align="center">   9 </TD> <TD align="center">   3 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:41 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> proximal.UMRs </th> <th> unique.genes </th> <th> DE.DMRs </th> <th> unique.DE.genes </th> <th> same.direction </th>  </tr>
+  <tr> <td align="center"> GE_UMRs-HuFNSC02 </td> <td align="center">  17 </td> <td align="center">  17 </td> <td align="center">   4 </td> <td align="center">   4 </td> <td align="center">   1 </td> </tr>
+  <tr> <td align="center"> Cortex_UMRs-HuFNSC02 </td> <td align="center">  53 </td> <td align="center">  52 </td> <td align="center">  15 </td> <td align="center">  14 </td> <td align="center">   8 </td> </tr>
+  <tr> <td align="center"> GE_UMRs-HuFNSC04 </td> <td align="center">   9 </td> <td align="center">  11 </td> <td align="center">   3 </td> <td align="center">   3 </td> <td align="center">   2 </td> </tr>
+  <tr> <td align="center"> Cortex_UMRs-HuFNSC04 </td> <td align="center">  82 </td> <td align="center">  84 </td> <td align="center">  10 </td> <td align="center">   9 </td> <td align="center">   3 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/WGBS_proximal-1.png) ![](./Summary_files/figure-html/WGBS_proximal-2.png) 
 
 ##### DE genes with proximal Cortex UMRs  
 
   * HuFNSC02    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:45 2014 -->
-<TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="right"> CD58 </TD> <TD align="right"> CD58_molecule </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> RGS10 </TD> <TD align="right"> regulator_of_G-protein_signaling_10 </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> ADM </TD> <TD align="right"> adrenomedullin </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> NKX2-1 </TD> <TD align="right"> NK2_homeobox_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> OTX2 </TD> <TD align="right"> orthodenticle_homeobox_2 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> USP43 </TD> <TD align="right"> ubiquitin_specific_peptidase_43 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> GAD1 </TD> <TD align="right"> glutamate_decarboxylase_1_(brain,_67kDa) </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> FZD7 </TD> <TD align="right"> frizzled_family_receptor_7 </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> FZD5 </TD> <TD align="right"> frizzled_family_receptor_5 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> CXCR7 </TD> <TD align="right"> chemokine_(C-X-C_motif)_receptor_7 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> ZAR1 </TD> <TD align="right"> zygote_arrest_1 </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1 </TD> <TD align="center"> DN </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:47 2014 -->
+<table border=1>
+<tr> <th> name </th> <th> description </th> <th> DE </th>  </tr>
+  <tr> <td align="right"> CD58 </td> <td align="right"> CD58_molecule </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> RGS10 </td> <td align="right"> regulator_of_G-protein_signaling_10 </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> ADM </td> <td align="right"> adrenomedullin </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> NKX2-1 </td> <td align="right"> NK2_homeobox_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> OTX2 </td> <td align="right"> orthodenticle_homeobox_2 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> USP43 </td> <td align="right"> ubiquitin_specific_peptidase_43 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> GFAP </td> <td align="right"> glial_fibrillary_acidic_protein </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> NFIX </td> <td align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> GAD1 </td> <td align="right"> glutamate_decarboxylase_1_(brain,_67kDa) </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> FZD7 </td> <td align="right"> frizzled_family_receptor_7 </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> FZD5 </td> <td align="right"> frizzled_family_receptor_5 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> CXCR7 </td> <td align="right"> chemokine_(C-X-C_motif)_receptor_7 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> ZAR1 </td> <td align="right"> zygote_arrest_1 </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> FEZF1 </td> <td align="right"> FEZ_family_zinc_finger_1 </td> <td align="center"> DN </td> </tr>
+   </table>
 
   * HuFNSC04    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:45 2014 -->
-<TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="right"> FAM5C </TD> <TD align="right"> family_with_sequence_similarity_5,_member_C </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> STXBP6 </TD> <TD align="right"> syntaxin_binding_protein_6_(amisyn) </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> NFIX </TD> <TD align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> MEIS1 </TD> <TD align="right"> Meis_homeobox_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> FSIP2 </TD> <TD align="right"> fibrous_sheath_interacting_protein_2 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> INSM1 </TD> <TD align="right"> insulinoma-associated_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> C9orf172 </TD> <TD align="right"> chromosome_9_open_reading_frame_172 </TD> <TD align="center"> DN </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:47 2014 -->
+<table border=1>
+<tr> <th> name </th> <th> description </th> <th> DE </th>  </tr>
+  <tr> <td align="right"> FAM5C </td> <td align="right"> family_with_sequence_similarity_5,_member_C </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> STXBP6 </td> <td align="right"> syntaxin_binding_protein_6_(amisyn) </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> GFAP </td> <td align="right"> glial_fibrillary_acidic_protein </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> NFIX </td> <td align="right"> nuclear_factor_I/X_(CCAAT-binding_transcription_factor) </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> MEIS1 </td> <td align="right"> Meis_homeobox_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> FSIP2 </td> <td align="right"> fibrous_sheath_interacting_protein_2 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> INSM1 </td> <td align="right"> insulinoma-associated_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> FEZF1 </td> <td align="right"> FEZ_family_zinc_finger_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> C9orf172 </td> <td align="right"> chromosome_9_open_reading_frame_172 </td> <td align="center"> DN </td> </tr>
+   </table>
 
 ##### DE genes with proximal GE UMRs  
 
   * HuFNSC02    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:45 2014 -->
-<TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="right"> PAX6 </TD> <TD align="right"> paired_box_6 </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> TMEM132B </TD> <TD align="right"> transmembrane_protein_132B </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> PID1 </TD> <TD align="right"> phosphotyrosine_interaction_domain_containing_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> ZIC3 </TD> <TD align="right"> Zic_family_member_3 </TD> <TD align="center"> UP </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:47 2014 -->
+<table border=1>
+<tr> <th> name </th> <th> description </th> <th> DE </th>  </tr>
+  <tr> <td align="right"> PAX6 </td> <td align="right"> paired_box_6 </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> TMEM132B </td> <td align="right"> transmembrane_protein_132B </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> PID1 </td> <td align="right"> phosphotyrosine_interaction_domain_containing_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> ZIC3 </td> <td align="right"> Zic_family_member_3 </td> <td align="center"> UP </td> </tr>
+   </table>
 
   * HuFNSC04    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:45 2014 -->
-<TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="right"> MN1 </TD> <TD align="right"> meningioma_(disrupted_in_balanced_translocation)_1 </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> PNCK </TD> <TD align="right"> pregnancy_up-regulated_non-ubiquitously_expressed_CaM_kinase </TD> <TD align="center"> UP </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:47 2014 -->
+<table border=1>
+<tr> <th> name </th> <th> description </th> <th> DE </th>  </tr>
+  <tr> <td align="right"> MN1 </td> <td align="right"> meningioma_(disrupted_in_balanced_translocation)_1 </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> PNCK </td> <td align="right"> pregnancy_up-regulated_non-ubiquitously_expressed_CaM_kinase </td> <td align="center"> UP </td> </tr>
+   </table>
 
 #### UMR distal associated genes - _TBC_  
 
@@ -149,26 +149,26 @@ Updated: Thu Oct 23 11:59:50 2014
   * However, in general, the correlation of TFBS Cortex UMR vs GE UMR fold change between the two individual is quite low, only 0.2. __Same in MeDIP__.     
   * There are 15 TFs that are at least 3-fold enriched in TFBSs overlapping Cortex UMRs compared to GE UMRs as shown below.   
 
-![](./Summary_files/figure-html/WGBS_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:46 2014 -->
-<TABLE border=1>
-<TR> <TH> TF </TH> <TH> Cortex02UMR </TH> <TH> GE02UMR </TH> <TH> Ratio02 </TH> <TH> Cortex04UMR </TH> <TH> GE04UMR </TH> <TH> Ratio04 </TH>  </TR>
-  <TR> <TD align="center"> TAF7 </TD> <TD align="center">  12 </TD> <TD align="center">   4 </TD> <TD align="center"> 3.00 </TD> <TD align="center">  10 </TD> <TD align="center">   1 </TD> <TD align="center"> 10.00 </TD> </TR>
-  <TR> <TD align="center"> TFAP2A </TD> <TD align="center">  30 </TD> <TD align="center">  10 </TD> <TD align="center"> 3.00 </TD> <TD align="center">  20 </TD> <TD align="center">   3 </TD> <TD align="center"> 6.67 </TD> </TR>
-  <TR> <TD align="center"> USF1 </TD> <TD align="center">  67 </TD> <TD align="center">  21 </TD> <TD align="center"> 3.19 </TD> <TD align="center">  31 </TD> <TD align="center">   6 </TD> <TD align="center"> 5.17 </TD> </TR>
-  <TR> <TD align="center"> ELF1 </TD> <TD align="center">  45 </TD> <TD align="center">  14 </TD> <TD align="center"> 3.21 </TD> <TD align="center">  39 </TD> <TD align="center">   5 </TD> <TD align="center"> 7.80 </TD> </TR>
-  <TR> <TD align="center"> GATA2 </TD> <TD align="center"> 116 </TD> <TD align="center">  36 </TD> <TD align="center"> 3.22 </TD> <TD align="center">  43 </TD> <TD align="center">   4 </TD> <TD align="center"> 10.75 </TD> </TR>
-  <TR> <TD align="center"> ESR1 </TD> <TD align="center">  55 </TD> <TD align="center">  17 </TD> <TD align="center"> 3.24 </TD> <TD align="center">   9 </TD> <TD align="center">   3 </TD> <TD align="center"> 3.00 </TD> </TR>
-  <TR> <TD align="center"> CTCF </TD> <TD align="center"> 197 </TD> <TD align="center">  56 </TD> <TD align="center"> 3.52 </TD> <TD align="center"> 105 </TD> <TD align="center">  16 </TD> <TD align="center"> 6.56 </TD> </TR>
-  <TR> <TD align="center"> TFAP2C </TD> <TD align="center">  32 </TD> <TD align="center">   9 </TD> <TD align="center"> 3.56 </TD> <TD align="center">  23 </TD> <TD align="center">   5 </TD> <TD align="center"> 4.60 </TD> </TR>
-  <TR> <TD align="center"> MYC </TD> <TD align="center"> 133 </TD> <TD align="center">  36 </TD> <TD align="center"> 3.69 </TD> <TD align="center">  84 </TD> <TD align="center">   5 </TD> <TD align="center"> 16.80 </TD> </TR>
-  <TR> <TD align="center"> FOXA1 </TD> <TD align="center">  89 </TD> <TD align="center">  24 </TD> <TD align="center"> 3.71 </TD> <TD align="center">  26 </TD> <TD align="center">   5 </TD> <TD align="center"> 5.20 </TD> </TR>
-  <TR> <TD align="center"> TCF7L2 </TD> <TD align="center">  82 </TD> <TD align="center">  22 </TD> <TD align="center"> 3.73 </TD> <TD align="center">  47 </TD> <TD align="center">   4 </TD> <TD align="center"> 11.75 </TD> </TR>
-  <TR> <TD align="center"> ZNF263 </TD> <TD align="center">  31 </TD> <TD align="center">   8 </TD> <TD align="center"> 3.88 </TD> <TD align="center">  23 </TD> <TD align="center">   5 </TD> <TD align="center"> 4.60 </TD> </TR>
-  <TR> <TD align="center"> E2F1 </TD> <TD align="center">  35 </TD> <TD align="center">   9 </TD> <TD align="center"> 3.89 </TD> <TD align="center">  38 </TD> <TD align="center">   5 </TD> <TD align="center"> 7.60 </TD> </TR>
-  <TR> <TD align="center"> TAL1 </TD> <TD align="center">  16 </TD> <TD align="center">   4 </TD> <TD align="center"> 4.00 </TD> <TD align="center">   5 </TD> <TD align="center">   1 </TD> <TD align="center"> 5.00 </TD> </TR>
-  <TR> <TD align="center"> GATA3 </TD> <TD align="center">  63 </TD> <TD align="center">   8 </TD> <TD align="center"> 7.88 </TD> <TD align="center">  18 </TD> <TD align="center">   1 </TD> <TD align="center"> 18.00 </TD> </TR>
-   </TABLE>
+![](./Summary_files/figure-html/WGBS_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:48 2014 -->
+<table border=1>
+<tr> <th> TF </th> <th> Cortex02UMR </th> <th> GE02UMR </th> <th> Ratio02 </th> <th> Cortex04UMR </th> <th> GE04UMR </th> <th> Ratio04 </th>  </tr>
+  <tr> <td align="center"> TAF7 </td> <td align="center">  12 </td> <td align="center">   4 </td> <td align="center"> 3.00 </td> <td align="center">  10 </td> <td align="center">   1 </td> <td align="center"> 10.00 </td> </tr>
+  <tr> <td align="center"> TFAP2A </td> <td align="center">  30 </td> <td align="center">  10 </td> <td align="center"> 3.00 </td> <td align="center">  20 </td> <td align="center">   3 </td> <td align="center"> 6.67 </td> </tr>
+  <tr> <td align="center"> USF1 </td> <td align="center">  67 </td> <td align="center">  21 </td> <td align="center"> 3.19 </td> <td align="center">  31 </td> <td align="center">   6 </td> <td align="center"> 5.17 </td> </tr>
+  <tr> <td align="center"> ELF1 </td> <td align="center">  45 </td> <td align="center">  14 </td> <td align="center"> 3.21 </td> <td align="center">  39 </td> <td align="center">   5 </td> <td align="center"> 7.80 </td> </tr>
+  <tr> <td align="center"> GATA2 </td> <td align="center"> 116 </td> <td align="center">  36 </td> <td align="center"> 3.22 </td> <td align="center">  43 </td> <td align="center">   4 </td> <td align="center"> 10.75 </td> </tr>
+  <tr> <td align="center"> ESR1 </td> <td align="center">  55 </td> <td align="center">  17 </td> <td align="center"> 3.24 </td> <td align="center">   9 </td> <td align="center">   3 </td> <td align="center"> 3.00 </td> </tr>
+  <tr> <td align="center"> CTCF </td> <td align="center"> 197 </td> <td align="center">  56 </td> <td align="center"> 3.52 </td> <td align="center"> 105 </td> <td align="center">  16 </td> <td align="center"> 6.56 </td> </tr>
+  <tr> <td align="center"> TFAP2C </td> <td align="center">  32 </td> <td align="center">   9 </td> <td align="center"> 3.56 </td> <td align="center">  23 </td> <td align="center">   5 </td> <td align="center"> 4.60 </td> </tr>
+  <tr> <td align="center"> MYC </td> <td align="center"> 133 </td> <td align="center">  36 </td> <td align="center"> 3.69 </td> <td align="center">  84 </td> <td align="center">   5 </td> <td align="center"> 16.80 </td> </tr>
+  <tr> <td align="center"> FOXA1 </td> <td align="center">  89 </td> <td align="center">  24 </td> <td align="center"> 3.71 </td> <td align="center">  26 </td> <td align="center">   5 </td> <td align="center"> 5.20 </td> </tr>
+  <tr> <td align="center"> TCF7L2 </td> <td align="center">  82 </td> <td align="center">  22 </td> <td align="center"> 3.73 </td> <td align="center">  47 </td> <td align="center">   4 </td> <td align="center"> 11.75 </td> </tr>
+  <tr> <td align="center"> ZNF263 </td> <td align="center">  31 </td> <td align="center">   8 </td> <td align="center"> 3.88 </td> <td align="center">  23 </td> <td align="center">   5 </td> <td align="center"> 4.60 </td> </tr>
+  <tr> <td align="center"> E2F1 </td> <td align="center">  35 </td> <td align="center">   9 </td> <td align="center"> 3.89 </td> <td align="center">  38 </td> <td align="center">   5 </td> <td align="center"> 7.60 </td> </tr>
+  <tr> <td align="center"> TAL1 </td> <td align="center">  16 </td> <td align="center">   4 </td> <td align="center"> 4.00 </td> <td align="center">   5 </td> <td align="center">   1 </td> <td align="center"> 5.00 </td> </tr>
+  <tr> <td align="center"> GATA3 </td> <td align="center">  63 </td> <td align="center">   8 </td> <td align="center"> 7.88 </td> <td align="center">  18 </td> <td align="center">   1 </td> <td align="center"> 18.00 </td> </tr>
+   </table>
 
 #### DE genes between Cortex and GE are enriched in neuron development and cell migration   
 
@@ -197,73 +197,73 @@ Updated: Thu Oct 23 11:59:50 2014
     + __OTX2__: Orthodenticle Homeobox 2. Plays a role in the development of the brain and the sense organs, also influences the proliferation and differentiation of dopaminergic neuronal progenitor cells during mitosis. UP in medulloblastomas [PMID: 20028867](http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=20028867&dopt=b).     
     + ASTN1: Astrotactin 1. A neuronal adhesion molecule required for glial-guided migration of young postmitotic neuroblasts in cortical regions of developing brain, including cerebrum, hippocampus, cerebellum, and olfactory bulb (Fink et al., 1995).      
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:46 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
-  <TR> <TD> HuFNSC01 </TD> <TD align="center"> 403 </TD> <TD align="center"> 508 </TD> <TD align="center"> 911 </TD> </TR>
-  <TR> <TD> HuFNSC02 </TD> <TD align="center"> 588 </TD> <TD align="center"> 640 </TD> <TD align="center"> 1228 </TD> </TR>
-  <TR> <TD> HuFNSC03 </TD> <TD align="center"> 447 </TD> <TD align="center"> 227 </TD> <TD align="center"> 674 </TD> </TR>
-  <TR> <TD> HuFNSC04 </TD> <TD align="center"> 378 </TD> <TD align="center"> 249 </TD> <TD align="center"> 627 </TD> </TR>
-   </TABLE>
-![](./Summary_files/figure-html/DE_Cortex_GE-1.png) ![](./Summary_files/figure-html/DE_Cortex_GE-2.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:46 2014 -->
-<TABLE border=1>
-<TR> <TH> DE </TH> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> SLC1A6 </TD> <TD align="right"> solute_carrier_family_1_(high_affinity_aspartate/glutamate_transporter),_member_6 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> PCDH20 </TD> <TD align="right"> protocadherin_20 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> C9orf64 </TD> <TD align="right"> chromosome_9_open_reading_frame_64 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> GFAP </TD> <TD align="right"> glial_fibrillary_acidic_protein </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> ZIC5 </TD> <TD align="right"> Zic_family_member_5 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> NEFM </TD> <TD align="right"> neurofilament,_medium_polypeptide </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> QPCT </TD> <TD align="right"> glutaminyl-peptide_cyclotransferase </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> UNC5C </TD> <TD align="right"> unc-5_homolog_C_(C._elegans) </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> ZIC2 </TD> <TD align="right"> Zic_family_member_2 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> XKR8 </TD> <TD align="right"> XK,_Kell_blood_group_complex_subunit-related_family,_member_8 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> PYGL </TD> <TD align="right"> phosphorylase,_glycogen,_liver </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> SERINC2 </TD> <TD align="right"> serine_incorporator_2 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> KIAA1239 </TD> <TD align="right"> KIAA1239 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> B3GALT1 </TD> <TD align="right"> UDP-Gal:betaGlcNAc_beta_1,3-galactosyltransferase,_polypeptide_1 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> CCDC48 </TD> <TD align="right"> coiled-coil_domain_containing_48 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> NOS1AP </TD> <TD align="right"> nitric_oxide_synthase_1_(neuronal)_adaptor_protein </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> ADAM19 </TD> <TD align="right"> ADAM_metallopeptidase_domain_19 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> H1F0 </TD> <TD align="right"> H1_histone_family,_member_0 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> ZIC3 </TD> <TD align="right"> Zic_family_member_3 </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> NT5E </TD> <TD align="right"> 5'-nucleotidase,_ecto_(CD73) </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> SYNM </TD> <TD align="right"> synemin,_intermediate_filament_protein </TD> </TR>
-  <TR> <TD align="center"> UP </TD> <TD align="right"> C1orf226 </TD> <TD align="right"> chromosome_1_open_reading_frame_226 </TD> </TR>
-   </TABLE>
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:46 2014 -->
-<TABLE border=1>
-<TR> <TH> DE </TH> <TH> name </TH> <TH> description </TH>  </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> DPPA4 </TD> <TD align="right"> developmental_pluripotency_associated_4 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> VAX1 </TD> <TD align="right"> ventral_anterior_homeobox_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> SHISA6 </TD> <TD align="right"> shisa_homolog_6_(Xenopus_laevis) </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> NRXN3 </TD> <TD align="right"> neurexin_3 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> FGFR2 </TD> <TD align="right"> fibroblast_growth_factor_receptor_2 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> ST8SIA2 </TD> <TD align="right"> ST8_alpha-N-acetyl-neuraminide_alpha-2,8-sialyltransferase_2 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> SLC32A1 </TD> <TD align="right"> solute_carrier_family_32_(GABA_vesicular_transporter),_member_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> FEZF1 </TD> <TD align="right"> FEZ_family_zinc_finger_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> AJAP1 </TD> <TD align="right"> adherens_junctions_associated_protein_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> ZNF703 </TD> <TD align="right"> zinc_finger_protein_703 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> VSIG10L </TD> <TD align="right"> V-set_and_immunoglobulin_domain_containing_10_like </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> SIX3 </TD> <TD align="right"> SIX_homeobox_3 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> SORL1 </TD> <TD align="right"> sortilin-related_receptor,_L(DLR_class)_A_repeats_containing </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> LMO1 </TD> <TD align="right"> LIM_domain_only_1_(rhombotin_1) </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> ODZ1 </TD> <TD align="right"> odz,_odd_Oz/ten-m_homolog_1_(Drosophila) </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> EPHA3 </TD> <TD align="right"> EPH_receptor_A3 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> TIMP3 </TD> <TD align="right"> TIMP_metallopeptidase_inhibitor_3 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> CAMK2N1 </TD> <TD align="right"> calcium/calmodulin-dependent_protein_kinase_II_inhibitor_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> EEF1A2 </TD> <TD align="right"> eukaryotic_translation_elongation_factor_1_alpha_2 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> OTX2 </TD> <TD align="right"> orthodenticle_homeobox_2 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> CHL1 </TD> <TD align="right"> cell_adhesion_molecule_with_homology_to_L1CAM_(close_homolog_of_L1) </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> PCSK1N </TD> <TD align="right"> proprotein_convertase_subtilisin/kexin_type_1_inhibitor </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> LMO2 </TD> <TD align="right"> LIM_domain_only_2_(rhombotin-like_1) </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> ASTN1 </TD> <TD align="right"> astrotactin_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> BASP1 </TD> <TD align="right"> brain_abundant,_membrane_attached_signal_protein_1 </TD> </TR>
-  <TR> <TD align="center"> DN </TD> <TD align="right"> ADCYAP1R1 </TD> <TD align="right"> adenylate_cyclase_activating_polypeptide_1_(pituitary)_receptor_type_I </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:50 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
+  <tr> <td> HuFNSC01 </td> <td align="center"> 403 </td> <td align="center"> 508 </td> <td align="center"> 911 </td> </tr>
+  <tr> <td> HuFNSC02 </td> <td align="center"> 588 </td> <td align="center"> 640 </td> <td align="center"> 1228 </td> </tr>
+  <tr> <td> HuFNSC03 </td> <td align="center"> 447 </td> <td align="center"> 227 </td> <td align="center"> 674 </td> </tr>
+  <tr> <td> HuFNSC04 </td> <td align="center"> 378 </td> <td align="center"> 249 </td> <td align="center"> 627 </td> </tr>
+   </table>
+![](./Summary_files/figure-html/DE_Cortex_GE-1.png) ![](./Summary_files/figure-html/DE_Cortex_GE-2.png) <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:50 2014 -->
+<table border=1>
+<tr> <th> DE </th> <th> name </th> <th> description </th>  </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> SLC1A6 </td> <td align="right"> solute_carrier_family_1_(high_affinity_aspartate/glutamate_transporter),_member_6 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> PCDH20 </td> <td align="right"> protocadherin_20 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> C9orf64 </td> <td align="right"> chromosome_9_open_reading_frame_64 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> GFAP </td> <td align="right"> glial_fibrillary_acidic_protein </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> ZIC5 </td> <td align="right"> Zic_family_member_5 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> NEFM </td> <td align="right"> neurofilament,_medium_polypeptide </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> QPCT </td> <td align="right"> glutaminyl-peptide_cyclotransferase </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> UNC5C </td> <td align="right"> unc-5_homolog_C_(C._elegans) </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> ZIC2 </td> <td align="right"> Zic_family_member_2 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> XKR8 </td> <td align="right"> XK,_Kell_blood_group_complex_subunit-related_family,_member_8 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> PYGL </td> <td align="right"> phosphorylase,_glycogen,_liver </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> SERINC2 </td> <td align="right"> serine_incorporator_2 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> KIAA1239 </td> <td align="right"> KIAA1239 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> B3GALT1 </td> <td align="right"> UDP-Gal:betaGlcNAc_beta_1,3-galactosyltransferase,_polypeptide_1 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> CCDC48 </td> <td align="right"> coiled-coil_domain_containing_48 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> NOS1AP </td> <td align="right"> nitric_oxide_synthase_1_(neuronal)_adaptor_protein </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> ADAM19 </td> <td align="right"> ADAM_metallopeptidase_domain_19 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> H1F0 </td> <td align="right"> H1_histone_family,_member_0 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> ZIC3 </td> <td align="right"> Zic_family_member_3 </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> NT5E </td> <td align="right"> 5'-nucleotidase,_ecto_(CD73) </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> SYNM </td> <td align="right"> synemin,_intermediate_filament_protein </td> </tr>
+  <tr> <td align="center"> UP </td> <td align="right"> C1orf226 </td> <td align="right"> chromosome_1_open_reading_frame_226 </td> </tr>
+   </table>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:50 2014 -->
+<table border=1>
+<tr> <th> DE </th> <th> name </th> <th> description </th>  </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> DPPA4 </td> <td align="right"> developmental_pluripotency_associated_4 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> VAX1 </td> <td align="right"> ventral_anterior_homeobox_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> SHISA6 </td> <td align="right"> shisa_homolog_6_(Xenopus_laevis) </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> NRXN3 </td> <td align="right"> neurexin_3 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> FGFR2 </td> <td align="right"> fibroblast_growth_factor_receptor_2 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> ST8SIA2 </td> <td align="right"> ST8_alpha-N-acetyl-neuraminide_alpha-2,8-sialyltransferase_2 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> SLC32A1 </td> <td align="right"> solute_carrier_family_32_(GABA_vesicular_transporter),_member_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> FEZF1 </td> <td align="right"> FEZ_family_zinc_finger_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> AJAP1 </td> <td align="right"> adherens_junctions_associated_protein_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> ZNF703 </td> <td align="right"> zinc_finger_protein_703 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> VSIG10L </td> <td align="right"> V-set_and_immunoglobulin_domain_containing_10_like </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> SIX3 </td> <td align="right"> SIX_homeobox_3 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> SORL1 </td> <td align="right"> sortilin-related_receptor,_L(DLR_class)_A_repeats_containing </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> LMO1 </td> <td align="right"> LIM_domain_only_1_(rhombotin_1) </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> ODZ1 </td> <td align="right"> odz,_odd_Oz/ten-m_homolog_1_(Drosophila) </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> EPHA3 </td> <td align="right"> EPH_receptor_A3 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> TIMP3 </td> <td align="right"> TIMP_metallopeptidase_inhibitor_3 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> CAMK2N1 </td> <td align="right"> calcium/calmodulin-dependent_protein_kinase_II_inhibitor_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> EEF1A2 </td> <td align="right"> eukaryotic_translation_elongation_factor_1_alpha_2 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> OTX2 </td> <td align="right"> orthodenticle_homeobox_2 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> CHL1 </td> <td align="right"> cell_adhesion_molecule_with_homology_to_L1CAM_(close_homolog_of_L1) </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> PCSK1N </td> <td align="right"> proprotein_convertase_subtilisin/kexin_type_1_inhibitor </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> LMO2 </td> <td align="right"> LIM_domain_only_2_(rhombotin-like_1) </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> ASTN1 </td> <td align="right"> astrotactin_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> BASP1 </td> <td align="right"> brain_abundant,_membrane_attached_signal_protein_1 </td> </tr>
+  <tr> <td align="center"> DN </td> <td align="right"> ADCYAP1R1 </td> <td align="right"> adenylate_cyclase_activating_polypeptide_1_(pituitary)_receptor_type_I </td> </tr>
+   </table>
 
 #### Isoforms between Cortex and GE are enriched in cell signaling proteins
 
@@ -271,15 +271,15 @@ Updated: Thu Oct 23 11:59:50 2014
   * Individual specific isoforms between cortex and GE have __no__ significantly enriched terms, suggesting they are more likely random events without biological functions.          
   * Isoforms shared by at least two individuals are enriched in terms related to __cellular signaling__. InterPro shows enrichment in __EGF protein domain__.         
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:47 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
-  <TR> <TD> cortex01_GE01_summary </TD> <TD align="center"> 911 </TD> <TD align="center"> 32372 </TD> <TD align="center"> 18968 </TD> <TD align="center"> 8440 </TD> <TD align="center"> 7962 </TD> <TD align="center"> 2447 </TD> </TR>
-  <TR> <TD> cortex02_GE02_summary </TD> <TD align="center"> 1228 </TD> <TD align="center"> 35196 </TD> <TD align="center"> 21880 </TD> <TD align="center"> 8163 </TD> <TD align="center"> 7374 </TD> <TD align="center"> 2298 </TD> </TR>
-  <TR> <TD> cortex03_GE03_summary </TD> <TD align="center"> 674 </TD> <TD align="center"> 29617 </TD> <TD align="center"> 13746 </TD> <TD align="center"> 6401 </TD> <TD align="center"> 6022 </TD> <TD align="center"> 2086 </TD> </TR>
-  <TR> <TD> cortex04_GE04_summary </TD> <TD align="center"> 627 </TD> <TD align="center"> 22386 </TD> <TD align="center"> 11253 </TD> <TD align="center"> 4323 </TD> <TD align="center"> 4259 </TD> <TD align="center"> 1386 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:52 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
+  <tr> <td> cortex01_GE01_summary </td> <td align="center"> 911 </td> <td align="center"> 32372 </td> <td align="center"> 18968 </td> <td align="center"> 8440 </td> <td align="center"> 7962 </td> <td align="center"> 2447 </td> </tr>
+  <tr> <td> cortex02_GE02_summary </td> <td align="center"> 1228 </td> <td align="center"> 35196 </td> <td align="center"> 21880 </td> <td align="center"> 8163 </td> <td align="center"> 7374 </td> <td align="center"> 2298 </td> </tr>
+  <tr> <td> cortex03_GE03_summary </td> <td align="center"> 674 </td> <td align="center"> 29617 </td> <td align="center"> 13746 </td> <td align="center"> 6401 </td> <td align="center"> 6022 </td> <td align="center"> 2086 </td> </tr>
+  <tr> <td> cortex04_GE04_summary </td> <td align="center"> 627 </td> <td align="center"> 22386 </td> <td align="center"> 11253 </td> <td align="center"> 4323 </td> <td align="center"> 4259 </td> <td align="center"> 1386 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/Isoform_Cortex_GE-1.png) 
 
 #### Intron retention between Cortex and GE - _TBC_
@@ -305,16 +305,16 @@ Updated: Thu Oct 23 11:59:50 2014
 ### MZ twins  
 #### UMR asymmetry between MZ twins in Brain and Cortex 
 
-  + There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in total UMR length HuFNSC02/HuFNSC01 in Brain is __2.33__, in Cortex is __1.76__, and in GE is __0.89__.    
+  + There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in UMR frequency HuFNSC02/HuFNSC01 in Brain is __2.41__, in Cortex is __1.83__, and in GE is __0.899__.    
   
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:50 2014 -->
-<TABLE border=1>
-<TR> <TH> Sample </TH> <TH> Total.DMR </TH> <TH> Hyper.DMR </TH> <TH> Hypo.DMR </TH>  </TR>
-  <TR> <TD> Brain-HuFNSC01_Brain-HuFNSC02 </TD> <TD align="center"> 4472 </TD> <TD align="center"> 2750 </TD> <TD align="center"> 1722 </TD> </TR>
-  <TR> <TD> Cortex-HuFNSC01_Cortex-HuFNSC02 </TD> <TD align="center"> 3161 </TD> <TD align="center"> 1758 </TD> <TD align="center"> 1403 </TD> </TR>
-  <TR> <TD> GE-HuFNSC01_GE-HuFNSC02 </TD> <TD align="center"> 2716 </TD> <TD align="center"> 1136 </TD> <TD align="center"> 1580 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:00:58 2014 -->
+<table border=1>
+<tr> <th> Sample </th> <th> Total.DMR </th> <th> Hyper.DMR </th> <th> Hypo.DMR </th>  </tr>
+  <tr> <td> Brain-HuFNSC01_Brain-HuFNSC02 </td> <td align="center"> 4472 </td> <td align="center"> 2750 </td> <td align="center"> 1722 </td> </tr>
+  <tr> <td> Cortex-HuFNSC01_Cortex-HuFNSC02 </td> <td align="center"> 3161 </td> <td align="center"> 1758 </td> <td align="center"> 1403 </td> </tr>
+  <tr> <td> GE-HuFNSC01_GE-HuFNSC02 </td> <td align="center"> 2716 </td> <td align="center"> 1136 </td> <td align="center"> 1580 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/MeDIP_MZ_asymmetry-1.png) ![](./Summary_files/figure-html/MeDIP_MZ_asymmetry-2.png) 
 
 #### GREAT analysis on MZ UMRs are enriched in Homeobox and brain development  
@@ -361,132 +361,132 @@ Updated: Thu Oct 23 11:59:50 2014
     * SEMA3D: Sema Domain, Immunoglobulin Domain (Ig), Short Basic Domain, Secreted, (Semaphorin) 3D. Induces the collapse and paralysis of neuronal growth cones. Could potentially act as repulsive cues toward specific neuronal populations.    
     * VGF: May be involved in the regulation of cell-cell interactions or in synatogenesis during the maturation of the nervous system.   
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:57 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> DMRs </TH> <TH> unique.genes </TH> <TH> DE.DMRs </TH> <TH> unique.DE.genes </TH> <TH> same.direction </TH>  </TR>
-  <TR> <TD> Brain01_Brain02_hyper </TD> <TD align="center"> 432 </TD> <TD align="center"> 473 </TD> <TD align="center">  26 </TD> <TD align="center">  26 </TD> <TD align="center">  10 </TD> </TR>
-  <TR> <TD> Brain01_Brain02_hypo </TD> <TD align="center"> 367 </TD> <TD align="center"> 409 </TD> <TD align="center">  20 </TD> <TD align="center">  20 </TD> <TD align="center">  13 </TD> </TR>
-  <TR> <TD> Cortex01_Cortex02_hyper </TD> <TD align="center"> 587 </TD> <TD align="center"> 659 </TD> <TD align="center">  30 </TD> <TD align="center">  28 </TD> <TD align="center">  17 </TD> </TR>
-  <TR> <TD> Cortex01_Cortex02_hypo </TD> <TD align="center"> 316 </TD> <TD align="center"> 342 </TD> <TD align="center">  24 </TD> <TD align="center">  22 </TD> <TD align="center">  11 </TD> </TR>
-  <TR> <TD> GE01_GE02_hyper </TD> <TD align="center"> 369 </TD> <TD align="center"> 402 </TD> <TD align="center">   1 </TD> <TD align="center">   1 </TD> <TD align="center">   1 </TD> </TR>
-  <TR> <TD> GE01_GE02_hypo </TD> <TD align="center"> 361 </TD> <TD align="center"> 398 </TD> <TD align="center">   2 </TD> <TD align="center">   2 </TD> <TD align="center">   0 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:13 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> DMRs </th> <th> unique.genes </th> <th> DE.DMRs </th> <th> unique.DE.genes </th> <th> same.direction </th>  </tr>
+  <tr> <td> Brain01_Brain02_hyper </td> <td align="center"> 432 </td> <td align="center"> 473 </td> <td align="center">  26 </td> <td align="center">  26 </td> <td align="center">  10 </td> </tr>
+  <tr> <td> Brain01_Brain02_hypo </td> <td align="center"> 367 </td> <td align="center"> 409 </td> <td align="center">  20 </td> <td align="center">  20 </td> <td align="center">  13 </td> </tr>
+  <tr> <td> Cortex01_Cortex02_hyper </td> <td align="center"> 587 </td> <td align="center"> 659 </td> <td align="center">  30 </td> <td align="center">  28 </td> <td align="center">  17 </td> </tr>
+  <tr> <td> Cortex01_Cortex02_hypo </td> <td align="center"> 316 </td> <td align="center"> 342 </td> <td align="center">  24 </td> <td align="center">  22 </td> <td align="center">  11 </td> </tr>
+  <tr> <td> GE01_GE02_hyper </td> <td align="center"> 369 </td> <td align="center"> 402 </td> <td align="center">   1 </td> <td align="center">   1 </td> <td align="center">   1 </td> </tr>
+  <tr> <td> GE01_GE02_hypo </td> <td align="center"> 361 </td> <td align="center"> 398 </td> <td align="center">   2 </td> <td align="center">   2 </td> <td align="center">   0 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/MeDIP_MZ_proximal-1.png) ![](./Summary_files/figure-html/MeDIP_MZ_proximal-2.png) 
 
 ##### HuFNSC01 UMRs proximal associated DE genes
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:58 2014 -->
-<TABLE border=1>
-<TR> <TH> CellType </TH> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> SAMD11 </TD> <TD align="right"> sterile_alpha_motif_domain_containing_11 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> ITGA8 </TD> <TD align="right"> integrin,_alpha_8 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> EMX2 </TD> <TD align="right"> empty_spiracles_homeobox_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> ARNTL2 </TD> <TD align="right"> aryl_hydrocarbon_receptor_nuclear_translocator-like_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CPNE8 </TD> <TD align="right"> copine_VIII </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> PCDH17 </TD> <TD align="right"> protocadherin_17 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right">  </TD> <TD align="right"> Putative_3-phosphoinositide-dependent_protein_kinase_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CPNE7 </TD> <TD align="right"> copine_VII </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> PKDREJ </TD> <TD align="right"> polycystic_kidney_disease_(polycystin)_and_REJ_homolog_(sperm_receptor_for_egg_jelly_homolog,_sea_urchin) </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> THRB </TD> <TD align="right"> thyroid_hormone_receptor,_beta </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> SFRP2 </TD> <TD align="right"> secreted_frizzled-related_protein_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> IER3 </TD> <TD align="right"> immediate_early_response_3 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> ZBTB12 </TD> <TD align="right"> zinc_finger_and_BTB_domain_containing_12 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> MDGA1 </TD> <TD align="right"> MAM_domain_containing_glycosylphosphatidylinositol_anchor_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> EPHA1 </TD> <TD align="right"> EPH_receptor_A1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right">  </TD> <TD align="right"> Protein_kinase-like_protein_SgK196 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> TOX </TD> <TD align="right"> thymocyte_selection-associated_high_mobility_group_box </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> NCOA2 </TD> <TD align="right"> nuclear_receptor_coactivator_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> GPR64 </TD> <TD align="right"> G_protein-coupled_receptor_64 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> TRPC5 </TD> <TD align="right"> transient_receptor_potential_cation_channel,_subfamily_C,_member_5 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> ELTD1 </TD> <TD align="right"> EGF,_latrophilin_and_seven_transmembrane_domain_containing_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> CRABP2 </TD> <TD align="right"> cellular_retinoic_acid_binding_protein_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SPOCK2 </TD> <TD align="right"> sparc/osteonectin,_cwcv_and_kazal-like_domains_proteoglycan_(testican)_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> VAX1 </TD> <TD align="right"> ventral_anterior_homeobox_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> LRRC10B </TD> <TD align="right"> leucine_rich_repeat_containing_10B </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NDUFA4L2 </TD> <TD align="right"> NADH_dehydrogenase_(ubiquinone)_1_alpha_subcomplex,_4-like_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> FOXO1 </TD> <TD align="right"> forkhead_box_O1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> C16orf74 </TD> <TD align="right"> chromosome_16_open_reading_frame_74 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> WNT3 </TD> <TD align="right"> wingless-type_MMTV_integration_site_family,_member_3 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> CHST9 </TD> <TD align="right"> carbohydrate_(N-acetylgalactosamine_4-0)_sulfotransferase_9 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> CD97 </TD> <TD align="right"> CD97_molecule </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> RNF144A </TD> <TD align="right"> ring_finger_protein_144A </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> DLX1 </TD> <TD align="right"> distal-less_homeobox_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> OLIG1 </TD> <TD align="right"> oligodendrocyte_transcription_factor_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SCUBE1 </TD> <TD align="right"> signal_peptide,_CUB_domain,_EGF-like_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> GRIA1 </TD> <TD align="right"> glutamate_receptor,_ionotropic,_AMPA_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> MMD2 </TD> <TD align="right"> monocyte_to_macrophage_differentiation-associated_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SEMA3E </TD> <TD align="right"> sema_domain,_immunoglobulin_domain_(Ig),_short_basic_domain,_secreted,_(semaphorin)_3E </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> VIPR2 </TD> <TD align="right"> vasoactive_intestinal_peptide_receptor_2 </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> AP1S2 </TD> <TD align="right"> adaptor-related_protein_complex_1,_sigma_2_subunit </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SH3KBP1 </TD> <TD align="right"> SH3-domain_kinase_binding_protein_1 </TD> <TD align="center"> hypo </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> GE </TD> <TD align="right"> FAM5B </TD> <TD align="right"> family_with_sequence_similarity_5,_member_B </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> GE </TD> <TD align="right"> DLL1 </TD> <TD align="right"> delta-like_1_(Drosophila) </TD> <TD align="center"> hypo </TD> <TD align="center"> DN </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:13 2014 -->
+<table border=1>
+<tr> <th> CellType </th> <th> name </th> <th> description </th> <th> DM </th> <th> DE </th>  </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> SAMD11 </td> <td align="right"> sterile_alpha_motif_domain_containing_11 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> ITGA8 </td> <td align="right"> integrin,_alpha_8 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> EMX2 </td> <td align="right"> empty_spiracles_homeobox_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> ARNTL2 </td> <td align="right"> aryl_hydrocarbon_receptor_nuclear_translocator-like_2 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CPNE8 </td> <td align="right"> copine_VIII </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> PCDH17 </td> <td align="right"> protocadherin_17 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right">  </td> <td align="right"> Putative_3-phosphoinositide-dependent_protein_kinase_2 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CPNE7 </td> <td align="right"> copine_VII </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> PKDREJ </td> <td align="right"> polycystic_kidney_disease_(polycystin)_and_REJ_homolog_(sperm_receptor_for_egg_jelly_homolog,_sea_urchin) </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> THRB </td> <td align="right"> thyroid_hormone_receptor,_beta </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> SFRP2 </td> <td align="right"> secreted_frizzled-related_protein_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> IER3 </td> <td align="right"> immediate_early_response_3 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> ZBTB12 </td> <td align="right"> zinc_finger_and_BTB_domain_containing_12 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> MDGA1 </td> <td align="right"> MAM_domain_containing_glycosylphosphatidylinositol_anchor_1 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> EPHA1 </td> <td align="right"> EPH_receptor_A1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right">  </td> <td align="right"> Protein_kinase-like_protein_SgK196 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> TOX </td> <td align="right"> thymocyte_selection-associated_high_mobility_group_box </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> NCOA2 </td> <td align="right"> nuclear_receptor_coactivator_2 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> GPR64 </td> <td align="right"> G_protein-coupled_receptor_64 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> TRPC5 </td> <td align="right"> transient_receptor_potential_cation_channel,_subfamily_C,_member_5 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> ELTD1 </td> <td align="right"> EGF,_latrophilin_and_seven_transmembrane_domain_containing_1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> CRABP2 </td> <td align="right"> cellular_retinoic_acid_binding_protein_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SPOCK2 </td> <td align="right"> sparc/osteonectin,_cwcv_and_kazal-like_domains_proteoglycan_(testican)_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> VAX1 </td> <td align="right"> ventral_anterior_homeobox_1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> LRRC10B </td> <td align="right"> leucine_rich_repeat_containing_10B </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NDUFA4L2 </td> <td align="right"> NADH_dehydrogenase_(ubiquinone)_1_alpha_subcomplex,_4-like_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> FOXO1 </td> <td align="right"> forkhead_box_O1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> C16orf74 </td> <td align="right"> chromosome_16_open_reading_frame_74 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> WNT3 </td> <td align="right"> wingless-type_MMTV_integration_site_family,_member_3 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> CHST9 </td> <td align="right"> carbohydrate_(N-acetylgalactosamine_4-0)_sulfotransferase_9 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> CD97 </td> <td align="right"> CD97_molecule </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> RNF144A </td> <td align="right"> ring_finger_protein_144A </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> DLX1 </td> <td align="right"> distal-less_homeobox_1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> OLIG1 </td> <td align="right"> oligodendrocyte_transcription_factor_1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SCUBE1 </td> <td align="right"> signal_peptide,_CUB_domain,_EGF-like_1 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> GRIA1 </td> <td align="right"> glutamate_receptor,_ionotropic,_AMPA_1 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> MMD2 </td> <td align="right"> monocyte_to_macrophage_differentiation-associated_2 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SEMA3E </td> <td align="right"> sema_domain,_immunoglobulin_domain_(Ig),_short_basic_domain,_secreted,_(semaphorin)_3E </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> VIPR2 </td> <td align="right"> vasoactive_intestinal_peptide_receptor_2 </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> AP1S2 </td> <td align="right"> adaptor-related_protein_complex_1,_sigma_2_subunit </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SH3KBP1 </td> <td align="right"> SH3-domain_kinase_binding_protein_1 </td> <td align="center"> hypo </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> GE </td> <td align="right"> FAM5B </td> <td align="right"> family_with_sequence_similarity_5,_member_B </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> GE </td> <td align="right"> DLL1 </td> <td align="right"> delta-like_1_(Drosophila) </td> <td align="center"> hypo </td> <td align="center"> DN </td> </tr>
+   </table>
 
 ##### HuFNSC02 UMRs proximal associated DE genes
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:58 2014 -->
-<TABLE border=1>
-<TR> <TH> CellType </TH> <TH> name </TH> <TH> description </TH> <TH> DM </TH> <TH> DE </TH>  </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> EPHA8 </TD> <TD align="right"> EPH_receptor_A8 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> IFI6 </TD> <TD align="right"> interferon,_alpha-inducible_protein_6 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> BMP8A </TD> <TD align="right"> bone_morphogenetic_protein_8a </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> ALX3 </TD> <TD align="right"> ALX_homeobox_3 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> NRGN </TD> <TD align="right"> neurogranin_(protein_kinase_C_substrate,_RC3) </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> C1QL4 </TD> <TD align="right"> complement_component_1,_q_subcomponent-like_4 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CSRP2 </TD> <TD align="right"> cysteine_and_glycine-rich_protein_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> TTYH2 </TD> <TD align="right"> tweety_homolog_2_(Drosophila) </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> DTNB </TD> <TD align="right"> dystrobrevin,_beta </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CXCR7 </TD> <TD align="right"> chemokine_(C-X-C_motif)_receptor_7 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> VHL </TD> <TD align="right"> von_Hippel-Lindau_tumor_suppressor </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> EPHA6 </TD> <TD align="right"> EPH_receptor_A6 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CAMK2N2 </TD> <TD align="right"> calcium/calmodulin-dependent_protein_kinase_II_inhibitor_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> TBC1D1 </TD> <TD align="right"> TBC1_(tre-2/USP6,_BUB2,_cdc16)_domain_family,_member_1 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> NMU </TD> <TD align="right"> neuromedin_U </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> FSTL5 </TD> <TD align="right"> follistatin-like_5 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CARTPT </TD> <TD align="right"> CART_prepropeptide </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> EDIL3 </TD> <TD align="right"> EGF-like_repeats_and_discoidin_I-like_domains_3 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> CCDC90A </TD> <TD align="right"> coiled-coil_domain_containing_90A </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right">  </TD> <TD align="right"> LOC401296_proteinUncharacterized_protein </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> NPY </TD> <TD align="right"> neuropeptide_Y </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> SFRP1 </TD> <TD align="right"> secreted_frizzled-related_protein_1 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> TOX </TD> <TD align="right"> thymocyte_selection-associated_high_mobility_group_box </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> ENTPD2 </TD> <TD align="right"> ectonucleoside_triphosphate_diphosphohydrolase_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> KLHL4 </TD> <TD align="right"> kelch-like_4_(Drosophila) </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Brain </TD> <TD align="right"> SOX3 </TD> <TD align="right"> SRY_(sex_determining_region_Y)-box_3 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> DMRTA2 </TD> <TD align="right"> DMRT-like_family_A2 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NPR1 </TD> <TD align="right"> natriuretic_peptide_receptor_A/guanylate_cyclase_A_(atrionatriuretic_peptide_receptor_A) </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> PTPRE </TD> <TD align="right"> protein_tyrosine_phosphatase,_receptor_type,_E </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> PDE3B </TD> <TD align="right"> phosphodiesterase_3B,_cGMP-inhibited </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> LDHA </TD> <TD align="right"> lactate_dehydrogenase_A </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> GNG3 </TD> <TD align="right"> guanine_nucleotide_binding_protein_(G_protein),_gamma_3 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> METTL7B </TD> <TD align="right"> methyltransferase_like_7B </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NME3 </TD> <TD align="right"> non-metastatic_cells_3,_protein_expressed_in </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> GRIN2A </TD> <TD align="right"> glutamate_receptor,_ionotropic,_N-methyl_D-aspartate_2A </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NOL3 </TD> <TD align="right"> nucleolar_protein_3_(apoptosis_repressor_with_CARD_domain) </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NR1D1 </TD> <TD align="right"> nuclear_receptor_subfamily_1,_group_D,_member_1 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> IGFBP4 </TD> <TD align="right"> insulin-like_growth_factor_binding_protein_4 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> TBX2 </TD> <TD align="right"> T-box_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> LBH </TD> <TD align="right"> limb_bud_and_heart_development_homolog_(mouse) </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> INSIG2 </TD> <TD align="right"> insulin_induced_gene_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> WNT7A </TD> <TD align="right"> wingless-type_MMTV_integration_site_family,_member_7A </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SNCA </TD> <TD align="right"> synuclein,_alpha_(non_A4_component_of_amyloid_precursor) </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NPNT </TD> <TD align="right"> nephronectin </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SFRP2 </TD> <TD align="right"> secreted_frizzled-related_protein_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> PRR16 </TD> <TD align="right"> proline_rich_16 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> STC2 </TD> <TD align="right"> stanniocalcin_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SNCB </TD> <TD align="right"> synuclein,_beta </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> ITPR3 </TD> <TD align="right"> inositol_1,4,5-trisphosphate_receptor,_type_3 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> NPY </TD> <TD align="right"> neuropeptide_Y </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SEMA3D </TD> <TD align="right"> sema_domain,_immunoglobulin_domain_(Ig),_short_basic_domain,_secreted,_(semaphorin)_3D </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> VGF </TD> <TD align="right"> VGF_nerve_growth_factor_inducible </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> CAV1 </TD> <TD align="right"> caveolin_1,_caveolae_protein,_22kDa </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> Cortex </TD> <TD align="right"> SHROOM2 </TD> <TD align="right"> shroom_family_member_2 </TD> <TD align="center"> hyper </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="center"> GE </TD> <TD align="right"> DBC1 </TD> <TD align="right"> deleted_in_bladder_cancer_1 </TD> <TD align="center"> hyper </TD> <TD align="center"> DN </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:13 2014 -->
+<table border=1>
+<tr> <th> CellType </th> <th> name </th> <th> description </th> <th> DM </th> <th> DE </th>  </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> EPHA8 </td> <td align="right"> EPH_receptor_A8 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> IFI6 </td> <td align="right"> interferon,_alpha-inducible_protein_6 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> BMP8A </td> <td align="right"> bone_morphogenetic_protein_8a </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> ALX3 </td> <td align="right"> ALX_homeobox_3 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> NRGN </td> <td align="right"> neurogranin_(protein_kinase_C_substrate,_RC3) </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> C1QL4 </td> <td align="right"> complement_component_1,_q_subcomponent-like_4 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CSRP2 </td> <td align="right"> cysteine_and_glycine-rich_protein_2 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> TTYH2 </td> <td align="right"> tweety_homolog_2_(Drosophila) </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> DTNB </td> <td align="right"> dystrobrevin,_beta </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CXCR7 </td> <td align="right"> chemokine_(C-X-C_motif)_receptor_7 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> VHL </td> <td align="right"> von_Hippel-Lindau_tumor_suppressor </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> EPHA6 </td> <td align="right"> EPH_receptor_A6 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CAMK2N2 </td> <td align="right"> calcium/calmodulin-dependent_protein_kinase_II_inhibitor_2 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> TBC1D1 </td> <td align="right"> TBC1_(tre-2/USP6,_BUB2,_cdc16)_domain_family,_member_1 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> NMU </td> <td align="right"> neuromedin_U </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> FSTL5 </td> <td align="right"> follistatin-like_5 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CARTPT </td> <td align="right"> CART_prepropeptide </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> EDIL3 </td> <td align="right"> EGF-like_repeats_and_discoidin_I-like_domains_3 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> CCDC90A </td> <td align="right"> coiled-coil_domain_containing_90A </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right">  </td> <td align="right"> LOC401296_proteinUncharacterized_protein </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> NPY </td> <td align="right"> neuropeptide_Y </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> SFRP1 </td> <td align="right"> secreted_frizzled-related_protein_1 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> TOX </td> <td align="right"> thymocyte_selection-associated_high_mobility_group_box </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> ENTPD2 </td> <td align="right"> ectonucleoside_triphosphate_diphosphohydrolase_2 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> KLHL4 </td> <td align="right"> kelch-like_4_(Drosophila) </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Brain </td> <td align="right"> SOX3 </td> <td align="right"> SRY_(sex_determining_region_Y)-box_3 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> DMRTA2 </td> <td align="right"> DMRT-like_family_A2 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NPR1 </td> <td align="right"> natriuretic_peptide_receptor_A/guanylate_cyclase_A_(atrionatriuretic_peptide_receptor_A) </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> PTPRE </td> <td align="right"> protein_tyrosine_phosphatase,_receptor_type,_E </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> PDE3B </td> <td align="right"> phosphodiesterase_3B,_cGMP-inhibited </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> LDHA </td> <td align="right"> lactate_dehydrogenase_A </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> GNG3 </td> <td align="right"> guanine_nucleotide_binding_protein_(G_protein),_gamma_3 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> METTL7B </td> <td align="right"> methyltransferase_like_7B </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NME3 </td> <td align="right"> non-metastatic_cells_3,_protein_expressed_in </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> GRIN2A </td> <td align="right"> glutamate_receptor,_ionotropic,_N-methyl_D-aspartate_2A </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NOL3 </td> <td align="right"> nucleolar_protein_3_(apoptosis_repressor_with_CARD_domain) </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NR1D1 </td> <td align="right"> nuclear_receptor_subfamily_1,_group_D,_member_1 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> IGFBP4 </td> <td align="right"> insulin-like_growth_factor_binding_protein_4 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> TBX2 </td> <td align="right"> T-box_2 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> LBH </td> <td align="right"> limb_bud_and_heart_development_homolog_(mouse) </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> INSIG2 </td> <td align="right"> insulin_induced_gene_2 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> WNT7A </td> <td align="right"> wingless-type_MMTV_integration_site_family,_member_7A </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SNCA </td> <td align="right"> synuclein,_alpha_(non_A4_component_of_amyloid_precursor) </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NPNT </td> <td align="right"> nephronectin </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SFRP2 </td> <td align="right"> secreted_frizzled-related_protein_2 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> PRR16 </td> <td align="right"> proline_rich_16 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> STC2 </td> <td align="right"> stanniocalcin_2 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SNCB </td> <td align="right"> synuclein,_beta </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> ITPR3 </td> <td align="right"> inositol_1,4,5-trisphosphate_receptor,_type_3 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> NPY </td> <td align="right"> neuropeptide_Y </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SEMA3D </td> <td align="right"> sema_domain,_immunoglobulin_domain_(Ig),_short_basic_domain,_secreted,_(semaphorin)_3D </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> VGF </td> <td align="right"> VGF_nerve_growth_factor_inducible </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> CAV1 </td> <td align="right"> caveolin_1,_caveolae_protein,_22kDa </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> Cortex </td> <td align="right"> SHROOM2 </td> <td align="right"> shroom_family_member_2 </td> <td align="center"> hyper </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="center"> GE </td> <td align="right"> DBC1 </td> <td align="right"> deleted_in_bladder_cancer_1 </td> <td align="center"> hyper </td> <td align="center"> DN </td> </tr>
+   </table>
 
 #### UMR distal associated genes - _TBC_  
 
@@ -497,29 +497,29 @@ Updated: Thu Oct 23 11:59:50 2014
   * Overlap UMRs with transcription factor binding sites and count No. of overlapping TFBSs for each TF showed similar asymmetry in Brain and Cortex, but is symmetric in GE. The correlation between Brain and Cortex is also very low, __0.15__.    
   * With 2-fold change cutoff, there are 18 TFs enriched in HuFNSC02 in both Brain and Cortex.   
 
-![](./Summary_files/figure-html/MeDIP_MZ_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:59 2014 -->
-<TABLE border=1>
-<TR> <TH> TF </TH> <TH> Brain.hypo </TH> <TH> Brain.hyper </TH> <TH> Ratio.Brain </TH> <TH> Cortex.hypo </TH> <TH> Cortex.hyper </TH> <TH> Ratio.Cortex </TH>  </TR>
-  <TR> <TD align="center"> ESRRA </TD> <TD align="center">   1 </TD> <TD align="center">   7 </TD> <TD align="center"> 0.14 </TD> <TD align="center">   1 </TD> <TD align="center">   5 </TD> <TD align="center"> 0.20 </TD> </TR>
-  <TR> <TD align="center"> TAL1 </TD> <TD align="center">  10 </TD> <TD align="center">  42 </TD> <TD align="center"> 0.24 </TD> <TD align="center">   9 </TD> <TD align="center">  34 </TD> <TD align="center"> 0.26 </TD> </TR>
-  <TR> <TD align="center"> HNF4A </TD> <TD align="center">  15 </TD> <TD align="center">  49 </TD> <TD align="center"> 0.31 </TD> <TD align="center">  11 </TD> <TD align="center">  27 </TD> <TD align="center"> 0.41 </TD> </TR>
-  <TR> <TD align="center"> HNF4G </TD> <TD align="center">  13 </TD> <TD align="center">  41 </TD> <TD align="center"> 0.32 </TD> <TD align="center">  10 </TD> <TD align="center">  29 </TD> <TD align="center"> 0.34 </TD> </TR>
-  <TR> <TD align="center"> ZNF217 </TD> <TD align="center">   6 </TD> <TD align="center">  17 </TD> <TD align="center"> 0.35 </TD> <TD align="center">   6 </TD> <TD align="center">  14 </TD> <TD align="center"> 0.43 </TD> </TR>
-  <TR> <TD align="center"> EBF1 </TD> <TD align="center">  49 </TD> <TD align="center"> 130 </TD> <TD align="center"> 0.38 </TD> <TD align="center">  48 </TD> <TD align="center">  98 </TD> <TD align="center"> 0.49 </TD> </TR>
-  <TR> <TD align="center"> FOS </TD> <TD align="center">  47 </TD> <TD align="center"> 123 </TD> <TD align="center"> 0.38 </TD> <TD align="center">  43 </TD> <TD align="center"> 118 </TD> <TD align="center"> 0.36 </TD> </TR>
-  <TR> <TD align="center"> GATA1 </TD> <TD align="center">  31 </TD> <TD align="center">  73 </TD> <TD align="center"> 0.42 </TD> <TD align="center">  32 </TD> <TD align="center">  80 </TD> <TD align="center"> 0.40 </TD> </TR>
-  <TR> <TD align="center"> HSF1 </TD> <TD align="center">   3 </TD> <TD align="center">   7 </TD> <TD align="center"> 0.43 </TD> <TD align="center">   2 </TD> <TD align="center">   6 </TD> <TD align="center"> 0.33 </TD> </TR>
-  <TR> <TD align="center"> FOXA2 </TD> <TD align="center">  26 </TD> <TD align="center">  60 </TD> <TD align="center"> 0.43 </TD> <TD align="center">  14 </TD> <TD align="center">  36 </TD> <TD align="center"> 0.39 </TD> </TR>
-  <TR> <TD align="center"> GATA3 </TD> <TD align="center">  35 </TD> <TD align="center">  80 </TD> <TD align="center"> 0.44 </TD> <TD align="center">  22 </TD> <TD align="center">  52 </TD> <TD align="center"> 0.42 </TD> </TR>
-  <TR> <TD align="center"> GATA2 </TD> <TD align="center">  58 </TD> <TD align="center"> 130 </TD> <TD align="center"> 0.45 </TD> <TD align="center">  39 </TD> <TD align="center">  96 </TD> <TD align="center"> 0.41 </TD> </TR>
-  <TR> <TD align="center"> STAT3 </TD> <TD align="center">  41 </TD> <TD align="center">  91 </TD> <TD align="center"> 0.45 </TD> <TD align="center">  26 </TD> <TD align="center">  87 </TD> <TD align="center"> 0.30 </TD> </TR>
-  <TR> <TD align="center"> CEBPD </TD> <TD align="center">  22 </TD> <TD align="center">  48 </TD> <TD align="center"> 0.46 </TD> <TD align="center">  23 </TD> <TD align="center">  64 </TD> <TD align="center"> 0.36 </TD> </TR>
-  <TR> <TD align="center"> SMC3 </TD> <TD align="center">  71 </TD> <TD align="center"> 150 </TD> <TD align="center"> 0.47 </TD> <TD align="center">  62 </TD> <TD align="center"> 144 </TD> <TD align="center"> 0.43 </TD> </TR>
-  <TR> <TD align="center"> NR3C1 </TD> <TD align="center">  46 </TD> <TD align="center">  95 </TD> <TD align="center"> 0.48 </TD> <TD align="center">  39 </TD> <TD align="center">  90 </TD> <TD align="center"> 0.43 </TD> </TR>
-  <TR> <TD align="center"> RXRA </TD> <TD align="center">  23 </TD> <TD align="center">  47 </TD> <TD align="center"> 0.49 </TD> <TD align="center">  16 </TD> <TD align="center">  35 </TD> <TD align="center"> 0.46 </TD> </TR>
-  <TR> <TD align="center"> HDAC6 </TD> <TD align="center">   1 </TD> <TD align="center">   2 </TD> <TD align="center"> 0.50 </TD> <TD align="center">   2 </TD> <TD align="center">  11 </TD> <TD align="center"> 0.18 </TD> </TR>
-   </TABLE>
+![](./Summary_files/figure-html/MeDIP_MZ_TF-1.png) <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:14 2014 -->
+<table border=1>
+<tr> <th> TF </th> <th> Brain.hypo </th> <th> Brain.hyper </th> <th> Ratio.Brain </th> <th> Cortex.hypo </th> <th> Cortex.hyper </th> <th> Ratio.Cortex </th>  </tr>
+  <tr> <td align="center"> ESRRA </td> <td align="center">   1 </td> <td align="center">   7 </td> <td align="center"> 0.14 </td> <td align="center">   1 </td> <td align="center">   5 </td> <td align="center"> 0.20 </td> </tr>
+  <tr> <td align="center"> TAL1 </td> <td align="center">  10 </td> <td align="center">  42 </td> <td align="center"> 0.24 </td> <td align="center">   9 </td> <td align="center">  34 </td> <td align="center"> 0.26 </td> </tr>
+  <tr> <td align="center"> HNF4A </td> <td align="center">  15 </td> <td align="center">  49 </td> <td align="center"> 0.31 </td> <td align="center">  11 </td> <td align="center">  27 </td> <td align="center"> 0.41 </td> </tr>
+  <tr> <td align="center"> HNF4G </td> <td align="center">  13 </td> <td align="center">  41 </td> <td align="center"> 0.32 </td> <td align="center">  10 </td> <td align="center">  29 </td> <td align="center"> 0.34 </td> </tr>
+  <tr> <td align="center"> ZNF217 </td> <td align="center">   6 </td> <td align="center">  17 </td> <td align="center"> 0.35 </td> <td align="center">   6 </td> <td align="center">  14 </td> <td align="center"> 0.43 </td> </tr>
+  <tr> <td align="center"> EBF1 </td> <td align="center">  49 </td> <td align="center"> 130 </td> <td align="center"> 0.38 </td> <td align="center">  48 </td> <td align="center">  98 </td> <td align="center"> 0.49 </td> </tr>
+  <tr> <td align="center"> FOS </td> <td align="center">  47 </td> <td align="center"> 123 </td> <td align="center"> 0.38 </td> <td align="center">  43 </td> <td align="center"> 118 </td> <td align="center"> 0.36 </td> </tr>
+  <tr> <td align="center"> GATA1 </td> <td align="center">  31 </td> <td align="center">  73 </td> <td align="center"> 0.42 </td> <td align="center">  32 </td> <td align="center">  80 </td> <td align="center"> 0.40 </td> </tr>
+  <tr> <td align="center"> HSF1 </td> <td align="center">   3 </td> <td align="center">   7 </td> <td align="center"> 0.43 </td> <td align="center">   2 </td> <td align="center">   6 </td> <td align="center"> 0.33 </td> </tr>
+  <tr> <td align="center"> FOXA2 </td> <td align="center">  26 </td> <td align="center">  60 </td> <td align="center"> 0.43 </td> <td align="center">  14 </td> <td align="center">  36 </td> <td align="center"> 0.39 </td> </tr>
+  <tr> <td align="center"> GATA3 </td> <td align="center">  35 </td> <td align="center">  80 </td> <td align="center"> 0.44 </td> <td align="center">  22 </td> <td align="center">  52 </td> <td align="center"> 0.42 </td> </tr>
+  <tr> <td align="center"> GATA2 </td> <td align="center">  58 </td> <td align="center"> 130 </td> <td align="center"> 0.45 </td> <td align="center">  39 </td> <td align="center">  96 </td> <td align="center"> 0.41 </td> </tr>
+  <tr> <td align="center"> STAT3 </td> <td align="center">  41 </td> <td align="center">  91 </td> <td align="center"> 0.45 </td> <td align="center">  26 </td> <td align="center">  87 </td> <td align="center"> 0.30 </td> </tr>
+  <tr> <td align="center"> CEBPD </td> <td align="center">  22 </td> <td align="center">  48 </td> <td align="center"> 0.46 </td> <td align="center">  23 </td> <td align="center">  64 </td> <td align="center"> 0.36 </td> </tr>
+  <tr> <td align="center"> SMC3 </td> <td align="center">  71 </td> <td align="center"> 150 </td> <td align="center"> 0.47 </td> <td align="center">  62 </td> <td align="center"> 144 </td> <td align="center"> 0.43 </td> </tr>
+  <tr> <td align="center"> NR3C1 </td> <td align="center">  46 </td> <td align="center">  95 </td> <td align="center"> 0.48 </td> <td align="center">  39 </td> <td align="center">  90 </td> <td align="center"> 0.43 </td> </tr>
+  <tr> <td align="center"> RXRA </td> <td align="center">  23 </td> <td align="center">  47 </td> <td align="center"> 0.49 </td> <td align="center">  16 </td> <td align="center">  35 </td> <td align="center"> 0.46 </td> </tr>
+  <tr> <td align="center"> HDAC6 </td> <td align="center">   1 </td> <td align="center">   2 </td> <td align="center"> 0.50 </td> <td align="center">   2 </td> <td align="center">  11 </td> <td align="center"> 0.18 </td> </tr>
+   </table>
 
 #### DE genes are cell type specific
 
@@ -529,29 +529,29 @@ Updated: Thu Oct 23 11:59:50 2014
   * There are much fewer DE genes in GE.    
   * DAVID enrichment analysis between MZ twins in brain and cortex show similar GO term in __brain development__, but there is no significantly enriched terms in GE.    
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:00:59 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> UP </TH> <TH> DN </TH> <TH> DE </TH>  </TR>
-  <TR> <TD> brain01_brain02 </TD> <TD align="center"> 461 </TD> <TD align="center"> 181 </TD> <TD align="center"> 642 </TD> </TR>
-  <TR> <TD> cortex01_cortex02 </TD> <TD align="center"> 248 </TD> <TD align="center"> 348 </TD> <TD align="center"> 596 </TD> </TR>
-  <TR> <TD> GE01_GE02 </TD> <TD align="center">  99 </TD> <TD align="center">  74 </TD> <TD align="center"> 173 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:14 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
+  <tr> <td> brain01_brain02 </td> <td align="center"> 461 </td> <td align="center"> 181 </td> <td align="center"> 642 </td> </tr>
+  <tr> <td> cortex01_cortex02 </td> <td align="center"> 248 </td> <td align="center"> 348 </td> <td align="center"> 596 </td> </tr>
+  <tr> <td> GE01_GE02 </td> <td align="center">  99 </td> <td align="center">  74 </td> <td align="center"> 173 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/DE_MZ-1.png) 
 
 ![](./Summary_files/figure-html/DE_MZ_DAVID-1.png) ![](./Summary_files/figure-html/DE_MZ_DAVID-2.png) 
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:01:01 2014 -->
-<TABLE border=1>
-<TR> <TH> name </TH> <TH> description </TH> <TH> Brain </TH> <TH> Cortex </TH> <TH> GE </TH>  </TR>
-  <TR> <TD align="right"> LMO1 </TD> <TD align="right"> LIM_domain_only_1_(rhombotin_1) </TD> <TD align="center"> UP </TD> <TD align="center"> DN </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> CXCR7 </TD> <TD align="right"> chemokine_(C-X-C_motif)_receptor_7 </TD> <TD align="center"> UP </TD> <TD align="center"> UP </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> SPP1 </TD> <TD align="right"> secreted_phosphoprotein_1 </TD> <TD align="center"> UP </TD> <TD align="center"> DN </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> NPY </TD> <TD align="right"> neuropeptide_Y </TD> <TD align="center"> UP </TD> <TD align="center"> DN </TD> <TD align="center"> DN </TD> </TR>
-  <TR> <TD align="right"> COL2A1 </TD> <TD align="right"> collagen,_type_II,_alpha_1 </TD> <TD align="center"> DN </TD> <TD align="center"> UP </TD> <TD align="center"> UP </TD> </TR>
-  <TR> <TD align="right"> BCL6 </TD> <TD align="right"> B-cell_CLL/lymphoma_6 </TD> <TD align="center"> DN </TD> <TD align="center"> DN </TD> <TD align="center"> DN </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:15 2014 -->
+<table border=1>
+<tr> <th> name </th> <th> description </th> <th> Brain </th> <th> Cortex </th> <th> GE </th>  </tr>
+  <tr> <td align="right"> LMO1 </td> <td align="right"> LIM_domain_only_1_(rhombotin_1) </td> <td align="center"> UP </td> <td align="center"> DN </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> CXCR7 </td> <td align="right"> chemokine_(C-X-C_motif)_receptor_7 </td> <td align="center"> UP </td> <td align="center"> UP </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> SPP1 </td> <td align="right"> secreted_phosphoprotein_1 </td> <td align="center"> UP </td> <td align="center"> DN </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> NPY </td> <td align="right"> neuropeptide_Y </td> <td align="center"> UP </td> <td align="center"> DN </td> <td align="center"> DN </td> </tr>
+  <tr> <td align="right"> COL2A1 </td> <td align="right"> collagen,_type_II,_alpha_1 </td> <td align="center"> DN </td> <td align="center"> UP </td> <td align="center"> UP </td> </tr>
+  <tr> <td align="right"> BCL6 </td> <td align="right"> B-cell_CLL/lymphoma_6 </td> <td align="center"> DN </td> <td align="center"> DN </td> <td align="center"> DN </td> </tr>
+   </table>
 
 #### Isoforms between MZ are enriched in cell signaling in neurospheres and immune response in Brain
 
@@ -560,16 +560,16 @@ Updated: Thu Oct 23 11:59:50 2014
   * Different regions on the Venn diagram have __no__ significantly enriched terms.     
   * Isoforms between HuFNSC01 and HuFNSC02 in neurospheres show similar terms, related to __cell signaling__, and __blood cell development__ in brain.     
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-3 package -->
-<!-- Thu Oct 23 12:01:01 2014 -->
-<TABLE border=1>
-<TR> <TH>  </TH> <TH> DE_genes </TH> <TH> DE_exons </TH> <TH> with_expressed_genes </TH> <TH> isoform_exons </TH> <TH> exclude_DE_genes </TH> <TH> isoform_genes </TH>  </TR>
-  <TR> <TD> brain01_brain02_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 32138 </TD> <TD align="center"> 16302 </TD> <TD align="center"> 8980 </TD> <TD align="center"> 8542 </TD> <TD align="center"> 2902 </TD> </TR>
-  <TR> <TD> cortex01_cortex02_summary </TD> <TD align="center"> 596 </TD> <TD align="center"> 26983 </TD> <TD align="center"> 15554 </TD> <TD align="center"> 7618 </TD> <TD align="center"> 7445 </TD> <TD align="center"> 2454 </TD> </TR>
-  <TR> <TD> GE01_GE02_summary </TD> <TD align="center"> 173 </TD> <TD align="center"> 23810 </TD> <TD align="center"> 12862 </TD> <TD align="center"> 7402 </TD> <TD align="center"> 7351 </TD> <TD align="center"> 2495 </TD> </TR>
-  <TR> <TD> cortex03_cortex04_summary </TD> <TD align="center"> 642 </TD> <TD align="center"> 26826 </TD> <TD align="center"> 12185 </TD> <TD align="center"> 5818 </TD> <TD align="center"> 5479 </TD> <TD align="center"> 1994 </TD> </TR>
-  <TR> <TD> GE03_GE04_summary </TD> <TD align="center"> 545 </TD> <TD align="center"> 24752 </TD> <TD align="center"> 12223 </TD> <TD align="center"> 4582 </TD> <TD align="center"> 4422 </TD> <TD align="center"> 1454 </TD> </TR>
-   </TABLE>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Tue Nov  4 18:01:15 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
+  <tr> <td> brain01_brain02_summary </td> <td align="center"> 642 </td> <td align="center"> 32138 </td> <td align="center"> 16302 </td> <td align="center"> 8980 </td> <td align="center"> 8542 </td> <td align="center"> 2902 </td> </tr>
+  <tr> <td> cortex01_cortex02_summary </td> <td align="center"> 596 </td> <td align="center"> 26983 </td> <td align="center"> 15554 </td> <td align="center"> 7618 </td> <td align="center"> 7445 </td> <td align="center"> 2454 </td> </tr>
+  <tr> <td> GE01_GE02_summary </td> <td align="center"> 173 </td> <td align="center"> 23810 </td> <td align="center"> 12862 </td> <td align="center"> 7402 </td> <td align="center"> 7351 </td> <td align="center"> 2495 </td> </tr>
+  <tr> <td> cortex03_cortex04_summary </td> <td align="center"> 642 </td> <td align="center"> 26826 </td> <td align="center"> 12185 </td> <td align="center"> 5818 </td> <td align="center"> 5479 </td> <td align="center"> 1994 </td> </tr>
+  <tr> <td> GE03_GE04_summary </td> <td align="center"> 545 </td> <td align="center"> 24752 </td> <td align="center"> 12223 </td> <td align="center"> 4582 </td> <td align="center"> 4422 </td> <td align="center"> 1454 </td> </tr>
+   </table>
 ![](./Summary_files/figure-html/Isoform_MZ-1.png) ![](./Summary_files/figure-html/Isoform_MZ-2.png) ![](./Summary_files/figure-html/Isoform_MZ-3.png) 
 
 #### Intron retention in MZ twins - _TBC_

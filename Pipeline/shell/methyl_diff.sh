@@ -15,6 +15,7 @@ do
         -n) name="$2"; shift;;
         -p) pth="$2"; shift;;
         -d) delta="$2"; shift;;
+        -m) m="$2"; shift;;
     esac
     shift
 done
