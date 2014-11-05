@@ -1,4 +1,4 @@
-enrich_GREAT <- function(file, name, top = 10, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), categories = NULL, height = 6, width = 9){
+enrich_GREAT <- function(file, name, top = 20, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), categories = NULL, height = 6, width = 9){
   library(ggplot2)
   enrich <- data.frame()
   for(f in list.files(path = dirIn, pattern = paste0("^GREAT.*", file, "\\.tsv"))){
@@ -22,8 +22,8 @@ enrich_GREAT <- function(file, name, top = 10, dirIn = paste0(getwd(), "/enrich/
     }
   }
   enrich$Term <- factor(enrich$Term, levels = enrich[order(enrich$Category, enrich$FDR, decreasing = T),]$Term)
-  Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR))) +
-    geom_bar(aes(fill = Category), stat = "identity", width = .5) + 
+  Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR), fill = Category)) +
+    geom_bar(stat = "identity", width = .5) + 
     coord_flip() + 
     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
     xlab("") + 
