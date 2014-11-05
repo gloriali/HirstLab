@@ -98,27 +98,33 @@ awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dir
 awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary
 awk 'NR==FNR {cortex[$1]=$2; ge[$1]=$3; ratio[$1]=$4; next} {if($1 in cortex){print $0"\t"cortex[$1]"\t"ge[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex_GE.m0.75.p0.005.d0.5.s300.c3.TF.summary
 
+# enrichment at chr ends
+cd /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/
+for file in DMR.*.bed
+do
+    echo "Processing "$file
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /home/lli/hg19/hg19.chrom.window.n10.bed -b $file -c > $file.chrom.window
+done
+
 # GW-related UMRs: Cortex02 vs Cortex04; GE02 vs GE04 (17-week vs 13-week)
 dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/GW/DMR/
 mkdir -p $dirOut
+cd $dirOut
+> $dirOut/DM.summary.stats  # sample, p, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs    
+> $dirOut/DMR.summary.stats # sample, size, cut, Median length of DMRs, Median No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    
 m=0.75 
 p=0.005
 delta=0.5
 size=300
-/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine -f2 A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine -n Cortex-HuFNSC02_Cortex-HuFNSC04
-/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine -f2 A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine -n GE-HuFNSC02_GE-HuFNSC04
-cd $dirOut
-> $dirOut/DM.summary.stats  # sample, p, delta, No.of DM CpGs, No.of hypermethylated DM CpGs, No.of hypomethylated DM CpGs    
-> $dirOut/DMR.summary.stats # sample, size, cut, Median length of DMRs, Median No.of CpGs per DMR, No.of DMRs, No.of hypermethylated DMRs, No.of hypomethylated DMRs    
-for file in *.diff
+/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine -f2 A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine -n Cortex-HuFNSC02_Cortex-HuFNSC04 -p $p -d $delta
+/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine -f2 A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine -n GE-HuFNSC02_GE-HuFNSC04 -p $p -d $delta
+for file in DM.*.bed
 do
-    name=$(echo $file | sed -e s/'.diff'//g)
-    echo "Processing "$name", p="$pth "delta="$delta "size="$size 
-    less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0; m="'$m'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); end=gensub(".*-", "", "g", $1); start=end-2; if(1-$6<pth && d>delta && $3>m){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta && $5>m){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.p$pth.d$delta.bed
-    dm=($(wc -l $dirOut/DM.$name.m$m.p$pth.d$delta.bed)); hyper=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}')); hypo=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
-    echo -e $name"\t"$pth"\t"$delta"\t"$dm"\t"$hyper"\t"$hypo >> $dirOut/DM.summary.stats
-    /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $file -n $name.m$m.p$pth.d$delta -s $size
+    name=$(echo $file | sed -e s/'DM.'//g)
+    name=$(echo $name | sed -e s/'.bed'//g)
+    echo "Processing "$name", size = "$size
+    /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f $file -n $name -s $size
 done
 for f in $dirOut/*.hyp*
 do
