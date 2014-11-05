@@ -9,20 +9,25 @@ ge03<-read.table(file="A15295.G.A.rpkm.pc",row.names=1,head=F)
 ge04<-read.table(file="A15299.G.A.rpkm.pc",row.names=1,head=F)
 brain01<-read.table(file="A03484.G.A.rpkm.pc",row.names=1,head=F)
 brain02<-read.table(file="A07825.G.A.rpkm.pc",row.names=1,head=F)
-diff<-setdiff(rownames(cortex04),rownames(cortex03))
-rpkm1<-data.frame(cortex01=cortex01[is.element(rownames(cortex01),diff)==F,2],
-                  cortex02=cortex02[is.element(rownames(cortex02),diff)==F,2],
-                  cortex03=cortex03[is.element(rownames(cortex03),diff)==F,2],
-                  cortex04=cortex04[is.element(rownames(cortex04),diff)==F,2],
-                  ge01=ge01[is.element(rownames(ge01),diff)==F,2],
-                  ge02=ge02[is.element(rownames(ge02),diff)==F,2],
-                  ge03=ge03[is.element(rownames(ge03),diff)==F,2],
-                  ge04=ge04[is.element(rownames(ge04),diff)==F,2],
-                  brain01=brain01[is.element(rownames(brain01),diff)==F,2],
-                  brain02=brain02[is.element(rownames(brain02),diff)==F,2])
-rownames(rpkm1)<-rownames(cortex01)[is.element(rownames(cortex01),diff)==F]
-logrpkm1<-log2(rpkm1)
-write.csv(rpkm1,file="rpkm1.csv",quote=F)
+IDs<-intersect(rownames(cortex04),rownames(cortex03))
+rpkm_pc<-data.frame(Ensembl = IDs, 
+                    Cortex.HuFNSC01=cortex01[IDs,2],
+                    Cortex.HuFNSC02=cortex02[IDs,2],
+                    Cortex.HuFNSC03=cortex03[IDs,2],
+                    Cortex.HuFNSC04=cortex04[IDs,2],
+                    GE.HuFNSC01=ge01[IDs,2],
+                    GE.HuFNSC02=ge02[IDs,2],
+                    GE.HuFNSC03=ge03[IDs,2],
+                    GE.HuFNSC04=ge04[IDs,2],
+                    Brain.HuFNSC01=brain01[IDs,2],
+                    Brain.HuFNSC02=brain02[IDs,2])
+rownames(rpkm_pc)<-IDs
+write.table(rpkm_pc, file="rpkm_pc.txt", sep = "\t", row.names = F, col.names = T, quote=F)
+
+# RPKM for 5mC regulators 
+regulator_5mC <- read.table("~/快盘/hg19/regulators.5mC", head = F, as.is = T)
+regulator_5mC <- data.frame(gene = regulator_5mC$V1, rpkm_pc[regulator_5mC$V2,])
+write.table(regulator_5mC, file = "~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", sep = "\t", row.names = F, col.names = T, quote = F)
 
 ##################################################################################################
 #expression correlation
