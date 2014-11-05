@@ -43,7 +43,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ### Neurospheres Cortex derived vs GE derived 
 #### Asymmetry between Cortex and GE UMRs  
 
-  * On average, there are , __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__-fold enrichment in total UMR length in Cortex compared to GE, __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC02" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == -1, "length"])/sum(DMR_pos_WGBS_figure$data[DMR_pos_WGBS_figure$data$donor == "HuFNSC04" & DMR_pos_WGBS_figure$data$DM == 1, "length"]), 2)`__ in HuFNSC04.    
+  * On average, there are , __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__-fold enrichment in total UMR frequency in Cortex compared to GE, __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC02" & DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC02" & DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC04" & DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC04" & DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__ in HuFNSC04.    
   * The asymmetry appears to be global, in all chromosomes. It is reproduced in the two individuals, and __supported in MeDIP UMRs__.  
   * __Single CpG level__ differential methylation is __symmetric__, but the asymmetry on __UMR level__ can be reproduced with different cutoffs. However, there are __no apparent differences in UMR length__ between Cortex and GE, suggesting that there are more __orphan GE UM CpGs__ that was not able to form UMRs than in Cortex. 
 
@@ -266,7 +266,7 @@ grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90
 ### MZ twins  
 #### UMR asymmetry between MZ twins in Brain and Cortex 
 
-  + There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in total UMR length HuFNSC02/HuFNSC01 in Brain is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Brain" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, in Cortex is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "Cortex" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 2)`__, and in GE is __`r round(sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == 1, "length"])/sum(DMR_pos_MZ_figure$data[DMR_pos_MZ_figure$data$cell == "GE" & DMR_pos_MZ_figure$data$DM == -1, "length"]), 3)`__.    
+  + There is an __asymmetry__ between UMRs in HuFNSC01 and HuFNSC02 in the Brain and Cortex neurosphere, but __not__ in GE neurosphere. Fold change in UMR frequency HuFNSC02/HuFNSC01 in Brain is __`r round(sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Brain" & DMR_freq_MZ_figure$data$DM == "1", "freq"])/-sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Brain" & DMR_freq_MZ_figure$data$DM == "-1", "freq"]), 2)`__, in Cortex is __`r round(sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Cortex" & DMR_freq_MZ_figure$data$DM == "1", "freq"])/-sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Cortex" & DMR_freq_MZ_figure$data$DM == "-1", "freq"]), 2)`__, and in GE is __`r round(sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "GE" & DMR_freq_MZ_figure$data$DM == "1", "freq"])/-sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "GE" & DMR_freq_MZ_figure$data$DM == "-1", "freq"]), 3)`__.    
   
 ```{r MeDIP_MZ_asymmetry, fig.width = 10, fig.height = 8, results='asis'}
 DMR_MZ_summary <- xtable(DMR_MZ_summary)
@@ -274,7 +274,7 @@ align(DMR_MZ_summary) <- "clccc"
 print(DMR_MZ_summary, type = "html", include.rownames = F)
 
 (DMR_freq_MZ_figure)
-(DMR_pos_MZ_figure)
+(DMR_pos_MZ_figure@ggplot)
 ```
 
 #### GREAT analysis on MZ UMRs are enriched in Homeobox and brain development  
