@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Wed Nov  5 18:17:31 2014
+Updated: Thu Nov  6 13:46:02 2014
 
 
 
@@ -126,6 +126,14 @@ Updated: Wed Nov  5 18:17:31 2014
 ##   2
 ```
 
+### Supplemental 13: Expression of DNA methylation reulators
+
+![](./Figures_files/figure-html/heatmap_5mC_regulator-1.png) 
+
+```
+## pdf 
+##   2
+```
 
 
 <!--

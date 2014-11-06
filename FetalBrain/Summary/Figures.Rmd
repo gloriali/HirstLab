@@ -18,6 +18,7 @@ library(dplyr)
 library(xtable)
 library(VennDiagram)
 library(gridExtra)
+library(gplots)
 load("~/快盘/FetalBrain/MeDIP/DMR_MZ.Rdata")
 load("~/快盘/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
@@ -359,6 +360,19 @@ grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:
 dev.off()
 ```
 
+### Supplemental 13: Expression of DNA methylation reulators
+
+```{r heatmap_5mC_regulator}
+regulator_5mC <- read.delim("~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", as.is = T, row.names = 1)
+regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
+clab <- c(rep(c("red", "blue"), each = 4), rep("green", 2))
+heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
+pdf("~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 7, width = 8)
+heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
+dev.off()
+```
 
 
 <!--
