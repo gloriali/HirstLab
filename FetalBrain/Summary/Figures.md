@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Tue Nov  4 17:55:55 2014
+Updated: Wed Nov  5 18:17:31 2014
 
 
 
@@ -11,7 +11,7 @@ Updated: Tue Nov  4 17:55:55 2014
   * No. of UMRs (hypermethylated in red and hypomethylated in blue) between monozygotic twins and Cortex vs GE neurospheres.    
   * No. of UMRs between MZ twins are on the same scale as UMRs between neurospheres.   
   
-![](./Figures_files/figure-html/UMR_scale-1.png) 
+![](./Figures_files/figure-html/MZ_scale-1.png) 
 
 ### Figure 1b: Asymmetry in UMRs between MZ twins in Brain and Cortex
   * UMR frequency (base pair per million base pair) between MZ twins (HuFNSC01 UMRs in blue, and HuFNSC02 UMRs in red) in Brain, Neurospheres Cortex derived and GE derived across different chormosomes. 
@@ -50,7 +50,7 @@ Updated: Tue Nov  4 17:55:55 2014
 
 ### Figure 2e: DNA methylation at exon boundaries
 
-![](./Figures_files/figure-html/neurospheres_epiProfile_5mC-1.png) 
+![](./Figures_files/figure-html/neurospheres_epiProfile_5mC-1.png) ![](./Figures_files/figure-html/neurospheres_epiProfile_5mC-2.png) 
 
 ```
 ## pdf 
@@ -58,17 +58,75 @@ Updated: Tue Nov  4 17:55:55 2014
 ```
 
 ## Supplemental Figures
-### Supplemental 1: Location of UMRs between MZ twins across the genome 
+### Supplemental 1: Location of UMRs across the genome 
 
-![](./Figures_files/figure-html/MZ_pos-1.png) 
+![](./Figures_files/figure-html/UMR_pos-1.png) ![](./Figures_files/figure-html/UMR_pos-2.png) 
 
-### Supplemental 2: Location of UMRs between neurospheres across the genome 
+```
+## pdf 
+##   2
+```
 
-![](./Figures_files/figure-html/neurospheres_pos-1.png) 
+### Supplemental 2: Genomic breakdown of UMRs
 
-### Supplemental 3: Neurosphere UMR enrichemnt at chromosome ends
+![](./Figures_files/figure-html/genomicBreak-1.png) ![](./Figures_files/figure-html/genomicBreak-2.png) 
+
+```
+## pdf 
+##   2
+```
+
+### Supplemental 3: Fraction of DE genes with proximal UMRs
+
+![](./Figures_files/figure-html/proximal_DE-1.png) ![](./Figures_files/figure-html/proximal_DE-2.png) 
+
+```
+## pdf 
+##   2
+```
+
+### Supplemental 4: TFBS asymmetry in MZ UMRs
+
+![](./Figures_files/figure-html/MZ_TFBS-1.png) 
+
+### Supplemental 5: DAVID enrichment for MZ DE genes
+
+![](./Figures_files/figure-html/MZ_DE_DAVID-1.png) 
+
+### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
+
+![](./Figures_files/figure-html/WGBS_valid-1.png) 
+
+### Supplemental 7: Neurosphere UMR enrichemnt at chromosome ends
 
 ![](./Figures_files/figure-html/neurospheres_chrEnd-1.png) 
+
+### Supplemental 8: UMR asymmetry between Cortex and GE with MeDIP
+
+![](./Figures_files/figure-html/neurospheres_asymmetry_MeDIP-1.png) 
+
+### Supplemental 9: GREAT enrichment for neurospheres UMRs with MeDIP
+
+![](./Figures_files/figure-html/neurospheres_GREAT_MeDIP-1.png) 
+
+### Supplemental 10: DAVID enrichment for neurospheres DE genes
+
+![](./Figures_files/figure-html/neurospheres_DE_DAVID-1.png) 
+
+### Supplemental 11: DAVID enrichment for neurospheres isoform genes
+
+![](./Figures_files/figure-html/neurospheres_isoform_DAVID-1.png) 
+
+### Supplemental 12: DNA methylation at exon boundaries with MeDIP
+
+![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-1.png) ![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-2.png) 
+
+```
+## pdf 
+##   2
+```
+
+
 
 <!--
 ### Supplemental : GREAT analysis on UMRs between MZ twins - GOBP 
