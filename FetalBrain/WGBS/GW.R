@@ -8,6 +8,7 @@ library(ggbio)
 library(GenomicRanges)
 library(labeling)
 library(VennDiagram)
+library(gridExtra)
 source('~/HirstLab/Pipeline/R/enrich.R')
 source("~/HirstLab/Pipeline/R/DMR.figures.R")
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
@@ -96,6 +97,16 @@ hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X")))
    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.y = element_line(color = "transparent"), panel.grid.minor.y = element_line(color = "transparent")))
 ggsave(DMR_pos_GW_figure@ggplot, file = "DMRpos_GW.pdf", width = 10, height = 10)
 
+GW_UMR_intersect_hyper <- as.integer(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed | wc -l", intern = T))
+GW_UMR_intersect_hypo <- as.integer(system("/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed | wc -l", intern = T))
+Venn_GW_UMR_hyper <- draw.pairwise.venn(area1 = GW_DMR_summary$Hyper.DMR[1], area2 = GW_DMR_summary$Hyper.DMR[2], cross.area = GW_UMR_intersect_hyper, category = c("Cortex", "GE"), fill = c("red", "blue"))
+Venn_GW_UMR_hypo <- draw.pairwise.venn(area1 = GW_DMR_summary$Hypo.DMR[1], area2 = GW_DMR_summary$Hypo.DMR[2], cross.area = GW_UMR_intersect_hypo, category = c("Cortex", "GE"), fill = c("red", "blue"))
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/Venn_GW_UMR.pdf", height = 5, width = 10)
+grid.arrange(gTree(children = Venn_GW_UMR_hyper), gTree(children = Venn_GW_UMR_hypo), nrow = 1)
+grid.text("Hyper", x = unit(0.25, "npc"), y = unit(0.9, "npc"))
+grid.text("Hypo", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
+dev.off()
+
 # ======= GREAT ======== 
 (GREAT_GW_Cortex02.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.hypo", name = "Cortex-HuFNSC02.UMRs", height = 15))
 (GREAT_GW_Cortex04.UMR <- enrich_GREAT(file = "DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.hyper", name = "Cortex-HuFNSC04.UMRs", height = 4))
@@ -120,7 +131,36 @@ genomicBreak_GW_figure <- ggplot(genomicBreak_GW_tall, aes(x = Region, y = CpG, 
 ggsave(genomicBreak_GW_figure, file = "genomicBreak_GW.pdf")
 (genomicBreak_GW_figure + ggtitle("DMR breakdown between 13-week and 17-week"))
 
-save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, 
+# ======= Proximal ========
+# setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/CpG/")
+# DMR_proximal_Cortex02_Cortex04_hyper <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG_promoter_pc.bed", head = F, as.is = T)
+# DMR_DE_Cortex02_Cortex04_hyper <- DMR_DE(DMR_gene = DMR_proximal_Cortex02_Cortex04_hyper, DE = cortex02_cortex04DE, DM = "hyper", name = "Cortex-HuFNSC02_Cortex-HuFNSC04.hyper.proximal")
+# DMR_proximal_Cortex02_Cortex04_hypo <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG_promoter_pc.bed", head = F, as.is = T)
+# DMR_DE_Cortex02_Cortex04_hypo <- DMR_DE(DMR_gene = DMR_proximal_Cortex02_Cortex04_hypo, DE = cortex02_cortex04DE, DM = "hypo", name = "Cortex-HuFNSC02_Cortex-HuFNSC04.hypo.proximal")
+# DMR_proximal_GE02_GE04_hyper <- read.delim("DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG_promoter_pc.bed", head = F, as.is = T)
+# DMR_DE_GE02_GE04_hyper <- DMR_DE(DMR_gene = DMR_proximal_GE02_GE04_hyper, DE = GE02_GE04DE, DM = "hyper", name = "GE-HuFNSC02_GE-HuFNSC04.hyper.proximal")
+# DMR_proximal_GE02_GE04_hypo <- read.delim("DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG_promoter_pc.bed", head = F, as.is = T)
+# DMR_DE_GE02_GE04_hypo <- DMR_DE(DMR_gene = DMR_proximal_GE02_GE04_hypo, DE = GE02_GE04DE, DM = "hypo", name = "GE-HuFNSC02_GE-HuFNSC04.hypo.proximal")
+# DMR_proximal_GW_summary <- rbind(DMR_DE_Cortex02_Cortex04_hyper$summary, DMR_DE_Cortex02_Cortex04_hypo$summary, DMR_DE_GE02_GE04_hyper$summary, DMR_DE_GE02_GE04_hypo$summary)
+# rownames(DMR_proximal_GW_summary) <- c("GE01.UMRs", "Cortex01.UMRs", "GE02.UMRs", "Cortex02.UMRs")
+# 
+# DMR_proximal_GW_hyper <- list(HuFNSC01 = DMR_DE_Cortex02_Cortex04_hyper$DMR_gene$id, HuFNSC02 = DMR_DE_GE02_GE04_hyper$DMR_gene$id)
+# venn_DMR_proximal_GW_hyper <- venn.diagram(DMR_proximal_GW_hyper, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of proximal GE UMRs between GW twins", force.unique = T)
+# pdf("venn_DMR_proximal_GW_hyper.pdf")
+# plot.new()
+# grid.draw(venn_DMR_proximal_GW_hyper)
+# dev.off()
+# DMR_proximal_GW_hypo <- list(HuFNSC01 = DMR_DE_Cortex02_Cortex04_hypo$DMR_gene$id, HuFNSC02 = DMR_DE_GE02_GE04_hypo$DMR_gene$id)
+# venn_DMR_proximal_GW_hypo <- venn.diagram(DMR_proximal_GW_hypo, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of proximal Cortex UMRs between GW twins", force.unique = T, na = "remove")
+# pdf("venn_DMR_proximal_GW_hypo.pdf")
+# plot.new()
+# grid.draw(venn_DMR_proximal_GW_hypo)
+# dev.off()
+# pcgene <- 19819 # wc -l /projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID
+# phyper(length(intersect(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene$id, DMR_DE_GE02_GE04_hyper$DMR_gene$id)), DMR_proximal_GW_summary["GE01.UMRs", "unique.genes"], pcgene - DMR_proximal_GW_summary["GE01.UMRs", "unique.genes"], DMR_proximal_GW_summary["GE02.UMRs", "unique.genes"], lower.tail = F, log = T) 
+# phyper(length(intersect(DMR_DE_Cortex02_Cortex04_hypo$DMR_gene$id, DMR_DE_GE02_GE04_hypo$DMR_gene$id)), DMR_proximal_GW_summary["Cortex01.UMRs", "unique.genes"], pcgene - DMR_proximal_GW_summary["Cortex01.UMRs", "unique.genes"], DMR_proximal_GW_summary["Cortex02.UMRs", "unique.genes"], lower.tail = F, log = T) 
+
+save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Venn_GW_UMR_hypo, 
      DMR_length_GW_figure, DMR_count_GW_figure, DMR_dis_GW_figure, DMR_freq_GW_figure, DMR_pos_GW_figure, 
      GREAT_GW_Cortex02.UMR, GREAT_GW_Cortex04.UMR, GREAT_GW_GE02.UMR, GREAT_GW_GE04.UMR, 
      genomicBreak_GW, genomicBreak_GW_figure, 
