@@ -1,0 +1,95 @@
+---
+title: "FetalBrain - Gestational week associated UMRs"
+author: "gloriali"
+date: "November 5, 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggbio)
+library(GenomicRanges)
+library(labeling)
+library(VennDiagram)
+library(gridExtra)
+library(xtable)
+load("~/快盘/FetalBrain/WGBS/GW/GW.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height = 8, fig.width = 8)
+```
+
+## DMR identification with methyl_diff
+
+  * Identify DM CpGs     
+    + methyl_diff one-sided p-value $\le$ 0.005  
+    + delta fractional methylation $\ge$ 0.5  
+    + fractional methylation of one sample $\ge$ 0.75   
+  * Collapse DM CpGs into DMRs     
+    + adjacent DM CpGs have the same DM status;    
+    + distance between adjacent CpGs (size) $\le$ 300bp;   
+    + No. of CpGs within each DMR $\ge$ 3.   
+
+## Summary and sanity check 
+
+  * On average, there are __`r as.integer(mean(GW_DMR_summary$Hypo.DMR))`__ 17-week UMRs, __428__ intersect between Cortex and GE, and __`r as.integer(mean(GW_DMR_summary$Hyper.DMR))`__ 13-week UMRs, __76__ intersect. The intersect is highly significant.       
+  * Median DMR length is __`r median(c(Cortex02_Cortex04_DMR$length, GE02_GE04_DMR$lenght))`__, _comparable to breast_. It's similar in all chromosomes in 17-week UMRs, but fluctuate more in 13-week UMRs, probably due to  small No. of UMRs identified.   
+  * Median No. of CpGs per DMR is __`r median(c(Cortex02_Cortex04_DMR$CpG_count, GE02_GE04_DMR$CpG_count))`__, also _similar to breast_.     
+
+```{r summary, results="asis", fig.height=6, fig.width=6}
+GW_DMR_summary <- xtable(GW_DMR_summary)
+align(GW_DMR_summary) <- "rrccc"
+print(GW_DMR_summary, type = "html", row.names = F)
+
+(DMR_length_GW_figure + ggtitle("DMR length between 13-week and 17-week"))
+(DMR_count_GW_figure + ggtitle("No. of CpGs per DMR between 13-week and 17-week"))
+```
+```{r intersect, fig.height = 4}
+grid.arrange(gTree(children = Venn_GW_UMR_hyper), gTree(children = Venn_GW_UMR_hypo), nrow = 1)
+grid.text("13-week UMRs", x = unit(0.25, "npc"), y = unit(0.9, "npc"))
+grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
+```
+
+## UMR asymmetry 
+
+  * On average, there are , __`r round(sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$DM == "1", "freq"]), 2)`__-fold enrichment in total UMR frequency in 17-week compared to 13-week, __`r round(sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$cell == "Cortex" & DMR_freq_GW_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$cell == "Cortex" & DMR_freq_GW_figure$data$DM == "1", "freq"]), 2)`__ in Cortex, and __`r round(sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$cell == "GE" & DMR_freq_GW_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_GW_figure$data[DMR_freq_GW_figure$data$cell == "GE" & DMR_freq_GW_figure$data$DM == "1", "freq"]), 2)`__ in GE.    
+
+```{r asymmetry}
+(DMR_freq_GW_figure + ggtitle("DMR frequency asymmetry between 13-week and 17-week") + scale_fill_manual(values = c("red", "blue"), labels = c("13-week UMRs", "17-week UMRs"), name = ""))
+(DMR_pos_GW_figure + scale_color_manual(values = c("red", "blue"), labels = c("13-week UMRs", "17-week UMRs"), name = ""))
+```
+
+## GREAT enrichment for GW-associated UMRs 
+
+  * GREAT terms are strongly associated with __neuron differentiation and brain development__.     
+  * 17-week UMRs are highly enriched in __glial cell development__ in Cortex, and __neural tube development__ in GE.     
+  * 13-week UMRs are enriched in __neuron fate commitment__ in Cortex, and __regionalization__ in GE.    
+  
+```{r GREAT1, fig.height = 15}
+(GREAT_GW_Cortex02.UMR + ggtitle("Cortex - 17-week UMRs"))
+```
+```{r GREAT2, fig.height = 4}
+(GREAT_GW_Cortex04.UMR + ggtitle("Cortex - 13-week UMRs"))
+```
+```{r GREAT3, fig.height = 12}
+(GREAT_GW_GE02.UMR + ggtitle("GE - 17-week UMRs"))
+```
+```{r GREAT4, fig.height = 15}
+(GREAT_GW_GE04.UMR + ggtitle("GE - 13-week UMRs"))
+```
+
+## Genomic breakdown
+
+  + On average, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold__ enriched. __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random.        
+
+<!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
+<!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
+
+```{r genomicBreak, fig.height=6, fig.width=6}
+(genomicBreak_GW_figure + ggtitle("DMR breakdown between 13-week and 17-week"))
+```
+
