@@ -133,4 +133,7 @@ do
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $f.bed -b /home/lli/hg19/hg19v65_genes.bed -d > $f.closest.gene
 done
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed > DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed > DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed
+
 
