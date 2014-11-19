@@ -1,5 +1,5 @@
 ---
-title: "FetalBrain - Gestational week associated UMRs"
+title: "FetalBrain - Gestational week associated analysis"
 author: "gloriali"
 date: "November 5, 2014"
 output:
@@ -19,7 +19,7 @@ library(labeling)
 library(VennDiagram)
 library(gridExtra)
 library(xtable)
-load("~/快盘/FetalBrain/WGBS/GW/GW.Rdata")
+load("~/快盘/FetalBrain/GW/GW.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height = 8, fig.width = 8)
 ```
 
