@@ -29,87 +29,88 @@ load("~/快盘/FetalBrain/RNAseq/epiProfile/exonProfile_Rmd.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 10)
 ```
 
-## Figure 1: MZ twins 
-### Figure 1a: No. of UMRs between MZ twins and neurospheres 
+## Figure 1: Summary   
+### Figure 1b: Comparisons setup  
+
+![](./Figures_files/figure-html/comparisons.png)     
+    
+### Figure 1c: No. of UMRs between MZ twins and neurospheres 
   * No. of UMRs (hypermethylated in red and hypomethylated in blue) between monozygotic twins and Cortex vs GE neurospheres.    
   * No. of UMRs between MZ twins are on the same scale as UMRs between neurospheres.   
   
 ```{r MZ_scale}
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 5), 
-                        Category = rep(c(rep("MZ twins", nrow(DMR_MZ_summary)), rep("Neurospheres", nrow(DMR_neurospheres_summary))), 5), 
+                        Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 5), 
                         DM_DE = c(rep(c("Hyper / UP", "Hypo / DN"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), rep(c("Hyper / UP", "Hypo / DN"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), 
                         Assay = factor(c(rep(c("UMRs", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "DE genes", "Isoforms")), 
-                        value = c(DMR_MZ_summary$Hyper.DMR, DMR_neurospheres_summary$Hyper.DMR, -DMR_MZ_summary$Hypo.DMR, -DMR_neurospheres_summary$Hypo.DMR, individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
+                        value = c((filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, (filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, (filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, (filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
 MZ_scale$Sample <- factor(gsub("-HuFNSC", "", MZ_scale$Sample), levels = c("Brain01_Brain02", "Cortex01_Cortex02", "GE01_GE02", "Cortex01_GE01", "Cortex02_GE02"))
-(MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) + 
+MZ_scale$Category <- factor(MZ_scale$Category, levels = c("Individual specific", "Cell type specific"))
+MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.5) + 
    geom_hline(yintercept = 0) + 
    facet_grid(Assay ~ Category, scales = "free", space = "free_x") + 
    scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   scale_y_continuous(breaks = c(seq(-3000, 3000, by = 1000), -500, 500), labels = c(abs(seq(-3000, 3000, by = 1000)), 500, 500)) + 
+   scale_y_continuous(breaks = c(-3000, -2000, -500, -100, 100, 500, 2000, 3000), labels = c(3000, 2000, 500, 100, 100, 500, 2000, 3000)) + 
    xlab("") + 
-   ylab("No. of UMRs") + 
+   ylab("") + 
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
-ggsave(MZ_scale_figure, file = "~/快盘/FetalBrain/Figures/Figure1a.pdf")
-```
-
-### Figure 1b: Asymmetry in UMRs between MZ twins in Brain and Cortex
-  * UMR frequency (base pair per million base pair) between MZ twins (HuFNSC01 UMRs in blue, and HuFNSC02 UMRs in red) in Brain, Neurospheres Cortex derived and GE derived across different chormosomes. 
-  * HuFNSC02 UMRs are __`r round(sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Brain" & DMR_freq_MZ_figure$data$DM == "1", "freq"])/-sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Brain" & DMR_freq_MZ_figure$data$DM == "-1", "freq"]), 2)`__-fold enriched in Brain, and __`r round(sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Cortex" & DMR_freq_MZ_figure$data$DM == "1", "freq"])/-sum(DMR_freq_MZ_figure$data[DMR_freq_MZ_figure$data$cell == "Cortex" & DMR_freq_MZ_figure$data$DM == "-1", "freq"]), 2)`__-fold enriched in Cortex compared to HuFNSC01 UMRs.    
-  
-```{r MZ_asymmetry}
-(DMR_freq_MZ_figure <- DMR_freq_MZ_figure + ylab("UMR frequency (bp/MB)") + xlab(""))
-ggsave(DMR_freq_MZ_figure, file = "~/快盘/FetalBrain/Figures/Figure1b.pdf")
-```
-
-### Figure 1c: Differential expressed genes between MZ twins are cell type specific
-  * No. of differential expressed genes between MZ twins in Brain (green), Neurospheres Cortex derived (red), and GE derived (blue).  
-  
-```{r MZ_DE, fig.height=5}
-MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
-venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "UP", main.cex = 1.5)
-MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
-venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "DN", main.cex = 1.5)
-grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
-pdf("~/快盘/FetalBrain/Figures/Figure1c.pdf", height = 5, width = 10)
-grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
+   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+MZ_scale_figure_gt <- ggplot_gtable(ggplot_build(MZ_scale_figure))
+grid.newpage()
+grid.draw(MZ_scale_figure_gt)
+grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90, gp=gpar(fontsize=15))
+pdf("~/快盘/FetalBrain/Figures/Figure1c.pdf", height = 10, width = 12)
+grid.newpage()
+grid.draw(MZ_scale_figure_gt)
+grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90, gp=gpar(fontsize=15))
 dev.off()
 ```
 
-## Figure 2: Neurospheres Cortex and GE
-### Figure 2a: UMR/DE genes accumulates over time
+### Figure 1d: UMR/DE genes accumulates over time
 
 ```{r neurospheres_scale}
 neurospheres_scale <- data.frame(Donor = c(rep(c("HuFNSC02", "HuFNSC04", "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 2), "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 
                                  GW = c(rep(c("17-week", "13-week", "17-week", "17-week", "13-week", "13-week"), 2), "17-week", "17-week", "13-week", "13-week"), 
                                  Assay = factor(c(rep(c(rep("UMRs", 2), rep("DE genes", 4)), 2), rep("Isoforms", 4)), levels = c("UMRs", "DE genes", "Isoforms")), 
                                  DM_DE = c(rep(c("Cortex UMR/UP", "GE UMR/UP"), each = 6), rep("Isoform", 4)), 
-                                 value = c(DMR_WGBS_summary$Hypo.DMR, cortex_GE_DE_summary$UP, DMR_WGBS_summary$Hyper.DMR, cortex_GE_DE_summary$DN, cortex_GE_summary[, "isoform_genes"]))
+                                 value = c((filter(DMR_freq_WGBS_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = -mean(freq)))$m, cortex_GE_DE_summary$UP, (filter(DMR_freq_WGBS_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, cortex_GE_DE_summary$DN, cortex_GE_summary[, "isoform_genes"]))
 neurospheres_scale[neurospheres_scale$DM_DE == "GE UMR/UP", "value"] <- -neurospheres_scale[neurospheres_scale$DM_DE == "GE UMR/UP", "value"]
-(neurospheres_scale_figure <- ggplot(neurospheres_scale, aes(x = Donor, y = value, fill = DM_DE)) + 
+neurospheres_scale <- filter(neurospheres_scale, Donor %in% c("HuFNSC02", "HuFNSC04"))
+neurospheres_scale_figure <- ggplot(neurospheres_scale, aes(x = Donor, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.4) + 
    geom_hline(yintercept = 0) + 
    facet_grid(Assay ~ GW, scales = "free") + 
    scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   #scale_y_continuous(breaks = seq(-3000, 3000, by = 1000), labels = abs(seq(-3000, 3000, by = 1000))) + 
+   scale_y_continuous(breaks = c(-400, -200, -50, 50, 200, 400, 1000, 2000), labels = abs(c(-400, -200, -50, 50, 200, 400, 1000, 2000))) + 
    xlab("") + 
-   ylab("No. of UMRs / genes") + 
+   ylab("") + 
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
-ggsave(neurospheres_scale_figure, file = "~/快盘/FetalBrain/Figures/Figure2a.pdf")
+   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+neurospheres_scale_figure_gt <- ggplot_gtable(ggplot_build(neurospheres_scale_figure))
+grid.newpage()
+grid.draw(neurospheres_scale_figure_gt)
+grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90, gp=gpar(fontsize=15))
+pdf("~/快盘/FetalBrain/Figures/Figure2a.pdf", height = 10, width = 12)
+grid.newpage()
+grid.draw(neurospheres_scale_figure_gt)
+grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90, gp=gpar(fontsize=15))
+dev.off()
 ```
 
-### Figure 2b: UMR asymmetry between Neurospheres Cortex and GE
-  * UMR frequency (base pair per million base pair) between neurospheres cortex derived (red), and GE derived(blue). 
-  * On average, there are , __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__-fold enrichment in total UMR frequency in Cortex compared to GE, __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC02" & DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC02" & DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__ in HuFNSC02, and __`r round(sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC04" & DMR_freq_WGBS_figure$data$DM == "-1", "freq"])/-sum(DMR_freq_WGBS_figure$data[DMR_freq_WGBS_figure$data$donor == "HuFNSC04" & DMR_freq_WGBS_figure$data$DM == "1", "freq"]), 2)`__ in HuFNSC04.    
+## Figure 2: Neurospheres Cortex and GE
+### Figure 2a: TFBS asymmetry between neurosphere UMRs
 
-```{r neurospheres_asymmetry}
-(DMR_freq_WGBS_figure <- DMR_freq_WGBS_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""))
-ggsave(DMR_freq_WGBS_figure, file = "~/快盘/FetalBrain/Figures/Figure2b.pdf")
+```{r neurospheres_TFBS}
+(DMR_TF_figure <- DMR_TF_figure + xlab("Abundance near Cortex UMRs") + ylab("Abundance near GE UMRs")) 
+ggsave(DMR_TF_figure, file = "~/快盘/FetalBrain/Figures/Figure2a.pdf")
 ```
 
-### Figure 2c: GREAT enrichment for neurospheres UMRs
+### Figure 2b: GREAT enrichment for neurospheres UMRs
 
 ```{r neurospheres_GREAT}
 GOBP_Cortex02.UMR_WGBS <- read.delim("~/快盘/FetalBrain/WGBS/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo.tsv", head = F, as.is = T, skip = 4)
@@ -125,58 +126,30 @@ GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Term
   ylab("-log10(FDR)") + 
   scale_fill_manual(values = c("blue", "red"), name = "") + 
   theme_bw())
-ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "~/快盘/FetalBrain/Figures/Figure2c.pdf")
+ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "~/快盘/FetalBrain/Figures/Figure2b.pdf")
 ```
 
-### Figure 2d: TFBS asymmetry between neurosphere UMRs
-
-```{r neurospheres_TFBS}
-(DMR_TF_figure <- DMR_TF_figure + xlab("Abundance near Cortex UMRs") + ylab("Abundance near GE UMRs")) 
-ggsave(DMR_TF_figure, file = "~/快盘/FetalBrain/Figures/Figure2d.pdf")
-```
-
-### Figure 2e: DNA methylation at exon boundaries
-
-```{r neurospheres_epiProfile_5mC}
-gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC02 + ggtitle("WGBS HuFNSC02 cortex vs GE"))) 
-gt$heights[[4]] <- unit(3.5, "null") 
-grid.newpage()
-grid.draw(gt) 
-grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
-grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-
-gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC04 + ggtitle("WGBS HuFNSC04 cortex vs GE"))) 
-gt$heights[[4]] <- unit(3.5, "null") 
-grid.newpage()
-grid.draw(gt) 
-grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
-grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-
-
-
-pdf("~/快盘/FetalBrain/Figures/Figure2e.pdf")
-grid.draw(gt) 
-grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
-grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-dev.off()
-```
 
 ## Supplemental Figures
-### Supplemental 1: Location of UMRs across the genome 
-
-```{r UMR_pos}
-(DMR_pos_MZ_ggplot <- DMR_pos_MZ_figure@ggplot + theme(legend.title = element_text(size = 0), panel.margin = unit(0.1, "lines")) + ggtitle("UMRs between MZ twins") + xlab("Position of UMRs on the chromosome") + scale_color_manual(values = c("red", "blue"), labels = c("HuFNSC02 UMRs", "HuFNSC01 UMRs"), name = ""))
-(DMR_pos_neurospheres_ggplot <- DMR_pos_WGBS_figure@ggplot + theme(legend.title = element_text(size = 0), panel.margin = unit(0.1, "lines")) + ggtitle("UMRs between neurospheres") + xlab("Position of UMRs on the chromosome") + scale_color_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""))
-pdf("~/快盘/FetalBrain/Figures/FigureS1.pdf", height = 10, width = 20)
-grid.arrange(DMR_pos_MZ_ggplot, DMR_pos_neurospheres_ggplot, nrow = 1, widths = 3:2)
+### Supplemental 1: Asymmetry in UMRs between MZ twins in Brain and Cortex
+  * UMR frequency (base pair per million base pair) between MZ twins (HuFNSC01 UMRs in blue, and HuFNSC02 UMRs in red) in Brain, Neurospheres Cortex derived and GE derived across different chormosomes. 
+  
+```{r UMR_asymmetry, fig.height = 8, fig.width = 15}
+grid.arrange(DMR_freq_MZ_figure + ggtitle("UMRs between MZ twins"), DMR_freq_WGBS_figure + ggtitle("UMRs between neurospheres"), nrow = 1, widths = 3:2)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.6, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+pdf(file = "~/快盘/FetalBrain/Figures/FigureS1.pdf", height = 8, width = 15)
+grid.arrange(DMR_freq_MZ_figure + ggtitle("UMRs between MZ twins"), DMR_freq_WGBS_figure + ggtitle("UMRs between neurospheres"), nrow = 1, widths = 3:2)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.6, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 dev.off()
 ```
 
 ### Supplemental 2: Genomic breakdown of UMRs
 
-```{r genomicBreak}
+```{r genomicBreak, fig.height = 5, fig.width = 10}
 genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "HuFNSC02 UMRs", "hypo" = "HuFNSC01 UMRs")))
-(genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
   ylab("Fraction of CpG") + 
@@ -184,9 +157,9 @@ genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(fact
   facet_wrap(~ DM) + 
   coord_flip() + 
   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
-  theme_bw())
+  theme_bw()
 genomicBreak_WGBS_tall <- genomicBreak_WGBS_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "GE UMRs", "hypo" = "Cortex UMRs")))
-(genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = CpG, fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
   ylab("Fraction of CpG") + 
@@ -194,15 +167,20 @@ genomicBreak_WGBS_tall <- genomicBreak_WGBS_figure$data %>% mutate(DM = revalue(
   coord_flip() + 
   scale_fill_manual(values = c("red", "blue"), labels = c("HuFNSC02", "HuFNSC04"), name = "") + 
   facet_wrap(~ DM) + 
-  theme_bw())
+  theme_bw()
+grid.arrange(genomicBreak_MZ_figure, genomicBreak_WGBS_figure, nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 pdf("~/快盘/FetalBrain/Figures/FigureS2.pdf", height = 7, width = 15)
 grid.arrange(genomicBreak_MZ_figure, genomicBreak_WGBS_figure, nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 dev.off()
 ```
 
 ### Supplemental 3: Fraction of DE genes with proximal UMRs
 
-```{r proximal_DE, fig.height=5, fig.width=7}
+```{r proximal_DE, fig.height=5, fig.width=10}
 DMR_proximal_DE_MZ_summary <- data.frame(Sample = rownames(DMR_proximal_MZ_summary), Total.UP = rep(c(nrow(filter(brain01_brain02DE, DE == "UP")), nrow(filter(cortex01_cortex02DE, DE == "UP")), nrow(filter(GE01_GE02DE, DE == "UP"))), each = 2), Total.DN = rep(c(nrow(filter(brain01_brain02DE, DE == "DN")), nrow(filter(cortex01_cortex02DE, DE == "DN")), nrow(filter(GE01_GE02DE, DE == "DN"))), each = 2), DMR.DE = DMR_proximal_MZ_summary[, "unique.DE.genes"], same.direction = DMR_proximal_MZ_summary[, "same.direction"], DMR.UP = NA, DMR.DN = NA)
 DMR_proximal_DE_MZ_summary$DM <- gsub(".*_", "", DMR_proximal_DE_MZ_summary$Sample)
 DMR_proximal_DE_MZ_summary$Sample <- gsub("_hy.*", "", DMR_proximal_DE_MZ_summary$Sample)
@@ -212,7 +190,7 @@ DMR_proximal_DE_MZ_summary[DMR_proximal_DE_MZ_summary$DM == "hyper", "DMR.DN"] <
 DMR_proximal_DE_MZ_summary[DMR_proximal_DE_MZ_summary$DM == "hypo", "DMR.DN"] <- (DMR_proximal_DE_MZ_summary[DMR_proximal_DE_MZ_summary$DM == "hypo", "DMR.DE"] - DMR_proximal_DE_MZ_summary[DMR_proximal_DE_MZ_summary$DM == "hypo", "same.direction"])  / DMR_proximal_DE_MZ_summary[DMR_proximal_DE_MZ_summary$DM == "hypo", "Total.DN"]
 DMR_proximal_DE_MZ_summary_tall <- data.frame(Sample = rep(DMR_proximal_DE_MZ_summary$Sample, 2), DM = rep(DMR_proximal_DE_MZ_summary$DM, 2), DE = rep(c("UP", "DN"), each = nrow(DMR_proximal_DE_MZ_summary)), Percent = c(DMR_proximal_DE_MZ_summary$DMR.UP, DMR_proximal_DE_MZ_summary$DMR.DN))
 DMR_proximal_DE_MZ_summary_tall <- DMR_proximal_DE_MZ_summary_tall %>% mutate(DM = revalue(factor(DM), c("hyper" = "HuFNSC02 UMRs", "hypo" = "HuFNSC01 UMRs")))
-(DMR_proximal_DE_MZ_figure <- ggplot(DMR_proximal_DE_MZ_summary_tall, aes(x = Sample, y = Percent, fill = DE)) + 
+DMR_proximal_DE_MZ_figure <- ggplot(DMR_proximal_DE_MZ_summary_tall, aes(x = Sample, y = Percent, fill = DE)) + 
    geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
    facet_wrap(~ DM) + 
    coord_flip() + 
@@ -220,7 +198,7 @@ DMR_proximal_DE_MZ_summary_tall <- DMR_proximal_DE_MZ_summary_tall %>% mutate(DM
    xlab("") + 
    ylab("Fraction of DE genes") + 
    ggtitle("UMRs between MZ twins") + 
-   theme_bw())
+   theme_bw()
 DMR_proximal_DE_neurospheres_summary <- data.frame(Sample = rownames(DMR_WGBS_gene_summary), Total.UP = rep(c(nrow(filter(cortex02_GE02DE, DE == "UP")), nrow(filter(cortex04_GE04DE, DE == "UP"))), each = 2), Total.DN = rep(c(nrow(filter(cortex02_GE02DE, DE == "DN")), nrow(filter(cortex04_GE04DE, DE == "DN"))), each = 2), DMR.DE = DMR_WGBS_gene_summary[, "unique.DE.Genes"], same.direction = DMR_WGBS_gene_summary[, "same.direction"], DMR.UP = NA, DMR.DN = NA)
 DMR_proximal_DE_neurospheres_summary$DM <- gsub("-.*", "", DMR_proximal_DE_neurospheres_summary$Sample)
 DMR_proximal_DE_neurospheres_summary$Sample <- gsub(".*-", "", DMR_proximal_DE_neurospheres_summary$Sample)
@@ -229,7 +207,7 @@ DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == 
 DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "DMR.DN"] <- DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "same.direction"] / DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "Total.DN"]
 DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "DMR.DN"] <- (DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "DMR.DE"] - DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "same.direction"])  / DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "Total.DN"]
 DMR_proximal_DE_neurospheres_summary_tall <- data.frame(Sample = rep(DMR_proximal_DE_neurospheres_summary$Sample, 2), DM = rep(DMR_proximal_DE_neurospheres_summary$DM, 2), DE = rep(c("UP", "DN"), each = nrow(DMR_proximal_DE_neurospheres_summary)), Percent = c(DMR_proximal_DE_neurospheres_summary$DMR.UP, DMR_proximal_DE_neurospheres_summary$DMR.DN))
-(DMR_proximal_DE_neurospheres_figure <- ggplot(DMR_proximal_DE_neurospheres_summary_tall, aes(x = Sample, y = Percent, fill = DE)) + 
+DMR_proximal_DE_neurospheres_figure <- ggplot(DMR_proximal_DE_neurospheres_summary_tall, aes(x = Sample, y = Percent, fill = DE)) + 
    geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
    facet_wrap(~ DM) + 
    coord_flip() + 
@@ -238,17 +216,33 @@ DMR_proximal_DE_neurospheres_summary_tall <- data.frame(Sample = rep(DMR_proxima
    xlab("") + 
    ylab("Fraction of DE genes") + 
    ggtitle("UMRs between neurospheres") + 
-   theme_bw())
+   theme_bw()
+grid.arrange(DMR_proximal_DE_MZ_figure, DMR_proximal_DE_neurospheres_figure, nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 pdf("~/快盘/FetalBrain/Figures/FigureS3.pdf", height = 5, width = 15)
 grid.arrange(DMR_proximal_DE_MZ_figure, DMR_proximal_DE_neurospheres_figure, nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 dev.off()
 ```
 
-### Supplemental 4: TFBS asymmetry in MZ UMRs
-
-```{r MZ_TFBS}
-(DMR_MZ_TF_figure <- DMR_MZ_TF_figure + xlab("Abundance near HuFNSC02 UMRs") + ylab("Abundance near HuFNSC01 UMRs")) 
-ggsave(DMR_MZ_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS4.pdf", height = 5, width = 15)
+### Supplemental 4: Differential expressed genes between MZ twins are cell type specific
+  * No. of differential expressed genes between MZ twins in Brain (green), Neurospheres Cortex derived (red), and GE derived (blue).  
+  
+```{r MZ_DE, fig.height=5}
+MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
+venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "UP", main.cex = 1.5)
+MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
+venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "DN", main.cex = 1.5)
+grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+pdf("~/快盘/FetalBrain/Figures/FigureS4.pdf", height = 5, width = 10)
+grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+dev.off()
 ```
 
 ### Supplemental 5: DAVID enrichment for MZ DE genes
@@ -278,7 +272,22 @@ ggsave(DAVID_MZ_figure, file = "~/快盘/FetalBrain/Figures/FigureS5.pdf")
 ggsave(valid_boxplot, file = "~/快盘/FetalBrain/Figures/FigureS6.pdf")
 ```
 
-### Supplemental 7: Neurosphere UMR enrichemnt at chromosome ends
+### Supplemental 7: Location of UMRs across the genome 
+
+```{r UMR_pos, fig.height = 10, fig.width = 20}
+DMR_pos_MZ_ggplot <- DMR_pos_MZ_figure@ggplot + theme(legend.title = element_text(size = 0), panel.margin = unit(0.1, "lines")) + ggtitle("UMRs between MZ twins") + xlab("Position of UMRs on the chromosome") + scale_color_manual(values = c("red", "blue"), labels = c("HuFNSC02 UMRs", "HuFNSC01 UMRs"), name = "")
+DMR_pos_neurospheres_ggplot <- DMR_pos_WGBS_figure@ggplot + theme(legend.title = element_text(size = 0), panel.margin = unit(0.1, "lines")) + ggtitle("UMRs between neurospheres") + xlab("Position of UMRs on the chromosome") + scale_color_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = "")
+grid.arrange(DMR_pos_MZ_ggplot, DMR_pos_neurospheres_ggplot, nrow = 1, widths = 3:2)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.59, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+pdf("~/快盘/FetalBrain/Figures/FigureS7.pdf", height = 10, width = 20)
+grid.arrange(DMR_pos_MZ_ggplot, DMR_pos_neurospheres_ggplot, nrow = 1, widths = 3:2)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.59, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 8: Neurosphere UMR enrichemnt at chromosome ends
 
 ```{r neurospheres_chrEnd}
 chrEnd_Cortex02UMR <- read.delim("~/快盘/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.chrom.window", head = F, as.is = T)
@@ -295,17 +304,17 @@ chrEnd <- rbind(data.frame(DM = "Cortex.UMRs", Donor = "HuFNSC02", chrEnd_Cortex
    scale_fill_discrete(name = "Normalized length \nalong chromosome", labels = as.character(seq(0.1, 1, by = 0.1))) + 
    theme_bw() + 
    theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
-ggsave(chrEnd_figure, file = "~/快盘/FetalBrain/Figures/FigureS7.pdf")
+ggsave(chrEnd_figure, file = "~/快盘/FetalBrain/Figures/FigureS8.pdf")
 ```
 
-### Supplemental 8: UMR asymmetry between Cortex and GE with MeDIP
+### Supplemental 9: UMR asymmetry between Cortex and GE with MeDIP
 
 ```{r neurospheres_asymmetry_MeDIP}
 (DMR_freq_neurospheres_figure <- DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""))
-ggsave(DMR_freq_neurospheres_figure, file = "~/快盘/FetalBrain/Figures/FigureS8.pdf")
+ggsave(DMR_freq_neurospheres_figure, file = "~/快盘/FetalBrain/Figures/FigureS9.pdf")
 ```
 
-### Supplemental 9: GREAT enrichment for neurospheres UMRs with MeDIP
+### Supplemental 10: GREAT enrichment for neurospheres UMRs with MeDIP
 
 ```{r neurospheres_GREAT_MeDIP}
 GOBP_Cortex02.UMR_MeDIP <- read.delim("~/快盘/FetalBrain/MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo.tsv", head = F, as.is = T, skip = 4)
@@ -321,10 +330,10 @@ GOBP_Cortex02_GE02_MeDIP <- mutate(filter(GOBP_Cortex02_GE02_MeDIP, Term %in% Te
   ylab("-log10(FDR)") + 
   scale_fill_manual(values = c("blue", "red"), name = "") + 
   theme_bw())
-ggsave(GOBP_Cortex02_GE02_MeDIP_figure, file = "~/快盘/FetalBrain/Figures/FigureS9.pdf")
+ggsave(GOBP_Cortex02_GE02_MeDIP_figure, file = "~/快盘/FetalBrain/Figures/FigureS10.pdf")
 ```
 
-### Supplemental 10: DAVID enrichment for neurospheres DE genes
+### Supplemental 11: DAVID enrichment for neurospheres DE genes
 
 ```{r neurospheres_DE_DAVID}
 DAVID_cortex_GE_UP <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex_GE_UP_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
@@ -340,27 +349,52 @@ DAVID_neurospheres$Term <- factor(DAVID_neurospheres$Term, levels = rev(unique(D
    xlab("") + 
    ylab("-log10(FDR)") + 
    theme_bw())
-ggsave(DAVID_neurospheres_figure, file = "~/快盘/FetalBrain/Figures/FigureS10.pdf")
+ggsave(DAVID_neurospheres_figure, file = "~/快盘/FetalBrain/Figures/FigureS11.pdf")
 ```
 
-### Supplemental 11: DAVID enrichment for neurospheres isoform genes
+### Supplemental 12: DAVID enrichment for neurospheres isoform genes
 
 ```{r neurospheres_isoform_DAVID}
 (isoform_neurospheres_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("") + xlab(""))
-ggsave(isoform_neurospheres_DAVID, file = "~/快盘/FetalBrain/Figures/FigureS11.pdf")
+ggsave(isoform_neurospheres_DAVID, file = "~/快盘/FetalBrain/Figures/FigureS12.pdf")
 ```
 
-### Supplemental 12: DNA methylation at exon boundaries with MeDIP
+##################################################################
+
+### Supplemental 13: TFBS asymmetry in MZ UMRs
+
+```{r MZ_TFBS}
+(DMR_MZ_TF_figure <- DMR_MZ_TF_figure + xlab("Abundance near HuFNSC02 UMRs") + ylab("Abundance near HuFNSC01 UMRs")) 
+ggsave(DMR_MZ_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 5, width = 15)
+```
+
+### Supplemental 14: DNA methylation at exon boundaries
+
+```{r neurospheres_epiProfile_5mC}
+gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC02 + ggtitle("WGBS HuFNSC02 cortex vs GE"))) 
+gt$heights[[4]] <- unit(3.5, "null") 
+grid.newpage()
+grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
+pdf("~/快盘/FetalBrain/Figures/FigureS14.pdf")
+grid.draw(gt) 
+grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
+grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
+dev.off()
+```
+
+### Supplemental 15: DNA methylation at exon boundaries with MeDIP
 
 ```{r neurospheres_epiProfile_5mC_MeDIP}
 (MeDIP_figure_HuFNSC01 <- MeDIP_figure_HuFNSC01 + ggtitle("HuFNSC01") + theme(legend.position = "none"))
 (MeDIP_figure_HuFNSC02 <- MeDIP_figure_HuFNSC02 + ggtitle("HuFNSC02"))
-pdf("~/快盘/FetalBrain/Figures/FigureS12.pdf", height = 7, width = 15)
+pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 7, width = 15)
 grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
 dev.off()
 ```
 
-### Supplemental 13: Expression of DNA methylation reulators
+### Supplemental 16: Expression of DNA methylation reulators
 
 ```{r heatmap_5mC_regulator}
 regulator_5mC <- read.delim("~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", as.is = T, row.names = 1)
@@ -368,7 +402,7 @@ regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
 clab <- c(rep(c("red", "blue"), each = 4), rep("green", 2))
 heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
-pdf("~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 7, width = 8)
+pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 7, width = 8)
 heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
 dev.off()
