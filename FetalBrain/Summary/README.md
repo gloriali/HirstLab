@@ -1,7 +1,7 @@
 Fetal Brain - Results summary
 ===============================
+* [Manuscript.md](./Manuscript.md): draft for Fetal Brain manuscript
 * [FetalBrainSummary.rmd (.md, .html)](./FetalBrainSummary.md): Fetal Brain summary for all results
-* [Manuscript.Rmd](./Manuscript.md): draft for Fetal Brain manuscript
 * [Figures.Rmd](./Figures.md): summary of all Fetal Brain figures
 * [hydroxy.Rmd](./hydroxy.md): summary results for potential hydroxymethylated CpGs analysis
 * [GW.Rmd](./GW.Rmd): summary results for comparisons between 13- and 17-gestational-week individuals    
