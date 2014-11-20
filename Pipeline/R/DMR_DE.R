@@ -1,10 +1,11 @@
 DMR_DE <- function(DMR_gene, DE, DM, name){
   load("~/hg19/hg19v65_genes.Rdata")
+  colnames(DE) <- c("ID", "rpkm1", "rpkm2", "p.value", "corrected_P.value", "DE")
   DMR_gene$DMR <- gsub("_.*", "", DMR_gene$V4)
   DMR_gene <- DMR_gene[!duplicated(DMR_gene[, c("DMR", "V5")]),]
   DMR_gene <- data.frame(DMR = DMR_gene$DMR, ensembl[DMR_gene$V5, c("id", "name", "description", "coord", "strand")], stringsAsFactors = F)
   DMR_gene$DM <- DM
-  DMR_gene_DE <- DMR_gene[DMR_gene$id %in% as.character(DE$V1), ]
+  DMR_gene_DE <- DMR_gene[DMR_gene$id %in% as.character(DE$ID), ]
   DMR_gene_DE$DE <- DE[DMR_gene_DE$id, "DE"]
   summary <- c(proximal.DMRs = length(unique(DMR_gene$DMR)), unique.genes = length(unique(DMR_gene$id)), 
                DE.DMRs = length(unique(DMR_gene_DE$DMR)), unique.DE.genes = length(unique(DMR_gene_DE$id)), 

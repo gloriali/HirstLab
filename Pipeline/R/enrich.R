@@ -24,10 +24,19 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
   enrich$Term <- gsub("P[0-9]+:", "", enrich$Term)
   enrich$Term <- gsub("REACT_[0-9]+:", "", enrich$Term)
   enrich$Term <- gsub("GO:[0-9]+~", "", enrich$Term)
-  enrich$Term <- strtrim(enrich$Term, 50)
+  for(i in 1:nrow(enrich)){
+    if(nchar(enrich$Term[i]) > 120){
+      enrich$Term[i] <- paste0(substr(enrich$Term[i], 1, as.integer(nchar(enrich$Term[i])/3)), "-\n", 
+                               substr(enrich$Term[i], as.integer(nchar(enrich$Term[i])/3) + 1, 2*as.integer(nchar(enrich$Term[i])/3)), "-\n", 
+                               substr(enrich$Term[i], 2*as.integer(nchar(enrich$Term[i])/3) + 1, nchar(enrich$Term[i])))
+    }
+    if(nchar(enrich$Term[i]) > 60 & nchar(enrich$Term[i]) <= 120){
+      enrich$Term[i] <- paste0(substr(enrich$Term[i], 1, as.integer(nchar(enrich$Term[i])/2)), "-\n", substr(enrich$Term[i], as.integer(nchar(enrich$Term[i])/2)+1, nchar(enrich$Term[i])))
+    }
+  }
   enrich$Term <- factor(enrich$Term, levels = enrich[order(enrich$Category, enrich$FDR, decreasing = T),]$Term)
-  Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR))) +
-     geom_bar(aes(fill = Category), stat = "identity", width = .5) + 
+  Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR), fill = Category)) +
+     geom_bar(stat = "identity", width = .5) + 
      coord_flip() + 
      geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
