@@ -228,6 +228,10 @@ dev.off()
 pcgene <- 19819 # wc -l /projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID
 phyper(nrow(GW_17_13_UP_duplicated), nrow(GW_17_13_UP_duplicated_cortex), pcgene - nrow(GW_17_13_UP_duplicated_cortex), nrow(GW_17_13_UP_duplicated_GE), lower.tail = F, log = T) 
 phyper(nrow(GW_17_13_DN_duplicated), nrow(GW_17_13_DN_duplicated_cortex), pcgene - nrow(GW_17_13_DN_duplicated_cortex), nrow(GW_17_13_DN_duplicated_GE), lower.tail = F, log = T) 
+GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP)), 
+                            DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN)), 
+                            DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE)))
+rownames(GW_DE_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04")
 # DAVID enrichment
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DE/")
 enrich_GW_17_13_UP <- enrich(name = "GW_17_13_UP_duplicated", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9)
@@ -300,6 +304,7 @@ lib2='A15299'; cell2='GE'; donor2='HuFNSC04';
 GE02_GE04_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
 GW_isoform_summary <- rbind(cortex01_cortex03_isoform$summary, cortex01_cortex04_isoform$summary, cortex02_cortex03_isoform$summary, cortex02_cortex04_isoform$summary, 
                             GE01_GE03_isoform$summary, GE01_GE04_isoform$summary, GE02_GE03_isoform$summary, GE02_GE04_isoform$summary)
+rownames(GW_isoform_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04")
 # Venn diagram 
 GW_isoform_cortex <- list(cortex01_cortex03 = cortex01_cortex03_isoform$isoform_gene$id, cortex01_cortex04 = cortex01_cortex04_isoform$isoform_gene$id, cortex02_cortex03 = cortex02_cortex03_isoform$isoform_gene$id, cortex02_cortex04 = cortex02_cortex04_isoform$isoform_gene$id)
 venn_GW_isoform_cortex <- venn.diagram(GW_isoform_cortex, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW isoform genes in cortex")
@@ -337,7 +342,7 @@ save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Ve
      genomicBreak_GW, genomicBreak_GW_figure, 
      cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, 
      venn_GW_17_13_UP_cortex, venn_GW_17_13_DN_cortex, GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, 
-     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, 
+     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GW_DE_summary, 
      venn_GW_17_13_UP_GE, venn_GW_17_13_DN_GE, GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, 
      GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, venn_GW_17_13_UP, venn_GW_17_13_DN, 
      enrich_GW_17_13_UP, enrich_GW_17_13_DN, enrich_GW_17_13_UP_cortex, enrich_GW_17_13_DN_cortex, enrich_GW_17_13_UP_GE, enrich_GW_17_13_DN_GE, 
