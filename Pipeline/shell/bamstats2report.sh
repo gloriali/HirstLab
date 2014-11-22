@@ -53,6 +53,8 @@ then
     exit
 fi
 
+i=`ll $i | awk '{print $9}'`
+
 # Output file
 outFileTemp=$outDir/report.temp1
 outFile=$outDir/report_$lib.$(date +%Y%m%d)
