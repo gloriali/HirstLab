@@ -38,10 +38,7 @@ lib=$1;
 # Automatic path to bamstats file from library ID 
 i="/projects/analysis*/"$lib"/*/hg19a/bwa/*.bamstats";
 
-echo "--- Processsing $i"
-echo "---> Processing Lib $lib";
-
-if [ `ll $i | wc -l` -gt 1 ]
+if [ `ls -l $i | wc -l` -gt 1 ]
 then
     echo "ERROR: more than one bamstats file found."
     exit
@@ -53,7 +50,9 @@ then
     exit
 fi
 
-i=`ll $i | awk '{print $9}'`
+i=`ls -l $i | awk '{print $9}'`
+echo "--- Processsing $i"
+echo "---> Processing Lib $lib";
 
 # Output file
 outFileTemp=$outDir/report.temp1
