@@ -34,7 +34,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height =
     + distance between adjacent CpGs (size) $\le$ 300bp;   
     + No. of CpGs within each DMR $\ge$ 3.   
 
-## Summary and sanity check 
+## UMR summary and sanity check 
 
   * On average, there are __`r as.integer(mean(GW_DMR_summary$Hypo.DMR))`__ 17-week UMRs, __428__ intersect between Cortex and GE, and __`r as.integer(mean(GW_DMR_summary$Hyper.DMR))`__ 13-week UMRs, __76__ intersect. The intersect is highly significant.       
   * Median DMR length is __`r median(c(Cortex02_Cortex04_DMR$length, GE02_GE04_DMR$lenght))`__, _comparable to breast_. It's similar in all chromosomes in 17-week UMRs, but fluctuate more in 13-week UMRs, probably due to  small No. of UMRs identified.   
@@ -66,8 +66,8 @@ grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
 ## GREAT enrichment for GW-associated UMRs 
 
   * GREAT terms are strongly associated with __neuron differentiation and brain development__.     
-  * 17-week UMRs are highly enriched in __glial cell development__ in Cortex, and __neural tube development__ in GE.     
-  * 13-week UMRs are enriched in __neuron fate commitment__ in Cortex, and __regionalization__ in GE.    
+  * 17-week UMRs are highly enriched in __glial cell development__ in Cortex, and __neural tube development__ in GE. Intersect of these two cell types show enrichment in __cell fate commitment__ related to different types of brain cells.         
+  * 13-week UMRs are enriched in __neuron fate commitment__ in Cortex, and __regionalization__ in GE. Intersect of these two cell types show no significant enrichment.          
   
 ```{r GREAT1, fig.height = 15}
 (GREAT_GW_Cortex02.UMR + ggtitle("Cortex - 17-week UMRs"))
@@ -80,9 +80,10 @@ grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
 ```
 ```{r GREAT4, fig.height = 15}
 (GREAT_GW_GE04.UMR + ggtitle("GE - 13-week UMRs"))
+(GREAT_GW_17week.UMR + ggtitle("17-week UMRs"))
 ```
 
-## Genomic breakdown
+## UMR Genomic breakdown
 
   + On average, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold__ enriched. __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random.        
 
@@ -92,4 +93,74 @@ grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
 ```{r genomicBreak, fig.height=6, fig.width=6}
 (genomicBreak_GW_figure + ggtitle("DMR breakdown between 13-week and 17-week"))
 ```
+
+## Proximal UMRs and DE genes  
+
+  + On average, there are __`r as.integer(mean(DMR_proximal_GW_summary[, "proximal.DMRs"]))`__ UMRs proximally (TSS +/- 1.5kb) associated with protein-coding genes, __`r round(mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "proximal.DMRs"]) / mean(GW_DMR_summary[, "Hypo.DMR"]) * 100, 2)`%__ in 17-week UMRs, and __`r round(mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "proximal.DMRs"]) / mean(GW_DMR_summary[, "Hyper.DMR"]) * 100, 2)`%__ in 13-week UMRs, __much lower__ than 17-week UMRs.   
+  + Among proximal UMRs, __`r round(mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) / mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "proximal.DMRs"]) * 100, 2)`%__ of 17-week proximal UMRs are associated with DE genes, __`r round(mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) / mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "proximal.DMRs"]) * 100, 2)`%__ 13-week UMRs, similar to 17-week UMRs. On average, __`r as.integer(mean(DMR_proximal_GW_summary[, "unique.DE.genes"]))`__ DE genes are associated with GW UMRs.        
+  + Among proximal UMR assocaited with DE genes, __`r round(mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "same.direction"]) / mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) * 100, 2)`%__ 17-week UMRs change in the same direction as DE genes (hyper to DN), __much higher__ than any Fetal Brain UMRs and close to observed in breast. __`r round(mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "same.direction"]) / mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) * 100, 2)`%__ in 13-week UMRs, __much lower__ than 17-week UMRs.     
+
+```{r proximal_DE, results='asis', fig.height=4}
+DMR_proximal_GW_summary <- xtable(DMR_proximal_GW_summary)
+align(DMR_proximal_GW_summary) <- "cccccc"
+print(DMR_proximal_GW_summary, type = "html", include.rownames = T)
+
+grid.arrange(gTree(children = venn_DMR_proximal_GW_hyper), gTree(children = venn_DMR_proximal_GW_hypo), nrow = 1)
+```
+
+## DE genes summary   
+  
+  + On average, there are __`r as.integer(mean(GW_DE_summary$DE))`__ genes differentially expressed between 13- and 17-week individuals, __`r as.integer(mean(GW_DE_summary$DN))`__ up-regulated in 13-week individuals, and __`r as.integer(mean(GW_DE_summary$UP))`__ up-regulated in 17-week individuals, __`r round(mean(GW_DE_summary$UP) / mean(GW_DE_summary$DN, 2))`__-times as many.   
+  + Within each cell type, majority of DE genes are shared among different comparisons (hypergeometric p-value = 0). There are __`r nrow(GW_17_13_UP_duplicated_cortex)`__ genes up-regulated in 17-week in cortex shared by at least two comparisons, __`r nrow(GW_17_13_DN_duplicated_cortex)`__ up-regulated in 13-week in cortex, __`r nrow(GW_17_13_UP_duplicated_GE)`__ up-regulated in 17-week in GE, and __`r nrow(GW_17_13_DN_duplicated_GE)`__ up-regulated in 13-week in GE.   
+  + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __`r nrow(GW_17_13_UP_duplicated)`__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __`r nrow(GW_17_13_DN_duplicated)`__ genes up-regulated in 13-week.    
+
+```{r DE, results='asis'}
+GW_DE_summary <- xtable(GW_DE_summary)
+align(GW_DE_summary) <- "cccc"
+print(GW_DE_summary, type = "html", include.rownames = T)
+
+grid.arrange(gTree(children = venn_GW_17_13_UP_cortex), gTree(children = venn_GW_17_13_DN_cortex), nrow = 1)
+grid.arrange(gTree(children = venn_GW_17_13_UP_GE), gTree(children = venn_GW_17_13_DN_GE), nrow = 1)
+grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_DN), nrow = 1)
+```
+
+## DAVID enrichment for DE genes  
+
+  * Genes up-regulated in 17-week in both cortex and GE show enrichment in __tissue development__ and __calcium ion binding__, they also show more __brain development__ terms in GE.    
+  * Genes up-regulated in 13-week in both cortex and GE show enrichment in __neurogenesis__.    
+  * Genes shared by both cortex and GE show no significant terms, probably due to small No. of genes.    
+  * In cortex:     
+```{r DAVID_DE_cortex, fig.height=3}
+(enrich_GW_17_13_UP_cortex)
+(enrich_GW_17_13_DN_cortex)
+```
+
+  * In GE:    
+```{r DAVID_DE_GE_UP, fig.height=8}
+(enrich_GW_17_13_UP_GE)
+```
+```{r DAVID_DE_GE_DN, fig.height=5}
+(enrich_GW_17_13_DN_GE)
+```
+
+## Isoform analysis   
+
+  * On average, there are __`r as.integer(mean(GW_isoform_summary[, "isoform_genes"]))`__ isoform genes between 13- and 17-week individuals, majority of them are shared among different comparisons and between the two cell types (hypergeometric p-value = 0).    
+  * There are __`r nrow(GW_isoform_gene_dup_cortex)`__ isoform genes in cortex supported by at least two comparisons, and __`r nrow(GW_isoform_gene_dup_GE)`__ in GE, among them, __`r nrow(GW_isoform_gene_dup)`__ isoform genes are shared between the two cell types.    
+  * Isoform genes are enriched in __cell signaling__ related terms.        
+
+```{r isoform, results='asis'}
+GW_isoform_summary <- xtable(GW_isoform_summary)
+align(GW_isoform_summary) <- "ccccccc"
+print(GW_isoform_summary, type = "html", include.rownames = T)
+
+grid.arrange(gTree(children = venn_GW_isoform_cortex), gTree(children = venn_GW_isoform_GE), nrow = 1)
+plot.new()
+grid.draw(venn_GW_isoform)
+```
+```{r DAVID_isoform, fig.height=8}
+(enrich_GW_isoform_gene_dup)
+```
+
+
 
