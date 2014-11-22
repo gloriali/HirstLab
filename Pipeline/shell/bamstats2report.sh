@@ -35,11 +35,23 @@ fi
 
 # First argument is library ID
 lib=$1;
-# Second argument is path to bamstats file
-i=$2;
+# Automatic path to bamstats file from library ID 
+i="/projects/analysis*/"$lib"/*/hg19a/bwa/*.bamstats";
 
 echo "--- Processsing $i"
 echo "---> Processing Lib $lib";
+
+if [ `ll $i | wc -l`>1 ]
+then
+    echo "ERROR: more than one bamstats file found."
+    exit
+fi
+
+if [ -e $i ]
+then
+    echo "ERROR: bamstats file not found."
+    exit
+fi
 
 # Output file
 outFileTemp=$outDir/report.temp1
