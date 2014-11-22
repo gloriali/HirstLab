@@ -41,7 +41,7 @@ i="/projects/analysis*/"$lib"/*/hg19a/bwa/*.bamstats";
 echo "--- Processsing $i"
 echo "---> Processing Lib $lib";
 
-if [ `ll $i | wc -l`>1 ]
+if [ `ll $i | wc -l` -gt 1 ]
 then
     echo "ERROR: more than one bamstats file found."
     exit
