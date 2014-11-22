@@ -9,3 +9,4 @@ REMC Fetal Brain Project
 * [MethylCRF](./MethylCRF): DMR analysis with MethylCRF methylation calls, _discontinued_.
 * [HisMod](./HisMod/HisMod.md): Histone modifications analysis, _will add ChromHMM_.
 * [SNP](./SNP): Validate monozygotic twins with SNPs.
+* [bamstats.sh](./bamstats.sh): Script to generate bamstats for all Fetal Brain libraries.
