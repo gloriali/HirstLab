@@ -36,7 +36,7 @@ fi
 # First argument is library ID
 lib=$1;
 # Automatic path to bamstats file from library ID 
-i="/projects/analysis*/"$lib"/*/hg19a/bwa/*.bamstats";
+i="/projects/analysis/analysis*/$lib/*/hg19a/bwa/*.bamstats";
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
@@ -44,7 +44,7 @@ then
     exit
 fi
 
-if [ -e $i ]
+if [ ! -f $i ]
 then
     echo "ERROR: bamstats file not found."
     exit
