@@ -36,7 +36,12 @@ fi
 # First argument is library ID
 lib=$1;
 # Automatic path to bamstats file from library ID 
-i=$2;
+i="/projects/analysis/analysis*/$lib/*/hg19a/bwa*/*.bamstats";
+
+if [ "$2" = "ChIPseq" ]
+then
+    i="/projects/analysis/analysis*/*/hg19a/$lib/bwa*/*.bamstats";
+fi
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
