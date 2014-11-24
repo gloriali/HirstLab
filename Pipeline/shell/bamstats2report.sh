@@ -33,10 +33,11 @@ else
 cp $outDir/qcReport.template $outDir/report.temp0
 fi
 
-# First argument is library ID
+# First argument is library ID, second argument is inx ID
 lib=$1;
+inx=$2;
 # Automatic path to bamstats file from library ID 
-i="/projects/analysis/analysis*/hg19a/$lib/bwa/*.bamstats";
+i="/projects/analysis/analysis*/$inx/*/hg19a/$lib/bwa*/*.bamstats";
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
