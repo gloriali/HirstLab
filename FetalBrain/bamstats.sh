@@ -1,11 +1,21 @@
 #!/bin/bash
 
-# bamstats report for FetalBrain libraries
-
+# bamstats path: /projects/analysis/analysis*/$lib/*/hg19a/bwa/*.bamstats
 bamstats=(
 "A02879"
 "A02880"
 "A02881"
+"A03484"
+"A22475"
+)
+for bamstats in ${bamstats[*]}
+do
+    echo $bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $bamstats
+done
+
+# bamstats path: /projects/analysis/analysis*/*/hg19a/$lib/bwa/*.bamstats
+bamstats=(
 "A03269"
 "A03271"
 "A03272"
@@ -32,7 +42,6 @@ bamstats=(
 "A03480"
 "A03481"
 "A03483"
-"A03484"
 "A03485"
 "A03486"
 "A03487"
@@ -60,7 +69,6 @@ bamstats=(
 "A19307"
 "A19308"
 "A19309"
-"A22475"
 "A22476"
 "A22477"
 "HS2774"
