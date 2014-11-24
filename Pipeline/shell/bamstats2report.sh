@@ -36,12 +36,7 @@ fi
 # First argument is library ID
 lib=$1;
 # Automatic path to bamstats file from library ID 
-i="/projects/analysis/analysis*/$lib/*/hg19a/bwa*/*.bamstats";
-
-if [ "$2" = "ChIPseq" ]
-then
-    i="/projects/analysis/analysis*/*/hg19a/$lib/bwa*/*.bamstats";
-fi
+i="/projects/analysis/analysis*/$lib/*/hg19a/bwa/*.bamstats";
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
@@ -138,4 +133,3 @@ join -1 1 -2 1 $outDir/report.temp0 $outFileTemp > $outFile
 # Final report
 rm $outDir/report.temp0
 rm $outFileTemp
-
