@@ -14,63 +14,13 @@ do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $bamstats
 done
 
-# bamstats path: /projects/analysis/analysis*/*/hg19a/$lib/bwa/*.bamstats
+# bamstats path for inx libraries
+less /projects/epigenomics/users/lli/FetalBrain/FetalBrainID_inx.txt | awk '{cmd="/home/lli/HirstLab/Pipeline/shell/bamstats2report.sh " $1 " " $2; print cmd; system(cmd)}'
+/home/acarles/bin/bamstats2report.sh A03481 /projects/analysis/analysis8/INX216/702RHABXX_7/hg19a/A03481/bwa/702RHABXX_7_GATCAG.bamstats
+/home/acarles/bin/bamstats2report.sh A03483 /projects/analysis8/INX216/702RHABXX_7/hg19a/A03483/bwa/702RHABXX_7_TAGCTT.bamstats
+
+# bamstats path for merged bams: /projects/analysis6/$lib/merge_bwa/hg19a/*.bamstats
 bamstats=(
-"A03269"
-"A03271"
-"A03272"
-"A03273"
-"A03275"
-"A03277"
-"A03278"
-"A03279"
-"A03281"
-"A03282"
-"A03283"
-"A03284"
-"A03285"
-"A03287"
-"A03288"
-"A03289"
-"A03473"
-"A03474"
-"A03475"
-"A03476"
-"A03477"
-"A03478"
-"A03479"
-"A03480"
-"A03481"
-"A03483"
-"A03485"
-"A03486"
-"A03487"
-"A03488"
-"A03489"
-"A03491"
-"A03493"
-"A03494"
-"A03495"
-"A03496"
-"A03497"
-"A03499"
-"A04599"
-"A07825"
-"A15295"
-"A15298"
-"A15299"
-"A16057"
-"A17784"
-"A13819"
-"A19303"
-"A19304"
-"A19305"
-"A19306"
-"A19307"
-"A19308"
-"A19309"
-"A22476"
-"A22477"
 "HS2774"
 "HS2775"
 "HS2776"
@@ -83,31 +33,21 @@ bamstats=(
 "HS2788"
 "HS2789"
 "HS2790"
-"M01577"
-"M01578"
-"M01579"
-"M01580"
-"M01581"
-"M01582"
-"M01587"
-"M05800"
-"M05801"
-"M05802"
 )
-
 for bamstats in ${bamstats[*]}
 do
     echo $bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $bamstats
 done
 
+# For libraries without bamstats
+less /projects/epigenomics/users/lli/FetalBrain/FetalBrainID_other.txt | awk '{cmd="/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py -g 2864785220 -q 10 -b " $2 " > /projects/epigenomics/users/lli/tmp/" $1 ".bamstats"; print cmd; system(cmd); cmd2="/home/acarles/bin/bamstats2report.sh " $1 " /projects/epigenomics/users/lli/tmp/" $1 ".bamstats"; print cmd2; system(cmd2)}'
+
 # combine reports together
 dir=/projects/epigenomics/users/acarles/qc
-
 cd $dir
 cp /projects/epigenomics/users/acarles/qc/summaryTemplate.11 summary.xls
- 
-for file in report_*.20141122; do
+for file in report_*.20141124; do
 less summary.xls | sort -k1,1 > x;
 echo "$file"
 rfile=$dir/$file
