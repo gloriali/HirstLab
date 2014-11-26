@@ -1,6 +1,18 @@
 #!/bin/sh
 
 # Dynamic growth appraoch to join DM CpGs
+if [ "$1" == "-h" ] ; then
+    echo -e "Dynamic growth appraoch to join DM CpGs
+Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -n <name> -s <size> -c <cut>
+    <dirIn>: input directory
+    <dirOut>: output directory
+    <file>: input DM CpG bed file
+    <name>: output name
+    <size>: max distance to join adjacent CpGs
+    <cut>: min No. of CpGs in each DMR"
+    exit 0
+fi
+
 size=500  # max distance between two consecutive CpGs
 cut=3     # minimum number of CpGs
 while [ $# -gt 0 ]

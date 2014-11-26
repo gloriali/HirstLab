@@ -1,6 +1,13 @@
 #!/bin/sh
 
 # intersect with genomic regions
+if [ "$1" == "-h" ] ; then
+    echo -e "Intersecting DM CpGs with genomic regions
+Usage: `basename $0` -d <dirIn>
+    <dirIn>: input directory with DMR bed files"
+    exit 0
+fi
+
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -12,8 +19,8 @@ dirOut=$dirIn/CpG
 mkdir -p $dirOut
 > $dirOut/genomic.breakdown.summary
 cd $dirIn
-echo -e "Intersecting DM CpGs with genomic regions
-Output files: $dirOut/DMR.<name>.CpG.bed: chr\tstart\tend\tDMR_ID
+echo -e "Output files:
+$dirOut/DMR.<name>.CpG.bed: chr\tstart\tend\tDMR_ID
 $dirOut/DMR.<name>.CpG_gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
 $dirOut/DMR.<name>.CpG_exon.bed: chr\tstart\tend\tDMR_IDtExon_ID
 $dirOut/DMR.<name>.CpG_promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl

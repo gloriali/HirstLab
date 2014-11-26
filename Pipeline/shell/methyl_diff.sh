@@ -1,6 +1,19 @@
 #!/bin/sh
 
-# identify DM CpGs from WGBS coverage with methyl_diff
+if [ "$1" == "-h" ] ; then
+    echo -e "Identify DM CpGs from WGBS coverage with methyl_diff
+Usage: `basename $0` -i <dirIn> -o <dirOut> -f1 <file1> -f2 <file2> -n <name> -p <p-value> -d <delta> -m <methylation>
+    <dirIn>: input directory
+    <dirOut>: ourput directory
+    <file1>: input for sample1, format ID\tunconverted\tconverted\tfractional
+    <file2>: input for sample2, format ID\tunconverted\tconverted\tfractional
+    <name>: output file name
+    <p-value>: p-value cutoff for methyl_diff, default to 0.0005
+    <delta>: min difference in fractional methylation, default to 0.6
+    <methylation>: min fractional methylation for the hyper, default to 0.75"
+    exit 0
+fi
+
 pth=0.0005
 delta=0.6
 m=0.75

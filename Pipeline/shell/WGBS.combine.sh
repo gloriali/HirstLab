@@ -1,6 +1,15 @@
 #!/bin/sh
 
 # Combine CpG coverage on both strand
+if [ "$1" == "-h" ] ; then
+    echo -e "Combine CpG coverage on both strand
+Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file>
+    <dirIn>: input directory
+    <dirOut>: output directory
+    <file>: WGBS .sam.bedGraph input file"
+    exit 0
+fi
+
 while [ $# -gt 0 ]
 do
     case "$1" in
