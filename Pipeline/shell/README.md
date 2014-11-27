@@ -4,3 +4,7 @@ Pipeline shell scripts
 * [methyl_diff.sh](./methyl_diff.sh): shell script to identify DM CpGs for WGBS using methyl_diff.  
 * [DMR.dynamic.sh](./DMR.dynamic.sh): shell script to collapse DM CpGs into DMRs.
 * [DMR.intersect.sh](./DMR.intersect.sh): intersecting DMRs with genomic regions and report CpG% breakdown in intergenic, intron, exon, gene, promoter regions.     
+* [region.mean.sh](./region.mean.sh): shell script to compute regional mean, sum or weighted mean.   
+* [bamstats2report.sh](./bamstats2report.sh): shell script to generate QC summary report from bamstats file.
+* [bamstats2report_all.sh](./bamstats2report_all.sh): shell script to generate QC summary report for multiple libraries.
+* [bamstats2report.combine.sh](./bamstats2report.combine.sh): shell script to combine multiple QC summary report into a single table.
