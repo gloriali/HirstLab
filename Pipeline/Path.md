@@ -2,7 +2,7 @@ File paths on xhost
 ===================
 
 ## Programs
-* R: `/gsc/software/linux-x86_64-centos5/R-3.0.2/bin/R`  
+* R: `/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R`  
 * Java: `/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java`
 * Python: `/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python`    
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`  
@@ -12,16 +12,18 @@ File paths on xhost
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
-* R libraries and functions: `/home/lli/HirstLab/Pipeline/R/`
+* R libraries: `/home/lli/bin/R-3.1.1/`    
+* R functions: `/home/lli/HirstLab/Pipeline/R/`
 * Shell scripts: `/home/lli/HirstLab/Pipeline/shell/`   
-* Python scripts: `/home/lli/bin/python/`  
-* UCSC scripts: `/home/lli/bin/`  
+* Python scripts: `/home/lli/HirstLab/Pipeline/python/`  
+* UCSC scripts: `/home/lli/HirstLab/Pipeline/UCSC/`  
 
 ## Rescources
 * Self processed hg19: `/home/lli/hg19/`
 * Ensembl v65: `/projects/epigenomics/resources/Ensembl/hg19v65/`
 * Genome hg19: `/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa`    
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
+* Encode TFBS: `/projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz`     
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
 * CpG +/- 25bp bins: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`  
 * Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`
