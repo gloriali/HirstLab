@@ -46,3 +46,4 @@ if [ "$WEIGHT" = YES ]; then
     echo "Processing "$file ": compute regional weighted mean for "$region ", output to "$dirOut/$name.weighted.mean.bed
     less $dirOut/$name.intersect | awk '{sum[$9]=sum[$9]+$4*$5; weight[$9]=weight[$9]+$5; chr[$9]=$6; start[$9]=$7; end[$9]=$8;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]/weight[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/users/lli/tmp/ > $dirOut/$name.sum.bed
 fi
+rm $dirOut/$name.intersect
