@@ -119,16 +119,15 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/")
 # ======= Genomic breakdown ======
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/CpG/")
 genomicBreak_GW <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
-genomicBreak_GW_tall <- data.frame(Sample = rep(row.names(genomicBreak_GW), ncol(genomicBreak_GW)), Region = factor(rep(colnames(genomicBreak_GW), each = nrow(genomicBreak_GW)), levels = colnames(genomicBreak_GW)), CpG = as.vector(as.matrix(genomicBreak_GW)))
+genomicBreak_GW_tall <- genomicBreak_GW[2:5, -1]
+genomicBreak_GW_tall <- data.frame(Sample = rep(row.names(genomicBreak_GW), ncol(genomicBreak_GW)), Region = factor(rep(colnames(genomicBreak_GW), each = nrow(genomicBreak_GW)), levels = colnames(genomicBreak_GW)), FC = as.vector(as.matrix(genomicBreak_GW)))
 genomicBreak_GW_tall$DM <- gsub(".*c3.", "", genomicBreak_GW_tall$Sample)
 genomicBreak_GW_tall$Sample <- gsub(".m0.75.*", "", genomicBreak_GW_tall$Sample)
-genomicBreak_GW_tall <- genomicBreak_GW_tall[genomicBreak_GW_tall$Region != "Total", ]
-genomicBreak_GW_figure <- ggplot(genomicBreak_GW_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_GW_figure <- ggplot(genomicBreak_GW_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
+  ylab("log2 Fold enrichment") + 
   facet_wrap(~ DM) + 
-  coord_flip() + 
   scale_fill_hue(l = 50, labels = c("Cortex", "GE")) + 
   theme_bw()
 ggsave(genomicBreak_GW_figure, file = "genomicBreak_GW.pdf")
@@ -336,20 +335,77 @@ write.table(GW_isoform_gene_dup, file = "GW_isoform_gene_dup.txt", sep = "\t", q
 enrich_GW_isoform_gene_dup <- enrich(name = "GW_isoform_gene_dup", fdr = 0.01, p = "FDR", erminej = F, height = 8, width = 9)
 (enrich_GW_isoform_gene_dup)
 
+#' overlap with TFBSs
+setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/TF")
+DMR_GW_TF <- read.delim("DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T, col.names = c("TF", "UMR17week_Cortex", "UMR13week_Cortex", "Ratio_Cortex", "UMR17week_GE", "UMR13week_GE", "Ratio_GE"))
+DMR_GW_TF_tall <- data.frame(TF = rep(DMR_GW_TF$TF, 2), Cell = rep(c("Cortex", "GE"), each = nrow(DMR_GW_TF)), UMR17week = c(DMR_GW_TF$UMR17week_Cortex, DMR_GW_TF$UMR17week_GE), UMR13week = c(DMR_GW_TF$UMR13week_Cortex, DMR_GW_TF$UMR13week_GE), Ratio = c(DMR_GW_TF$Ratio_Cortex, DMR_GW_TF$Ratio_GE))
+DMR_GW_TF_tall$Asymmetry <- NA
+DMR_GW_TF_tall[DMR_GW_TF_tall$Ratio > 1,]$Asymmetry <- "17-week enriched"
+DMR_GW_TF_tall[DMR_GW_TF_tall$Ratio < 1,]$Asymmetry <- "13-week enriched"
+DMR_GW_TF_tall[DMR_GW_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
+(DMR_GW_TF_figure <- ggplot(DMR_GW_TF_tall, aes(x = UMR17week, y = UMR13week, label = TF, color = Asymmetry)) + 
+   geom_point() + 
+   geom_abline(intercept=0, slope=1) + 
+   geom_text(data = subset(DMR_GW_TF_tall, (Ratio > 40 | Ratio <= 1/40)), angle = 45, size = 4, hjust = 0.2, vjust = 0.2) + 
+   facet_wrap(~ Cell) + 
+   scale_x_log10() + 
+   scale_y_log10() + 
+   scale_color_hue(l = 50) + 
+   theme_bw())
+ggsave(DMR_GW_TF_figure, file = "DMR_GW_TF.pdf", height = 6)
+
+# chrEnd_GW enrichment
+setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/")
+chrEnd_GW_Cortex17UMR <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed.chrom.window", head = F, as.is = T)
+chrEnd_GW_Cortex13UMR <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed.chrom.window", head = F, as.is = T)
+chrEnd_GW_GE17UMR <- read.delim("DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed.chrom.window", head = F, as.is = T)
+chrEnd_GW_GE13UMR <- read.delim("DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed.chrom.window", head = F, as.is = T)
+chrEnd_GW <- rbind(data.frame(DM = "17-week.UMRs", Cell = "Cortex", chrEnd_GW_Cortex17UMR %>% group_by(V4) %>% summarise(N = sum(V5))), 
+                   data.frame(DM = "13-week.UMRs", Cell = "Cortex", chrEnd_GW_Cortex13UMR %>% group_by(V4) %>% summarise(N = sum(V5))), 
+                   data.frame(DM = "17-week.UMRs", Cell = "GE", chrEnd_GW_GE17UMR %>% group_by(V4) %>% summarise(N = sum(V5))), 
+                   data.frame(DM = "13-week.UMRs", Cell = "GE", chrEnd_GW_GE13UMR %>% group_by(V4) %>% summarise(N = sum(V5))))
+(chrEnd_GW_figure <- ggplot(chrEnd_GW, aes(x = Cell, y = N, fill = as.factor(V4))) + 
+   geom_bar(stat = "identity", width = 0.5, position = "fill") + 
+   facet_grid(DM ~ .) + 
+   xlab("") + 
+   ylab("Fraction of total UMRs") + 
+   coord_flip() + 
+   scale_fill_discrete(name = "Normalized length \nalong chromosome", labels = as.character(seq(0.1, 1, by = 0.1))) + 
+   theme_bw() + 
+   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
+ggsave(chrEnd_GW_figure, file = "chrEnd_GW.pdf")
+
+# CGI coverage
+setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS/CGI/")
+Cortex02_CGI <- read.delim("A22475.WGBS.NeurospheresCortex02.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "Cortex02", cell = "Cortex", GW = "17-week")
+GE02_CGI <- read.delim("A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "GE02", cell = "GE", GW = "17-week")
+Cortex04_CGI <- read.delim("A22477.WGBS.NeurospheresCortex04.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "Cortex04", cell = "Cortex", GW = "13-week")
+GE04_CGI <- read.delim("A22476.WGBS.NeurospheresGE04.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "GE04", cell = "GE", GW = "13-week")
+CGI_WGBS <- rbind(Cortex02_CGI, GE02_CGI, Cortex04_CGI, GE04_CGI)
+(CGI_coverage_figure <- ggplot(CGI_WGBS, aes(x = sample, y = cov, fill = GW)) + 
+   geom_boxplot(outlier.shape = NA) + 
+   xlab("") + 
+   ylab("Average coverage per CpG in CGIs") + 
+   coord_cartesian(ylim = c(0, 100)) + 
+   scale_fill_hue(l = 50) + 
+   theme_bw())
+ggsave(CGI_coverage_figure, file = "CGI_coverage_figure.pdf")
+
 save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Venn_GW_UMR_hypo, 
      DMR_length_GW_figure, DMR_count_GW_figure, DMR_dis_GW_figure, DMR_freq_GW_figure, DMR_pos_GW_figure, 
      GREAT_GW_Cortex02.UMR, GREAT_GW_Cortex04.UMR, GREAT_GW_GE02.UMR, GREAT_GW_GE04.UMR, GREAT_GW_17week.UMR,  
      genomicBreak_GW, genomicBreak_GW_figure, 
      cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, 
      venn_GW_17_13_UP_cortex, venn_GW_17_13_DN_cortex, GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, 
-     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GW_DE_summary, 
+     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, 
      venn_GW_17_13_UP_GE, venn_GW_17_13_DN_GE, GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, 
      GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, venn_GW_17_13_UP, venn_GW_17_13_DN, 
      enrich_GW_17_13_UP, enrich_GW_17_13_DN, enrich_GW_17_13_UP_cortex, enrich_GW_17_13_DN_cortex, enrich_GW_17_13_UP_GE, enrich_GW_17_13_DN_GE, 
-     DMR_DE_Cortex02_Cortex04_hyper, DMR_DE_Cortex02_Cortex04_hypo, DMR_proximal_GE02_GE04_hyper, DMR_proximal_GE02_GE04_hypo, 
+     DMR_DE_Cortex02_Cortex04_hyper, DMR_DE_Cortex02_Cortex04_hypo, DMR_DE_GE02_GE04_hyper, DMR_DE_GE02_GE04_hypo, 
      DMR_proximal_GW_summary, venn_DMR_proximal_GW_hyper, venn_DMR_proximal_GW_hypo, 
      cortex01_cortex03_isoform, cortex01_cortex04_isoform, cortex02_cortex03_isoform, cortex02_cortex04_isoform, 
      GE01_GE03_isoform, GE01_GE04_isoform, GE02_GE03_isoform, GE02_GE04_isoform, GW_isoform_summary, enrich_GW_isoform_gene_dup, 
      venn_GW_isoform_cortex, GW_isoform_gene_dup_cortex, venn_GW_isoform_GE, GW_isoform_gene_dup_GE, venn_GW_isoform, GW_isoform_gene_dup, 
+     DMR_GW_TF, DMR_GW_TF_figure, chrEnd_GW_figure, CGI_coverage_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
 

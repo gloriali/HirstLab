@@ -106,6 +106,7 @@ do
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /home/lli/hg19/hg19.chrom.window.n10.bed -b $file -c > $file.chrom.window
 done
 
+##########################################################################
 # GW-related UMRs: Cortex02 vs Cortex04; GE02 vs GE04 (17-week vs 13-week)
 dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/GW/DMR/
@@ -135,5 +136,38 @@ done
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed > DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed > DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed
-
+## intersect with TFBS
+mkdir -p $dirOut/TF/
+> $dirOut/TF/DMR.TF.summary
+cd $dirOut
+for file in DMR.*.bed
+do
+    name=$(echo $file | sed -e s/'.bed'//g)
+    echo "Processing "$name >> $dirOut/TF/DMR.TF.summary
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $file -b /projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz -wa -wb | awk '{print $4"\t"$5":"$6"-"$7"\t"$8}' > $dirOut/TF/$name.TF
+    less $dirOut/TF/$name.TF | awk '{if(!($1 in h1)){c1=c1+1; h1[$1]=1} if(!($2 in h2)){c2=c2+1; h2[$2]=1} if(!($3 in h3)){c3=c3+1; h3[$3]=1} else{h3[$3]=h3[$3]+1}} END{print "No. of DMRs overlap with TFBSs", c1; print "No. of unique TFBSs", c2; print "No. of unique TFs", c3; for(i in h3){print i"\t"h3[i] >> "'$dirOut'""/TF/""'$name'"".TF.summary"}}' >> $dirOut/TF/DMR.TF.summary
+done
+awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dirOut/TF/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.TF.summary | sort -k4,4n > $dirOut/TF/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary
+awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]"\t"$2/h[$1]}}' $dirOut/TF/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.TF.summary $dirOut/TF/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.TF.summary | sort -k4,4n > $dirOut/TF/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary
+awk 'NR==FNR {late[$1]=$2; early[$1]=$3; ratio[$1]=$4; next} {if($1 in ratio){print $0"\t"late[$1]"\t"early[$1]"\t"ratio[$1]}}' $dirOut/TF/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary $dirOut/TF/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary | sort -k4,4n > $dirOut/TF/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary
+## chr End enrichment
+cd /projects/epigenomics/users/lli/FetalBrain/GW/DMR/
+for file in DMR.*.bed
+do
+    echo "Processing "$file
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /home/lli/hg19/hg19.chrom.window.n10.bed -b $file -c > $file.chrom.window
+done
+## coverage at CGIs
+less /projects/epigenomics/resources/UCSC_hg19/CGI/CGI.forProfiles.BED | awk '{chr=gensub("chr", "", "g", $1); print chr"\t"$2"\t"$3"\t"$5}' > /home/lli/hg19/CGI.nochr.BED
+region="/home/lli/hg19/CGI.nochr.BED"
+dirOut="/projects/epigenomics/users/lli/FetalBrain/WGBS/CGI/"
+mkdir -p $dirOut
+cd /projects/epigenomics/users/lli/FetalBrain/WGBS/
+for file in *.sam.bedGraph
+do
+    echo "Processing "$file
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $file -b $region -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5+$6"\tchr"$7"\t"$8"\t"$9"\t"$10}' > $dirOut/$file.CGI
+    less $dirOut/$file.CGI | awk '{cov[$9]=cov[$9]+$5; count[$9]=count[$9]+1; m[$9]=m[$9]+$4*$5; chr[$9]=$6; start[$9]=$7; end[$9]=$8;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"m[i]/cov[i]"\t"cov[i]/count[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/users/lli/tmp/ > $dirOut/$file.CGI.bed
+    rm $dirOut/$file.CGI
+done
 
