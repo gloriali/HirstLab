@@ -125,13 +125,12 @@ ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "./enrich/GOBP_Cortex02_GE02_WGBS_
 
 #' genomic break down  
 genomicBreak_WGBS <- read.delim("./CpG/genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
-genomicBreak_WGBS_tall <- genomicBreak_WGBS[, -1]
-genomicBreak_WGBS_tall <- data.frame(Sample = rep(gsub(".m.*", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), DM = rep(gsub(".*.c3.", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), Region = factor(rep(colnames(genomicBreak_WGBS_tall), each = nrow(genomicBreak_WGBS_tall)), levels = colnames(genomicBreak_WGBS_tall)), CpG = as.vector(as.matrix(genomicBreak_WGBS_tall)))
-genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_WGBS_tall <- genomicBreak_WGBS[-1, -1]
+genomicBreak_WGBS_tall <- data.frame(Sample = rep(gsub(".m.*", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), DM = rep(gsub(".*.c3.", "", rownames(genomicBreak_WGBS_tall)), ncol(genomicBreak_WGBS_tall)), Region = factor(rep(colnames(genomicBreak_WGBS_tall), each = nrow(genomicBreak_WGBS_tall)), levels = colnames(genomicBreak_WGBS_tall)), FC = as.vector(as.matrix(genomicBreak_WGBS_tall)))
+genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
-  coord_flip() + 
+  ylab("log2 Fold enrichment") + 
   scale_fill_hue(l = 50) + 
   facet_wrap(~ DM) + 
   theme_bw()
@@ -337,7 +336,7 @@ DMR_TF_tall[DMR_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
 ggsave(DMR_TF_figure, file = "DMR_TF_WGBS.pdf", height = 6)
 
 save(DM_test_summary, DMR_test_summary, DMR_WGBS_summary, Cortex02_GE02_DMR_WGBS, Cortex02_GE02_DMR_WGBS_figures, Cortex04_GE04_DMR_WGBS, Cortex04_GE04_DMR_WGBS_figures, DMR_freq_WGBS_figure, DMR_pos_WGBS_figure, 
-     GREAT_Cortex02.UMR_WGBS, GREAT_GE02.UMR_WGBS, GREAT_Cortex04.UMR_WGBS, GREAT_GE04.UMR_WGBS, valid_boxplot, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
+     GREAT_Cortex02.UMR_WGBS, GREAT_GE02.UMR_WGBS, GREAT_Cortex04.UMR_WGBS, GREAT_GE04.UMR_WGBS, valid_boxplot, genomicBreak_WGBS, genomicBreak_WGBS_figure, DMR_WGBS_gene_summary,
      venn_Cortex_UMR_WGBS, venn_Cortex_UMR_pcGene_WGBS, venn_Cortex_UMR_pcPromoter_WGBS, venn_Cortex_UMR_pcPromoter_DE_WGBS, 
      venn_GE_UMR_WGBS, venn_GE_UMR_pcGene_WGBS, venn_GE_UMR_pcPromoter_WGBS, venn_GE_UMR_pcPromoter_DE_WGBS, 
      Cortex02_UMR_pcPromoter, Cortex02_UMR_pcPromoter_DE, GE02_UMR_pcPromoter, GE02_UMR_pcPromoter_DE, 

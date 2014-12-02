@@ -35,8 +35,8 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
 ## Summary and sanity check  
 
   * On average, there are __`r as.integer(mean(DMR_WGBS_summary$Hypo.DMR))`__ Cortex UMRs, 179 intersect between two individuals, and __`r as.integer(mean(DMR_WGBS_summary$Hyper.DMR))`__ GE UMRs, 10 intersect. The intersect is significant. And there seems to be an asymmetry between Cortex UMRs and GE UMRs.    
-  * Median DMR length is __`r median(c(Cortex02_GE02_DMR_WGBS$V7, Cortex04_GE04_DMR_WGBS$V7))`__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
-  * Median No. of CpGs per DMR is __`r median(c(Cortex02_GE02_DMR_WGBS$V6, Cortex04_GE04_DMR_WGBS$V6))`__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
+  * Median DMR length is __`r median(c(Cortex02_GE02_DMR_WGBS$length, Cortex04_GE04_DMR_WGBS$length))`__, _comparable to breast_. It's similar in all chromosomes in Cortex UMRs, but fluctuate more in GE UMRs, probably due to  small No. of UMRs identified.   
+  * Median No. of CpGs per DMR is __`r median(c(Cortex02_GE02_DMR_WGBS$count, Cortex04_GE04_DMR_WGBS$count))`__, _similar to breast_. chr11 and chr13 in GE UMRs have higher No. of CpGs per DMR.  
 
 ```{r WGBS_sanity, results='asis'}
 DMR_WGBS_summary <- xtable(DMR_WGBS_summary)
@@ -90,7 +90,7 @@ grid.draw(venn_GE_UMR_WGBS)
 
 ## UMR genomic break down  
 
-  + On average, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold)__. __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random.        
+  + On average, __`r round(summarise(genomicBreak_WGBS[rownames(genomicBreak_WGBS) != "ExpectedPercent", ], mean(Gene))*genomicBreak_WGBS["ExpectedPercent", "Gene"]*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(genomicBreak_WGBS[rownames(genomicBreak_WGBS) != "ExpectedPercent", ], mean(Promoter))*genomicBreak_WGBS["ExpectedPercent", "Promoter"]*100, 2)`%__ of CpGs in UMRs overlap with promoters, not a significant enrichment __(`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "Promoter"), mean(FC)), 2)`-fold)__. __`r round(summarise(genomicBreak_WGBS[rownames(genomicBreak_WGBS) != "ExpectedPercent", ], mean(CGI))*genomicBreak_WGBS["ExpectedPercent", "CGI"]*100, 2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_WGBS_figure$data, Region == "CGI"), mean(FC)), 2)`-fold__ than expected by random.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->

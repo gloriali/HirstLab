@@ -140,15 +140,14 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/")
 genomicBreak_MZ <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
 genomicBreak_MZ <- genomicBreak_MZ[grep("HuFNSC01.*HuFNSC02", rownames(genomicBreak_MZ)), -1]
-genomicBreak_MZ_tall <- data.frame(Sample = rep(row.names(genomicBreak_MZ), ncol(genomicBreak_MZ)), Region = factor(rep(colnames(genomicBreak_MZ), each = nrow(genomicBreak_MZ)), levels = colnames(genomicBreak_MZ)), CpG = as.vector(as.matrix(genomicBreak_MZ)))
+genomicBreak_MZ_tall <- data.frame(Sample = rep(row.names(genomicBreak_MZ), ncol(genomicBreak_MZ)), Region = factor(rep(colnames(genomicBreak_MZ), each = nrow(genomicBreak_MZ)), levels = colnames(genomicBreak_MZ)), FC = as.vector(as.matrix(genomicBreak_MZ)))
 genomicBreak_MZ_tall$DM <- gsub(".*c4.", "", genomicBreak_MZ_tall$Sample)
 genomicBreak_MZ_tall$Sample <- gsub(".m0.75.*", "", genomicBreak_MZ_tall$Sample)
-genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
+  ylab("log2 Fold enrichment") + 
   facet_wrap(~ DM) + 
-  coord_flip() + 
   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE")) + 
   theme_bw()
 ggsave(genomicBreak_MZ_figure, file = "genomicBreak_MZ.pdf")
@@ -321,15 +320,14 @@ setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/CpG/")
 genomicBreak_neurospheres <- read.delim("genomic.breakdown.summary", head = F, as.is = T, row.names = 1, col.names = c("Name", "Total", "Intergenic", "Intron", "Exon", "Gene", "Promoter", "CGI"))
 genomicBreak_neurospheres <- genomicBreak_neurospheres[grep("Cortex.*GE", rownames(genomicBreak_neurospheres)), -1]
-genomicBreak_neurospheres_tall <- data.frame(Sample = rep(row.names(genomicBreak_neurospheres), ncol(genomicBreak_neurospheres)), Region = factor(rep(colnames(genomicBreak_neurospheres), each = nrow(genomicBreak_neurospheres)), levels = colnames(genomicBreak_neurospheres)), CpG = as.vector(as.matrix(genomicBreak_neurospheres)))
+genomicBreak_neurospheres_tall <- data.frame(Sample = rep(row.names(genomicBreak_neurospheres), ncol(genomicBreak_neurospheres)), Region = factor(rep(colnames(genomicBreak_neurospheres), each = nrow(genomicBreak_neurospheres)), levels = colnames(genomicBreak_neurospheres)), FC = as.vector(as.matrix(genomicBreak_neurospheres)))
 genomicBreak_neurospheres_tall$DM <- gsub(".*c4.", "", genomicBreak_neurospheres_tall$Sample)
 genomicBreak_neurospheres_tall$Sample <- gsub(".m0.75.*", "", genomicBreak_neurospheres_tall$Sample)
-genomicBreak_neurospheres_figure <- ggplot(genomicBreak_neurospheres_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_neurospheres_figure <- ggplot(genomicBreak_neurospheres_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
+  ylab("log2 Fold enrichment") + 
   facet_wrap(~ DM) + 
-  coord_flip() + 
   scale_fill_hue(l = 50, labels = c("HuFNSC01", "HuFNSC02")) + 
   theme_bw()
 ggsave(genomicBreak_neurospheres_figure, file = "genomicBreak_neurospheres.pdf")

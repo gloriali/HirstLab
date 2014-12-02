@@ -78,7 +78,7 @@ print(DMR_neurospheres_summary, type = "html", include.rownames = F)
 
 ### UMR genomic break down  
 
-  + On average, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, _similar to WGBS_, and __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold__ enriched, _higher than WGBS_. __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random, _slightly higher than WGBS_.        
+  + UMRs are __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "Promoter"), mean(FC)), 2)`-fold__ enriched in promoters, _higher than WGBS_, and __`r round(summarise(filter(genomicBreak_neurospheres_figure$data, Region == "CGI"), mean(FC)), 2)`-fold__ enriched in CGIs, _slightly higher than WGBS_.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
@@ -185,7 +185,7 @@ print(DMR_MZ_summary, type = "html", include.rownames = F)
 
 ### MZ UMR breakdown
 
-  + Majority of UMR CpGs overlap with genebody, on average __`r round(mean(genomicBreak_MZ$Gene)*100, 2)`%__. And UMR CpGs are __`r round(mean(genomicBreak_MZ$Promoter)/(3727169/28217448), 0)`-fold__ enriched in promoter regions, with on average __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "Promoter", "CpG"])*100, 2)`%__ UMR CpGs are in promoter regions, __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "CGI", "CpG"])*100, 2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(mean(genomicBreak_MZ_figure$data[genomicBreak_MZ_figure$data$Region == "CGI", "CpG"])/(2089538/28217448), 2)`-fold__ than expected by random. 
+  + UMR CpGs are __`r round(summarise(filter(genomicBreak_MZ_figure$data, Region == "Promoter"), mean(FC)), 2)`-fold__ enriched in promoter regions, and __`r round(summarise(filter(genomicBreak_MZ_figure$data, Region == "CGI"), mean(FC)), 2)`-fold__ enriched in CGIs. 
   + Brain seems to have less CGI/promoter UMRs.   
   
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->  
