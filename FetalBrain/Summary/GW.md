@@ -1,8 +1,8 @@
 # FetalBrain - Gestational week associated analysis
-gloriali  
+Gloria Li  
 November 5, 2014  
 
-Updated: Thu Nov 20 11:03:42 2014
+Updated: Wed Dec  3 15:41:03 2014
 
 
 
@@ -24,7 +24,7 @@ Updated: Thu Nov 20 11:03:42 2014
   * Median No. of CpGs per DMR is __5__, also _similar to breast_.     
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Thu Nov 20 11:03:57 2014 -->
+<!-- Wed Dec  3 15:41:19 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> Sample </th> <th> Total.DMR </th> <th> Hyper.DMR </th> <th> Hypo.DMR </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> Cortex-HuFNSC02_Cortex-HuFNSC04 </td> <td align="center"> 1283 </td> <td align="center"> 179 </td> <td align="center"> 1104 </td> </tr>
@@ -52,12 +52,12 @@ Updated: Thu Nov 20 11:03:42 2014
 
 ## UMR Genomic breakdown
 
-  + On average, __62.81%__ of CpGs in UMRs overlap with genebody, and __23.58%__ of CpGs in UMRs overlap with promoters, __1.78-fold__ enriched. __44.2%__ of CpGs in UMRs overlap with CGIs, __5.97-fold__ than expected by random.        
+  + On average, __62.26%__ of CpGs in UMRs overlap with genebody, and __23.95%__ of CpGs in UMRs overlap with promoters, __1.78-fold__ enriched. __44.87%__ of CpGs in UMRs overlap with CGIs, __5.97-fold__ than expected by random.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
 
-![](./GW_files/figure-html/genomicBreak-1.png) 
+![](./GW_files/figure-html/genomicBreak-1.png) ![](./GW_files/figure-html/genomicBreak-2.png) 
 
 ## Proximal UMRs and DE genes  
 
@@ -66,7 +66,7 @@ Updated: Thu Nov 20 11:03:42 2014
   + Among proximal UMR assocaited with DE genes, __79.55%__ 17-week UMRs change in the same direction as DE genes (hyper to DN), __much higher__ than any Fetal Brain UMRs and close to observed in breast. __50%__ in 13-week UMRs, __much lower__ than 17-week UMRs.     
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Thu Nov 20 11:04:07 2014 -->
+<!-- Wed Dec  3 15:41:31 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> proximal.DMRs </th> <th> unique.genes </th> <th> DE.DMRs </th> <th> unique.DE.genes </th> <th> same.direction </th>  </tr>
   <tr> <td align="center"> Cortex04.UMRs </td> <td align="center">   7 </td> <td align="center">   7 </td> <td align="center">   0 </td> <td align="center">   0 </td> <td align="center">   0 </td> </tr>
@@ -76,6 +76,61 @@ Updated: Thu Nov 20 11:03:42 2014
    </table>
 ![](./GW_files/figure-html/proximal_DE-1.png) 
 
+### Proximal 13-week UMRs in both Cortex and GE
+
+
+       id              name                                                                            description
+-----------------  --------  -------------------------------------------------------------------------------------
+ ENSG00000189334    S100A14                        S100_calcium_binding_protein_A14_[Source:HGNC_Symbol;Acc:18901]
+ ENSG00000237693       IRGM                       immunity-related_GTPase_family,_M_[Source:HGNC_Symbol;Acc:29597]
+ ENSG00000124564    SLC17A3   solute_carrier_family_17_(sodium_phosphate),_member_3_[Source:HGNC_Symbol;Acc:10931]
+
+### Proximal GE 13-week UMRs with DE genes
+
+
+       id             name                                                                                 description    DM      DE 
+-----------------  -------  ------------------------------------------------------------------------------------------  -------  ----
+ ENSG00000134954      ETS1   v-ets_erythroblastosis_virus_E26_oncogene_homolog_1_(avian)_[Source:HGNC_Symbol;Acc:3488]   hyper    UP 
+ ENSG00000136352    NKX2-1                                               NK2_homeobox_1_[Source:HGNC_Symbol;Acc:11825]   hyper    UP 
+ ENSG00000165588      OTX2                                      orthodenticle_homeobox_2_[Source:HGNC_Symbol;Acc:8522]   hyper    UP 
+ ENSG00000231421                                                                                                         hyper    DN 
+ ENSG00000155760      FZD7                                    frizzled_family_receptor_7_[Source:HGNC_Symbol;Acc:4045]   hyper    DN 
+
+### Proximal 17-week UMRs with DE genes in both Cortex and GE
+
+
+       id             name                                                                                          description    DM     DE 
+-----------------  -------  ---------------------------------------------------------------------------------------------------  ------  ----
+ ENSG00000255737        NA   HCG2014417,_isoform_CRA_aUncharacterized_proteincDNA_FLJ59598_[Source:UniProtKB/TrEMBL;Acc:B7Z718]   hypo    UP 
+ ENSG00000167178     ISLR2           immunoglobulin_superfamily_containing_leucine-rich_repeat_2_[Source:HGNC_Symbol;Acc:29286]   hypo    UP 
+ ENSG00000161999     JMJD8                                           jumonji_domain_containing_8_[Source:HGNC_Symbol;Acc:14148]   hypo    UP 
+ ENSG00000051523      CYBA                                    cytochrome_b-245,_alpha_polypeptide_[Source:HGNC_Symbol;Acc:2577]   hypo    UP 
+ ENSG00000169515     CCDC8                                       coiled-coil_domain_containing_8_[Source:HGNC_Symbol;Acc:25367]   hypo    UP 
+ ENSG00000205927     OLIG2                         oligodendrocyte_lineage_transcription_factor_2_[Source:HGNC_Symbol;Acc:9398]   hypo    UP 
+ ENSG00000189060      H1F0                                            H1_histone_family,_member_0_[Source:HGNC_Symbol;Acc:4714]   hypo    UP 
+ ENSG00000146904     EPHA1                                                        EPH_receptor_A1_[Source:HGNC_Symbol;Acc:3385]   hypo    UP 
+ ENSG00000165072    MAMDC2                                               MAM_domain_containing_2_[Source:HGNC_Symbol;Acc:23673]   hypo    UP 
+
+## UMRs overlapping with TFBS
+
+![](./GW_files/figure-html/UMR_TFBS-1.png) 
+
+     TF   UMR17week_Cortex    UMR13week_Cortex    Ratio_Cortex    UMR17week_GE    UMR13week_GE    Ratio_GE 
+-------  ------------------  ------------------  --------------  --------------  --------------  ----------
+    MAZ         133                  5              26.6000           319              12         26.5833  
+ GTF2F1          28                  1              28.0000           103              2          51.5000  
+ ZBTB7A          97                  3              32.3333           201              3          67.0000  
+  HMGN3          66                  2              33.0000           131              4          32.7500  
+   NRF1          34                  1              34.0000            64              1          64.0000  
+   MXI1         112                  3              37.3333           262              7          37.4286  
+   E2F4          50                  1              50.0000           110              1          110.0000 
+  CCNT2          87                  1              87.0000           148              4          37.0000  
+   E2F6         140                  1              140.0000          263              8          32.8750  
+
+## UMR enrichment at chromosome ends
+
+![](./GW_files/figure-html/UMR_chrEnd-1.png) 
+
 ## DE genes summary   
   
   + On average, there are __754__ genes differentially expressed between 13- and 17-week individuals, __254__ up-regulated in 13-week individuals, and __499__ up-regulated in 17-week individuals, __2__-times as many.   
@@ -83,7 +138,7 @@ Updated: Thu Nov 20 11:03:42 2014
   + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __270__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __103__ genes up-regulated in 13-week.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Thu Nov 20 11:04:07 2014 -->
+<!-- Wed Dec  3 15:41:32 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 284 </td> <td align="center"> 281 </td> <td align="center"> 565 </td> </tr>
@@ -116,7 +171,7 @@ Updated: Thu Nov 20 11:03:42 2014
   * Isoform genes are enriched in __cell signaling__ related terms.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Thu Nov 20 11:04:09 2014 -->
+<!-- Wed Dec  3 15:41:34 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 565 </td> <td align="center"> 28637 </td> <td align="center"> 16045 </td> <td align="center"> 8044 </td> <td align="center"> 7772 </td> <td align="center"> 2490 </td> </tr>

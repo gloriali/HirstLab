@@ -1,6 +1,6 @@
 ---
 title: "FetalBrain - Gestational week associated analysis"
-author: "gloriali"
+author: "Gloria Li"
 date: "November 5, 2014"
 output:
   html_document:
@@ -19,6 +19,7 @@ library(labeling)
 library(VennDiagram)
 library(gridExtra)
 library(xtable)
+library(knitr)
 load("~/快盘/FetalBrain/GW/GW.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height = 8, fig.width = 8)
 ```
@@ -85,13 +86,14 @@ grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
 
 ## UMR Genomic breakdown
 
-  + On average, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Gene"), mean(CpG))*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(CpG))/(3727169/28217448), 2)`-fold__ enriched. __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))*100,2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(CpG))/(2089538/28217448), 2)`-fold__ than expected by random.        
+  + On average, __`r round(summarise(genomicBreak_GW[rownames(genomicBreak_GW) != "ExpectedPercent", ], mean(Gene))*genomicBreak_GW["ExpectedPercent", "Gene"]*100, 2)`%__ of CpGs in UMRs overlap with genebody, and __`r round(summarise(genomicBreak_GW[rownames(genomicBreak_GW) != "ExpectedPercent", ], mean(Promoter))*genomicBreak_GW["ExpectedPercent", "Promoter"]*100, 2)`%__ of CpGs in UMRs overlap with promoters, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "Promoter"), mean(FC)), 2)`-fold__ enriched. __`r round(summarise(genomicBreak_GW[rownames(genomicBreak_GW) != "ExpectedPercent", ], mean(CGI))*genomicBreak_GW["ExpectedPercent", "CGI"]*100, 2)`%__ of CpGs in UMRs overlap with CGIs, __`r round(summarise(filter(genomicBreak_GW_figure$data, Region == "CGI"), mean(FC)), 2)`-fold__ than expected by random.        
 
 <!-- For the entire genome, 3727169 out of 28217448 CpGs overlap with TSS +/- 1500bp promoter regions -->
 <!-- For the entire genome, 2089538 out of 28217448 CpGs overlap with CGIs -->
 
 ```{r genomicBreak, fig.height=6, fig.width=6}
 (genomicBreak_GW_figure + ggtitle("DMR breakdown between 13-week and 17-week"))
+(CGI_coverage_figure)
 ```
 
 ## Proximal UMRs and DE genes  
@@ -106,6 +108,37 @@ align(DMR_proximal_GW_summary) <- "cccccc"
 print(DMR_proximal_GW_summary, type = "html", include.rownames = T)
 
 grid.arrange(gTree(children = venn_DMR_proximal_GW_hyper), gTree(children = venn_DMR_proximal_GW_hypo), nrow = 1)
+```
+
+### Proximal 13-week UMRs in both Cortex and GE
+
+```{r proximal_13, results='asis'}
+kable(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene[intersect(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene$id, DMR_DE_GE02_GE04_hyper$DMR_gene$id), c("id", "name", "description")], row.names = F, align = c("c", "r", "r"))
+```
+
+### Proximal GE 13-week UMRs with DE genes
+
+```{r proximal_13_GE_DE, results='asis'}
+kable(DMR_DE_GE02_GE04_hyper$DMR_gene_DE[!duplicated(DMR_DE_GE02_GE04_hyper$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], row.names = F, align = c("c", "r", "r", "c", "c"))
+```
+
+### Proximal 17-week UMRs with DE genes in both Cortex and GE
+
+```{r proximal_17_DE, results='asis'}
+kable(DMR_DE_GE02_GE04_hypo$DMR_gene_DE[intersect(DMR_DE_Cortex02_Cortex04_hypo$DMR_gene_DE$id, DMR_DE_GE02_GE04_hypo$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], row.names = F, align = c("c", "r", "r", "c", "c"))
+```
+
+## UMRs overlapping with TFBS
+
+```{r UMR_TFBS, results='asis'}
+(DMR_GW_TF_figure)
+kable(DMR_GW_TF[DMR_GW_TF$Ratio_Cortex>25 & DMR_GW_TF$Ratio_GE>25, ], row.names = F, align = c("r", "c", "c", "c", "c", "c", "c"))
+```
+
+## UMR enrichment at chromosome ends
+
+```{r UMR_chrEnd}
+(chrEnd_GW_figure)
 ```
 
 ## DE genes summary   

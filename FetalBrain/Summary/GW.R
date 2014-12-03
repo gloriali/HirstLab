@@ -335,7 +335,7 @@ write.table(GW_isoform_gene_dup, file = "GW_isoform_gene_dup.txt", sep = "\t", q
 enrich_GW_isoform_gene_dup <- enrich(name = "GW_isoform_gene_dup", fdr = 0.01, p = "FDR", erminej = F, height = 8, width = 9)
 (enrich_GW_isoform_gene_dup)
 
-#' overlap with TFBSs
+#' ================ UMR overlap with TFBSs =====================
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/TF")
 DMR_GW_TF <- read.delim("DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.TF.summary", head = F, as.is = T, col.names = c("TF", "UMR17week_Cortex", "UMR13week_Cortex", "Ratio_Cortex", "UMR17week_GE", "UMR13week_GE", "Ratio_GE"))
 DMR_GW_TF_tall <- data.frame(TF = rep(DMR_GW_TF$TF, 2), Cell = rep(c("Cortex", "GE"), each = nrow(DMR_GW_TF)), UMR17week = c(DMR_GW_TF$UMR17week_Cortex, DMR_GW_TF$UMR17week_GE), UMR13week = c(DMR_GW_TF$UMR13week_Cortex, DMR_GW_TF$UMR13week_GE), Ratio = c(DMR_GW_TF$Ratio_Cortex, DMR_GW_TF$Ratio_GE))
@@ -354,7 +354,7 @@ DMR_GW_TF_tall[DMR_GW_TF_tall$Ratio == 1,]$Asymmetry <- "Equal"
    theme_bw())
 ggsave(DMR_GW_TF_figure, file = "DMR_GW_TF.pdf", height = 6)
 
-# chrEnd_GW enrichment
+# ================= chrEnd_GW enrichment ====================
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/")
 chrEnd_GW_Cortex17UMR <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed.chrom.window", head = F, as.is = T)
 chrEnd_GW_Cortex13UMR <- read.delim("DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed.chrom.window", head = F, as.is = T)
@@ -375,7 +375,7 @@ chrEnd_GW <- rbind(data.frame(DM = "17-week.UMRs", Cell = "Cortex", chrEnd_GW_Co
    theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
 ggsave(chrEnd_GW_figure, file = "chrEnd_GW.pdf")
 
-# CGI coverage
+# =============== CGI coverage =================
 setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS/CGI/")
 Cortex02_CGI <- read.delim("A22475.WGBS.NeurospheresCortex02.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "Cortex02", cell = "Cortex", GW = "17-week")
 GE02_CGI <- read.delim("A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.CGI.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "m", "cov")) %>% mutate(sample = "GE02", cell = "GE", GW = "17-week")
@@ -397,7 +397,7 @@ save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Ve
      genomicBreak_GW, genomicBreak_GW_figure, 
      cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, 
      venn_GW_17_13_UP_cortex, venn_GW_17_13_DN_cortex, GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, 
-     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, 
+     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GW_DE_summary, 
      venn_GW_17_13_UP_GE, venn_GW_17_13_DN_GE, GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, 
      GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, venn_GW_17_13_UP, venn_GW_17_13_DN, 
      enrich_GW_17_13_UP, enrich_GW_17_13_DN, enrich_GW_17_13_UP_cortex, enrich_GW_17_13_DN_cortex, enrich_GW_17_13_UP_GE, enrich_GW_17_13_DN_GE, 
