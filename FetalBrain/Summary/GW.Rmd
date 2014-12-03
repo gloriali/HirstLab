@@ -113,26 +113,26 @@ grid.arrange(gTree(children = venn_DMR_proximal_GW_hyper), gTree(children = venn
 ### Proximal 13-week UMRs in both Cortex and GE
 
 ```{r proximal_13, results='asis'}
-kable(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene[intersect(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene$id, DMR_DE_GE02_GE04_hyper$DMR_gene$id), c("id", "name", "description")], row.names = F, align = c("c", "r", "r"))
+kable(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene[intersect(DMR_DE_Cortex02_Cortex04_hyper$DMR_gene$id, DMR_DE_GE02_GE04_hyper$DMR_gene$id), c("id", "name", "description")], format = "html", row.names = F, align = c("c", "r", "r"))
 ```
 
 ### Proximal GE 13-week UMRs with DE genes
 
 ```{r proximal_13_GE_DE, results='asis'}
-kable(DMR_DE_GE02_GE04_hyper$DMR_gene_DE[!duplicated(DMR_DE_GE02_GE04_hyper$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], row.names = F, align = c("c", "r", "r", "c", "c"))
+kable(DMR_DE_GE02_GE04_hyper$DMR_gene_DE[!duplicated(DMR_DE_GE02_GE04_hyper$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], format = "html", row.names = F, align = c("c", "r", "r", "c", "c"))
 ```
 
 ### Proximal 17-week UMRs with DE genes in both Cortex and GE
 
 ```{r proximal_17_DE, results='asis'}
-kable(DMR_DE_GE02_GE04_hypo$DMR_gene_DE[intersect(DMR_DE_Cortex02_Cortex04_hypo$DMR_gene_DE$id, DMR_DE_GE02_GE04_hypo$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], row.names = F, align = c("c", "r", "r", "c", "c"))
+kable(DMR_DE_GE02_GE04_hypo$DMR_gene_DE[intersect(DMR_DE_Cortex02_Cortex04_hypo$DMR_gene_DE$id, DMR_DE_GE02_GE04_hypo$DMR_gene_DE$id), c("id", "name", "description", "DM", "DE")], format = "html", row.names = F, align = c("c", "r", "r", "c", "c"))
 ```
 
 ## UMRs overlapping with TFBS
 
 ```{r UMR_TFBS, results='asis'}
 (DMR_GW_TF_figure)
-kable(DMR_GW_TF[DMR_GW_TF$Ratio_Cortex>25 & DMR_GW_TF$Ratio_GE>25, ], row.names = F, align = c("r", "c", "c", "c", "c", "c", "c"))
+kable(DMR_GW_TF[DMR_GW_TF$Ratio_Cortex>25 & DMR_GW_TF$Ratio_GE>25, ], format = "html", row.names = F, align = c("r", "c", "c", "c", "c", "c", "c"))
 ```
 
 ## UMR enrichment at chromosome ends
