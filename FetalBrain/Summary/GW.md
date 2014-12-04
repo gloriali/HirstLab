@@ -2,7 +2,7 @@
 Gloria Li  
 November 5, 2014  
 
-Updated: Wed Dec  3 16:13:48 2014
+Updated: Wed Dec  3 16:25:07 2014
 
 
 
@@ -16,6 +16,10 @@ Updated: Wed Dec  3 16:13:48 2014
     + adjacent DM CpGs have the same DM status;    
     + distance between adjacent CpGs (size) $\le$ 300bp;   
     + No. of CpGs within each DMR $\ge$ 3.   
+
+## Background
+![](./GW_files/figure-html/FetalBrainDevelopment1.png)         
+![](./GW_files/figure-html/FetalBrainDevelopment2.png)          
 
 ## UMR summary and sanity check 
 
@@ -402,7 +406,7 @@ Updated: Wed Dec  3 16:13:48 2014
   + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __270__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __103__ genes up-regulated in 13-week.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:14:17 2014 -->
+<!-- Wed Dec  3 16:25:35 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 284 </td> <td align="center"> 281 </td> <td align="center"> 565 </td> </tr>
@@ -435,7 +439,7 @@ Updated: Wed Dec  3 16:13:48 2014
   * Isoform genes are enriched in __cell signaling__ related terms.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:14:18 2014 -->
+<!-- Wed Dec  3 16:25:37 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 565 </td> <td align="center"> 28637 </td> <td align="center"> 16045 </td> <td align="center"> 8044 </td> <td align="center"> 7772 </td> <td align="center"> 2490 </td> </tr>

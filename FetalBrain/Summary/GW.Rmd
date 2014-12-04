@@ -35,6 +35,10 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height =
     + distance between adjacent CpGs (size) $\le$ 300bp;   
     + No. of CpGs within each DMR $\ge$ 3.   
 
+## Background
+![](./GW_files/figure-html/FetalBrainDevelopment1.png)         
+![](./GW_files/figure-html/FetalBrainDevelopment2.png)          
+
 ## UMR summary and sanity check 
 
   * On average, there are __`r as.integer(mean(GW_DMR_summary$Hypo.DMR))`__ 17-week UMRs, __428__ intersect between Cortex and GE, and __`r as.integer(mean(GW_DMR_summary$Hyper.DMR))`__ 13-week UMRs, __76__ intersect. The intersect is highly significant.       
