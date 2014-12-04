@@ -2,7 +2,7 @@
 Gloria Li  
 November 5, 2014  
 
-Updated: Wed Dec  3 16:00:09 2014
+Updated: Wed Dec  3 16:08:25 2014
 
 
 
@@ -24,13 +24,14 @@ Updated: Wed Dec  3 16:00:09 2014
   * Median No. of CpGs per DMR is __5__, also _similar to breast_.            
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:00:25 2014 -->
+<!-- Wed Dec  3 16:08:42 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> Sample </th> <th> Total.DMR </th> <th> Hyper.DMR </th> <th> Hypo.DMR </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> Cortex-HuFNSC02_Cortex-HuFNSC04 </td> <td align="center"> 1283 </td> <td align="center"> 179 </td> <td align="center"> 1104 </td> </tr>
   <tr> <td align="right"> 2 </td> <td align="right"> GE-HuFNSC02_GE-HuFNSC04 </td> <td align="center"> 3002 </td> <td align="center"> 722 </td> <td align="center"> 2280 </td> </tr>
    </table>
-![](./GW_files/figure-html/summary-1.png) ![](./GW_files/figure-html/summary-2.png) 
+
+![](./GW_files/figure-html/summary_figure-1.png) ![](./GW_files/figure-html/summary_figure-2.png) 
 
 ![](./GW_files/figure-html/intersect-1.png) 
 
@@ -67,7 +68,7 @@ Updated: Wed Dec  3 16:00:09 2014
   + Among proximal UMR assocaited with DE genes, __79.55%__ 17-week UMRs change in the same direction as DE genes (hyper to DN), __much higher__ than any Fetal Brain UMRs and close to observed in breast. __50%__ in 13-week UMRs, __much lower__ than 17-week UMRs.     
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:00:36 2014 -->
+<!-- Wed Dec  3 16:08:53 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> proximal.DMRs </th> <th> unique.genes </th> <th> DE.DMRs </th> <th> unique.DE.genes </th> <th> same.direction </th>  </tr>
   <tr> <td align="center"> Cortex04.UMRs </td> <td align="center">   7 </td> <td align="center">   7 </td> <td align="center">   0 </td> <td align="center">   0 </td> <td align="center">   0 </td> </tr>
@@ -75,7 +76,8 @@ Updated: Wed Dec  3 16:00:09 2014
   <tr> <td align="center"> GE04.UMRs </td> <td align="center">  37 </td> <td align="center">  36 </td> <td align="center">   6 </td> <td align="center">   5 </td> <td align="center">   3 </td> </tr>
   <tr> <td align="center"> GE02.UMRs </td> <td align="center"> 402 </td> <td align="center"> 402 </td> <td align="center">  64 </td> <td align="center">  57 </td> <td align="center">  49 </td> </tr>
    </table>
-![](./GW_files/figure-html/proximal_DE-1.png) 
+
+![](./GW_files/figure-html/proximal_DE_figure-1.png) 
 
 ### Proximal 13-week UMRs in both Cortex and GE
 
@@ -346,7 +348,7 @@ Updated: Wed Dec  3 16:00:09 2014
   + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __270__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __103__ genes up-regulated in 13-week.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:00:37 2014 -->
+<!-- Wed Dec  3 16:08:54 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 284 </td> <td align="center"> 281 </td> <td align="center"> 565 </td> </tr>
@@ -379,7 +381,7 @@ Updated: Wed Dec  3 16:00:09 2014
   * Isoform genes are enriched in __cell signaling__ related terms.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:00:39 2014 -->
+<!-- Wed Dec  3 16:08:55 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 565 </td> <td align="center"> 28637 </td> <td align="center"> 16045 </td> <td align="center"> 8044 </td> <td align="center"> 7772 </td> <td align="center"> 2490 </td> </tr>
