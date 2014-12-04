@@ -2,7 +2,7 @@
 Gloria Li  
 November 5, 2014  
 
-Updated: Wed Dec  3 16:08:25 2014
+Updated: Wed Dec  3 16:13:48 2014
 
 
 
@@ -23,13 +23,30 @@ Updated: Wed Dec  3 16:08:25 2014
   * Median DMR length is __321__, _comparable to breast_. It's similar in all chromosomes in 17-week UMRs, but fluctuate more in 13-week UMRs, probably due to  small No. of UMRs identified.   
   * Median No. of CpGs per DMR is __5__, also _similar to breast_.            
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:08:42 2014 -->
-<table border=1>
-<tr> <th>  </th> <th> Sample </th> <th> Total.DMR </th> <th> Hyper.DMR </th> <th> Hypo.DMR </th>  </tr>
-  <tr> <td align="right"> 1 </td> <td align="right"> Cortex-HuFNSC02_Cortex-HuFNSC04 </td> <td align="center"> 1283 </td> <td align="center"> 179 </td> <td align="center"> 1104 </td> </tr>
-  <tr> <td align="right"> 2 </td> <td align="right"> GE-HuFNSC02_GE-HuFNSC04 </td> <td align="center"> 3002 </td> <td align="center"> 722 </td> <td align="center"> 2280 </td> </tr>
-   </table>
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> Sample </th>
+   <th style="text-align:right;"> Total.DMR </th>
+   <th style="text-align:center;"> Hyper.DMR </th>
+   <th style="text-align:center;"> Hypo.DMR </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> Cortex-HuFNSC02_Cortex-HuFNSC04 </td>
+   <td style="text-align:right;"> 1283 </td>
+   <td style="text-align:center;"> 179 </td>
+   <td style="text-align:center;"> 1104 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> GE-HuFNSC02_GE-HuFNSC04 </td>
+   <td style="text-align:right;"> 3002 </td>
+   <td style="text-align:center;"> 722 </td>
+   <td style="text-align:center;"> 2280 </td>
+  </tr>
+</tbody>
+</table>
 
 ![](./GW_files/figure-html/summary_figure-1.png) ![](./GW_files/figure-html/summary_figure-2.png) 
 
@@ -67,15 +84,52 @@ Updated: Wed Dec  3 16:08:25 2014
   + Among proximal UMRs, __14.26%__ of 17-week proximal UMRs are associated with DE genes, __13.64%__ 13-week UMRs, similar to 17-week UMRs. On average, __20__ DE genes are associated with GW UMRs.        
   + Among proximal UMR assocaited with DE genes, __79.55%__ 17-week UMRs change in the same direction as DE genes (hyper to DN), __much higher__ than any Fetal Brain UMRs and close to observed in breast. __50%__ in 13-week UMRs, __much lower__ than 17-week UMRs.     
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:08:53 2014 -->
-<table border=1>
-<tr> <th>  </th> <th> proximal.DMRs </th> <th> unique.genes </th> <th> DE.DMRs </th> <th> unique.DE.genes </th> <th> same.direction </th>  </tr>
-  <tr> <td align="center"> Cortex04.UMRs </td> <td align="center">   7 </td> <td align="center">   7 </td> <td align="center">   0 </td> <td align="center">   0 </td> <td align="center">   0 </td> </tr>
-  <tr> <td align="center"> Cortex02.UMRs </td> <td align="center"> 215 </td> <td align="center"> 215 </td> <td align="center">  24 </td> <td align="center">  19 </td> <td align="center">  21 </td> </tr>
-  <tr> <td align="center"> GE04.UMRs </td> <td align="center">  37 </td> <td align="center">  36 </td> <td align="center">   6 </td> <td align="center">   5 </td> <td align="center">   3 </td> </tr>
-  <tr> <td align="center"> GE02.UMRs </td> <td align="center"> 402 </td> <td align="center"> 402 </td> <td align="center">  64 </td> <td align="center">  57 </td> <td align="center">  49 </td> </tr>
-   </table>
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> proximal.DMRs </th>
+   <th style="text-align:center;"> unique.genes </th>
+   <th style="text-align:center;"> DE.DMRs </th>
+   <th style="text-align:center;"> unique.DE.genes </th>
+   <th style="text-align:center;"> same.direction </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Cortex04.UMRs </td>
+   <td style="text-align:center;"> 7 </td>
+   <td style="text-align:center;"> 7 </td>
+   <td style="text-align:center;"> 0 </td>
+   <td style="text-align:center;"> 0 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cortex02.UMRs </td>
+   <td style="text-align:center;"> 215 </td>
+   <td style="text-align:center;"> 215 </td>
+   <td style="text-align:center;"> 24 </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE04.UMRs </td>
+   <td style="text-align:center;"> 37 </td>
+   <td style="text-align:center;"> 36 </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 5 </td>
+   <td style="text-align:center;"> 3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE02.UMRs </td>
+   <td style="text-align:center;"> 402 </td>
+   <td style="text-align:center;"> 402 </td>
+   <td style="text-align:center;"> 64 </td>
+   <td style="text-align:center;"> 57 </td>
+   <td style="text-align:center;"> 49 </td>
+  </tr>
+</tbody>
+</table>
 
 ![](./GW_files/figure-html/proximal_DE_figure-1.png) 
 
@@ -348,7 +402,7 @@ Updated: Wed Dec  3 16:08:25 2014
   + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __270__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __103__ genes up-regulated in 13-week.    
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:08:54 2014 -->
+<!-- Wed Dec  3 16:14:17 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 284 </td> <td align="center"> 281 </td> <td align="center"> 565 </td> </tr>
@@ -381,7 +435,7 @@ Updated: Wed Dec  3 16:08:25 2014
   * Isoform genes are enriched in __cell signaling__ related terms.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec  3 16:08:55 2014 -->
+<!-- Wed Dec  3 16:14:18 2014 -->
 <table border=1>
 <tr> <th>  </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th>  </tr>
   <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 565 </td> <td align="center"> 28637 </td> <td align="center"> 16045 </td> <td align="center"> 8044 </td> <td align="center"> 7772 </td> <td align="center"> 2490 </td> </tr>

@@ -42,9 +42,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height =
   * Median No. of CpGs per DMR is __`r median(c(Cortex02_Cortex04_DMR$CpG_count, GE02_GE04_DMR$CpG_count))`__, also _similar to breast_.            
 
 ```{r summary, results="asis"}
-GW_DMR_summary <- xtable(GW_DMR_summary)
-align(GW_DMR_summary) <- "rrccc"
-print(GW_DMR_summary, type = "html", row.names = F)
+kable(GW_DMR_summary, format = "html", row.names = F, align = c("r", "r", "c", "c", "c"))
 ```
 
 ```{r summary_figure, fig.height=6, fig.width=6}
@@ -106,9 +104,7 @@ grid.text("17-week UMRs", x = unit(0.75, "npc"), y = unit(0.9, "npc"))
   + Among proximal UMR assocaited with DE genes, __`r round(mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "same.direction"]) / mean(DMR_proximal_GW_summary[grepl("02", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) * 100, 2)`%__ 17-week UMRs change in the same direction as DE genes (hyper to DN), __much higher__ than any Fetal Brain UMRs and close to observed in breast. __`r round(mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "same.direction"]) / mean(DMR_proximal_GW_summary[grepl("04", rownames(DMR_proximal_GW_summary)), "DE.DMRs"]) * 100, 2)`%__ in 13-week UMRs, __much lower__ than 17-week UMRs.     
 
 ```{r proximal_DE, results='asis'}
-DMR_proximal_GW_summary <- xtable(DMR_proximal_GW_summary)
-align(DMR_proximal_GW_summary) <- "cccccc"
-print(DMR_proximal_GW_summary, type = "html", include.rownames = T)
+kable(DMR_proximal_GW_summary, format = "html", align = c("c", "c", "c", "c", "c", "c"))
 ```
 
 ```{r proximal_DE_figure, fig.height=4}
