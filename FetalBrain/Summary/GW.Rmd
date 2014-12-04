@@ -39,7 +39,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height =
 
   * On average, there are __`r as.integer(mean(GW_DMR_summary$Hypo.DMR))`__ 17-week UMRs, __428__ intersect between Cortex and GE, and __`r as.integer(mean(GW_DMR_summary$Hyper.DMR))`__ 13-week UMRs, __76__ intersect. The intersect is highly significant.       
   * Median DMR length is __`r median(c(Cortex02_Cortex04_DMR$length, GE02_GE04_DMR$lenght))`__, _comparable to breast_. It's similar in all chromosomes in 17-week UMRs, but fluctuate more in 13-week UMRs, probably due to  small No. of UMRs identified.   
-  * Median No. of CpGs per DMR is __`r median(c(Cortex02_Cortex04_DMR$CpG_count, GE02_GE04_DMR$CpG_count))`__, also _similar to breast_.     
+  * Median No. of CpGs per DMR is __`r median(c(Cortex02_Cortex04_DMR$CpG_count, GE02_GE04_DMR$CpG_count))`__, also _similar to breast_.            
 
 ```{r summary, results="asis", fig.height=6, fig.width=6}
 GW_DMR_summary <- xtable(GW_DMR_summary)
@@ -49,6 +49,7 @@ print(GW_DMR_summary, type = "html", row.names = F)
 (DMR_length_GW_figure + ggtitle("DMR length between 13-week and 17-week"))
 (DMR_count_GW_figure + ggtitle("No. of CpGs per DMR between 13-week and 17-week"))
 ```
+
 ```{r intersect, fig.height = 4}
 grid.arrange(gTree(children = Venn_GW_UMR_hyper), gTree(children = Venn_GW_UMR_hypo), nrow = 1)
 grid.text("13-week UMRs", x = unit(0.25, "npc"), y = unit(0.9, "npc"))
