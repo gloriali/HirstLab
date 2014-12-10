@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Wed Nov 19 13:53:08 2014
+Updated: Tue Dec  9 11:54:20 2014
 
 
 
@@ -134,7 +134,7 @@ Updated: Wed Nov 19 13:53:08 2014
 
 ### Supplemental 15: DNA methylation at exon boundaries with MeDIP
 
-![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-1.png) ![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-2.png) 
+![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-1.png) 
 
 ```
 ## pdf 
@@ -144,6 +144,15 @@ Updated: Wed Nov 19 13:53:08 2014
 ### Supplemental 16: Expression of DNA methylation reulators
 
 ![](./Figures_files/figure-html/heatmap_5mC_regulator-1.png) 
+
+```
+## pdf 
+##   2
+```
+
+### Supplemental 17: RNA-seq gene/exon clustering
+
+![](./Figures_files/figure-html/cluster-1.png) 
 
 ```
 ## pdf 

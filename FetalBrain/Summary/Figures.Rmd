@@ -19,6 +19,7 @@ library(xtable)
 library(VennDiagram)
 library(gridExtra)
 library(gplots)
+library(dendextend)
 load("~/快盘/FetalBrain/MeDIP/DMR_MZ.Rdata")
 load("~/快盘/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
@@ -149,20 +150,20 @@ dev.off()
 
 ```{r genomicBreak, fig.height = 5, fig.width = 10}
 genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "HuFNSC02 UMRs", "hypo" = "HuFNSC01 UMRs")))
-genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
+  ylab("log2 Fold enrichment") + 
   ggtitle("UMRs between MZ twins") + 
   facet_wrap(~ DM) + 
   coord_flip() + 
   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
   theme_bw()
 genomicBreak_WGBS_tall <- genomicBreak_WGBS_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "GE UMRs", "hypo" = "Cortex UMRs")))
-genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = CpG, fill = Sample)) + 
+genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
-  ylab("Fraction of CpG") + 
+  ylab("log2 Fold enrichment") + 
   ggtitle("UMRs between neurospheres") + 
   coord_flip() + 
   scale_fill_manual(values = c("red", "blue"), labels = c("HuFNSC02", "HuFNSC04"), name = "") + 
@@ -387,8 +388,9 @@ dev.off()
 ### Supplemental 15: DNA methylation at exon boundaries with MeDIP
 
 ```{r neurospheres_epiProfile_5mC_MeDIP}
-(MeDIP_figure_HuFNSC01 <- MeDIP_figure_HuFNSC01 + ggtitle("HuFNSC01") + theme(legend.position = "none"))
-(MeDIP_figure_HuFNSC02 <- MeDIP_figure_HuFNSC02 + ggtitle("HuFNSC02"))
+MeDIP_figure_HuFNSC01 <- MeDIP_figure_HuFNSC01 + ggtitle("HuFNSC01") + theme(legend.position = "none")
+MeDIP_figure_HuFNSC02 <- MeDIP_figure_HuFNSC02 + ggtitle("HuFNSC02")
+grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
 pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 7, width = 15)
 grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
 dev.off()
@@ -405,6 +407,35 @@ legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue
 pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 7, width = 8)
 heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
+dev.off()
+```
+
+### Supplemental 17: RNA-seq gene/exon clustering
+
+```{r cluster}
+gene_FetalBrain <- read.delim("~/快盘/FetalBrain/Tables/rpkm_pc.txt", as.is = T, row.names = 1)
+gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
+exon_FetalBrain <- read.delim("~/快盘/FetalBrain/Tables/rpkm_exon.txt", as.is = T, row.names = 1)
+exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(exon_FetalBrain), TF_value = 2)
+par(mar = c(5, 4, 4, 8), mfrow = c(1,2))
+plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
+mtext("a", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
+mtext("b", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+pdf("~/快盘/FetalBrain/Figures/FigureS17.pdf", height = 7, width = 10)
+par(mar = c(5, 4, 4, 8), mfrow = c(1,2))
+plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
+mtext("a", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
+mtext("b", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
 dev.off()
 ```
 

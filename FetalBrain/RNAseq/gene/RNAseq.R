@@ -1,4 +1,6 @@
 setwd("~/FetalBrain/RNAseq/rpkm/")
+library(dplyr)
+# gene expression matrix 
 cortex01<-read.table(file="A03473.G.A.rpkm.pc",row.names=1,head=F)
 cortex02<-read.table(file="A03475.G.A.rpkm.pc",row.names=1,head=F)
 cortex03<-read.table(file="A04599.G.A.rpkm.pc",row.names=1,head=F)
@@ -23,6 +25,30 @@ rpkm_pc<-data.frame(Ensembl = IDs,
                     Brain.HuFNSC02=brain02[IDs,2])
 rownames(rpkm_pc)<-IDs
 write.table(rpkm_pc, file="rpkm_pc.txt", sep = "\t", row.names = F, col.names = T, quote=F)
+# exon expression matrix
+cortex01<-read.table(file="A03473.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+cortex02<-read.table(file="A03475.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+cortex03<-read.table(file="A04599.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+cortex04<-read.table(file="A15298.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+ge01<-read.table(file="A03474.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+ge02<-read.table(file="A03476.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+ge03<-read.table(file="A15295.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+ge04<-read.table(file="A15299.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+brain01<-read.table(file="A03484.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+brain02<-read.table(file="A07825.G.exn.A.rpkm",head=F) %>% distinct(ID = paste0(V1, "_", V2))
+rpkm_exon<-data.frame(ID = cortex01$ID, 
+                    Cortex.HuFNSC01=cortex01$V4,
+                    Cortex.HuFNSC02=cortex02$V4,
+                    Cortex.HuFNSC03=cortex03$V4,
+                    Cortex.HuFNSC04=cortex04$V4,
+                    GE.HuFNSC01=ge01$V4,
+                    GE.HuFNSC02=ge02$V4,
+                    GE.HuFNSC03=ge03$V4,
+                    GE.HuFNSC04=ge04$V4,
+                    Brain.HuFNSC01=brain01$V4,
+                    Brain.HuFNSC02=brain02$V4)
+rownames(rpkm_exon)<-rpkm_exon$ID
+write.table(rpkm_exon, file="rpkm_exon.txt", sep = "\t", row.names = F, col.names = T, quote=F)
 
 # RPKM for 5mC regulators 
 regulator_5mC <- read.table("~/快盘/hg19/regulators.5mC", head = F, as.is = T)
