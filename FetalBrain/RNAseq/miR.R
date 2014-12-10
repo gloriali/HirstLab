@@ -83,6 +83,7 @@ Cortex01_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex03")])
 Cortex01_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex04")])
 Cortex02_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex03")])
 Cortex02_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex04")])
+Cortex03_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex03", "Cortex04")])
 miR_DE_GW_Cortex_UP <- list(HuFNSC01_03 = Cortex01_Cortex03_miR_DE$UP$geneID, HuFNSC01_04 = Cortex01_Cortex04_miR_DE$UP$geneID, HuFNSC01_03 = Cortex02_Cortex03_miR_DE$UP$geneID, HuFNSC02_04 = Cortex02_Cortex04_miR_DE$UP$geneID)
 venn_miR_DE_GW_Cortex_UP <- venn.diagram(miR_DE_GW_Cortex_UP, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_Cortex UP miRNAs")
 miR_DE_GW_Cortex_DN <- list(HuFNSC01_03 = Cortex01_Cortex03_miR_DE$DN$geneID, HuFNSC01_04 = Cortex01_Cortex04_miR_DE$DN$geneID, HuFNSC01_03 = Cortex02_Cortex03_miR_DE$DN$geneID, HuFNSC02_04 = Cortex02_Cortex04_miR_DE$DN$geneID)
@@ -91,12 +92,14 @@ GE01_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE03")])
 GE01_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE04")])
 GE02_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE03")])
 GE02_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE04")])
+GE03_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE03", "GE04")])
 miR_DE_GW_GE_UP <- list(HuFNSC01_03 = GE01_GE03_miR_DE$UP$geneID, HuFNSC01_04 = GE01_GE04_miR_DE$UP$geneID, HuFNSC01_03 = GE02_GE03_miR_DE$UP$geneID, HuFNSC02_04 = GE02_GE04_miR_DE$UP$geneID)
 venn_miR_DE_GW_GE_UP <- venn.diagram(miR_DE_GW_GE_UP, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_GE UP miRNAs")
 miR_DE_GW_GE_DN <- list(HuFNSC01_03 = GE01_GE03_miR_DE$DN$geneID, HuFNSC01_04 = GE01_GE04_miR_DE$DN$geneID, HuFNSC01_03 = GE02_GE03_miR_DE$DN$geneID, HuFNSC02_04 = GE02_GE04_miR_DE$DN$geneID)
 venn_miR_DE_GW_GE_DN <- venn.diagram(miR_DE_GW_GE_DN, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_GE DN miRNAs")
-miR_DE_GW_summary <- rbind(Cortex01_Cortex03_miR_DE$summary, Cortex01_Cortex04_miR_DE$summary, Cortex02_Cortex03_miR_DE$summary, Cortex02_Cortex04_miR_DE$summary, 
-                           GE01_GE03_miR_DE$summary, GE01_GE04_miR_DE$summary, GE02_GE03_miR_DE$summary, GE02_GE04_miR_DE$summary)
+miR_DE_GW_summary <- rbind(Cortex01_Cortex03_miR_DE$summary, Cortex01_Cortex04_miR_DE$summary, Cortex02_Cortex03_miR_DE$summary, Cortex02_Cortex04_miR_DE$summary, Cortex03_Cortex04_miR_DE$summary, 
+                           GE01_GE03_miR_DE$summary, GE01_GE04_miR_DE$summary, GE02_GE03_miR_DE$summary, GE02_GE04_miR_DE$summary, GE03_GE04_miR_DE$summary) %>% 
+  mutate(GW = rep(c("17 vs 15", "17 vs 13", "17 vs 15", "17 vs 13", "15 vs 13"), 2))
 pdf("/projects/epigenomics/users/lli/FetalBrain/miR/DE/venn_miR_DE_GW.pdf", height = 8, width = 8)
 grid.arrange(gTree(children = venn_miR_DE_GW_Cortex_UP), gTree(children = venn_miR_DE_GW_Cortex_DN), gTree(children = venn_miR_DE_GW_GE_UP), gTree(children = venn_miR_DE_GW_GE_DN), nrow = 2)
 dev.off()
@@ -112,8 +115,8 @@ miR_DE_GW_GE_DN_intersect <- miR_DE_GW_GE_DN_intersect %>% arrange(miR_DE_GW_GE_
 save(miR_FetalBrain, miR_summary, miR_summary_figure, miR_dend, 
      Brain01_Brain02_miR_DE, Cortex01_Cortex02_miR_DE, GE01_GE02_miR_DE, miR_DE_MZ_summary, venn_miR_DE_MZ_UP, venn_miR_DE_MZ_DN, 
      Cortex01_GE01_miR_DE, Cortex02_GE02_miR_DE, Cortex03_GE03_miR_DE, Cortex04_GE04_miR_DE, miR_DE_neurospheres_summary, venn_miR_DE_neurospheres_UP, venn_miR_DE_neurospheres_DN, 
-     Cortex01_Cortex03_miR_DE, Cortex01_Cortex04_miR_DE, Cortex02_Cortex03_miR_DE, Cortex02_Cortex04_miR_DE, venn_miR_DE_GW_Cortex_UP, venn_miR_DE_GW_Cortex_DN, 
-     GE01_GE03_miR_DE, GE01_GE04_miR_DE, GE02_GE03_miR_DE, GE02_GE04_miR_DE, venn_miR_DE_GW_GE_UP, venn_miR_DE_GW_GE_DN, 
+     Cortex03_Cortex04_miR_DE, Cortex01_Cortex03_miR_DE, Cortex01_Cortex04_miR_DE, Cortex02_Cortex03_miR_DE, Cortex02_Cortex04_miR_DE, venn_miR_DE_GW_Cortex_UP, venn_miR_DE_GW_Cortex_DN, 
+     GE03_GE04_miR_DE, GE01_GE03_miR_DE, GE01_GE04_miR_DE, GE02_GE03_miR_DE, GE02_GE04_miR_DE, venn_miR_DE_GW_GE_UP, venn_miR_DE_GW_GE_DN, 
      miR_DE_GW_summary, miR_DE_GW_Cortex_UP_intersect, miR_DE_GW_Cortex_DN_intersect, miR_DE_GW_GE_UP_intersect, miR_DE_GW_GE_DN_intersect, 
      file = "/projects/epigenomics/users/lli/FetalBrain/miR/FetalBrain_miR.Rdata")
 

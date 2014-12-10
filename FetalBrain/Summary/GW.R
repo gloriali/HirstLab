@@ -141,10 +141,12 @@ cortex01_cortex03UP <- mutate(read.delim("UP.Cortex-HuFNSC01_Cortex-HuFNSC03.FDR
 cortex01_cortex04UP <- mutate(read.delim("UP.Cortex-HuFNSC01_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 cortex02_cortex03UP <- mutate(read.delim("UP.Cortex-HuFNSC02_Cortex-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 cortex02_cortex04UP <- mutate(read.delim("UP.Cortex-HuFNSC02_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
+cortex03_cortex04UP <- mutate(read.delim("UP.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 cortex01_cortex03DN <- mutate(read.delim("DN.Cortex-HuFNSC01_Cortex-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 cortex01_cortex04DN <- mutate(read.delim("DN.Cortex-HuFNSC01_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 cortex02_cortex03DN <- mutate(read.delim("DN.Cortex-HuFNSC02_Cortex-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 cortex02_cortex04DN <- mutate(read.delim("DN.Cortex-HuFNSC02_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
+cortex03_cortex04DN <- mutate(read.delim("DN.Cortex-HuFNSC03_Cortex-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 cortex01_cortex03DE <- rbind(cortex01_cortex03UP, cortex01_cortex03DN)
 row.names(cortex01_cortex03DE) <- cortex01_cortex03DE$ID
 cortex01_cortex04DE <- rbind(cortex01_cortex04UP, cortex01_cortex04DN)
@@ -153,33 +155,41 @@ cortex02_cortex03DE <- rbind(cortex02_cortex03UP, cortex02_cortex03DN)
 row.names(cortex02_cortex03DE) <- cortex02_cortex03DE$ID
 cortex02_cortex04DE <- rbind(cortex02_cortex04UP, cortex02_cortex04DN)
 row.names(cortex02_cortex04DE) <- cortex02_cortex04DE$ID
-GW_17_13_UP_cortex <- list(cortex01_cortex03 = cortex01_cortex03UP$ID, cortex01_cortex04 = cortex01_cortex04UP$ID, cortex02_cortex03 = cortex02_cortex03UP$ID, cortex02_cortex04 = cortex02_cortex04UP$ID)
-venn_GW_17_13_UP_cortex <- venn.diagram(GW_17_13_UP_cortex, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of 17-week up-regulated genes in cortex")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_UP_cortex.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_UP_cortex)
+cortex03_cortex04DE <- rbind(cortex03_cortex04UP, cortex03_cortex04DN)
+row.names(cortex03_cortex04DE) <- cortex03_cortex04DE$ID
+GW_17_13_UP_cortex <- list(cortex01_cortex04 = cortex01_cortex04UP$ID, cortex02_cortex04 = cortex02_cortex04UP$ID)
+venn_GW_17_13_UP_cortex <- venn.diagram(GW_17_13_UP_cortex, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes in cortex")
+GW_17_15_UP_cortex <- list(cortex01_cortex03 = cortex01_cortex03UP$ID, cortex02_cortex03 = cortex02_cortex03UP$ID)
+venn_GW_17_15_UP_cortex <- venn.diagram(GW_17_15_UP_cortex, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes in cortex")
+GW_17_13_DN_cortex <- list(cortex01_cortex04 = cortex01_cortex04DN$ID, cortex02_cortex04 = cortex02_cortex04DN$ID)
+venn_GW_17_13_DN_cortex <- venn.diagram(GW_17_13_DN_cortex, filename = NULL, fill = c("red", "blue"), main = "GW13 up-regulated genes in cortex")
+GW_17_15_DN_cortex <- list(cortex01_cortex03 = cortex01_cortex03DN$ID, cortex02_cortex03 = cortex02_cortex03DN$ID)
+venn_GW_17_15_DN_cortex <- venn.diagram(GW_17_15_DN_cortex, filename = NULL, fill = c("red", "blue"), main = "GW15 up-regulated genes in cortex")
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_cortex.pdf")
+grid.arrange(gTree(children = venn_GW_17_13_UP_cortex), gTree(children = venn_GW_17_13_DN_cortex), nrow = 1)
 dev.off()
-GW_17_13_DN_cortex <- list(cortex01_cortex03 = cortex01_cortex03DN$ID, cortex01_cortex04 = cortex01_cortex04DN$ID, cortex02_cortex03 = cortex02_cortex03DN$ID, cortex02_cortex04 = cortex02_cortex04DN$ID)
-venn_GW_17_13_DN_cortex <- venn.diagram(GW_17_13_DN_cortex, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of 13-week up-regulated genes in cortex")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_DN_cortex.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_DN_cortex)
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_15_cortex.pdf")
+grid.arrange(gTree(children = venn_GW_17_15_UP_cortex), gTree(children = venn_GW_17_15_DN_cortex), nrow = 1)
 dev.off()
-GW_17_13_UP_duplicated_cortex <- c(cortex01_cortex03UP$ID, cortex01_cortex04UP$ID, cortex02_cortex03UP$ID, cortex02_cortex04UP$ID)
-GW_17_13_UP_duplicated_cortex <- ensembl[unique(GW_17_13_UP_duplicated_cortex[duplicated(GW_17_13_UP_duplicated_cortex)]), ]
-GW_17_13_DN_duplicated_cortex <- c(cortex01_cortex03DN$ID, cortex01_cortex04DN$ID, cortex02_cortex03DN$ID, cortex02_cortex04DN$ID)
-GW_17_13_DN_duplicated_cortex <- ensembl[unique(GW_17_13_DN_duplicated_cortex[duplicated(GW_17_13_DN_duplicated_cortex)]), ]
+GW_17_13_UP_duplicated_cortex <- ensembl[intersect(cortex01_cortex04UP$ID, cortex02_cortex04UP$ID), ]
+GW_17_13_DN_duplicated_cortex <- ensembl[intersect(cortex01_cortex04DN$ID, cortex02_cortex04DN$ID), ]
 write.table(GW_17_13_UP_duplicated_cortex, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_UP_duplicated_cortex.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 write.table(GW_17_13_DN_duplicated_cortex, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_DN_duplicated_cortex.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_17_15_UP_duplicated_cortex <- ensembl[intersect(cortex01_cortex03UP$ID, cortex02_cortex03UP$ID), ]
+GW_17_15_DN_duplicated_cortex <- ensembl[intersect(cortex01_cortex03DN$ID, cortex02_cortex03DN$ID), ]
+write.table(GW_17_15_UP_duplicated_cortex, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_UP_duplicated_cortex.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+write.table(GW_17_15_DN_duplicated_cortex, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_DN_duplicated_cortex.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 # GE
 GE01_GE03UP <- mutate(read.delim("UP.GE-HuFNSC01_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 GE01_GE04UP <- mutate(read.delim("UP.GE-HuFNSC01_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 GE02_GE03UP <- mutate(read.delim("UP.GE-HuFNSC02_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 GE02_GE04UP <- mutate(read.delim("UP.GE-HuFNSC02_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
+GE03_GE04UP <- mutate(read.delim("UP.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "UP")
 GE01_GE03DN <- mutate(read.delim("DN.GE-HuFNSC01_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 GE01_GE04DN <- mutate(read.delim("DN.GE-HuFNSC01_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 GE02_GE03DN <- mutate(read.delim("DN.GE-HuFNSC02_GE-HuFNSC03.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 GE02_GE04DN <- mutate(read.delim("DN.GE-HuFNSC02_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
+GE03_GE04DN <- mutate(read.delim("DN.GE-HuFNSC03_GE-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25", head = F, as.is = T, col.names = col), DE = "DN")
 GE01_GE03DE <- rbind(GE01_GE03UP, GE01_GE03DN)
 row.names(GE01_GE03DE) <- GE01_GE03DE$ID
 GE01_GE04DE <- rbind(GE01_GE04UP, GE01_GE04DN)
@@ -188,63 +198,97 @@ GE02_GE03DE <- rbind(GE02_GE03UP, GE02_GE03DN)
 row.names(GE02_GE03DE) <- GE02_GE03DE$ID
 GE02_GE04DE <- rbind(GE02_GE04UP, GE02_GE04DN)
 row.names(GE02_GE04DE) <- GE02_GE04DE$ID
-GW_17_13_UP_GE <- list(GE01_GE03 = GE01_GE03UP$ID, GE01_GE04 = GE01_GE04UP$ID, GE02_GE03 = GE02_GE03UP$ID, GE02_GE04 = GE02_GE04UP$ID)
-venn_GW_17_13_UP_GE <- venn.diagram(GW_17_13_UP_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of 17-week up-regulated genes in GE")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_UP_GE.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_UP_GE)
+GE03_GE04DE <- rbind(GE03_GE04UP, GE03_GE04DN)
+row.names(GE03_GE04DE) <- GE03_GE04DE$ID
+GW_17_13_UP_GE <- list(GE01_GE04 = GE01_GE04UP$ID, GE02_GE04 = GE02_GE04UP$ID)
+venn_GW_17_13_UP_GE <- venn.diagram(GW_17_13_UP_GE, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes in GE")
+GW_17_15_UP_GE <- list(GE01_GE03 = GE01_GE03UP$ID, GE02_GE03 = GE02_GE03UP$ID)
+venn_GW_17_15_UP_GE <- venn.diagram(GW_17_15_UP_GE, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes in GE")
+GW_17_13_DN_GE <- list(GE01_GE04 = GE01_GE04DN$ID, GE02_GE04 = GE02_GE04DN$ID)
+venn_GW_17_13_DN_GE <- venn.diagram(GW_17_13_DN_GE, filename = NULL, fill = c("red", "blue"), main = "GW13 up-regulated genes in GE")
+GW_17_15_DN_GE <- list(GE01_GE03 = GE01_GE03DN$ID, GE02_GE03 = GE02_GE03DN$ID)
+venn_GW_17_15_DN_GE <- venn.diagram(GW_17_15_DN_GE, filename = NULL, fill = c("red", "blue"), main = "GW15 up-regulated genes in GE")
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_GE.pdf")
+grid.arrange(gTree(children = venn_GW_17_13_UP_GE), gTree(children = venn_GW_17_13_DN_GE), nrow = 1)
 dev.off()
-GW_17_13_DN_GE <- list(GE01_GE03 = GE01_GE03DN$ID, GE01_GE04 = GE01_GE04DN$ID, GE02_GE03 = GE02_GE03DN$ID, GE02_GE04 = GE02_GE04DN$ID)
-venn_GW_17_13_DN_GE <- venn.diagram(GW_17_13_DN_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of 13-week up-regulated genes in GE")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_DN_GE.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_DN_GE)
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_15_GE.pdf")
+grid.arrange(gTree(children = venn_GW_17_15_UP_GE), gTree(children = venn_GW_17_15_DN_GE), nrow = 1)
 dev.off()
-GW_17_13_UP_duplicated_GE <- c(GE01_GE03UP$ID, GE01_GE04UP$ID, GE02_GE03UP$ID, GE02_GE04UP$ID)
-GW_17_13_UP_duplicated_GE <- ensembl[unique(GW_17_13_UP_duplicated_GE[duplicated(GW_17_13_UP_duplicated_GE)]), ]
-write.table(GW_17_13_UP_duplicated_GE, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_UP_duplicated_GE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
-GW_17_13_DN_duplicated_GE <- c(GE01_GE03DN$ID, GE01_GE04DN$ID, GE02_GE03DN$ID, GE02_GE04DN$ID)
-GW_17_13_DN_duplicated_GE <- ensembl[unique(GW_17_13_DN_duplicated_GE[duplicated(GW_17_13_DN_duplicated_GE)]), ]
+GW_17_13_UP_duplicated_GE <- ensembl[intersect(GE01_GE04UP$ID, GE02_GE04UP$ID), ]
+GW_17_13_DN_duplicated_GE <- ensembl[intersect(GE01_GE04DN$ID, GE02_GE04DN$ID), ]
 write.table(GW_17_13_UP_duplicated_GE, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_UP_duplicated_GE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 write.table(GW_17_13_DN_duplicated_GE, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_DN_duplicated_GE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_17_15_UP_duplicated_GE <- ensembl[intersect(GE01_GE03UP$ID, GE02_GE03UP$ID), ]
+GW_17_15_DN_duplicated_GE <- ensembl[intersect(GE01_GE03DN$ID, GE02_GE03DN$ID), ]
+write.table(GW_17_15_UP_duplicated_GE, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_UP_duplicated_GE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+write.table(GW_17_15_DN_duplicated_GE, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_DN_duplicated_GE.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 # Shared by two cell types
-GW_17_13_UP_duplicated <- ensembl[intersect(GW_17_13_UP_duplicated_cortex$id, GW_17_13_UP_duplicated_GE$id), ]
+GW_17_13_UP_duplicated <- ensembl[intersect(GW_17_13_UP_duplicated_cortex$id, GW_17_13_UP_duplicated_GE$id), ] %>% filter(chr != "Y")
 write.table(GW_17_13_UP_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_UP_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 GW_17_13_UP <- list(Cortex = GW_17_13_UP_duplicated_cortex$id, GE = GW_17_13_UP_duplicated_GE$id)
-venn_GW_17_13_UP <- venn.diagram(GW_17_13_UP, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of 17-week up-regulated genes")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_UP.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_UP)
-dev.off()
-GW_17_13_DN_duplicated <- ensembl[intersect(GW_17_13_DN_duplicated_cortex$id, GW_17_13_DN_duplicated_GE$id), ]
+venn_GW_17_13_UP <- venn.diagram(GW_17_13_UP, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes")
+GW_17_13_DN_duplicated <- ensembl[intersect(GW_17_13_DN_duplicated_cortex$id, GW_17_13_DN_duplicated_GE$id), ] %>% filter(chr != "Y")
 write.table(GW_17_13_DN_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_13_DN_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
 GW_17_13_DN <- list(Cortex = GW_17_13_DN_duplicated_cortex$id, GE = GW_17_13_DN_duplicated_GE$id)
-venn_GW_17_13_DN <- venn.diagram(GW_17_13_DN, filename = NULL, fill = c("red", "blue"), main = "Venn diagram of 17-week DN-regulated genes")
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13_DN.pdf")
-plot.new()
-grid.draw(venn_GW_17_13_DN)
-dev.off()
+venn_GW_17_13_DN <- venn.diagram(GW_17_13_DN, filename = NULL, fill = c("red", "blue"), main = "GW13 up-regulated genes")
 pcgene <- 19819 # wc -l /projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID
 phyper(nrow(GW_17_13_UP_duplicated), nrow(GW_17_13_UP_duplicated_cortex), pcgene - nrow(GW_17_13_UP_duplicated_cortex), nrow(GW_17_13_UP_duplicated_GE), lower.tail = F, log = T) 
 phyper(nrow(GW_17_13_DN_duplicated), nrow(GW_17_13_DN_duplicated_cortex), pcgene - nrow(GW_17_13_DN_duplicated_cortex), nrow(GW_17_13_DN_duplicated_GE), lower.tail = F, log = T) 
-GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP)), 
-                            DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN)), 
-                            DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE)))
-rownames(GW_DE_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04")
+GW_17_15_UP_duplicated <- ensembl[intersect(GW_17_15_UP_duplicated_cortex$id, GW_17_15_UP_duplicated_GE$id), ] %>% filter(chr != "Y")
+write.table(GW_17_15_UP_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_UP_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_17_15_UP <- list(Cortex = GW_17_15_UP_duplicated_cortex$id, GE = GW_17_15_UP_duplicated_GE$id)
+venn_GW_17_15_UP <- venn.diagram(GW_17_15_UP, filename = NULL, fill = c("red", "blue"), main = "GW17 up-regulated genes")
+GW_17_15_DN_duplicated <- ensembl[intersect(GW_17_15_DN_duplicated_cortex$id, GW_17_15_DN_duplicated_GE$id), ] %>% filter(chr != "Y")
+write.table(GW_17_15_DN_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_17_15_DN_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_17_15_DN <- list(Cortex = GW_17_15_DN_duplicated_cortex$id, GE = GW_17_15_DN_duplicated_GE$id)
+venn_GW_17_15_DN <- venn.diagram(GW_17_15_DN, filename = NULL, fill = c("red", "blue"), main = "GW15 up-regulated genes")
+phyper(nrow(GW_17_15_UP_duplicated), nrow(GW_17_15_UP_duplicated_cortex), pcgene - nrow(GW_17_15_UP_duplicated_cortex), nrow(GW_17_15_UP_duplicated_GE), lower.tail = F, log = T) 
+phyper(nrow(GW_17_15_DN_duplicated), nrow(GW_17_15_DN_duplicated_cortex), pcgene - nrow(GW_17_15_DN_duplicated_cortex), nrow(GW_17_15_DN_duplicated_GE), lower.tail = F, log = T) 
+GW_15_13_UP_duplicated <- ensembl[intersect(cortex03_cortex04UP$ID, GE03_GE04UP$ID), ] %>% filter(chr != "Y")
+write.table(GW_15_13_UP_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_15_13_UP_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_15_13_DN_duplicated <- ensembl[intersect(cortex03_cortex04DN$ID, GE03_GE04DN$ID), ] %>% filter(chr != "Y")
+write.table(GW_15_13_DN_duplicated, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_15_13_DN_duplicated.txt", sep = "\t", quote = F, row.names = F, col.names = F)
+GW_15_13_UP <- list(Cortex = cortex03_cortex04UP$ID, GE = GE03_GE04UP$ID)
+venn_GW_15_13_UP <- venn.diagram(GW_15_13_UP, filename = NULL, fill = c("red", "blue"), main = "GW15 up-regulated genes")
+GW_15_13_DN <- list(Cortex = cortex03_cortex04DN$ID, GE = GE03_GE04DN$ID)
+venn_GW_15_13_DN <- venn.diagram(GW_15_13_DN, filename = NULL, fill = c("red", "blue"), main = "GW13 up-regulated genes")
+phyper(length(intersect(cortex03_cortex04UP$ID, GE03_GE04UP$ID)), nrow(cortex03_cortex04UP), pcgene - nrow(cortex03_cortex04UP), nrow(GE03_GE04UP), lower.tail = F, log = T) 
+phyper(length(intersect(cortex03_cortex04DN$ID, GE03_GE04DN$ID)), nrow(cortex03_cortex04DN), pcgene - nrow(cortex03_cortex04DN), nrow(GE03_GE04DN), lower.tail = F, log = T) 
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_17_13.pdf")
+grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_DN), 
+             gTree(children = venn_GW_17_15_UP), gTree(children = venn_GW_17_15_DN), 
+             gTree(children = venn_GW_15_13_UP), gTree(children = venn_GW_15_13_DN), nrow = 3)
+dev.off()
+GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(cortex03_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP), nrow(GE03_GE04UP)), 
+                            DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(cortex03_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN), nrow(GE03_GE04DN)), 
+                            DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(cortex03_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE), nrow(GE03_GE04DE)), 
+                            GW = rep(c("17 vs 15", "17 vs 13", "17 vs 15", "17 vs 13", "15 vs 13"), 2))
+rownames(GW_DE_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "cortex03_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04", "GE03_GE04")
+# gene profiles: 1) GW13-15:UP, GW15-17:UP; 2) GW13-15:UP, GW15-17:DN; 3) GW13-15:DN, GW15-17:UP; 4) GW13-15:DN, GW15-17:DN;
+GW_UP_UP <- ensembl[intersect(GW_15_13_UP_duplicated$id, GW_17_15_UP_duplicated$id), ]
+GW_UP_DN <- ensembl[intersect(GW_15_13_UP_duplicated$id, GW_17_15_DN_duplicated$id), ] 
+GW_DN_UP <- ensembl[intersect(GW_15_13_DN_duplicated$id, GW_17_15_UP_duplicated$id), ]
+GW_DN_DN <- ensembl[intersect(GW_15_13_DN_duplicated$id, GW_17_15_DN_duplicated$id), ]
 # DAVID enrichment
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DE/")
-enrich_GW_17_13_UP <- enrich(name = "GW_17_13_UP_duplicated", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9)
-(enrich_GW_17_13_UP)
-enrich_GW_17_13_DN <- enrich(name = "GW_17_13_DN_duplicated", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9)
-(enrich_GW_17_13_DN)
-enrich_GW_17_13_UP_cortex <- enrich(name = "GW_17_13_UP_duplicated_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9)
-(enrich_GW_17_13_UP_cortex)
-enrich_GW_17_13_DN_cortex <- enrich(name = "GW_17_13_DN_duplicated_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9)
-(enrich_GW_17_13_DN_cortex)
-enrich_GW_17_13_UP_GE <- enrich(name = "GW_17_13_UP_duplicated_GE", fdr = 0.05, p = "FDR", erminej = F, height = 8, width = 9)
-(enrich_GW_17_13_UP_GE)
-enrich_GW_17_13_DN_GE <- enrich(name = "GW_17_13_DN_duplicated_GE", fdr = 0.05, p = "FDR", erminej = F, height = 5, width = 9)
-(enrich_GW_17_13_DN_GE)
+(enrich_GW_17_13_UP <- enrich(name = "GW_17_13_UP", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_17_13_DN <- enrich(name = "GW_17_13_DN", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_17_13_UP_cortex <- enrich(name = "GW_17_13_UP_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_17_13_DN_cortex <- enrich(name = "GW_17_13_DN_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_17_13_UP_GE <- enrich(name = "GW_17_13_UP_GE", fdr = 0.05, p = "FDR", erminej = F, height = 6, width = 9))
+(enrich_GW_17_13_DN_GE <- enrich(name = "GW_17_13_DN_GE", fdr = 0.05, p = "FDR", erminej = F, height = 6, width = 9))
+(enrich_GW_17_15_UP <- enrich(name = "GW_17_15_UP", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_17_15_DN <- enrich(name = "GW_17_15_DN", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_17_15_UP_cortex <- enrich(name = "GW_17_15_UP_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_17_15_DN_cortex <- enrich(name = "GW_17_15_DN_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_17_15_UP_GE <- enrich(name = "GW_17_15_UP_GE", fdr = 0.05, p = "FDR", erminej = F, height = 8, width = 9))
+(enrich_GW_17_15_DN_GE <- enrich(name = "GW_17_15_DN_GE", fdr = 0.05, p = "FDR", erminej = F, height = 4, width = 9))
+(enrich_GW_15_13_UP <- enrich(name = "GW_15_13_UP", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_15_13_DN <- enrich(name = "GW_15_13_DN", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_15_13_UP_cortex <- enrich(name = "GW_15_13_UP_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
+(enrich_GW_15_13_DN_cortex <- enrich(name = "GW_15_13_DN_cortex", fdr = 0.05, p = "FDR", erminej = F, height = 5, width = 9))
+(enrich_GW_15_13_UP_GE <- enrich(name = "GW_15_13_UP_GE", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
+(enrich_GW_15_13_DN_GE <- enrich(name = "GW_15_13_DN_GE", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
 
 # ======= Proximal UMR and DE genes ========
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/CpG/")
@@ -289,6 +333,9 @@ cortex02_cortex03_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, ce
 lib1='A03475'; cell1='Cortex'; donor1='HuFNSC02';
 lib2='A15298'; cell2='Cortex'; donor2='HuFNSC04';
 cortex02_cortex04_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
+lib1='A04599'; cell1='Cortex'; donor1='HuFNSC03';
+lib2='A15298'; cell2='Cortex'; donor2='HuFNSC04';
+cortex03_cortex04_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
 lib1='A03474'; cell1='GE'; donor1='HuFNSC01';
 lib2='A15295'; cell2='GE'; donor2='HuFNSC03';
 GE01_GE03_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
@@ -301,9 +348,12 @@ GE02_GE03_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = ce
 lib1='A03476'; cell1='GE'; donor1='HuFNSC02';
 lib2='A15299'; cell2='GE'; donor2='HuFNSC04';
 GE02_GE04_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
-GW_isoform_summary <- rbind(cortex01_cortex03_isoform$summary, cortex01_cortex04_isoform$summary, cortex02_cortex03_isoform$summary, cortex02_cortex04_isoform$summary, 
-                            GE01_GE03_isoform$summary, GE01_GE04_isoform$summary, GE02_GE03_isoform$summary, GE02_GE04_isoform$summary)
-rownames(GW_isoform_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04")
+lib1='A15295'; cell1='GE'; donor1='HuFNSC03';
+lib2='A15299'; cell2='GE'; donor2='HuFNSC04';
+GE03_GE04_isoform <- isoform(lib1 = lib1, lib2 = lib2, cell1 = cell1, cell2 = cell2, donor1 = donor1, donor2 = donor2, dirExon = "/home/lli/FetalBrain/RNAseq/DEfine/exon/", dirGene = "/home/lli/FetalBrain/RNAseq/DEfine/gene/")
+GW_isoform_summary <- data.frame(rbind(cortex01_cortex03_isoform$summary, cortex01_cortex04_isoform$summary, cortex02_cortex03_isoform$summary, cortex02_cortex04_isoform$summary, cortex03_cortex04_isoform$summary, 
+                                       GE01_GE03_isoform$summary, GE01_GE04_isoform$summary, GE02_GE03_isoform$summary, GE02_GE04_isoform$summary, GE03_GE04_isoform$summary)) %>% 
+  mutate(GW = rep(c("17 vs 15", "17 vs 13", "17 vs 15", "17 vs 13", "15 vs 13"), 2))
 # Venn diagram 
 GW_isoform_cortex <- list(cortex01_cortex03 = cortex01_cortex03_isoform$isoform_gene$id, cortex01_cortex04 = cortex01_cortex04_isoform$isoform_gene$id, cortex02_cortex03 = cortex02_cortex03_isoform$isoform_gene$id, cortex02_cortex04 = cortex02_cortex04_isoform$isoform_gene$id)
 venn_GW_isoform_cortex <- venn.diagram(GW_isoform_cortex, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW isoform genes in cortex")
@@ -395,16 +445,19 @@ save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Ve
      DMR_length_GW_figure, DMR_count_GW_figure, DMR_dis_GW_figure, DMR_freq_GW_figure, DMR_pos_GW_figure, 
      GREAT_GW_Cortex02.UMR, GREAT_GW_Cortex04.UMR, GREAT_GW_GE02.UMR, GREAT_GW_GE04.UMR, GREAT_GW_17week.UMR,  
      genomicBreak_GW, genomicBreak_GW_figure, 
-     cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, 
-     venn_GW_17_13_UP_cortex, venn_GW_17_13_DN_cortex, GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, 
-     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GW_DE_summary, 
-     venn_GW_17_13_UP_GE, venn_GW_17_13_DN_GE, GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, 
-     GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, venn_GW_17_13_UP, venn_GW_17_13_DN, 
+     cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, cortex03_cortex04DE, 
+     GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, GW_17_15_UP_duplicated_cortex, GW_17_15_DN_duplicated_cortex, 
+     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GE03_GE04DE, GW_DE_summary, 
+     GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, GW_17_15_UP_duplicated_GE, GW_17_15_DN_duplicated_GE, 
+     GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, GW_17_15_UP_duplicated, GW_17_15_DN_duplicated, GW_15_13_UP_duplicated, GW_15_13_DN_duplicated, 
+     venn_GW_17_13_UP, venn_GW_17_13_DN, venn_GW_17_15_UP, venn_GW_17_15_DN, venn_GW_15_13_UP, venn_GW_15_13_DN, 
      enrich_GW_17_13_UP, enrich_GW_17_13_DN, enrich_GW_17_13_UP_cortex, enrich_GW_17_13_DN_cortex, enrich_GW_17_13_UP_GE, enrich_GW_17_13_DN_GE, 
+     enrich_GW_17_15_UP, enrich_GW_17_15_DN, enrich_GW_17_15_UP_cortex, enrich_GW_17_15_DN_cortex, enrich_GW_17_15_UP_GE, enrich_GW_17_15_DN_GE, 
+     enrich_GW_15_13_UP, enrich_GW_15_13_DN, enrich_GW_15_13_UP_cortex, enrich_GW_15_13_DN_cortex, enrich_GW_15_13_UP_GE, enrich_GW_15_13_DN_GE, 
      DMR_DE_Cortex02_Cortex04_hyper, DMR_DE_Cortex02_Cortex04_hypo, DMR_DE_GE02_GE04_hyper, DMR_DE_GE02_GE04_hypo, 
      DMR_proximal_GW_summary, venn_DMR_proximal_GW_hyper, venn_DMR_proximal_GW_hypo, 
-     cortex01_cortex03_isoform, cortex01_cortex04_isoform, cortex02_cortex03_isoform, cortex02_cortex04_isoform, 
-     GE01_GE03_isoform, GE01_GE04_isoform, GE02_GE03_isoform, GE02_GE04_isoform, GW_isoform_summary, enrich_GW_isoform_gene_dup, 
+     cortex01_cortex03_isoform, cortex01_cortex04_isoform, cortex02_cortex03_isoform, cortex02_cortex04_isoform, cortex03_cortex04_isoform, 
+     GE01_GE03_isoform, GE01_GE04_isoform, GE02_GE03_isoform, GE02_GE04_isoform, GE03_GE04_isoform, GW_isoform_summary, enrich_GW_isoform_gene_dup, 
      venn_GW_isoform_cortex, GW_isoform_gene_dup_cortex, venn_GW_isoform_GE, GW_isoform_gene_dup_GE, venn_GW_isoform, GW_isoform_gene_dup, 
      DMR_GW_TF, DMR_GW_TF_figure, chrEnd_GW_figure, CGI_coverage_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
