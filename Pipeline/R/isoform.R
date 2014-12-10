@@ -36,7 +36,7 @@ isoform <- function(lib1, lib2, cell1, cell2, donor1, donor2, cutoff = 0.01, cut
   (isoform_genes <- nrow(isoform_gene))
   write.table(exon, file = paste0(dirOut, cell1, "-", donor1, "_", cell2, "-", donor2, "_isoform.txt"), sep = "\t", quote = F, row.names = F)
   write.table(isoform_gene, file = paste0(dirOut, cell1, "-", donor1, "_", cell2, "-", donor2, "_isoform_gene.txt"), sep = "\t", quote = F, row.names = F)
-  summary <- c("DE_genes" = DE_genes, "DE_exons" = DE_exons, "with_expressed_genes" = with_expressed_genes, "isoform_exons" = isoform_exons, "exclude_DE_genes" = exclude_DE_genes, "isoform_genes" = isoform_genes)
+  summary <- c("Sample" = paste0(cell1, "-", donor1, "_", cell2, "-", donor2), "DE_genes" = DE_genes, "DE_exons" = DE_exons, "with_expressed_genes" = with_expressed_genes, "isoform_exons" = isoform_exons, "exclude_DE_genes" = exclude_DE_genes, "isoform_genes" = isoform_genes)
   return(list(summary = summary, isoform_exon = exon, isoform_gene = isoform_gene))
 }
 # isoform (cassete exon) identification 
