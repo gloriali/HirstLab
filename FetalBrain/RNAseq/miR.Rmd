@@ -1,0 +1,80 @@
+---
+title: "Fetal Brain - miRNA summary"
+author: "Gloria Li"
+date: "December 15, 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(dplyr)
+library(reshape)
+library(dendextend)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(knitr)
+load("~/快盘/FetalBrain/miR/FetalBrain_miR.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height = 8, fig.width = 8)
+```
+
+## Summary and clustering 
+
+* Out of `r nrow(miR_FetalBrain)` miRNAs, on average, there are __`r round(mean(miR_summary$N_0.1), 0)`__ miRNAs expressed (RPM > 0.1), __`r round(mean(miR_summary$N_100), 0)`__ highly expressed (RPM > 100). The No. of expressed miRNAs in different samples are similar.       
+* Clustering distinguish mixed brain sample from neurospheres, but shows no pattern within neurospheres.    
+
+```{r summary, fig.height = 6, fig.width = 8}
+(miR_summary_figure)
+op <- par(mar = c(5, 4, 4, 4))
+plot(miR_dend, main = "miRNA", horiz = TRUE)
+legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
+par(op)
+```
+
+## Differential expression by fold change 
+
+* DE: fold change between two samples $\ge$ 2.     
+
+### Between monozygotic twins  
+
+* On average, there are __`r round(mean(miR_DE_MZ_summary$DE), 0)`__ miRNAs differentially expressed between monozygotic twins.   
+* There are few overlaps between different cell types.      
+* Clustering on DE miRNAs does not show particular patterns.        
+
+```{r DE_MZ, results='asis', fig.height=6, fig.width=12}
+kable(miR_DE_MZ_summary, format = "html", align = "c")
+grid.arrange(gTree(children = venn_miR_DE_MZ_UP), gTree(children = venn_miR_DE_MZ_DN), nrow = 1)
+heatmap.2(as.matrix(miR_DE_MZ_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+```
+
+### Between neurospheres  
+
+* On average, there are __`r round(mean(miR_DE_neurospheres_summary$DE), 0)`__ miRNAs differentially expressed between Cortex and GE, slightly more than observed between MZ twins.   
+* There are few overlaps between different cell types.      
+* Clustering on DE miRNAs does not show particular patterns.        
+
+```{r DE_neurospheres, results='asis', fig.height=6, fig.width=12}
+kable(miR_DE_neurospheres_summary, format = "html", align = "c")
+grid.arrange(gTree(children = venn_miR_DE_neurospheres_UP), gTree(children = venn_miR_DE_neurospheres_DN), nrow = 1)
+heatmap.2(as.matrix(miR_DE_neurospheres_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+```
+
+### Between gestational weeks 
+
+* On average, there are __`r round(mean(miR_DE_GW_summary[miR_DE_GW_summary$GW == "17 vs 15",]$DE), 0)`__ miRNAs differentially expressed between GW17 and GW15, __`r round(mean(miR_DE_GW_summary[miR_DE_GW_summary$GW == "15 vs 13",]$DE), 0)`__ between GW15 and GW13, __`r round(mean(miR_DE_GW_summary[miR_DE_GW_summary$GW == "17 vs 13",]$DE), 0)`__ between GW17 and GW13.   
+* There are significant overlaps between the two GW17 vs GW15 sample pairs (01 vs 03, 02 vs 03), much fewer between GW17 vs GW15 and GW15 vs GW13.      
+* Clustering on DE miRNAs shows GW17, GW15, and GW13 clusters, although no pattern within GW17 group.        
+
+```{r DE_GW, results='asis', fig.height=6, fig.width=12}
+kable(miR_DE_GW_summary, format = "html", align = "c")
+grid.arrange(gTree(children = venn_miR_DE_GW_Cortex), gTree(children = venn_miR_DE_GW_GE), nrow = 1)
+heatmap.2(as.matrix(miR_DE_GW_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+```
+
+
+
