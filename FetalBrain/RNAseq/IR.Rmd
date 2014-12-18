@@ -1,0 +1,110 @@
+---
+title: "Fetal Brain - Intron retention summary"
+author: "Gloria Li"
+date: "December 17, 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+Update `r date()`
+
+```{r setup, include  =  FALSE}
+library(knitr)
+library(ggplot2)
+library(VennDiagram)
+library(reshape2)
+library(dplyr)
+library(gridExtra)
+opts_chunk$set(message = FALSE, echo  =  FALSE, warning  =  FALSE, fig.height = 6, fig.width = 6)
+load("~/快盘/FetalBrain/RNAseq/IR/FetalBrian_IR.Rdata")
+```
+```{r input, eval=FALSE}
+intron_gene <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_introns_for_genes", head = F, as.is = T) %>% mutate(ID = paste0("chr", V1, ":", V2, "-", V3, "<", V5), gene = V4) %>% filter(!duplicated(ID))
+rownames(intron_gene) <- intron_gene$ID
+IR_Cortex01 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A03473/A03473.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_Cortex02 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A03475/A03475.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_Cortex03 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A04599/A04599.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_Cortex04 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A15298/A15298.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_GE01 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A03474/A03474.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_GE02 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A03476/A03476.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_GE03 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A15295/A15295.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_GE04 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A15299/A15299.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_Brain01 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A03484/A03484.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_Brain02 <- intron_gene[read.delim(file = "/projects/epigenomics/IR/brain/A07825/A07825.introns.passed.final", head = F, as.is = T)$V1, c("ID", "gene")]
+IR_summary <- data.frame(Sample = c("Brain01", "Brain02", "Cortex01", "Cortex02", "Cortex03", "Cortex04", "GE01", "GE02", "GE03", "GE04"), 
+                         IR = c(nrow(IR_Brain01), nrow(IR_Brain02), nrow(IR_Cortex01), nrow(IR_Cortex02), nrow(IR_Cortex03), nrow(IR_Cortex04), nrow(IR_GE01), nrow(IR_GE02), nrow(IR_GE03), nrow(IR_GE04)), 
+                         Intron_Exon = c(0.315206, 0.257299, 0.17734, 0.233707, 0.206882, 0.237196, 0.306185, 0.283982, 0.266194, 0.12402)) 
+```
+
+## Summary 
+  * There are on average __`r round(mean(IR_summary$IR), 0)`__ retained introns in each sample. The average Intron/Exon ratio is __`r round(mean(IR_summary$Intron_Exon), 2)`__.       
+  
+```{r IR_summary, results='asis'}
+kable(IR_summary, format = "html", row.names = F, align = "c")
+IR_summary_tall <- melt(IR_summary) %>% mutate(Cell = gsub("\\d+", "", Sample))
+(IR_summary_figure <- ggplot(IR_summary_tall, aes(x = Sample, y = value, fill = Cell)) + 
+   geom_bar(stat = "identity", width = 0.5) + 
+   facet_grid(variable ~ ., scales = "free") + 
+   scale_fill_manual(values = c("green", "red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw())
+# ggsave(IR_summary_figure, file = "IR_summary_figure.pdf")
+```
+
+## Between MZ twins  
+* Majority of IR genes are shared by the MZ twins.     
+
+```{r IR_MZ, fig.height=3, fig.width=9}
+IR_MZ_Brain <- list(HuFNSC01 = IR_Brain01$gene, HuFNSC02 = IR_Brain02$gene)
+venn_IR_MZ_Brain <- venn.diagram(IR_MZ_Brain, filename = NULL, fill = c("red", "blue"), main = "MZ IR genes in Brain", force.unique = T)
+IR_MZ_Cortex <- list(HuFNSC01 = IR_Cortex01$gene, HuFNSC02 = IR_Cortex02$gene)
+venn_IR_MZ_Cortex <- venn.diagram(IR_MZ_Cortex, filename = NULL, fill = c("red", "blue"), main = "MZ IR genes in Cortex", force.unique = T)
+IR_MZ_GE <- list(HuFNSC01 = IR_GE01$gene, HuFNSC02 = IR_GE02$gene)
+venn_IR_MZ_GE <- venn.diagram(IR_MZ_GE, filename = NULL, fill = c("red", "blue"), main = "MZ IR genes in GE", force.unique = T)
+grid.arrange(gTree(children = venn_IR_MZ_Brain), gTree(children = venn_IR_MZ_Cortex), gTree(children = venn_IR_MZ_GE), nrow = 1)
+# pdf("venn_IR_MZ.pdf", height=3, width=9)
+# grid.arrange(gTree(children = venn_IR_MZ_Brain), gTree(children = venn_IR_MZ_Cortex), gTree(children = venn_IR_MZ_GE), nrow = 1)
+# dev.off()
+```
+
+## Between Cortex and GE  
+* Most of IR genes are shared by Cortex and GE.     
+
+```{r IR_neurospheres}
+IR_neurospheres_01 <- list(Cortex = IR_Cortex01$gene, GE = IR_GE01$gene)
+venn_IR_neurospheres_01 <- venn.diagram(IR_neurospheres_01, filename = NULL, fill = c("red", "blue"), main = "Neurospheres IR genes in HuFNSC01", force.unique = T)
+IR_neurospheres_02 <- list(Cortex = IR_Cortex02$gene, GE = IR_GE02$gene)
+venn_IR_neurospheres_02 <- venn.diagram(IR_neurospheres_02, filename = NULL, fill = c("red", "blue"), main = "Neurospheres IR genes in HuFNSC02", force.unique = T)
+IR_neurospheres_03 <- list(Cortex = IR_Cortex03$gene, GE = IR_GE03$gene)
+venn_IR_neurospheres_03 <- venn.diagram(IR_neurospheres_03, filename = NULL, fill = c("red", "blue"), main = "Neurospheres IR genes in HuFNSC03", force.unique = T)
+IR_neurospheres_04 <- list(Cortex = IR_Cortex04$gene, GE = IR_GE04$gene)
+venn_IR_neurospheres_04 <- venn.diagram(IR_neurospheres_04, filename = NULL, fill = c("red", "blue"), main = "Neurospheres IR genes in HuFNSC04", force.unique = T)
+grid.arrange(gTree(children = venn_IR_neurospheres_01), gTree(children = venn_IR_neurospheres_02), gTree(children = venn_IR_neurospheres_03), gTree(children = venn_IR_neurospheres_04), nrow = 2)
+# pdf("venn_IR_neurospheres.pdf")
+# grid.arrange(gTree(children = venn_IR_neurospheres_01), gTree(children = venn_IR_neurospheres_02), gTree(children = venn_IR_neurospheres_03), gTree(children = venn_IR_neurospheres_04), nrow = 2)
+# dev.off()
+```
+
+## Between GW 
+* Majority of IR genes are also shared by different gestational weeks.   
+
+```{r IR_GW, fig.height=3}
+IR_GW_Cortex <- list(GW17_1 = IR_Cortex01$gene, GW17_2 = IR_Cortex02$gene, GW15 = IR_Cortex03$gene, GW13 = IR_Cortex04$gene)
+venn_IR_GW_Cortex <- venn.diagram(IR_GW_Cortex, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "GE IR genes in Cortex", force.unique = T)
+IR_GW_GE <- list(GW17_1 = IR_GE01$gene, GW17_2 = IR_GE02$gene, GW15 = IR_GE03$gene, GW13 = IR_GE04$gene)
+venn_IR_GW_GE <- venn.diagram(IR_GW_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "GW IR genes in GE", force.unique = T)
+grid.arrange(gTree(children = venn_IR_GW_Cortex), gTree(children = venn_IR_GW_GE), nrow = 1)
+# pdf("venn_IR_GW.pdf")
+# grid.arrange(gTree(children = venn_IR_GW_Cortex), gTree(children = venn_IR_GW_GE), nrow = 1)
+# dev.off()
+```
+
+```{r save, eval=FALSE}
+save(IR_Brain01, IR_Brain02, IR_Cortex01, IR_Cortex02, IR_Cortex03, IR_Cortex04, IR_GE01, IR_GE02, IR_GE03, IR_GE04, IR_summary, IR_summary_figure, 
+    venn_IR_MZ_Brain, venn_IR_MZ_Cortex, venn_IR_MZ_GE, venn_IR_neurospheres_01, venn_IR_neurospheres_02, venn_IR_neurospheres_03, venn_IR_neurospheres_04, venn_IR_GW_Cortex, venn_IR_GW_GE, 
+     file = "FetalBrian_IR.Rdata")
+```
+
