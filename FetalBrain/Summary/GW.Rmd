@@ -17,6 +17,7 @@ library(ggbio)
 library(GenomicRanges)
 library(labeling)
 library(VennDiagram)
+library(gplots)
 library(gridExtra)
 library(xtable)
 library(knitr)
@@ -148,36 +149,72 @@ kable(DMR_GW_TF[DMR_GW_TF$Ratio_Cortex>25 & DMR_GW_TF$Ratio_GE>25, ], format = "
 
 ## DE genes summary   
   
-  + On average, there are __`r as.integer(mean(GW_DE_summary$DE))`__ genes differentially expressed between 13- and 17-week individuals, __`r as.integer(mean(GW_DE_summary$DN))`__ up-regulated in 13-week individuals, and __`r as.integer(mean(GW_DE_summary$UP))`__ up-regulated in 17-week individuals, __`r round(mean(GW_DE_summary$UP) / mean(GW_DE_summary$DN, 2))`__-times as many.   
-  + Within each cell type, majority of DE genes are shared among different comparisons (hypergeometric p-value = 0). There are __`r nrow(GW_17_13_UP_duplicated_cortex)`__ genes up-regulated in 17-week in cortex shared by at least two comparisons, __`r nrow(GW_17_13_DN_duplicated_cortex)`__ up-regulated in 13-week in cortex, __`r nrow(GW_17_13_UP_duplicated_GE)`__ up-regulated in 17-week in GE, and __`r nrow(GW_17_13_DN_duplicated_GE)`__ up-regulated in 13-week in GE.   
-  + The overlap between cell types is highly significant as well (hypergeometric p-value = 0), with __`r nrow(GW_17_13_UP_duplicated)`__ genes up-regulated in 17-week in both cortex and GE supported by at least two comparisons, and __`r nrow(GW_17_13_DN_duplicated)`__ genes up-regulated in 13-week.    
+  + On average, there are __`r as.integer(mean(GW_DE_summary$DE))`__ genes differentially expressed between 13- and 17-week individuals, __`r as.integer(mean((GW_DE_summary %>% filter (GW == "15 vs 13"))$DE))`__ DE between GW13 and GW15 individuals, __`r as.integer(mean((GW_DE_summary %>% filter (GW == "17 vs 15"))$DE))`__ DE between GW15 and GW17, __`r as.integer(mean((GW_DE_summary %>% filter (GW == "17 vs 13"))$DE))`__ DE between GW13 and GW17.   
+  + Within each cell type, majority of DE genes are shared among different comparisons (hypergeometric p-value = 0), less but still significant genes overlap between cell types. .   
+  + Majority of the GW-associated DE genes are __stage-specific__.       
 
 ```{r DE, results='asis'}
 GW_DE_summary <- xtable(GW_DE_summary)
-align(GW_DE_summary) <- "cccc"
+align(GW_DE_summary) <- "ccccc"
 print(GW_DE_summary, type = "html", include.rownames = T)
 
-grid.arrange(gTree(children = venn_GW_17_13_UP_cortex), gTree(children = venn_GW_17_13_DN_cortex), nrow = 1)
-grid.arrange(gTree(children = venn_GW_17_13_UP_GE), gTree(children = venn_GW_17_13_DN_GE), nrow = 1)
-grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_DN), nrow = 1)
+grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_DN), 
+             gTree(children = venn_GW_17_15_UP), gTree(children = venn_GW_17_15_DN), 
+             gTree(children = venn_GW_15_13_UP), gTree(children = venn_GW_15_13_DN), nrow = 3)
+grid.arrange(gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 1)
+heatmap.2(as.matrix(GW_DE_rpkm), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 ```
 
-## DAVID enrichment for DE genes  
+### Stage-specific DE gene profiles
 
-  * Genes up-regulated in 17-week in both cortex and GE show enrichment in __tissue development__ and __calcium ion binding__, they also show more __brain development__ terms in GE.    
-  * Genes up-regulated in 13-week in both cortex and GE show enrichment in __neurogenesis__.    
-  * Genes shared by both cortex and GE show no significant terms, probably due to small No. of genes.    
-  * In cortex:     
-```{r DAVID_DE_cortex, fig.height=3}
+1. GW13-15:UP, GW15-17:UP;    
+    _No genes_   
+2. GW13-15:UP, GW15-17:DN;    
+```{r GW_UP_DN, results='asis'}
+kable(GW_UP_DN %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+3. GW13-15:DN, GW15-17:UP; 
+```{r GW_DN_UP, results='asis'}
+kable(GW_DN_UP %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+4. GW13-15:DN, GW15-17:DN;   
+    _No genes_   
+5. GW13-15:UP, GW15-17:not DE; 
+```{r GW_UP_no, results='asis'}
+kable(GW_UP_no %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+6. GW13-15:DN, GW15-17:not DE; 
+```{r GW_DN_no, results='asis'}
+kable(GW_DN_no %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+7. GW13-15:not DE, GW15-17:UP; 
+```{r GW_no_UP, results='asis'}
+kable(GW_no_UP %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+8. GW13-15:not DE, GW15-17:DN; 
+```{r GW_no_DN, results='asis'}
+kable(GW_no_DN %>% select(id, name, description), format = "html", row.names = F, align = "r")
+```
+
+### DAVID enrichment for DE genes  
+
+  * GW associated DE genes shared by cell types show no enrichment due to small gene lists.    
+  * GW15 vs GW 13: __calcium ion binding__ in cortex UP and GE DN, __neurogenesis__ in cortex DN.               
+```{r DAVID_DE_15_13, fig.height=3}
+(enrich_GW_15_13_UP_cortex)
+(enrich_GW_15_13_DN_cortex)
+(enrich_GW_15_13_UP_GE)
+(enrich_GW_15_13_DN_GE)
+```
+  * GW17 vs GW 15: __neurogenesis__ in GE, no enrichment in cortex.            
+```{r DAVID_DE_17_15, fig.height=5}
+(enrich_GW_17_15_UP_GE)
+(enrich_GW_17_15_DN_GE)
+```
+  * GW17 vs GW 13: __calcium ion binding__ in cortex UP and GE UP, __neurogenesis__ in GE DN.               
+```{r DAVID_DE_17_13, fig.height=4}
 (enrich_GW_17_13_UP_cortex)
-(enrich_GW_17_13_DN_cortex)
-```
-
-  * In GE:    
-```{r DAVID_DE_GE_UP, fig.height=8}
 (enrich_GW_17_13_UP_GE)
-```
-```{r DAVID_DE_GE_DN, fig.height=5}
 (enrich_GW_17_13_DN_GE)
 ```
 
@@ -189,8 +226,8 @@ grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_
 
 ```{r isoform, results='asis'}
 GW_isoform_summary <- xtable(GW_isoform_summary)
-align(GW_isoform_summary) <- "ccccccc"
-print(GW_isoform_summary, type = "html", include.rownames = T)
+align(GW_isoform_summary) <- "ccccccccc"
+print(GW_isoform_summary, type = "html", include.rownames = F)
 
 grid.arrange(gTree(children = venn_GW_isoform_cortex), gTree(children = venn_GW_isoform_GE), nrow = 1)
 plot.new()
