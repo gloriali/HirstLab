@@ -2,7 +2,7 @@
 Gloria Li  
 November 5, 2014  
 
-Updated: Wed Dec 17 17:11:25 2014
+Updated: Thu Dec 18 09:57:30 2014
 
 
 
@@ -405,21 +405,89 @@ Updated: Wed Dec 17 17:11:25 2014
   + Within each cell type, majority of DE genes are shared among different comparisons (hypergeometric p-value = 0), less but still significant genes overlap between cell types. .   
   + Majority of the GW-associated DE genes are __stage-specific__.       
 
-<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec 17 17:11:52 2014 -->
-<table border=1>
-<tr> <th>  </th> <th> UP </th> <th> DN </th> <th> DE </th> <th> GW </th>  </tr>
-  <tr> <td align="center"> cortex01_cortex03 </td> <td align="center"> 284 </td> <td align="center"> 281 </td> <td align="center"> 565 </td> <td align="center"> 17 vs 15 </td> </tr>
-  <tr> <td align="center"> cortex01_cortex04 </td> <td align="center"> 365 </td> <td align="center"> 165 </td> <td align="center"> 530 </td> <td align="center"> 17 vs 13 </td> </tr>
-  <tr> <td align="center"> cortex02_cortex03 </td> <td align="center"> 398 </td> <td align="center"> 283 </td> <td align="center"> 681 </td> <td align="center"> 17 vs 15 </td> </tr>
-  <tr> <td align="center"> cortex02_cortex04 </td> <td align="center"> 497 </td> <td align="center"> 225 </td> <td align="center"> 722 </td> <td align="center"> 17 vs 13 </td> </tr>
-  <tr> <td align="center"> cortex03_cortex04 </td> <td align="center"> 459 </td> <td align="center"> 183 </td> <td align="center"> 642 </td> <td align="center"> 15 vs 13 </td> </tr>
-  <tr> <td align="center"> GE01_GE03 </td> <td align="center"> 587 </td> <td align="center"> 274 </td> <td align="center"> 861 </td> <td align="center"> 17 vs 15 </td> </tr>
-  <tr> <td align="center"> GE01_GE04 </td> <td align="center"> 645 </td> <td align="center"> 238 </td> <td align="center"> 883 </td> <td align="center"> 17 vs 13 </td> </tr>
-  <tr> <td align="center"> GE02_GE03 </td> <td align="center"> 609 </td> <td align="center"> 312 </td> <td align="center"> 921 </td> <td align="center"> 17 vs 15 </td> </tr>
-  <tr> <td align="center"> GE02_GE04 </td> <td align="center"> 610 </td> <td align="center"> 259 </td> <td align="center"> 869 </td> <td align="center"> 17 vs 13 </td> </tr>
-  <tr> <td align="center"> GE03_GE04 </td> <td align="center"> 313 </td> <td align="center"> 232 </td> <td align="center"> 545 </td> <td align="center"> 15 vs 13 </td> </tr>
-   </table>
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> UP </th>
+   <th style="text-align:center;"> DN </th>
+   <th style="text-align:center;"> DE </th>
+   <th style="text-align:center;"> GW </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> cortex01_cortex03 </td>
+   <td style="text-align:center;"> 284 </td>
+   <td style="text-align:center;"> 281 </td>
+   <td style="text-align:center;"> 565 </td>
+   <td style="text-align:center;"> 17 vs 15 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> cortex01_cortex04 </td>
+   <td style="text-align:center;"> 365 </td>
+   <td style="text-align:center;"> 165 </td>
+   <td style="text-align:center;"> 530 </td>
+   <td style="text-align:center;"> 17 vs 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> cortex02_cortex03 </td>
+   <td style="text-align:center;"> 398 </td>
+   <td style="text-align:center;"> 283 </td>
+   <td style="text-align:center;"> 681 </td>
+   <td style="text-align:center;"> 17 vs 15 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> cortex02_cortex04 </td>
+   <td style="text-align:center;"> 497 </td>
+   <td style="text-align:center;"> 225 </td>
+   <td style="text-align:center;"> 722 </td>
+   <td style="text-align:center;"> 17 vs 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> cortex03_cortex04 </td>
+   <td style="text-align:center;"> 459 </td>
+   <td style="text-align:center;"> 183 </td>
+   <td style="text-align:center;"> 642 </td>
+   <td style="text-align:center;"> 15 vs 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE01_GE03 </td>
+   <td style="text-align:center;"> 587 </td>
+   <td style="text-align:center;"> 274 </td>
+   <td style="text-align:center;"> 861 </td>
+   <td style="text-align:center;"> 17 vs 15 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE01_GE04 </td>
+   <td style="text-align:center;"> 645 </td>
+   <td style="text-align:center;"> 238 </td>
+   <td style="text-align:center;"> 883 </td>
+   <td style="text-align:center;"> 17 vs 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE02_GE03 </td>
+   <td style="text-align:center;"> 609 </td>
+   <td style="text-align:center;"> 312 </td>
+   <td style="text-align:center;"> 921 </td>
+   <td style="text-align:center;"> 17 vs 15 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE02_GE04 </td>
+   <td style="text-align:center;"> 610 </td>
+   <td style="text-align:center;"> 259 </td>
+   <td style="text-align:center;"> 869 </td>
+   <td style="text-align:center;"> 17 vs 13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GE03_GE04 </td>
+   <td style="text-align:center;"> 313 </td>
+   <td style="text-align:center;"> 232 </td>
+   <td style="text-align:center;"> 545 </td>
+   <td style="text-align:center;"> 15 vs 13 </td>
+  </tr>
+</tbody>
+</table>
 ![](./GW_files/figure-html/DE-1.png) ![](./GW_files/figure-html/DE-2.png) ![](./GW_files/figure-html/DE-3.png) 
 
 ### Stage-specific DE gene profiles
@@ -1063,7 +1131,7 @@ Updated: Wed Dec 17 17:11:25 2014
   * Isoform genes are enriched in __cell signaling__ related terms.        
 
 <!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
-<!-- Wed Dec 17 17:12:02 2014 -->
+<!-- Thu Dec 18 09:58:16 2014 -->
 <table border=1>
 <tr> <th> Sample </th> <th> DE_genes </th> <th> DE_exons </th> <th> with_expressed_genes </th> <th> isoform_exons </th> <th> exclude_DE_genes </th> <th> isoform_genes </th> <th> GW </th>  </tr>
   <tr> <td align="center"> Cortex-HuFNSC01_Cortex-HuFNSC03 </td> <td align="center"> 565 </td> <td align="center"> 28637 </td> <td align="center"> 16045 </td> <td align="center"> 8044 </td> <td align="center"> 7772 </td> <td align="center"> 2490 </td> <td align="center"> 17 vs 15 </td> </tr>

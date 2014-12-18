@@ -154,10 +154,7 @@ kable(DMR_GW_TF[DMR_GW_TF$Ratio_Cortex>25 & DMR_GW_TF$Ratio_GE>25, ], format = "
   + Majority of the GW-associated DE genes are __stage-specific__.       
 
 ```{r DE, results='asis'}
-GW_DE_summary <- xtable(GW_DE_summary)
-align(GW_DE_summary) <- "ccccc"
-print(GW_DE_summary, type = "html", include.rownames = T)
-
+kable(GW_DE_summary, format = "html", row.names = T, align = "c")
 grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_DN), 
              gTree(children = venn_GW_17_15_UP), gTree(children = venn_GW_17_15_DN), 
              gTree(children = venn_GW_15_13_UP), gTree(children = venn_GW_15_13_DN), nrow = 3)
