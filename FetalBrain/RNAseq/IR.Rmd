@@ -1,5 +1,5 @@
 ---
-title: "Fetal Brain - miRNA summary"
+title: "Fetal Brain - Intron retention summary"
 author: "Gloria Li"
 date: "December 17, 2014"
 output:
@@ -18,7 +18,7 @@ library(reshape2)
 library(dplyr)
 library(gridExtra)
 opts_chunk$set(message = FALSE, echo  =  FALSE, warning  =  FALSE, fig.height = 6, fig.width = 6)
-load("~/快盘/FetalBrain/IR/FetalBrain_IR.Rdata")
+load("~/快盘/FetalBrain/RNAseq/IR/FetalBrian_IR.Rdata")
 ```
 ```{r input, eval=FALSE}
 intron_gene <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_introns_for_genes", head = F, as.is = T) %>% mutate(ID = paste0("chr", V1, ":", V2, "-", V3, "<", V5), gene = V4) %>% filter(!duplicated(ID))
@@ -51,7 +51,7 @@ IR_summary_tall <- melt(IR_summary) %>% mutate(Cell = gsub("\\d+", "", Sample))
    xlab("") + 
    ylab("") + 
    theme_bw())
-ggsave(IR_summary_figure, file = "IR_summary_figure.pdf")
+# ggsave(IR_summary_figure, file = "IR_summary_figure.pdf")
 ```
 
 ## Between MZ twins  
@@ -65,6 +65,9 @@ venn_IR_MZ_Cortex <- venn.diagram(IR_MZ_Cortex, filename = NULL, fill = c("red",
 IR_MZ_GE <- list(HuFNSC01 = IR_GE01$gene, HuFNSC02 = IR_GE02$gene)
 venn_IR_MZ_GE <- venn.diagram(IR_MZ_GE, filename = NULL, fill = c("red", "blue"), main = "MZ IR genes in GE", force.unique = T)
 grid.arrange(gTree(children = venn_IR_MZ_Brain), gTree(children = venn_IR_MZ_Cortex), gTree(children = venn_IR_MZ_GE), nrow = 1)
+# pdf("venn_IR_MZ.pdf", height=3, width=9)
+# grid.arrange(gTree(children = venn_IR_MZ_Brain), gTree(children = venn_IR_MZ_Cortex), gTree(children = venn_IR_MZ_GE), nrow = 1)
+# dev.off()
 ```
 
 ## Between Cortex and GE  
@@ -80,6 +83,9 @@ venn_IR_neurospheres_03 <- venn.diagram(IR_neurospheres_03, filename = NULL, fil
 IR_neurospheres_04 <- list(Cortex = IR_Cortex04$gene, GE = IR_GE04$gene)
 venn_IR_neurospheres_04 <- venn.diagram(IR_neurospheres_04, filename = NULL, fill = c("red", "blue"), main = "Neurospheres IR genes in HuFNSC04", force.unique = T)
 grid.arrange(gTree(children = venn_IR_neurospheres_01), gTree(children = venn_IR_neurospheres_02), gTree(children = venn_IR_neurospheres_03), gTree(children = venn_IR_neurospheres_04), nrow = 2)
+# pdf("venn_IR_neurospheres.pdf")
+# grid.arrange(gTree(children = venn_IR_neurospheres_01), gTree(children = venn_IR_neurospheres_02), gTree(children = venn_IR_neurospheres_03), gTree(children = venn_IR_neurospheres_04), nrow = 2)
+# dev.off()
 ```
 
 ## Between GW 
@@ -91,6 +97,9 @@ venn_IR_GW_Cortex <- venn.diagram(IR_GW_Cortex, filename = NULL, fill = c("red",
 IR_GW_GE <- list(GW17_1 = IR_GE01$gene, GW17_2 = IR_GE02$gene, GW15 = IR_GE03$gene, GW13 = IR_GE04$gene)
 venn_IR_GW_GE <- venn.diagram(IR_GW_GE, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "GW IR genes in GE", force.unique = T)
 grid.arrange(gTree(children = venn_IR_GW_Cortex), gTree(children = venn_IR_GW_GE), nrow = 1)
+# pdf("venn_IR_GW.pdf")
+# grid.arrange(gTree(children = venn_IR_GW_Cortex), gTree(children = venn_IR_GW_GE), nrow = 1)
+# dev.off()
 ```
 
 ```{r save, eval=FALSE}
