@@ -300,16 +300,6 @@ grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_
              gTree(children = venn_GW_17_15_UP), gTree(children = venn_GW_17_15_DN), 
              gTree(children = venn_GW_15_13_UP), gTree(children = venn_GW_15_13_DN), nrow = 3)
 dev.off()
-# Stage specific DE genes
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_DE.pdf")
-grid.arrange(gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 1)
-dev.off()
-rpkm <- read.delim("/home/lli/FetalBrain/RNAseq/rpkm_pc.txt", as.is = T, row.names = 1)
-GW_DE_rpkm <- rpkm[c(GW_17_13_UP_duplicated_cortex$id, GW_17_13_DN_duplicated_cortex$id, GW_17_15_UP_duplicated_cortex$id, GW_17_15_DN_duplicated_cortex$id, cortex03_cortex04DE$ID, 
-                     GW_17_13_UP_duplicated_GE$id, GW_17_13_DN_duplicated_GE$id, GW_17_15_UP_duplicated_GE$id, GW_17_15_DN_duplicated_GE$id, GE03_GE04DE$ID),!grepl("Brain", colnames(rpkm))]
-pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/heat_GW_DE.pdf")
-heatmap.2(as.matrix(GW_DE_rpkm), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
-dev.off()
 GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(cortex03_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP), nrow(GE03_GE04UP), length(intersect(cortex01_cortex03UP$ID, GE01_GE03UP$ID)), length(intersect(cortex01_cortex04UP$ID, GE01_GE04UP$ID)), length(intersect(cortex02_cortex03UP$ID, GE02_GE03UP$ID)), length(intersect(cortex02_cortex04UP$ID, GE02_GE04UP$ID)), length(intersect(cortex03_cortex04UP$ID, GE03_GE04UP$ID))), 
                             DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(cortex03_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN), nrow(GE03_GE04DN), length(intersect(cortex01_cortex03DN$ID, GE01_GE03DN$ID)), length(intersect(cortex01_cortex04DN$ID, GE01_GE04DN$ID)), length(intersect(cortex02_cortex03DN$ID, GE02_GE03DN$ID)), length(intersect(cortex02_cortex04DN$ID, GE02_GE04DN$ID)), length(intersect(cortex03_cortex04DN$ID, GE03_GE04DN$ID))), 
                             DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(cortex03_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE), nrow(GE03_GE04DE), length(intersect(cortex01_cortex03DE$ID, GE01_GE03DE$ID)), length(intersect(cortex01_cortex04DE$ID, GE01_GE04DE$ID)), length(intersect(cortex02_cortex03DE$ID, GE02_GE03DE$ID)), length(intersect(cortex02_cortex04DE$ID, GE02_GE04DE$ID)), length(intersect(cortex03_cortex04DE$ID, GE03_GE04DE$ID))),  
@@ -328,7 +318,12 @@ GW_DE_summary_tall[GW_DE_summary_tall$variable == "DN", "value"] <- - GW_DE_summ
    theme_bw() + 
    theme(axis.text.x = element_text(angle = 90)))
 ggsave(GW_DE_summary_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_summary_figure.pdf")
-## gene profiles: 1) GW13-15:UP, GW15-17:UP, (0,1,2); 2) GW13-15:UP, GW15-17:DN, (0,2,0); 3) GW13-15:DN, GW15-17:UP, (2,0,2); 4) GW13-15:DN, GW15-17:DN, (2,1,0);
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/venn_GW_DE.pdf")
+grid.arrange(gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 1)
+dev.off()
+# Stage specific DE genes
+## DE gene trend profiles: for MZ twins, DE are taken as DE in both individual, and not DE are taken as DE in neither individual. 
+## 1) GW13-15:UP, GW15-17:UP, (0,1,2); 2) GW13-15:UP, GW15-17:DN, (0,2,0); 3) GW13-15:DN, GW15-17:UP, (2,0,2); 4) GW13-15:DN, GW15-17:DN, (2,1,0);
 ## 5) GW13-15:UP, GW15-17:not, (0,2,2); 6) GW13-15:DN, GW15-17:not, (2,0,0); 7) GW13-15:not, GW15-17:UP, (0,0,2); 8) GW13-15:not, GW15-17:DN, (2,2,0); 
 ### shared by cortex and GE
 GW_UP_UP <- ensembl[intersect(GW_15_13_UP_duplicated$id, GW_17_15_UP_duplicated$id), ]
@@ -398,7 +393,16 @@ GW_DE_trend_GE <- data.frame(x = rep(c("GW13", "GW15", "GW17"), 8),
    theme_bw() + 
    theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))
 ggsave(GW_DE_trend_GE_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_trend_GE_figure.pdf")
-# DAVID enrichment
+## heatmap
+rownames(gene_FetalBrain) <- gene_FetalBrain$Ensembl
+GW_DE_rpkm <- gene_FetalBrain[c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id, GW_UP_no_cortex$id, GW_DN_no_cortex$id, GW_no_UP_cortex$id, GW_no_DN_cortex$id, 
+                     GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, GW_UP_no_GE$id, GW_DN_no_GE$id, GW_no_UP_GE$id, GW_no_DN_GE$id),c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")]
+clab = rep(c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), 2)
+pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/heat_GW_DE.pdf")
+heatmap.2(as.matrix(GW_DE_rpkm), Rowv = F, Colv = F, labRow = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.25, y = 1, c("GW13", "GW15", "GW17"), col = c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), lwd = 8, ncol = 3)
+dev.off()
+## DAVID enrichment
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DE/")
 (enrich_GW_17_13_UP <- enrich(name = "GW_17_13_UP", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
 (enrich_GW_17_13_DN <- enrich(name = "GW_17_13_DN", fdr = 0.05, p = "FDR", erminej = F, height = 3, width = 9))
