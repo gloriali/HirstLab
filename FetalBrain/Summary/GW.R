@@ -395,8 +395,8 @@ GW_DE_trend_GE <- data.frame(x = rep(c("GW13", "GW15", "GW17"), 8),
 ggsave(GW_DE_trend_GE_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_trend_GE_figure.pdf")
 ## heatmap
 rownames(gene_FetalBrain) <- gene_FetalBrain$Ensembl
-GW_DE_rpkm <- gene_FetalBrain[c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id, GW_UP_no_cortex$id, GW_DN_no_cortex$id, GW_no_UP_cortex$id, GW_no_DN_cortex$id, 
-                     GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, GW_UP_no_GE$id, GW_DN_no_GE$id, GW_no_UP_GE$id, GW_no_DN_GE$id),c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")]
+GW_DE_rpkm <- gene_FetalBrain[c(GW_UP_UP_cortex$id, GW_UP_UP_GE$id, GW_UP_DN_cortex$id, GW_UP_DN_GE$id, GW_DN_UP_cortex$id, GW_DN_UP_GE$id, GW_DN_DN_cortex$id, GW_DN_DN_GE$id, 
+                                GW_UP_no_cortex$id, GW_UP_no_GE$id, GW_no_UP_cortex$id, GW_no_UP_GE$id, GW_DN_no_cortex$id, GW_DN_no_GE$id, GW_no_DN_cortex$id, GW_no_DN_GE$id),c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")]
 clab = rep(c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), 2)
 pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/heat_GW_DE.pdf")
 heatmap.2(as.matrix(GW_DE_rpkm), Rowv = F, Colv = F, labRow = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
