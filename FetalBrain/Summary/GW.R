@@ -9,6 +9,7 @@ library(labeling)
 library(VennDiagram)
 library(gridExtra)
 library(gplots)
+library(reshape)
 source('~/HirstLab/Pipeline/R/enrich.R')
 source("~/HirstLab/Pipeline/R/DMR.figures.R")
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
@@ -133,6 +134,41 @@ genomicBreak_GW_figure <- ggplot(genomicBreak_GW_tall, aes(x = Region, y = log2(
   theme_bw()
 ggsave(genomicBreak_GW_figure, file = "genomicBreak_GW.pdf")
 (genomicBreak_GW_figure + ggtitle("DMR breakdown between 13-week and 17-week"))
+
+# ======= expression pattern ======
+gene_FetalBrain <- read.delim("/home/lli/FetalBrain/RNAseq/rpkm_pc.txt", as.is = T)
+colnames(gene_FetalBrain) <- gsub("\\.HuFNSC", "", colnames(gene_FetalBrain))
+gene_summary <- data.frame(Sample = colnames(gene_FetalBrain)[-1], 
+                          N_0.1 = c(filter(gene_FetalBrain, Brain01 > 0.1) %>% nrow, filter(gene_FetalBrain, Brain02 > 0.1) %>% nrow, filter(gene_FetalBrain, Cortex01 > 0.1) %>% nrow, filter(gene_FetalBrain, Cortex02 > 0.1) %>% nrow, filter(gene_FetalBrain, Cortex03 > 0.1) %>% nrow, filter(gene_FetalBrain, Cortex04 > 0.1) %>% nrow, filter(gene_FetalBrain, GE01 > 0.1) %>% nrow, filter(gene_FetalBrain, GE02 > 0.1) %>% nrow, filter(gene_FetalBrain, GE03 > 0.1) %>% nrow, filter(gene_FetalBrain, GE04 > 0.1) %>% nrow), 
+                          N_1 = c(filter(gene_FetalBrain, Brain01 > 1) %>% nrow, filter(gene_FetalBrain, Brain02 > 1) %>% nrow, filter(gene_FetalBrain, Cortex01 > 1) %>% nrow, filter(gene_FetalBrain, Cortex02 > 1) %>% nrow, filter(gene_FetalBrain, Cortex03 > 1) %>% nrow, filter(gene_FetalBrain, Cortex04 > 1) %>% nrow, filter(gene_FetalBrain, GE01 > 1) %>% nrow, filter(gene_FetalBrain, GE02 > 1) %>% nrow, filter(gene_FetalBrain, GE03 > 1) %>% nrow, filter(gene_FetalBrain, GE04 > 1) %>% nrow), 
+                          N_10 = c(filter(gene_FetalBrain, Brain01 > 10) %>% nrow, filter(gene_FetalBrain, Brain02 > 10) %>% nrow, filter(gene_FetalBrain, Cortex01 > 10) %>% nrow, filter(gene_FetalBrain, Cortex02 > 10) %>% nrow, filter(gene_FetalBrain, Cortex03 > 10) %>% nrow, filter(gene_FetalBrain, Cortex04 > 10) %>% nrow, filter(gene_FetalBrain, GE01 > 10) %>% nrow, filter(gene_FetalBrain, GE02 > 10) %>% nrow, filter(gene_FetalBrain, GE03 > 10) %>% nrow, filter(gene_FetalBrain, GE04 > 10) %>% nrow), 
+                          N_100 = c(filter(gene_FetalBrain, Brain01 > 100) %>% nrow, filter(gene_FetalBrain, Brain02 > 100) %>% nrow, filter(gene_FetalBrain, Cortex01 > 100) %>% nrow, filter(gene_FetalBrain, Cortex02 > 100) %>% nrow, filter(gene_FetalBrain, Cortex03 > 100) %>% nrow, filter(gene_FetalBrain, Cortex04 > 100) %>% nrow, filter(gene_FetalBrain, GE01 > 100) %>% nrow, filter(gene_FetalBrain, GE02 > 100) %>% nrow, filter(gene_FetalBrain, GE03 > 100) %>% nrow, filter(gene_FetalBrain, GE04 > 100) %>% nrow))
+rownames(gene_summary) <- colnames(gene_FetalBrain)[-1]
+gene_summary_tall <- melt(gene_summary, id = "Sample")
+(gene_summary_figure <- ggplot(gene_summary_tall, aes(x = Sample, y = value, fill = variable)) + 
+   geom_bar(stat = "identity", position = "dodge") + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   scale_fill_discrete(labels=c("N > 0.1","N > 1","N > 10", "N > 100"), name = "") + 
+   theme_bw())
+ggsave(gene_summary_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/gene_summary_figure.pdf")
+
+exon_FetalBrain <- read.delim("/home/lli/FetalBrain/RNAseq/rpkm_exon.txt", as.is = T)
+colnames(exon_FetalBrain) <- gsub("\\.HuFNSC", "", colnames(exon_FetalBrain))
+exon_summary <- data.frame(Sample = colnames(exon_FetalBrain)[-1], 
+                           N_0.1 = c(filter(exon_FetalBrain, Brain01 > 0.1) %>% nrow, filter(exon_FetalBrain, Brain02 > 0.1) %>% nrow, filter(exon_FetalBrain, Cortex01 > 0.1) %>% nrow, filter(exon_FetalBrain, Cortex02 > 0.1) %>% nrow, filter(exon_FetalBrain, Cortex03 > 0.1) %>% nrow, filter(exon_FetalBrain, Cortex04 > 0.1) %>% nrow, filter(exon_FetalBrain, GE01 > 0.1) %>% nrow, filter(exon_FetalBrain, GE02 > 0.1) %>% nrow, filter(exon_FetalBrain, GE03 > 0.1) %>% nrow, filter(exon_FetalBrain, GE04 > 0.1) %>% nrow), 
+                           N_1 = c(filter(exon_FetalBrain, Brain01 > 1) %>% nrow, filter(exon_FetalBrain, Brain02 > 1) %>% nrow, filter(exon_FetalBrain, Cortex01 > 1) %>% nrow, filter(exon_FetalBrain, Cortex02 > 1) %>% nrow, filter(exon_FetalBrain, Cortex03 > 1) %>% nrow, filter(exon_FetalBrain, Cortex04 > 1) %>% nrow, filter(exon_FetalBrain, GE01 > 1) %>% nrow, filter(exon_FetalBrain, GE02 > 1) %>% nrow, filter(exon_FetalBrain, GE03 > 1) %>% nrow, filter(exon_FetalBrain, GE04 > 1) %>% nrow), 
+                           N_10 = c(filter(exon_FetalBrain, Brain01 > 10) %>% nrow, filter(exon_FetalBrain, Brain02 > 10) %>% nrow, filter(exon_FetalBrain, Cortex01 > 10) %>% nrow, filter(exon_FetalBrain, Cortex02 > 10) %>% nrow, filter(exon_FetalBrain, Cortex03 > 10) %>% nrow, filter(exon_FetalBrain, Cortex04 > 10) %>% nrow, filter(exon_FetalBrain, GE01 > 10) %>% nrow, filter(exon_FetalBrain, GE02 > 10) %>% nrow, filter(exon_FetalBrain, GE03 > 10) %>% nrow, filter(exon_FetalBrain, GE04 > 10) %>% nrow), 
+                           N_100 = c(filter(exon_FetalBrain, Brain01 > 100) %>% nrow, filter(exon_FetalBrain, Brain02 > 100) %>% nrow, filter(exon_FetalBrain, Cortex01 > 100) %>% nrow, filter(exon_FetalBrain, Cortex02 > 100) %>% nrow, filter(exon_FetalBrain, Cortex03 > 100) %>% nrow, filter(exon_FetalBrain, Cortex04 > 100) %>% nrow, filter(exon_FetalBrain, GE01 > 100) %>% nrow, filter(exon_FetalBrain, GE02 > 100) %>% nrow, filter(exon_FetalBrain, GE03 > 100) %>% nrow, filter(exon_FetalBrain, GE04 > 100) %>% nrow))
+rownames(exon_summary) <- colnames(exon_FetalBrain)[-1]
+exon_summary_tall <- melt(exon_summary, id = "Sample")
+(exon_summary_figure <- ggplot(exon_summary_tall, aes(x = Sample, y = value, fill = variable)) + 
+   geom_bar(stat = "identity", position = "dodge") + 
+   xlab("") + 
+   ylab("No. of exons") + 
+   scale_fill_discrete(labels=c("N > 0.1","N > 1","N > 10", "N > 100"), name = "") + 
+   theme_bw())
+ggsave(exon_summary_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/exon_summary_figure.pdf")
 
 # ======= DE genes =======
 setwd("/home/lli/FetalBrain/RNAseq/DEfine/gene/")
@@ -274,8 +310,27 @@ GW_DE_rpkm <- rpkm[c(GW_17_13_UP_duplicated_cortex$id, GW_17_13_DN_duplicated_co
 pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/heat_GW_DE.pdf")
 heatmap.2(as.matrix(GW_DE_rpkm), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 dev.off()
-## gene profiles: 1) GW13-15:UP, GW15-17:UP; 2) GW13-15:UP, GW15-17:DN; 3) GW13-15:DN, GW15-17:UP; 4) GW13-15:DN, GW15-17:DN;
-## 5) GW13-15:UP, GW15-17:not; 6) GW13-15:DN, GW15-17:not; 7) GW13-15:not, GW15-17:UP; 8) GW13-15:not, GW15-17:DN; 
+GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(cortex03_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP), nrow(GE03_GE04UP), length(intersect(cortex01_cortex03UP$ID, GE01_GE03UP$ID)), length(intersect(cortex01_cortex04UP$ID, GE01_GE04UP$ID)), length(intersect(cortex02_cortex03UP$ID, GE02_GE03UP$ID)), length(intersect(cortex02_cortex04UP$ID, GE02_GE04UP$ID)), length(intersect(cortex03_cortex04UP$ID, GE03_GE04UP$ID))), 
+                            DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(cortex03_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN), nrow(GE03_GE04DN), length(intersect(cortex01_cortex03DN$ID, GE01_GE03DN$ID)), length(intersect(cortex01_cortex04DN$ID, GE01_GE04DN$ID)), length(intersect(cortex02_cortex03DN$ID, GE02_GE03DN$ID)), length(intersect(cortex02_cortex04DN$ID, GE02_GE04DN$ID)), length(intersect(cortex03_cortex04DN$ID, GE03_GE04DN$ID))), 
+                            DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(cortex03_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE), nrow(GE03_GE04DE), length(intersect(cortex01_cortex03DE$ID, GE01_GE03DE$ID)), length(intersect(cortex01_cortex04DE$ID, GE01_GE04DE$ID)), length(intersect(cortex02_cortex03DE$ID, GE02_GE03DE$ID)), length(intersect(cortex02_cortex04DE$ID, GE02_GE04DE$ID)), length(intersect(cortex03_cortex04DE$ID, GE03_GE04DE$ID))),  
+                            GW = rep(c("GW17-GW15", "GW17-GW13", "GW17-GW15", "GW17-GW13", "GW15-GW13"), 3), 
+                            type = rep(c("cortex", "GE", "shared"), each = 5),
+                            Sample = c("GW17-GW15.1_cortex", "GW17-GW13.1_cortex", "GW17-GW15.2_cortex", "GW17-GW13.2_cortex", "GW15-GW13_cortex", "GW17-GW15.1_GE", "GW17-GW13.1_GE", "GW17-GW15.2_GE", "GW17-GW13.2_GE", "GW15-GW13_GE", "GW17-GW15.1_shared", "GW17-GW13.1_shared", "GW17-GW15.2_shared", "GW17-GW13.2_shared", "GW15-GW13_shared"))
+GW_DE_summary_tall <- melt(GW_DE_summary %>% select(-DE), id = c("GW", "Sample", "type")) %>% arrange(Sample) %>% mutate(GW = factor(GW, levels = c("GW17-GW13", "GW17-GW15", "GW15-GW13")))
+GW_DE_summary_tall[GW_DE_summary_tall$variable == "DN", "value"] <- - GW_DE_summary_tall[GW_DE_summary_tall$variable == "DN", "value"]
+(GW_DE_summary_figure <- ggplot(GW_DE_summary_tall, aes(Sample, value, fill = type)) + 
+   geom_bar(stat = "identity", position = "identity", width = 0.5) + 
+   geom_hline(aes(yintercept = 0)) + 
+   facet_grid(. ~ GW, scales = "free_x", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue", "purple")) + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   theme_bw() + 
+   theme(axis.text.x = element_text(angle = 90)))
+ggsave(GW_DE_summary_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_summary_figure.pdf")
+## gene profiles: 1) GW13-15:UP, GW15-17:UP, (0,1,2); 2) GW13-15:UP, GW15-17:DN, (0,2,0); 3) GW13-15:DN, GW15-17:UP, (2,0,2); 4) GW13-15:DN, GW15-17:DN, (2,1,0);
+## 5) GW13-15:UP, GW15-17:not, (0,2,2); 6) GW13-15:DN, GW15-17:not, (2,0,0); 7) GW13-15:not, GW15-17:UP, (0,0,2); 8) GW13-15:not, GW15-17:DN, (2,2,0); 
+### shared by cortex and GE
 GW_UP_UP <- ensembl[intersect(GW_15_13_UP_duplicated$id, GW_17_15_UP_duplicated$id), ]
 GW_UP_DN <- ensembl[intersect(GW_15_13_UP_duplicated$id, GW_17_15_DN_duplicated$id), ] 
 GW_DN_UP <- ensembl[intersect(GW_15_13_DN_duplicated$id, GW_17_15_UP_duplicated$id), ]
@@ -284,11 +339,65 @@ GW_UP_no <- ensembl[setdiff(GW_15_13_UP_duplicated$id, c(cortex01_cortex03DE$ID,
 GW_DN_no <- ensembl[setdiff(GW_15_13_DN_duplicated$id, c(cortex01_cortex03DE$ID, cortex02_cortex03DE$ID, GE01_GE03DE$ID, GE02_GE03DE$ID)), ]
 GW_no_UP <- ensembl[setdiff(GW_17_15_UP_duplicated$id, c(cortex03_cortex04DE$ID, GE03_GE04DE$ID)), ]
 GW_no_DN <- ensembl[setdiff(GW_17_15_DN_duplicated$id, c(cortex03_cortex04DE$ID, GE03_GE04DE$ID)), ]
-GW_DE_summary <- data.frame(UP = c(nrow(cortex01_cortex03UP), nrow(cortex01_cortex04UP), nrow(cortex02_cortex03UP), nrow(cortex02_cortex04UP), nrow(cortex03_cortex04UP), nrow(GE01_GE03UP), nrow(GE01_GE04UP), nrow(GE02_GE03UP), nrow(GE02_GE04UP), nrow(GE03_GE04UP)), 
-                            DN = c(nrow(cortex01_cortex03DN), nrow(cortex01_cortex04DN), nrow(cortex02_cortex03DN), nrow(cortex02_cortex04DN), nrow(cortex03_cortex04DN), nrow(GE01_GE03DN), nrow(GE01_GE04DN), nrow(GE02_GE03DN), nrow(GE02_GE04DN), nrow(GE03_GE04DN)), 
-                            DE = c(nrow(cortex01_cortex03DE), nrow(cortex01_cortex04DE), nrow(cortex02_cortex03DE), nrow(cortex02_cortex04DE), nrow(cortex03_cortex04DE), nrow(GE01_GE03DE), nrow(GE01_GE04DE), nrow(GE02_GE03DE), nrow(GE02_GE04DE), nrow(GE03_GE04DE)), 
-                            GW = rep(c("17 vs 15", "17 vs 13", "17 vs 15", "17 vs 13", "15 vs 13"), 2))
-rownames(GW_DE_summary) <- c("cortex01_cortex03", "cortex01_cortex04", "cortex02_cortex03", "cortex02_cortex04", "cortex03_cortex04", "GE01_GE03", "GE01_GE04", "GE02_GE03", "GE02_GE04", "GE03_GE04")
+e <- 0.08
+GW_DE_trend <- data.frame(x = rep(c("GW13", "GW15", "GW17"), 8), 
+                          y = c(0,1,2, 0,2-e,0, 2,0+e,2, 2,1,0, 0,2,2, 2,0,0, 0,0,2, 2,2,0), 
+                          trend = rep(c("UP-UP", "UP-DN", "DN-UP", "DN-DN", "UP-notDE", "DN-notDE", "notDE-UP", "notDE-DN"), each = 3), 
+                          N = rep(c(nrow(GW_UP_UP), nrow(GW_UP_DN), nrow(GW_DN_UP), nrow(GW_DN_DN), nrow(GW_UP_no), nrow(GW_DN_no), nrow(GW_no_UP), nrow(GW_no_DN)), each = 3)) %>%
+  mutate(type = (N == 0))
+(GW_DE_trend_figure <- ggplot(GW_DE_trend, aes(x, y, group = trend, color = trend, size = N, linetype = type)) + 
+   geom_line(arrow = arrow(angle = 15, type = "closed")) + 
+   xlab("") + 
+   ylab("Differential expression") + 
+   ggtitle("Shared by Cortex and GE") + 
+   scale_linetype_discrete(guide = "none") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))
+ggsave(GW_DE_trend_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_trend_figure.pdf")
+### cortex
+GW_UP_UP_cortex <- ensembl[intersect(cortex03_cortex04UP$ID, GW_17_15_UP_duplicated_cortex$id), ]
+GW_UP_DN_cortex <- ensembl[intersect(cortex03_cortex04UP$ID, GW_17_15_DN_duplicated_cortex$id), ] 
+GW_DN_UP_cortex <- ensembl[intersect(cortex03_cortex04DN$ID, GW_17_15_UP_duplicated_cortex$id), ]
+GW_DN_DN_cortex <- ensembl[intersect(cortex03_cortex04DN$ID, GW_17_15_DN_duplicated_cortex$id), ]
+GW_UP_no_cortex <- ensembl[setdiff(cortex03_cortex04UP$ID, c(cortex01_cortex03DE$ID, cortex02_cortex03DE$ID)), ]
+GW_DN_no_cortex <- ensembl[setdiff(cortex03_cortex04DN$ID, c(cortex01_cortex03DE$ID, cortex02_cortex03DE$ID)), ]
+GW_no_UP_cortex <- ensembl[setdiff(GW_17_15_UP_duplicated_cortex$id, c(cortex03_cortex04DE$ID)), ]
+GW_no_DN_cortex <- ensembl[setdiff(GW_17_15_DN_duplicated_cortex$id, c(cortex03_cortex04DE$ID)), ]
+e <- 0.08
+GW_DE_trend_cortex <- data.frame(x = rep(c("GW13", "GW15", "GW17"), 8), 
+                          y = c(0,1,2, 0,2-e,0, 2,0+e,2, 2,1,0, 0,2,2, 2,0,0, 0,0,2, 2,2,0), 
+                          trend = rep(c("UP-UP", "UP-DN", "DN-UP", "DN-DN", "UP-notDE", "DN-notDE", "notDE-UP", "notDE-DN"), each = 3), 
+                          N = rep(c(nrow(GW_UP_UP_cortex), nrow(GW_UP_DN_cortex), nrow(GW_DN_UP_cortex), nrow(GW_DN_DN_cortex), nrow(GW_UP_no_cortex), nrow(GW_DN_no_cortex), nrow(GW_no_UP_cortex), nrow(GW_no_DN_cortex)), each = 3)) 
+(GW_DE_trend_cortex_figure <- ggplot(GW_DE_trend_cortex, aes(x, y, group = trend, color = trend, size = N)) + 
+   geom_line(arrow = arrow(angle = 15, type = "closed")) + 
+   xlab("") + 
+   ylab("Differential expression") + 
+   ggtitle("Cortex") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))
+ggsave(GW_DE_trend_cortex_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_trend_cortex_figure.pdf")
+### GE
+GW_UP_UP_GE <- ensembl[intersect(GE03_GE04UP$ID, GW_17_15_UP_duplicated_GE$id), ]
+GW_UP_DN_GE <- ensembl[intersect(GE03_GE04UP$ID, GW_17_15_DN_duplicated_GE$id), ] 
+GW_DN_UP_GE <- ensembl[intersect(GE03_GE04DN$ID, GW_17_15_UP_duplicated_GE$id), ]
+GW_DN_DN_GE <- ensembl[intersect(GE03_GE04DN$ID, GW_17_15_DN_duplicated_GE$id), ]
+GW_UP_no_GE <- ensembl[setdiff(GE03_GE04UP$ID, c(GE01_GE03DE$ID, GE02_GE03DE$ID)), ]
+GW_DN_no_GE <- ensembl[setdiff(GE03_GE04DN$ID, c(GE01_GE03DE$ID, GE02_GE03DE$ID)), ]
+GW_no_UP_GE <- ensembl[setdiff(GW_17_15_UP_duplicated_GE$id, c(GE03_GE04DE$ID)), ]
+GW_no_DN_GE <- ensembl[setdiff(GW_17_15_DN_duplicated_GE$id, c(GE03_GE04DE$ID)), ]
+e <- 0.08
+GW_DE_trend_GE <- data.frame(x = rep(c("GW13", "GW15", "GW17"), 8), 
+                                 y = c(0,1,2, 0,2-e,0, 2,0+e,2, 2,1,0, 0,2,2, 2,0,0, 0,0,2, 2,2,0), 
+                                 trend = rep(c("UP-UP", "UP-DN", "DN-UP", "DN-DN", "UP-notDE", "DN-notDE", "notDE-UP", "notDE-DN"), each = 3), 
+                                 N = rep(c(nrow(GW_UP_UP_GE), nrow(GW_UP_DN_GE), nrow(GW_DN_UP_GE), nrow(GW_DN_DN_GE), nrow(GW_UP_no_GE), nrow(GW_DN_no_GE), nrow(GW_no_UP_GE), nrow(GW_no_DN_GE)), each = 3)) 
+(GW_DE_trend_GE_figure <- ggplot(GW_DE_trend_GE, aes(x, y, group = trend, color = trend, size = N)) + 
+   geom_line(arrow = arrow(angle = 15, type = "closed")) + 
+   xlab("") + 
+   ylab("Differential expression") + 
+   ggtitle("GE") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))
+ggsave(GW_DE_trend_GE_figure, file = "/projects/epigenomics/users/lli/FetalBrain/GW/DE/GW_DE_trend_GE_figure.pdf")
 # DAVID enrichment
 setwd("/projects/epigenomics/users/lli/FetalBrain/GW/DE/")
 (enrich_GW_17_13_UP <- enrich(name = "GW_17_13_UP", fdr = 0.05, p = "FDR", erminej = F, height = 2, width = 9))
@@ -473,14 +582,16 @@ ggsave(CGI_coverage_figure, file = "CGI_coverage_figure.pdf")
 save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Venn_GW_UMR_hypo, 
      DMR_length_GW_figure, DMR_count_GW_figure, DMR_dis_GW_figure, DMR_freq_GW_figure, DMR_pos_GW_figure, 
      GREAT_GW_Cortex02.UMR, GREAT_GW_Cortex04.UMR, GREAT_GW_GE02.UMR, GREAT_GW_GE04.UMR, GREAT_GW_17week.UMR,  
-     genomicBreak_GW, genomicBreak_GW_figure, 
+     genomicBreak_GW, genomicBreak_GW_figure, gene_summary_figure, exon_summary_figure, 
      cortex01_cortex03DE, cortex01_cortex04DE, cortex02_cortex03DE, cortex02_cortex04DE, cortex03_cortex04DE, 
      GW_17_13_UP_duplicated_cortex, GW_17_13_DN_duplicated_cortex, GW_17_15_UP_duplicated_cortex, GW_17_15_DN_duplicated_cortex, 
-     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GE03_GE04DE, GW_DE_summary, 
+     GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GE03_GE04DE, GW_DE_summary, GW_DE_summary_figure, 
      GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, GW_17_15_UP_duplicated_GE, GW_17_15_DN_duplicated_GE, 
      GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, GW_17_15_UP_duplicated, GW_17_15_DN_duplicated, GW_15_13_UP_duplicated, GW_15_13_DN_duplicated, 
      venn_GW_17_13_UP, venn_GW_17_13_DN, venn_GW_17_15_UP, venn_GW_17_15_DN, venn_GW_15_13_UP, venn_GW_15_13_DN, venn_GW_cortex, venn_GW_GE, GW_DE_rpkm, 
-     GW_UP_UP, GW_UP_DN, GW_DN_UP, GW_DN_DN, GW_UP_no, GW_DN_no, GW_no_UP, GW_no_DN, 
+     GW_UP_UP, GW_UP_DN, GW_DN_UP, GW_DN_DN, GW_UP_no, GW_DN_no, GW_no_UP, GW_no_DN, GW_DE_trend, GW_DE_trend_figure, 
+     GW_UP_UP_cortex, GW_UP_DN_cortex, GW_DN_UP_cortex, GW_DN_DN_cortex, GW_UP_no_cortex, GW_DN_no_cortex, GW_no_UP_cortex, GW_no_DN_cortex, GW_DE_trend_cortex, GW_DE_trend_cortex_figure, 
+     GW_UP_UP_GE, GW_UP_DN_GE, GW_DN_UP_GE, GW_DN_DN_GE, GW_UP_no_GE, GW_DN_no_GE, GW_no_UP_GE, GW_no_DN_GE, GW_DE_trend_GE, GW_DE_trend_GE_figure, 
      enrich_GW_17_13_UP, enrich_GW_17_13_DN, enrich_GW_17_13_UP_cortex, enrich_GW_17_13_DN_cortex, enrich_GW_17_13_UP_GE, enrich_GW_17_13_DN_GE, 
      enrich_GW_17_15_UP, enrich_GW_17_15_DN, enrich_GW_17_15_UP_cortex, enrich_GW_17_15_DN_cortex, enrich_GW_17_15_UP_GE, enrich_GW_17_15_DN_GE, 
      enrich_GW_15_13_UP, enrich_GW_15_13_DN, enrich_GW_15_13_UP_cortex, enrich_GW_15_13_DN_cortex, enrich_GW_15_13_UP_GE, enrich_GW_15_13_DN_GE, 
