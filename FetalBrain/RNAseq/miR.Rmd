@@ -26,7 +26,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.height =
 ## Summary and clustering 
 
 * Out of `r nrow(miR_FetalBrain)` miRNAs, on average, there are __`r round(mean(miR_summary$N_0.1), 0)`__ miRNAs expressed (RPM > 0.1), __`r round(mean(miR_summary$N_100), 0)`__ highly expressed (RPM > 100). The No. of expressed miRNAs in different samples are similar.       
-* Clustering distinguish mixed brain sample from neurospheres, but shows no pattern within neurospheres.    
+* Clustering on miRs highly expressed (RPM > 100) in at least one sample revealed same clusters as coding genes and exons.    
 
 ```{r summary, fig.height = 6, fig.width = 8}
 (miR_summary_figure)
@@ -39,6 +39,7 @@ par(op)
 ## Differential expression by fold change 
 
 * DE: fold change between two samples $\ge$ 2.     
+* Average RPM of two samples > 100. 
 
 ### Between monozygotic twins  
 

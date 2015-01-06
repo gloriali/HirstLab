@@ -42,7 +42,8 @@ miR_summary_tall <- melt(miR_summary, id = "Sample")
 ggsave(miR_summary_figure, file = "/projects/epigenomics/users/lli/FetalBrain/miR/miR_summary_figure.pdf")
 
 # =========== cluster ===========
-miR_dend <- (1- (miR_FetalBrain[, -1] %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+highExpr <- as.character(miR_FetalBrain[rowSums(miR_FetalBrain[, 2:11] > 100) > 0, "Gene"])
+miR_dend <- (1- (miR_FetalBrain[highExpr, -1] %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
   set("by_labels_branches_col", value = c("Brain01", "Brain02"), TF_value = "green", type = "all") %>% 
   set("by_labels_branches_col", value = c("Cortex01", "Cortex02", "Cortex03", "Cortex04"), TF_value = "red", type = "all") %>% 
   set("by_labels_branches_col", value = c("GE01", "GE02", "GE03", "GE04"), TF_value = "blue", type = "all") %>% 
@@ -56,9 +57,9 @@ dev.off()
 
 # =========== DE ==============
 ## MZ twins 
-Brain01_Brain02_miR_DE <- DE_FC(miR_FetalBrain[, c("Brain01", "Brain02")])
-Cortex01_Cortex02_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex02")])
-GE01_GE02_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE02")])
+Brain01_Brain02_miR_DE <- DE_FC(miR_FetalBrain[, c("Brain01", "Brain02")], log_cut = 2)
+Cortex01_Cortex02_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex02")], log_cut = 2)
+GE01_GE02_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE02")], log_cut = 2)
 miR_DE_MZ_summary <- rbind(Brain01_Brain02_miR_DE$summary, Cortex01_Cortex02_miR_DE$summary, GE01_GE02_miR_DE$summary)
 miR_DE_MZ_UP <- list(Brain = Brain01_Brain02_miR_DE$UP$geneID, Cortex = Cortex01_Cortex02_miR_DE$UP$geneID, GE = GE01_GE02_miR_DE$UP$geneID)
 venn_miR_DE_MZ_UP <- venn.diagram(miR_DE_MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "Venn diagram of MZ UP miRNAs")
@@ -72,10 +73,10 @@ pdf("/projects/epigenomics/users/lli/FetalBrain/miR/DE/heatmap_miR_DE_MZ.pdf", h
 heatmap.2(as.matrix(miR_DE_MZ_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 dev.off()
 ## Cortex vs GE
-Cortex01_GE01_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "GE01")])
-Cortex02_GE02_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "GE02")])
-Cortex03_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex03", "GE03")])
-Cortex04_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex04", "GE04")])
+Cortex01_GE01_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "GE01")], log_cut = 2)
+Cortex02_GE02_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "GE02")], log_cut = 2)
+Cortex03_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex03", "GE03")], log_cut = 2)
+Cortex04_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex04", "GE04")], log_cut = 2)
 miR_DE_neurospheres_summary <- rbind(Cortex01_GE01_miR_DE$summary, Cortex02_GE02_miR_DE$summary, Cortex03_GE03_miR_DE$summary, Cortex04_GE04_miR_DE$summary)
 miR_DE_neurospheres_UP <- list(HuFNSC01 = Cortex01_GE01_miR_DE$UP$geneID, HuFNSC02 = Cortex02_GE02_miR_DE$UP$geneID, HuFNSC03 = Cortex03_GE03_miR_DE$UP$geneID, HuFNSC04 = Cortex04_GE04_miR_DE$UP$geneID)
 venn_miR_DE_neurospheres_UP <- venn.diagram(miR_DE_neurospheres_UP, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of neurospheres UP miRNAs")
@@ -89,20 +90,20 @@ pdf("/projects/epigenomics/users/lli/FetalBrain/miR/DE/heatmap_miR_DE_neurospher
 heatmap.2(as.matrix(miR_DE_neurospheres_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
 dev.off()
 ## GW
-Cortex01_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex03")])
-Cortex01_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex04")])
-Cortex02_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex03")])
-Cortex02_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex04")])
-Cortex03_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex03", "Cortex04")])
+Cortex01_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex03")], log_cut = 2)
+Cortex01_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex01", "Cortex04")], log_cut = 2)
+Cortex02_Cortex03_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex03")], log_cut = 2)
+Cortex02_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex02", "Cortex04")], log_cut = 2)
+Cortex03_Cortex04_miR_DE <- DE_FC(miR_FetalBrain[, c("Cortex03", "Cortex04")], log_cut = 2)
 miR_DE_GW_Cortex_UP <- list(HuFNSC01_03 = Cortex01_Cortex03_miR_DE$UP$geneID, HuFNSC01_04 = Cortex01_Cortex04_miR_DE$UP$geneID, HuFNSC01_03 = Cortex02_Cortex03_miR_DE$UP$geneID, HuFNSC02_04 = Cortex02_Cortex04_miR_DE$UP$geneID)
 venn_miR_DE_GW_Cortex_UP <- venn.diagram(miR_DE_GW_Cortex_UP, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_Cortex UP miRNAs")
 miR_DE_GW_Cortex_DN <- list(HuFNSC01_03 = Cortex01_Cortex03_miR_DE$DN$geneID, HuFNSC01_04 = Cortex01_Cortex04_miR_DE$DN$geneID, HuFNSC01_03 = Cortex02_Cortex03_miR_DE$DN$geneID, HuFNSC02_04 = Cortex02_Cortex04_miR_DE$DN$geneID)
 venn_miR_DE_GW_Cortex_DN <- venn.diagram(miR_DE_GW_Cortex_DN, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_Cortex DN miRNAs")
-GE01_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE03")])
-GE01_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE04")])
-GE02_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE03")])
-GE02_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE04")])
-GE03_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE03", "GE04")])
+GE01_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE03")], log_cut = 2)
+GE01_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE01", "GE04")], log_cut = 2)
+GE02_GE03_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE03")], log_cut = 2)
+GE02_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE02", "GE04")], log_cut = 2)
+GE03_GE04_miR_DE <- DE_FC(miR_FetalBrain[, c("GE03", "GE04")], log_cut = 2)
 miR_DE_GW_GE_UP <- list(HuFNSC01_03 = GE01_GE03_miR_DE$UP$geneID, HuFNSC01_04 = GE01_GE04_miR_DE$UP$geneID, HuFNSC01_03 = GE02_GE03_miR_DE$UP$geneID, HuFNSC02_04 = GE02_GE04_miR_DE$UP$geneID)
 venn_miR_DE_GW_GE_UP <- venn.diagram(miR_DE_GW_GE_UP, filename = NULL, fill = c("red", "blue", "green", "yellow"), main = "Venn diagram of GW_GE UP miRNAs")
 miR_DE_GW_GE_DN <- list(HuFNSC01_03 = GE01_GE03_miR_DE$DN$geneID, HuFNSC01_04 = GE01_GE04_miR_DE$DN$geneID, HuFNSC01_03 = GE02_GE03_miR_DE$DN$geneID, HuFNSC02_04 = GE02_GE04_miR_DE$DN$geneID)
