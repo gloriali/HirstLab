@@ -159,11 +159,34 @@ grid.arrange(gTree(children = venn_GW_17_13_UP), gTree(children = venn_GW_17_13_
              gTree(children = venn_GW_17_15_UP), gTree(children = venn_GW_17_15_DN), 
              gTree(children = venn_GW_15_13_UP), gTree(children = venn_GW_15_13_DN), nrow = 3)
 grid.arrange(gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 1)
-heatmap.2(as.matrix(GW_DE_rpkm), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+(GW_DE_summary_figure)
 ```
 
 ### Stage-specific DE gene profiles
 
+  + Cortex stage-specific DE genes are mostly turned on during GW13-GW15, while GE stage-specific DE genes are mostly turned on during GW15-GW17. This supports the clustering in coding gene RPKM, exon RPKM and miRNA RPM that in cortex GW15 clustered with GW17, and in GE GW15 clustered with GW13.     
+
+```{r DE_trend}
+(GW_DE_trend_figure)
+(GW_DE_trend_cortex_figure)
+(GW_DE_trend_GE_figure)
+clab = rep(c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), 2)
+heatmap.2(as.matrix(GW_DE_rpkm), Rowv = F, Colv = F, labRow = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.25, y = 1, c("GW13", "GW15", "GW17"), col = c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), lwd = 8, ncol = 3)
+```
+
+  + Genes activated during GW13-GW15 in cortex, not GE     
+```{r DE_cortex, results='asis'}
+kable(GW_UP_no_cortex[!(GW_UP_no_cortex$id %in% c(GE01_GE03DE$ID, GE01_GE04DE$ID, GE02_GE03DE$ID, GE02_GE04DE$ID, GE03_GE04DE$ID)), c("id", "name", "description")], format = "html", row.names = F, align = "c")
+```
+
+  + Genes activated during GW15-GW17 in GE, not cortex     
+```{r DE_GE, results='asis'}
+kable(GW_no_UP_GE[!(GW_no_UP_GE$id %in% c(cortex01_cortex03DE$ID, cortex01_cortex04DE$ID, cortex02_cortex03DE$ID, cortex02_cortex04DE$ID, cortex03_cortex04DE$ID)), c("id", "name", "description")], format = "html", row.names = F, align = "c")
+```
+
+
+#### Stage-specific DE gene shared by Crotex and GE
 1. GW13-15:UP, GW15-17:UP;    
     _No genes_   
 2. GW13-15:UP, GW15-17:DN;    
