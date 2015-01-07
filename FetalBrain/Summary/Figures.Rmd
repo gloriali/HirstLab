@@ -31,6 +31,10 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FA
 ```
 
 ## Figure 1: Summary   
+### Figure 1a: Experimental design overview   
+
+![](./Figures_files/figure-html/design.png)     
+
 ### Figure 1b: Comparisons setup  
 
 ![](./Figures_files/figure-html/comparisons.png)     

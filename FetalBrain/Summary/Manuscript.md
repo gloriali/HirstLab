@@ -27,7 +27,9 @@ Epigenetic differences between genetically identical monozygotic (MZ) twins are 
 ## Results  
 To explore the epigenetic landscape in the developing human brain we performed comprehensive epigenomic profiling of primary brain tissue and neurospheres derived from microdissected cortex and ganglionic eminence brain regions from normal human fetal brain at 13, 15 and 17 gestational weeks (Figure X and Table SX).  , including a 13-gestational-week individual (HuFNSC04), a 15-gestational-week individual (HuFNSC03), and a pair of 17-gestational-week monozygotic twins (HuFNSC01 and HuFNSC02). Epigenomic and transcriptomic sequencing (Figure X? and Table SX) were employed to comprehensively annotate epigenetic and expressional differences associated with MZ twins, by pairwise comparisons between MZ twins within same cell types, neurospheres, by pairwise comparisons between cortex and GE neurospheres within same individuals, and gestational week, by pairwise comparisons between 13 and 17-gestational-week individuals within same cell types (Figure X). _(Need further description of the cell types?)_        
     
-  * Figure 1b
+  * Figure 1a    
+![](./Figures_files/figure-html/design.png)     
+  * Figure 1b    
 ![](./Figures_files/figure-html/comparisons.png)    
     
 ### MZ twins 

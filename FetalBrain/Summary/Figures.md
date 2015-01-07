@@ -2,11 +2,15 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Tue Dec  9 17:35:23 2014
+Updated: Tue Jan  6 17:50:21 2015
 
 
 
 ## Figure 1: Summary   
+### Figure 1a: Experimental design overview   
+
+![](./Figures_files/figure-html/design.png)     
+
 ### Figure 1b: Comparisons setup  
 
 ![](./Figures_files/figure-html/comparisons.png)     
