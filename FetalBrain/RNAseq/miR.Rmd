@@ -49,7 +49,9 @@ par(op)
 
 ```{r DE_MZ, results='asis'}
 kable(miR_DE_MZ_summary, format = "html", align = "c")
-heatmap.2(as.matrix(miR_DE_MZ_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+clab <- rep(c("red", "blue"), 3)
+heatmap.2(as.matrix(miR_DE_MZ_heat), Rowv = F, Colv = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.35, y = 1, c("HuFNSC01", "HuFNSC02"), col = c("red", "blue"), lwd = 8, ncol = 2)
 ```
 
 ### Between neurospheres  
@@ -60,7 +62,9 @@ heatmap.2(as.matrix(miR_DE_MZ_heat), scale = "row", trace = "none", margins = c(
 
 ```{r DE_neurospheres, results='asis'}
 kable(miR_DE_neurospheres_summary, format = "html", align = "c")
-heatmap.2(as.matrix(miR_DE_neurospheres_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+clab <- rep(c("red", "blue"), each = 4)
+heatmap.2(as.matrix(miR_DE_neurospheres_heat), Rowv = F, Colv = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.4, y = 1, c("Cortex", "GE"), col = c("red", "blue"), lwd = 8, ncol = 2)
 ```
 
 ### Between gestational weeks 
@@ -71,7 +75,9 @@ heatmap.2(as.matrix(miR_DE_neurospheres_heat), scale = "row", trace = "none", ma
 
 ```{r DE_GW, results='asis'}
 kable(miR_DE_GW_summary, format = "html", align = "c")
-heatmap.2(as.matrix(miR_DE_GW_heat), scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+clab <- rep(c(rgb(228,108,10,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(250,192,144,maxColorValue = 255)), 2)
+heatmap.2(as.matrix(miR_DE_GW_heat), Rowv = F, Colv = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
+legend(x = 0.25, y = 1, c("GW13", "GW15", "GW17"), col = c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), lwd = 8, ncol = 3)
 ```
 
 
