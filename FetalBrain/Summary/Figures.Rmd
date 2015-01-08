@@ -20,6 +20,7 @@ library(VennDiagram)
 library(gridExtra)
 library(gplots)
 library(dendextend)
+library(reshape)
 load("~/快盘/FetalBrain/MeDIP/DMR_MZ.Rdata")
 load("~/快盘/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
@@ -27,6 +28,8 @@ load("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("~/快盘/FetalBrain/RNAseq/isoform/FetalBrain_isoform.Rdata")
 load("~/快盘/FetalBrain/RNAseq/junction/FetalBrain_isoform_valid.Rdata")
 load("~/快盘/FetalBrain/RNAseq/epiProfile/exonProfile_Rmd.Rdata")
+load("~/快盘/FetalBrain/miR/FetalBrain_miR.Rdata")
+load("~/快盘/FetalBrain/GW/GW.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 10)
 ```
 
@@ -43,7 +46,7 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FA
   * No. of UMRs (hypermethylated in red and hypomethylated in blue) between monozygotic twins and Cortex vs GE neurospheres.    
   * No. of UMRs between MZ twins are on the same scale as UMRs between neurospheres.   
   
-```{r MZ_scale}
+```{r MZ_scale, fig.height = 10, fig.width = 12}
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 5), 
                         Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 5), 
                         DM_DE = c(rep(c("Hyper / UP", "Hypo / DN"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), rep(c("Hyper / UP", "Hypo / DN"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), 
@@ -76,7 +79,7 @@ dev.off()
 
 ### Figure 1d: UMR/DE genes accumulates over time
 
-```{r neurospheres_scale}
+```{r neurospheres_scale, fig.height = 10, fig.width = 12}
 neurospheres_scale <- data.frame(Donor = c(rep(c("HuFNSC02", "HuFNSC04", "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 2), "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 
                                  GW = c(rep(c("17-week", "13-week", "17-week", "17-week", "13-week", "13-week"), 2), "17-week", "17-week", "13-week", "13-week"), 
                                  Assay = factor(c(rep(c(rep("UMRs", 2), rep("DE genes", 4)), 2), rep("Isoforms", 4)), levels = c("UMRs", "DE genes", "Isoforms")), 
@@ -99,7 +102,7 @@ grid.newpage()
 grid.draw(neurospheres_scale_figure_gt)
 grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.35, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("~/快盘/FetalBrain/Figures/Figure2a.pdf", height = 10, width = 12)
+pdf("~/快盘/FetalBrain/Figures/Figure1d.pdf", height = 10, width = 12)
 grid.newpage()
 grid.draw(neurospheres_scale_figure_gt)
 grid.text("UMR frequency", x = unit(0.015, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
@@ -176,7 +179,7 @@ genomicBreak_WGBS_figure <- ggplot(genomicBreak_WGBS_tall, aes(x = Region, y = l
 grid.arrange(genomicBreak_MZ_figure, genomicBreak_WGBS_figure, nrow = 1)
 grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-pdf("~/快盘/FetalBrain/Figures/FigureS2.pdf", height = 7, width = 15)
+pdf("~/快盘/FetalBrain/Figures/FigureS2.pdf", height = 5, width = 10)
 grid.arrange(genomicBreak_MZ_figure, genomicBreak_WGBS_figure, nrow = 1)
 grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("b", x = unit(0.5, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
@@ -235,7 +238,7 @@ dev.off()
 ### Supplemental 4: Differential expressed genes between MZ twins are cell type specific
   * No. of differential expressed genes between MZ twins in Brain (green), Neurospheres Cortex derived (red), and GE derived (blue).  
   
-```{r MZ_DE, fig.height=5}
+```{r MZ_DE, fig.height=5, fig.width = 10}
 MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
 venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "UP", main.cex = 1.5)
 MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
@@ -368,7 +371,7 @@ ggsave(isoform_neurospheres_DAVID, file = "~/快盘/FetalBrain/Figures/FigureS12
 
 ### Supplemental 13: TFBS asymmetry in MZ UMRs
 
-```{r MZ_TFBS}
+```{r MZ_TFBS, fig.height = 5, fig.width = 15}
 (DMR_MZ_TF_figure <- DMR_MZ_TF_figure + xlab("Abundance near HuFNSC02 UMRs") + ylab("Abundance near HuFNSC01 UMRs")) 
 ggsave(DMR_MZ_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 5, width = 15)
 ```
@@ -391,7 +394,7 @@ dev.off()
 
 ### Supplemental 15: DNA methylation at exon boundaries with MeDIP
 
-```{r neurospheres_epiProfile_5mC_MeDIP}
+```{r neurospheres_epiProfile_5mC_MeDIP, fig.height = 7, fig.width = 15}
 MeDIP_figure_HuFNSC01 <- MeDIP_figure_HuFNSC01 + ggtitle("HuFNSC01") + theme(legend.position = "none")
 MeDIP_figure_HuFNSC02 <- MeDIP_figure_HuFNSC02 + ggtitle("HuFNSC02")
 grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
@@ -402,21 +405,22 @@ dev.off()
 
 ### Supplemental 16: Expression of DNA methylation reulators
 
-```{r heatmap_5mC_regulator}
+```{r heatmap_5mC_regulator, fig.height = 7, fig.width = 8}
 regulator_5mC <- read.delim("~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", as.is = T, row.names = 1)
 regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
-clab <- c(rep(c("red", "blue"), each = 4), rep("green", 2))
-heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
-legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
-pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 7, width = 8)
-heatmap.2(regulator_5mC, ColSideColors = clab, Rowv = NA, Colv = NA, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
-legend(x = 0.3, y = 1, c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8, ncol = 3)
-dev.off()
+regulator_5mC_heatmap <- ggplot(melt(t(scale(t(regulator_5mC), center = T, scale = T))) %>% mutate(Gene = factor(X1, levels = rev(rownames(regulator_5mC))), Sample = factor(X2, levels = colnames(regulator_5mC))), aes(x=Sample, y=Gene, fill=value)) + 
+   geom_tile() + 
+   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
+ggsave(regulator_5mC_heatmap, file = "~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 7, width = 8)
 ```
 
-### Supplemental 17: RNA-seq gene/exon clustering
+### Supplemental 17: RNA-seq and miRNA-seq clustering
 
-```{r cluster}
+```{r cluster, fig.height = 8, fig.width = 8}
 gene_FetalBrain <- read.delim("~/快盘/FetalBrain/Tables/rpkm_pc.txt", as.is = T, row.names = 1)
 gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
   set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
@@ -429,17 +433,69 @@ exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %
   set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
   set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(exon_FetalBrain), TF_value = 2)
-par(mar = c(5, 4, 4, 8), mfrow = c(1,2))
+op <- par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
 plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
 mtext("a", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
 plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
 mtext("b", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-pdf("~/快盘/FetalBrain/Figures/FigureS17.pdf", height = 7, width = 10)
-par(mar = c(5, 4, 4, 8), mfrow = c(1,2))
+plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
+mtext("c", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot.new()
+legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
+par(op)
+pdf("~/快盘/FetalBrain/Figures/FigureS17.pdf", height = 8, width = 8)
+par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
 plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
 mtext("a", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
 plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
 mtext("b", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
+mtext("c", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot.new()
+legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
+dev.off()
+```
+
+### Supplemental 18: miRNA 
+
+```{r miR, fig.height = 15, fig.width = 15}
+miR_summary_figure <- miR_summary_figure + ylab("No. of miRs") + 
+  theme(axis.text.x = element_text(angle = 90))
+miR_DE_MZ_heatmap <- ggplot(melt(t(scale(t(miR_DE_MZ_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_MZ_heat))), Sample = factor(X2, levels = colnames(miR_DE_MZ_heat))), aes(x=Sample, y=miR, fill=value)) + 
+   geom_tile() + 
+   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   ggtitle("MZ twins") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 6), axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
+miR_DE_neurospheres_heatmap <- ggplot(melt(t(scale(t(miR_DE_neurospheres_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_neurospheres_heat))), Sample = factor(X2, levels = colnames(miR_DE_neurospheres_heat))), aes(x=Sample, y=miR, fill=value)) + 
+   geom_tile() + 
+   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   ggtitle("Neurospheres") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 6), axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
+miR_DE_GW_heatmap <- ggplot(melt(t(scale(t(miR_DE_GW_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_GW_heat))), Sample = factor(X2, levels = colnames(miR_DE_GW_heat))), aes(x=Sample, y=miR, fill=value)) + 
+   geom_tile() + 
+   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   ggtitle("GW") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 6), axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
+grid.arrange(miR_summary_figure, miR_DE_MZ_heatmap, miR_DE_neurospheres_heatmap, miR_DE_GW_heatmap, nrow = 2)
+grid.text("a", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
+grid.text("b", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
+grid.text("c", x=unit(.02, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
+grid.text("d", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
+pdf("~/快盘/FetalBrain/Figures/FigureS18.pdf", height = 15, width = 15)
+grid.arrange(miR_summary_figure, miR_DE_MZ_heatmap, miR_DE_neurospheres_heatmap, miR_DE_GW_heatmap, nrow = 2)
+grid.text("a", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
+grid.text("b", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
+grid.text("c", x=unit(.02, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
+grid.text("d", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 dev.off()
 ```
 
