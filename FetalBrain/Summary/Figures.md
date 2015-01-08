@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Wed Jan  7 17:37:17 2015
+Updated: Wed Jan  7 17:50:41 2015
 
 
 
@@ -147,7 +147,7 @@ Updated: Wed Jan  7 17:37:17 2015
 
 ### Supplemental 16: Expression of DNA methylation reulators
 
-
+![](./Figures_files/figure-html/heatmap_5mC_regulator-1.png) 
 
 ### Supplemental 17: RNA-seq and miRNA-seq clustering
 

@@ -408,13 +408,13 @@ dev.off()
 ```{r heatmap_5mC_regulator, fig.height = 7, fig.width = 8}
 regulator_5mC <- read.delim("~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", as.is = T, row.names = 1)
 regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
-regulator_5mC_heatmap <- ggplot(melt(t(scale(t(regulator_5mC), center = T, scale = T))) %>% mutate(Gene = factor(X1, levels = rev(rownames(regulator_5mC))), Sample = factor(X2, levels = colnames(regulator_5mC))), aes(x=Sample, y=Gene, fill=value)) + 
+(regulator_5mC_heatmap <- ggplot(melt(t(scale(t(regulator_5mC), center = T, scale = T))) %>% mutate(Gene = factor(X1, levels = rev(rownames(regulator_5mC))), Sample = factor(X2, levels = colnames(regulator_5mC))), aes(x=Sample, y=Gene, fill=value)) + 
    geom_tile() + 
    scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
+   theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90)))
 ggsave(regulator_5mC_heatmap, file = "~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 7, width = 8)
 ```
 
