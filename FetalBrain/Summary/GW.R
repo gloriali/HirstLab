@@ -312,7 +312,8 @@ GW_DE_summary_tall[GW_DE_summary_tall$variable == "DN", "value"] <- - GW_DE_summ
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
    geom_hline(aes(yintercept = 0)) + 
    facet_grid(. ~ GW, scales = "free_x", space = "free_x") + 
-   scale_fill_manual(values = c("red", "blue", "purple")) + 
+   scale_fill_manual(values = c("red", "blue", "purple"), name = "") + 
+   scale_y_continuous(breaks = c(-250, 0, 250, 500), labels = c(250, 0, 250, 500)) + 
    xlab("") + 
    ylab("No. of genes") + 
    theme_bw() + 

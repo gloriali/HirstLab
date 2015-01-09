@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Thu Jan  8 14:52:07 2015
+Updated: Thu Jan  8 18:25:11 2015
 
 
 
@@ -53,6 +53,31 @@ Updated: Thu Jan  8 14:52:07 2015
 
 ![](./Figures_files/figure-html/neurospheres_GREAT-1.png) 
 
+## Figure 3: Stage-specific differential expression  
+### Figure 3a: Stage-specific differential expression summary  
+
+![](./Figures_files/figure-html/GW_DE_summary-1.png) 
+
+### Figure 3b: Stage-specific differential expression trend - shared
+
+![](./Figures_files/figure-html/GW_DE_trend-1.png) 
+
+### Figure 3c: Stage-specific differential expression trend - cortex
+
+![](./Figures_files/figure-html/GW_DE_trend_cortex-1.png) 
+
+### Figure 3d: Stage-specific differential expression trend - GE
+
+![](./Figures_files/figure-html/GW_DE_trend_GE-1.png) 
+
+### Figure 3e: Stage-specific differential expression heatmap  
+
+![](./Figures_files/figure-html/GW_DE_heatmap-1.png) 
+
+```
+## pdf 
+##   2
+```
 
 ## Supplemental Figures
 ### Supplemental 1: Asymmetry in UMRs 
@@ -82,10 +107,10 @@ Updated: Thu Jan  8 14:52:07 2015
 ##   2
 ```
 
-### Supplemental 4: Differential expressed genes between MZ twins are cell type specific
+### Supplemental 4: Venn diagram of differential expressed genes between MZ and between GW 
   * No. of differential expressed genes between MZ twins in Brain (green), Neurospheres Cortex derived (red), and GE derived (blue).  
   
-![](./Figures_files/figure-html/MZ_DE-1.png) 
+![](./Figures_files/figure-html/Venn_DE-1.png) 
 
 ```
 ## pdf 
@@ -116,7 +141,12 @@ Updated: Thu Jan  8 14:52:07 2015
 
 ### Supplemental 8: Neurosphere UMR enrichemnt at chromosome ends
 
-![](./Figures_files/figure-html/neurospheres_chrEnd-1.png) 
+![](./Figures_files/figure-html/chrEnd_WGBS-1.png) 
+
+```
+## pdf 
+##   2
+```
 
 ### Supplemental 9: DAVID enrichment for neurospheres DE genes
 
@@ -171,6 +201,19 @@ Updated: Thu Jan  8 14:52:07 2015
 ## pdf 
 ##   2
 ```
+
+### Supplemental 17: GREAT for GW UMRs  
+
+![](./Figures_files/figure-html/GREAT_GW-1.png) 
+
+```
+## pdf 
+##   2
+```
+
+### Supplemental 18: TFBS asymmetry in GW UMRs
+
+![](./Figures_files/figure-html/GW_TFBS-1.png) 
 
 
 <!--
