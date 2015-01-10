@@ -204,7 +204,7 @@ ggsave(GW_DE_trend_GE_figure, file = "~/快盘/FetalBrain/Figures/Figure3d.pdf")
 ### Figure 3e: Stage-specific differential expression heatmap  
 
 ```{r GW_DE_heatmap}
-clab <- data.frame(sample = colnames(GW_DE_rpkm),
+clab <- data.frame(sample = factor(colnames(GW_DE_rpkm), levels = colnames(GW_DE_rpkm)),
                    y = 1, 
                    GW = rep(c("GW13", "GW15", "GW17", "GW17"), 2))
 clab_figure <- ggplot(clab, aes(sample, y, fill = GW)) + 
@@ -213,14 +213,15 @@ clab_figure <- ggplot(clab, aes(sample, y, fill = GW)) +
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), plot.margin=unit(c(1,3.4,-0.3,1), "cm"), legend.position = "top", panel.grid = element_line(color = "white"))
+   theme(axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), plot.margin=unit(c(1,1,-0.3,1), "cm"), legend.position = "top", panel.grid = element_line(color = "white"))
 GW_DE_heatmap <- ggplot(melt(t(scale(t(GW_DE_rpkm), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm))), Sample = factor(X2, levels = colnames(GW_DE_rpkm))), aes(x=Sample, y=miR, fill=value)) + 
    geom_tile() + 
-   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   geom_hline(yintercept=as.numeric(factor(c("ENSG00000086570", "ENSG00000164929", "ENSG00000154736", "ENSG00000182580"), levels = rev(rownames(GW_DE_rpkm))))) + 
+   scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"))
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 grid.arrange(clab_figure, GW_DE_heatmap, nrow = 2, heights = c(0.12, 0.88))
 pdf("~/快盘/FetalBrain/Figures/Figure3e.pdf", height = 12, width = 12)
 grid.arrange(clab_figure, GW_DE_heatmap, nrow = 2, heights = c(0.12, 0.88))
@@ -326,6 +327,7 @@ DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == 
 DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "DMR.UP"] <- DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "same.direction"] / DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "Total.UP"]
 DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "DMR.DN"] <- DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "same.direction"] / DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "GE_UMRs", "Total.DN"]
 DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "DMR.DN"] <- (DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "DMR.DE"] - DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "same.direction"])  / DMR_proximal_DE_neurospheres_summary[DMR_proximal_DE_neurospheres_summary$DM == "Cortex_UMRs", "Total.DN"]
+DMR_proximal_DE_neurospheres_summary$DM <- gsub("_", " ", DMR_proximal_DE_neurospheres_summary$DM)
 DMR_proximal_DE_neurospheres_summary_tall <- data.frame(Sample = rep(DMR_proximal_DE_neurospheres_summary$Sample, 2), DM = rep(DMR_proximal_DE_neurospheres_summary$DM, 2), DE = rep(c("UP", "DN"), each = nrow(DMR_proximal_DE_neurospheres_summary)), Percent = c(DMR_proximal_DE_neurospheres_summary$DMR.UP, DMR_proximal_DE_neurospheres_summary$DMR.DN))
 DMR_proximal_DE_neurospheres_figure <- ggplot(DMR_proximal_DE_neurospheres_summary_tall, aes(x = Sample, y = Percent, fill = DE)) + 
    geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
@@ -396,22 +398,71 @@ dev.off()
 
 ### Supplemental 5: DAVID enrichment for MZ DE genes
 
-```{r MZ_DE_DAVID}
+```{r DE_DAVID}
 DAVID_brain01_brain02DE <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/brain01_brain02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
 DAVID_cortex01_cortex02DE <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex01_cortex02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
 DAVID_GE01_GE02DE <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/GE01_GE02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
 Terms <- unique(c(DAVID_brain01_brain02DE[DAVID_brain01_brain02DE$FDR < 0.01, "Term"], DAVID_cortex01_cortex02DE[DAVID_cortex01_cortex02DE$FDR < 0.01, "Term"], DAVID_GE01_GE02DE[DAVID_GE01_GE02DE$FDR < 0.01, "Term"]))
 DAVID_MZ <- rbind(filter(DAVID_brain01_brain02DE, Term %in% Terms) %>% mutate(Cell = "Brain"), filter(DAVID_cortex01_cortex02DE, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(DAVID_GE01_GE02DE, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
 DAVID_MZ$Term <- factor(DAVID_MZ$Term, levels = rev(unique(DAVID_MZ[order(DAVID_MZ$FDR, decreasing = T), "Term"])))
-(DAVID_MZ_figure <- ggplot(DAVID_MZ, aes(x = Term, y = FDR, fill = Cell)) + 
+DAVID_MZ_figure <- ggplot(DAVID_MZ, aes(x = Term, y = FDR, fill = Cell)) + 
    geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
    coord_flip() + 
    scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
    scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
    xlab("") + 
    ylab("-log10(FDR)") + 
-   theme_bw())
-ggsave(DAVID_MZ_figure, file = "~/快盘/FetalBrain/Figures/FigureS5.pdf", height = 12, width = 12)
+   ggtitle("MZ twins") + 
+   theme_bw()
+DAVID_cortex_GE_UP <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex_GE_UP_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+DAVID_cortex_GE_DN <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex_GE_DN_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+Terms <- unique(c(DAVID_cortex_GE_UP[DAVID_cortex_GE_UP$FDR < 0.01, "Term"], DAVID_cortex_GE_DN[DAVID_cortex_GE_DN$FDR < 0.01, "Term"]))
+DAVID_neurospheres <- rbind(filter(DAVID_cortex_GE_UP, Term %in% Terms) %>% mutate(DE = "UP"), filter(DAVID_cortex_GE_DN, Term %in% Terms) %>% mutate(DE = "DN")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(DE, Term, FDR)
+DAVID_neurospheres$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_neurospheres$Term)
+DAVID_neurospheres$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_neurospheres$Term)
+DAVID_neurospheres$Term <- factor(DAVID_neurospheres$Term, levels = rev(unique(DAVID_neurospheres[order(DAVID_neurospheres$FDR, decreasing = T), "Term"])))
+DAVID_neurospheres_figure <- ggplot(DAVID_neurospheres, aes(x = Term, y = FDR, fill = DE)) + 
+   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("blue", "red"), labels = c("UP in GE", "UP in Cortex"), name = "") + 
+   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
+   xlab("") + 
+   ylab("-log10(FDR)") + 
+   ggtitle("Neurospheres") + 
+   theme_bw()
+# write.table(c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id, GW_UP_no_cortex$id, GW_no_UP_cortex$id, GW_DN_no_cortex$id, GW_no_DN_cortex$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_cortex.txt", row.names = F, col.names = F, quote = F)
+GW_DE_cortex_DAVID <- read.delim("~/快盘/FetalBrain/GW/DE/enrich/GW_DE_cortex_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+# write.table(c(GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, GW_UP_no_GE$id, GW_no_UP_GE$id, GW_DN_no_GE$id, GW_no_DN_GE$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_GE.txt", row.names = F, col.names = F, quote = F)
+GW_DE_GE_DAVID <- read.delim("~/快盘/FetalBrain/GW/DE/enrich/GW_DE_GE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+Terms <- unique(c(GW_DE_cortex_DAVID[GW_DE_cortex_DAVID$FDR < 0.01, "Term"], GW_DE_GE_DAVID[GW_DE_GE_DAVID$FDR < 0.01, "Term"]))
+DAVID_GW <- rbind(filter(GW_DE_cortex_DAVID, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(GW_DE_GE_DAVID, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
+DAVID_GW$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_GW$Term)
+DAVID_GW$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_GW$Term)
+DAVID_GW$Term <- factor(DAVID_GW$Term, levels = rev(unique(DAVID_GW[order(DAVID_GW$FDR, decreasing = T), "Term"])))
+DAVID_GW_figure <- ggplot(DAVID_GW, aes(x = Term, y = FDR, fill = Cell)) + 
+   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
+   xlab("") + 
+   ylab("-log10(FDR)") + 
+   ggtitle("GW") + 
+   theme_bw()
+grid.newpage()
+layOut(list(DAVID_MZ_figure, 1:2, 1), 
+       list(DAVID_neurospheres_figure, 1:4, 2), 
+       list(DAVID_GW_figure, 3:5, 1))
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("c", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
+pdf("~/快盘/FetalBrain/Figures/FigureS5.pdf", height = 12, width = 12)
+layOut(list(DAVID_MZ_figure, 1:2, 1), 
+       list(DAVID_neurospheres_figure, 1:4, 2), 
+       list(DAVID_GW_figure, 3:5, 1))
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("c", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
+dev.off()
 ```
 
 ### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
@@ -454,17 +505,20 @@ DMR_pos_MZ_ggplot <- DMR_pos_MZ_figure@ggplot +
   theme(axis.title.x = element_text(size = 10), axis.text.x = element_text(angle = 90, size = 8), strip.text.x = element_text(size = 8), strip.text.y = element_text(angle = 0, size = 8), plot.title = element_text(size = 10), legend.title = element_text(size = 0), legend.text = element_text(size = 8), panel.margin = unit(0.1, "lines")) + 
   ggtitle("UMRs between MZ twins") + 
   xlab("Position of UMRs on the chromosome") + 
-  scale_color_manual(values = c("red", "blue"), labels = c("HuFNSC02 UMRs", "HuFNSC01 UMRs"), name = "")
+  scale_color_manual(values = c("red", "blue"), labels = c("HuFNSC02 UMRs", "HuFNSC01 UMRs"), name = "") + 
+  guides(color = guide_legend(override.aes = list(size=5, alpha = 1)), fill = 'none')
 DMR_pos_neurospheres_ggplot <- DMR_pos_WGBS_figure@ggplot + 
   theme(axis.title.x = element_text(size = 10), axis.text.x = element_text(angle = 90, size = 8), strip.text.x = element_text(size = 8), strip.text.y = element_text(angle = 0, size = 8), plot.title = element_text(size = 10), legend.title = element_text(size = 0), legend.text = element_text(size = 8), panel.margin = unit(0.1, "lines")) + 
   ggtitle("UMRs between neurospheres") + 
   xlab("Position of UMRs on the chromosome") + 
-  scale_color_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = "")
+  scale_color_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = "") + 
+  guides(color = guide_legend(override.aes = list(size=5, alpha = 1)), fill = 'none')
 DMR_pos_GW_ggplot <- DMR_pos_GW_figure@ggplot + 
   theme(axis.title.x = element_text(size = 10), axis.text.x = element_text(angle = 90, size = 8), strip.text.x = element_text(size = 8), strip.text.y = element_text(angle = 0, size = 8), plot.title = element_text(size = 10), legend.title = element_text(size = 0), legend.text = element_text(size = 8), panel.margin = unit(0.1, "lines")) + 
   ggtitle("UMRs between GW") + 
   xlab("Position of UMRs on the chromosome") + 
-  scale_color_manual(values = c("red", "blue"), labels = c("GW13 UMRs", "GW17 UMRs"), name = "")
+  scale_color_manual(values = c("red", "blue"), labels = c("GW13 UMRs", "GW17 UMRs"), name = "") + 
+  guides(color = guide_legend(override.aes = list(size=5, alpha = 1)), fill = 'none')
 grid.newpage()
 layOut(list(DMR_pos_MZ_ggplot, 1, 1:3), 
        list(DMR_pos_neurospheres_ggplot, 2, 1:2), 
@@ -512,50 +566,52 @@ chrEnd_GW_figure <- ggplot(chrEnd_GW_figure$data %>% mutate(DM = revalue(DM, c("
    theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 pdf("~/快盘/FetalBrain/Figures/FigureS8.pdf", height = 6, width = 12)
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 dev.off()
 ```
 
-### Supplemental 9: DAVID enrichment for neurospheres DE genes
+### Supplemental 9: DAVID enrichment for isoform genes
 
-```{r neurospheres_DE_DAVID}
-DAVID_cortex_GE_UP <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex_GE_UP_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-DAVID_cortex_GE_DN <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/cortex_GE_DN_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-Terms <- unique(c(DAVID_cortex_GE_UP[DAVID_cortex_GE_UP$FDR < 0.01, "Term"], DAVID_cortex_GE_DN[DAVID_cortex_GE_DN$FDR < 0.01, "Term"]))
-DAVID_neurospheres <- rbind(filter(DAVID_cortex_GE_UP, Term %in% Terms) %>% mutate(DE = "UP"), filter(DAVID_cortex_GE_DN, Term %in% Terms) %>% mutate(DE = "DN")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(DE, Term, FDR)
-DAVID_neurospheres$Term <- factor(DAVID_neurospheres$Term, levels = rev(unique(DAVID_neurospheres[order(DAVID_neurospheres$FDR, decreasing = T), "Term"])))
-(DAVID_neurospheres_figure <- ggplot(DAVID_neurospheres, aes(x = Term, y = FDR, fill = DE)) + 
-   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
-   coord_flip() + 
-   scale_fill_manual(values = c("blue", "red"), labels = c("UP in GE", "UP in Cortex"), name = "") + 
-   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
-   xlab("") + 
-   ylab("-log10(FDR)") + 
-   theme_bw())
-ggsave(DAVID_neurospheres_figure, file = "~/快盘/FetalBrain/Figures/FigureS9.pdf", height = 12, width = 12)
-```
-
-### Supplemental 10: DAVID enrichment for neurospheres isoform genes
-
-```{r neurospheres_isoform_DAVID}
-(isoform_neurospheres_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("") + xlab(""))
-ggsave(isoform_neurospheres_DAVID, file = "~/快盘/FetalBrain/Figures/FigureS10.pdf", height = 12, width = 12)
+```{r isoform_DAVID}
+isoform_neurospheres_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("Neurospheres") + xlab("") + 
+  theme(plot.margin=unit(c(1,1.35,1,1), "cm"))
+enrich_GW_isoform_gene_dup <- enrich_GW_isoform_gene_dup + ggtitle("GW") + xlab("") + 
+  theme(plot.margin=unit(c(1,1,1,2.5), "cm"))
+grid.arrange(isoform_neurospheres_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
+pdf("~/快盘/FetalBrain/Figures/FigureS9.pdf", height = 12, width = 12)
+grid.arrange(isoform_neurospheres_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
+dev.off()
 ```
 
 ##################################################################
 
-### Supplemental 11: TFBS asymmetry in MZ UMRs
+### Supplemental 10: TFBS asymmetry in MZ UMRs
 
-```{r MZ_TFBS, fig.height = 5, fig.width = 15}
-(DMR_MZ_TF_figure <- DMR_MZ_TF_figure + xlab("Abundance near HuFNSC02 UMRs") + ylab("Abundance near HuFNSC01 UMRs")) 
-ggsave(DMR_MZ_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS11.pdf", height = 5, width = 12)
+```{r MZ_TFBS}
+DMR_MZ_TF_figure <- DMR_MZ_TF_figure + xlab("Abundance near HuFNSC02 UMRs") + ylab("Abundance near HuFNSC01 UMRs")
+DMR_GW_TF_figure <- DMR_GW_TF_figure + xlab("Abundance near GW17 UMRs") + ylab("Abundance near GW13 UMRs") + scale_color_manual(values = c("blue", "green"), labels = c("GW17 enriched", "Equal"))
+grid.newpage()
+layOut(list(DMR_MZ_TF_figure, 1, 1:4), 
+       list(DMR_GW_TF_figure, 2, 1:3))
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("~/快盘/FetalBrain/Figures/FigureS10.pdf", height = 12, width = 12)
+layOut(list(DMR_MZ_TF_figure, 1, 1:4), 
+       list(DMR_GW_TF_figure, 2, 1:3))
+grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("b", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+dev.off()
 ```
 
-### Supplemental 12: DNA methylation at exon boundaries
+### Supplemental 11: DNA methylation at exon boundaries
 
 ```{r neurospheres_epiProfile_5mC}
 gt <- ggplot_gtable(ggplot_build(WGBS_figure_HuFNSC02 + ggtitle("WGBS HuFNSC02 cortex vs GE"))) 
@@ -564,40 +620,40 @@ grid.newpage()
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-pdf("~/快盘/FetalBrain/Figures/FigureS12.pdf", height = 12, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS11.pdf", height = 12, width = 12)
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
 dev.off()
 ```
 
-### Supplemental 13: DNA methylation at exon boundaries with MeDIP
+### Supplemental 12: DNA methylation at exon boundaries with MeDIP
 
-```{r neurospheres_epiProfile_5mC_MeDIP}
+```{r neurospheres_epiProfile_5mC_MeDIP, fig.height = 6}
 MeDIP_figure_HuFNSC01 <- MeDIP_figure_HuFNSC01 + ggtitle("HuFNSC01") + theme(legend.position = "none")
 MeDIP_figure_HuFNSC02 <- MeDIP_figure_HuFNSC02 + ggtitle("HuFNSC02")
 grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
-pdf("~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 7, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS12.pdf", height = 6, width = 12)
 grid.arrange(MeDIP_figure_HuFNSC01, MeDIP_figure_HuFNSC02, nrow = 1, widths = 2:3)
 dev.off()
 ```
 
-### Supplemental 14: Expression of DNA methylation reulators
+### Supplemental 13: Expression of DNA methylation reulators
 
 ```{r heatmap_5mC_regulator}
 regulator_5mC <- read.delim("~/快盘/FetalBrain/RNAseq/regulator_5mC.rpkm", as.is = T, row.names = 1)
 regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
 (regulator_5mC_heatmap <- ggplot(melt(t(scale(t(regulator_5mC), center = T, scale = T))) %>% mutate(Gene = factor(X1, levels = rev(rownames(regulator_5mC))), Sample = factor(X2, levels = colnames(regulator_5mC))), aes(x=Sample, y=Gene, fill=value)) + 
    geom_tile() + 
-   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
    theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90)))
-ggsave(regulator_5mC_heatmap, file = "~/快盘/FetalBrain/Figures/FigureS14.pdf", height = 12, width = 12)
+ggsave(regulator_5mC_heatmap, file = "~/快盘/FetalBrain/Figures/FigureS13.pdf", height = 12, width = 12)
 ```
 
-### Supplemental 15: RNA-seq and miRNA-seq clustering
+### Supplemental 14: RNA-seq and miRNA-seq clustering
 
 ```{r cluster}
 gene_FetalBrain <- read.delim("~/快盘/FetalBrain/Tables/rpkm_pc.txt", as.is = T, row.names = 1)
@@ -622,7 +678,7 @@ mtext("c", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
 plot.new()
 legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
 par(op)
-pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 12, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS14.pdf", height = 12, width = 12)
 par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
 plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
 mtext("a", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
@@ -635,14 +691,14 @@ legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), l
 dev.off()
 ```
 
-### Supplemental 16: miRNA 
+### Supplemental 15: miRNA 
 
-```{r miR, fig.height = 12, fig.width = 12}
+```{r miR}
 miR_summary_figure <- miR_summary_figure + ylab("No. of miRs") + 
   theme(axis.text.x = element_text(angle = 90))
 miR_DE_MZ_heatmap <- ggplot(melt(t(scale(t(miR_DE_MZ_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_MZ_heat))), Sample = factor(X2, levels = colnames(miR_DE_MZ_heat))), aes(x=Sample, y=miR, fill=value)) + 
    geom_tile() + 
-   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    ggtitle("MZ twins") + 
@@ -650,7 +706,7 @@ miR_DE_MZ_heatmap <- ggplot(melt(t(scale(t(miR_DE_MZ_heat), center = T, scale = 
    theme(axis.text.y = element_text(size = 6), axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
 miR_DE_neurospheres_heatmap <- ggplot(melt(t(scale(t(miR_DE_neurospheres_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_neurospheres_heat))), Sample = factor(X2, levels = colnames(miR_DE_neurospheres_heat))), aes(x=Sample, y=miR, fill=value)) + 
    geom_tile() + 
-   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    ggtitle("Neurospheres") + 
@@ -658,7 +714,7 @@ miR_DE_neurospheres_heatmap <- ggplot(melt(t(scale(t(miR_DE_neurospheres_heat), 
    theme(axis.text.y = element_text(size = 6), axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90))
 miR_DE_GW_heatmap <- ggplot(melt(t(scale(t(miR_DE_GW_heat), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(miR_DE_GW_heat))), Sample = factor(X2, levels = colnames(miR_DE_GW_heat))), aes(x=Sample, y=miR, fill=value)) + 
    geom_tile() + 
-   scale_fill_gradient2(low="blue", high="red", name = "Z-score") + 
+   scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    ggtitle("GW") + 
@@ -669,7 +725,7 @@ grid.text("a", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("b", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("c", x=unit(.02, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 grid.text("d", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
-pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 12, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 12, width = 12)
 grid.arrange(miR_summary_figure, miR_DE_MZ_heatmap, miR_DE_neurospheres_heatmap, miR_DE_GW_heatmap, nrow = 2)
 grid.text("a", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("b", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
@@ -678,7 +734,7 @@ grid.text("d", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 dev.off()
 ```
 
-### Supplemental 17: GREAT for GW UMRs  
+### Supplemental 16: GREAT for GW UMRs  
 
 ```{r GREAT_GW}
 GREAT_GW_Cortex <- rbind(GREAT_GW_Cortex02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
@@ -717,7 +773,7 @@ layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4),
 grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("c", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("~/快盘/FetalBrain/Figures/FigureS17.pdf", height = 12, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 12, width = 12)
 layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
        list(GREAT_GW_GE_figure, 1:3, 5:9), 
        list(GREAT_GW_shared_figure, 3:4, 1:4))
@@ -725,13 +781,6 @@ grid.text("a", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize =
 grid.text("b", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("c", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
 dev.off()
-```
-
-### Supplemental 18: TFBS asymmetry in GW UMRs
-
-```{r GW_TFBS, fig.height = 5, fig.width = 15}
-(DMR_GW_TF_figure <- DMR_GW_TF_figure + xlab("Abundance near GW17 UMRs") + ylab("Abundance near GW13 UMRs") + scale_color_manual(values = c("blue", "green"), labels = c("GW17 enriched", "Equal"))) 
-ggsave(DMR_GW_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS18.pdf", height = 12, width = 12)
 ```
 
 

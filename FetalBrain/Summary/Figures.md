@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Thu Jan  8 18:25:11 2015
+Updated: Fri Jan  9 17:51:42 2015
 
 
 
@@ -119,7 +119,12 @@ Updated: Thu Jan  8 18:25:11 2015
 
 ### Supplemental 5: DAVID enrichment for MZ DE genes
 
-![](./Figures_files/figure-html/MZ_DE_DAVID-1.png) 
+![](./Figures_files/figure-html/DE_DAVID-1.png) 
+
+```
+## pdf 
+##   2
+```
 
 ### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
 
@@ -148,21 +153,27 @@ Updated: Thu Jan  8 18:25:11 2015
 ##   2
 ```
 
-### Supplemental 9: DAVID enrichment for neurospheres DE genes
+### Supplemental 9: DAVID enrichment for isoform genes
 
-![](./Figures_files/figure-html/neurospheres_DE_DAVID-1.png) 
+![](./Figures_files/figure-html/isoform_DAVID-1.png) 
 
-### Supplemental 10: DAVID enrichment for neurospheres isoform genes
-
-![](./Figures_files/figure-html/neurospheres_isoform_DAVID-1.png) 
+```
+## pdf 
+##   2
+```
 
 ##################################################################
 
-### Supplemental 11: TFBS asymmetry in MZ UMRs
+### Supplemental 10: TFBS asymmetry in MZ UMRs
 
 ![](./Figures_files/figure-html/MZ_TFBS-1.png) 
 
-### Supplemental 12: DNA methylation at exon boundaries
+```
+## pdf 
+##   2
+```
+
+### Supplemental 11: DNA methylation at exon boundaries
 
 ![](./Figures_files/figure-html/neurospheres_epiProfile_5mC-1.png) 
 
@@ -171,7 +182,7 @@ Updated: Thu Jan  8 18:25:11 2015
 ##   2
 ```
 
-### Supplemental 13: DNA methylation at exon boundaries with MeDIP
+### Supplemental 12: DNA methylation at exon boundaries with MeDIP
 
 ![](./Figures_files/figure-html/neurospheres_epiProfile_5mC_MeDIP-1.png) 
 
@@ -180,11 +191,11 @@ Updated: Thu Jan  8 18:25:11 2015
 ##   2
 ```
 
-### Supplemental 14: Expression of DNA methylation reulators
+### Supplemental 13: Expression of DNA methylation reulators
 
 ![](./Figures_files/figure-html/heatmap_5mC_regulator-1.png) 
 
-### Supplemental 15: RNA-seq and miRNA-seq clustering
+### Supplemental 14: RNA-seq and miRNA-seq clustering
 
 ![](./Figures_files/figure-html/cluster-1.png) 
 
@@ -193,7 +204,7 @@ Updated: Thu Jan  8 18:25:11 2015
 ##   2
 ```
 
-### Supplemental 16: miRNA 
+### Supplemental 15: miRNA 
 
 ![](./Figures_files/figure-html/miR-1.png) 
 
@@ -202,7 +213,7 @@ Updated: Thu Jan  8 18:25:11 2015
 ##   2
 ```
 
-### Supplemental 17: GREAT for GW UMRs  
+### Supplemental 16: GREAT for GW UMRs  
 
 ![](./Figures_files/figure-html/GREAT_GW-1.png) 
 
@@ -210,10 +221,6 @@ Updated: Thu Jan  8 18:25:11 2015
 ## pdf 
 ##   2
 ```
-
-### Supplemental 18: TFBS asymmetry in GW UMRs
-
-![](./Figures_files/figure-html/GW_TFBS-1.png) 
 
 
 <!--
