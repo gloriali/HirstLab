@@ -175,16 +175,63 @@ heatmap.2(as.matrix(GW_DE_rpkm), Rowv = F, Colv = F, labRow = F, ColSideColors =
 legend(x = 0.25, y = 1, c("GW13", "GW15", "GW17"), col = c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), lwd = 8, ncol = 3)
 ```
 
-  + Genes activated during GW13-GW15 in cortex, not GE     
-```{r DE_cortex, results='asis'}
-kable(GW_UP_no_cortex[!(GW_UP_no_cortex$id %in% c(GE01_GE03DE$ID, GE01_GE04DE$ID, GE02_GE03DE$ID, GE02_GE04DE$ID, GE03_GE04DE$ID)), c("id", "name", "description")], format = "html", row.names = F, align = "c")
-```
-
-  + Genes activated during GW15-GW17 in GE, not cortex     
-```{r DE_GE, results='asis'}
-kable(GW_no_UP_GE[!(GW_no_UP_GE$id %in% c(cortex01_cortex03DE$ID, cortex01_cortex04DE$ID, cortex02_cortex03DE$ID, cortex02_cortex04DE$ID, cortex03_cortex04DE$ID)), c("id", "name", "description")], format = "html", row.names = F, align = "c")
-```
-
+#### Genes activated during GW13-GW15 in cortex     
+  * ALX3: a transcriptional regulator involved in cell-type differentiation and development. Preferential methylation of this genes promoter is associated with advanced-stage neuroblastoma tumors.        
+  * EPHB2: mediate numerous developmental processes, particularly in the nervous system. Functions in axon guidance during development.     
+  * FAT2: This protein most likely functions as a cell adhesion molecule, controlling cell proliferation and playing an important role in cerebellum development.    
+  * FOSL1: regulators of cell proliferation, differentiation, and transformation. associated with glioblastoma multiforme.   
+  * HNF1A: sequence-specific DNA binding transcription factor activity.    
+  * LHX4: a transcription factor involved in the control of differentiation and development of the pituitary gland.     
+  * MEIS2: essential contributors to developmental programs.    
+  * POU5F1: controls the expression of a number of genes involved in embryonic development such as YES1, FGF4, UTF1 and ZFP206. Critical for early embryogenesis and for embryonic stem cell pluripotency.     
+  * CDR1: found in some patients with paraneoplastic cerebellar degeneration.         
+  * CCKAR: modulates feeding and dopamine-induced behavior in the central and peripheral nervous system.    
+  * FOXH1: Transcriptional activator.     
+  * LGI1: is rearranged as a result of translocations in glioblastoma cell lines. May play a role in the control of neuroblastoma cell survival.    
+  * LHFPL5: In the inner ear, may be a component of the hair cells mechanotransduction machinery.   
+  * NEGR1: involved in cell-adhesion. May function as a trans-neural growth-promoting factor in regenerative axon sprouting in the mammalian brain.    
+  * NRP2: may play a role in cardiovascular development, axon guidance, and tumorigenesis.    
+  * OLIG2: an essential regulator of ventral neuroectodermal progenitor cell fate.     
+  * RTN1: May be involved in neuroendocrine secretion or in membrane trafficking in neuroendocrine cells. a specific marker for neurological diseases and cancer.    
+    
+#### Genes activated during GW15-GW17 in GE       
+  * ALX3: a transcriptional regulator involved in cell-type differentiation and development. Preferential methylation of this genes promoter is associated with advanced-stage neuroblastoma tumors.        
+  * EPHB3: mediate numerous developmental processes, particularly in the nervous system. Functions in axon guidance during development.     
+  * GPR98: a G-protein coupled receptor that may have an important role in the development of the central nervous system.    
+  * GSX1: Homeobox transcription factor that plays an important role in pituitary development.    
+  * HNF1A: sequence-specific DNA binding transcription factor activity.    
+  * LHX4: a transcription factor involved in the control of differentiation and development of the pituitary gland.     
+  * LHX6: a transcription factor required for the expression of a subset of genes involved in interneurons migration and development.    
+  * NKX2-1: a Homeobox transcription factor that activates thyroid specific genes.        
+  * SATB2: a Homeobox transcription factor and regulatory determinant of corticocortical connections in the developing cerebral cortex.     
+  * SIX3: a Homeobox transcription factor that plays a role in eye development.    
+  * SLITRK1: Enhances neurite outgrowth.    
+  * SLITRK4: suppress neurite outgrowth.           
+  * SLITRK5: suppress neurite outgrowth.           
+  * CDR1: found in some patients with paraneoplastic cerebellar degeneration.         
+  * CHAT: a characteristic feature of cholinergic neurons, and changes in these neurons may explain some of the symptoms of Alzheimers disease.     
+  * DCC: Receptor for netrin required for axon guidance. Mediates axon attraction of neuronal growth cones in the developing nervous system upon ligand binding.      
+  * FOXH1: Transcriptional activator.     
+  * FOXP4: forkhead box (FOX) transcription factor.     
+  * FZD5: Interacts specifically with Wnt5A to induce the beta-catenin pathway.    
+  * INA: a member of the intermediate filament family and is involved in the morphogenesis of neurons.    
+  * IRX2: a member of the Iroquois homeobox gene family. Members of this family appear to play multiple roles during pattern formation of vertebrate embryos.     
+  * NTN1: netrin is thought to be involved in axon guidance and cell migration during development.    
+  * NXPH1: forms a very tight complex with alpha neurexins, a group of proteins that promote adhesion between dendrites and axons.     
+  * NRGN: a direct target for thyroid hormone in human brain, and that control of expression of this gene could underlay many of the consequences of hypothyroidism on mental states during development.       
+  * NRP2: may play a role in cardiovascular development, axon guidance, and tumorigenesis.    
+  * OLFM1: May play an important role in regulating the production of neural crest cells by the neural tube.      
+  * OLFM3: May play an important role in regulating the production of neural crest cells by the neural tube.      
+  * OLIG2: an essential regulator of ventral neuroectodermal progenitor cell fate.     
+  * LPPR4: is located in the membranes of outgrowing axons and has been shown to be important for axonal outgrowth during development and regenerative sprouting.    
+  * PLXNA2: semaphorin co-receptors. Semaphorins are a large family of secreted or membrane-bound proteins that mediate repulsive effects on axon pathfinding during nervous system development.     
+  * SFRP1: soluble modulators of Wnt signaling; epigenetic silencing of SFRP genes leads to deregulated activation of the Wnt-pathway which is associated with cancer.    
+  * SLIT1: During neural development involved in axonal navigation at the ventral midline of the neural tube and projection of axons to different regions.     
+  * SLIT2: SLIT1 and SLIT2 together seem to be essential for midline guidance in the forebrain by acting as repulsive signal preventing inappropriate midline crossing by axons projecting from the olfactory bulb.     
+  * STMN2: plays a regulatory role in neuronal growth and is also thought to be involved in osteogenesis. Reductions in the expression of this gene have been associated with Downs syndrome and Alzheimers disease.     
+  * VAX1: homeobox transcription factors that may play an important role in the development of anterior ventral forebrain and visual system.     
+  * WNT7A: have been implicated in oncogenesis and in several developmental processes, including regulation of cell fate and patterning during embryogenesis.    
+  * WNT5A: Stimulates cell migration. Decreases proliferation, migration, invasiveness and clonogenicity of carcinoma cells and may act as a tumor suppressor. Mediates motility of melanoma cells. Required during embryogenesis for extension of the primary anterior-posterior axis and for outgrowth of limbs and the genital tubercle.     
 
 #### Stage-specific DE gene shared by Crotex and GE
 1. GW13-15:UP, GW15-17:UP;    
