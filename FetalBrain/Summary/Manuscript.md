@@ -3,7 +3,7 @@ Epigenetic and transcriptional profiling of fetal brain of human monozygotic twi
 
 ## Key points 
 
-* Epigenetic and transcriptional differences between MZ twins are on the same scale as differences between cell types, and are asymmetric between the twins.    
+* Epigenetic differences between MZ twins are on the same scale as differences between cell types, and are asymmetric between the twins.    
 * UMRs between cortex and GE neurospheres are more dynamic in GW17 than GW13, and lead to differential expression of key factors in brain development.    
 * Differences between GW are asymmetric, with more GW17-specific UMRs and up-regulated genes, and key neuron fate regulators are epigenetically activated in GW17.      
 * Transcriptional activation in neurospheres happens at different gestational stages, with major wave at GW13-GW15 in cortex, and at GW15-GW17 in GE.    
