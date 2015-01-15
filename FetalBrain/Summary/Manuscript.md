@@ -64,7 +64,7 @@ To explore the epigenetic landscape in the developing human brain we performed c
     
 ### Neurospheres cortex vs GE  
 
-* More differences in GW17 than in GW13.   
+* More epigenetic and transcriptional differences in GW17 than in GW13.   
 * UMR asymmetry between cortex and GE.   
 * Enrichment of UMRs at ends of chromosomes. 
 * GREAT analysis of UMRs showed brain development terms.    
@@ -97,8 +97,39 @@ To explore the epigenetic landscape in the developing human brain we performed c
 * Figure S5b   
 ![](./Figures_files/figure-html/DE_DAVID-1.png)     
 * Figure S9  
-![](./Figures_files/figure-html/neurospheres_isoform_DAVID-1.png)
+![](./Figures_files/figure-html/isoform_DAVID-1.png)     
      
 ### Gestational week associated  
+
+* More GW17-specific UMRs and upregulated genes than GW13.    
+* UMRs are strongly associated with neuron differentiation and brain development GREAT terms.      
+* OLIG2, a neuron fate regulator was epigenetically turned on in GW17 individuals by GW17 UMRs.    
+* TFBS overlapping with UMRs asymmetry.       
+* Enrichment of UMRs at ends of chromosomes.       
+* Transcriptiome clustering and stage-specific DE gene profiles found transcriptional activation in neurospheres happens at different gestational stages, with major wave at GW13-GW15 in cortex neurosphere, and at GW15-GW17 in GE neurosphere.      
+* DE genes are enriched in neurogenesis and cell migration, and isoforms are enriched in signaling proteins.      
+
+     To analysis the dynamic epigenetic change during early brain development, UMRs between GW13 and GW17 were identified with WGBS data in neurospheres cortex and GE. On average, there are 1692 GW17-specific UMRs, 3.76-fold over GW13-specific UMRs (Figure X). GW17 UMRs are enriched in oligodendrocyte and glio cell development, while GW13 UMRs are enriched in neuron fate commitment in cortex and regionalization in GE neurospheres (Figure SX), suggesting epigenetic changes are critical for early fetal brain development. And overlapping UMRs with transcription factor binding sites (TFBS) showed more TFBSs in GW17 UMRs than GW13 UMRs (Figure SX). On average, only 165 UMRs are proximally associated with protein-coding genes, and among them, 14% genes are also differentially expressed. Particularly, OLIG2, a neuron fate regulator, were epigenetically turned on in both cortex and GE neurospheres.    
+     
+     Unsupervised clustering of expression of protein-coding genes, exons, and highly expressed (RPM > 100) miRNAs all showed the same clustering, with mostly cell-type specific clusters except cortex neurospheres in GW13 clustering with GW13 GE, away from other cortex neurospheres (Figure SX). This suggest that transcriptomes between neuron stem cells are very similar at early development, and may diverge at different pace later on. To further classify dynamic transcriptional changes during early brain development, differential expression between GW13, GW15, and GW17 were identified (Figure X), and categorized into eight profile groups: up regulated in both GW13-GW15 and GW15-GW17, down regulated at both sages, up and then down regulated, down and then up regulated, not differentially expressed and then up regulated, not differentially expressed and then down regulated, up regulated and then not differentially expressed, down regulated and then not differentially expressed. In cortex neuropshere, the major differential expression profile group was up regulation between GW13-GW15 (Figure X), while in GE neurosphere, it was up regulation between GW15-GW17 (Figure X). This further supports transcriptional clustering that GW15 cortex clustered with GW17 cortex, however, GW15 GE are closer related to GW13 GE, suggesting waves of transcriptional activation in different neuron stem cells happen at different developmental stages.   
+
+* Figure 1e
+![](./Figures_files/figure-html/GW_scale-1.png)    
+* Figure S16
+![](./Figures_files/figure-html/GREAT_GW-1.png) 
+* Figure S10b
+![](./Figures_files/figure-html/MZ_TFBS-1.png) 
+* Figure S14
+![](./Figures_files/figure-html/cluster-1.png) 
+* Figure 3a    
+![](./Figures_files/figure-html/GW_DE_summary-1.png) 
+* Figure 3b   
+![](./Figures_files/figure-html/GW_DE_trend-1.png) 
+* Figure 3c      
+![](./Figures_files/figure-html/GW_DE_trend_cortex-1.png)
+* Figure 3d    
+![](./Figures_files/figure-html/GW_DE_trend_GE-1.png)
+* Figure 3e 
+![](./Figures_files/figure-html/GW_DE_heatmap-1.png) 
 
 
