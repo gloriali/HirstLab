@@ -2,12 +2,12 @@
 
 dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
 # index bam files
-cd $dirIn
-for file in *.bam
-do
-    echo "Processing" $file
-    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
-done
+#cd $dirIn
+#for file in *.bam
+#do
+#    echo "Processing" $file
+#    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
+#done
 
 # FindER for H3K4me1
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
@@ -20,7 +20,7 @@ for bam in *.H3K4me1.*.bam
 do
     for minER in 250 500 1000
     do
-        echo "Processing" $bam
+        echo "Processing FindER on" $bam $minER
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
@@ -31,7 +31,7 @@ cd $dirOut
 names=$(ll | grep "_1000" | awk '{print $9}' | cut -f1-2 -d".")
 for name in ${names[*]}
 do
-    echo "Processing" $name;
+    echo "Integrating" $name;
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
@@ -49,7 +49,7 @@ for bam in *.H3K4me3.*.bam
 do
     for minER in 200 300 
     do
-        echo "Processing" $bam
+        echo "Processing FindER on" $bam $minER
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
@@ -65,7 +65,7 @@ for bam in *.H3K9me3.*.bam
 do
     for minER in 250 500 1000
     do
-        echo "Processing" $bam
+        echo "Processing FindER on" $bam $minER
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
@@ -76,7 +76,7 @@ cd $dirOut
 names=$(ll | grep "_1000" | awk '{print $9}' | cut -f1-2 -d".")
 for name in ${names[*]}
 do
-    echo "Processing" $name;
+    echo "Integrating" $name;
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
@@ -94,7 +94,7 @@ for bam in *.H3K27me3.*.bam
 do
     for minER in 250 500 1000
     do
-        echo "Processing" $bam
+        echo "Processing FindER on" $bam $minER
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
@@ -105,7 +105,7 @@ cd $dirOut
 names=$(ll | grep "_1000" | awk '{print $9}' | cut -f1-2 -d".")
 for name in ${names[*]}
 do
-    echo "Processing" $name;
+    echo "Integrating" $name;
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
@@ -123,7 +123,7 @@ for bam in *.H3K36me3.*.bam
 do
     for minER in 250 500 1000
     do
-        echo "Processing" $bam
+        echo "Processing FindER on" $bam $minER
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
@@ -134,7 +134,7 @@ cd $dirOut
 names=$(ll | grep "_1000" | awk '{print $9}' | cut -f1-2 -d".")
 for name in ${names[*]}
 do
-    echo "Processing" $name;
+    echo "Integrating" $name;
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
@@ -149,7 +149,7 @@ mkdir -p $dirOut
 cd $dirIn
 for bam in *.Input.*.bam
 do
-    echo "Processing" $bam
+    echo "Processing FindER on" $bam
     /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/FindER2.jar -i $bam -r $reg -o $dirOut -v -m $map -bin 10 -info -cs > $dirOut/FindER_scan.$bam.log
 done
 
