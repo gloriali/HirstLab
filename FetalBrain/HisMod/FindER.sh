@@ -29,6 +29,7 @@ done
 dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
 mkdir -p $dirER 
 cd $dirOut
+> $dirER/H3K4me1.combine.summary
 for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
@@ -36,6 +37,11 @@ do
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
+    N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
+    N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
+    N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
+    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K4me1.combine.summary
 done
 rm -rf x y
 
@@ -55,6 +61,20 @@ do
         /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/bin/Solexa_Java/FindER.jar -i $bam -r $reg -o $dirOut -v -m $map -minER $minER -info -cs > $dirOut/FindER_scan.$bam.log
     done
 done
+### summary
+dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me3/
+mkdir -p $dirER 
+cd $dirOut
+> $dirER/H3K4me3.combine.summary
+for file in *.bam.log
+do
+    name=$(echo $file | sed -e 's/.bam.log//g')
+    cp $name.minER_200.FDR_0.05.bed $dirER
+    N200=`wc -l $name.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
+    N300=`wc -l $name.minER_300.FDR_0.05.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N200\t$N300" >> $dirER/H3K4me3.combine.summary
+done
+
 
 # FindER for H3K9me3
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
@@ -76,6 +96,7 @@ done
 dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K9me3/
 mkdir -p $dirER 
 cd $dirOut
+> $dirER/H3K9me3.combine.summary
 for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
@@ -83,6 +104,11 @@ do
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
+    N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
+    N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
+    N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
+    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K9me3.combine.summary
 done
 rm -rf x y
 
@@ -106,6 +132,7 @@ done
 dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K27me3/
 mkdir -p $dirER 
 cd $dirOut
+> $dirER/H3K27me3.combine.summary
 for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
@@ -113,6 +140,11 @@ do
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
+    N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
+    N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
+    N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
+    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K27me3.combine.summary
 done
 rm -rf x y
 
@@ -136,6 +168,7 @@ done
 dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K36me3/
 mkdir -p $dirER 
 cd $dirOut
+> $dirER/H3K36me3.combine.summary
 for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
@@ -143,6 +176,11 @@ do
     less $name.minER_250.FDR_0.05.bed | awk '{print $0"\tL"}' > x
     cat x $name.minER_500.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | sort -k1,1 -k2,2n | uniq > y;
     cat y $name.minER_1000.FDR_0.05.bed | sort -k1,1 -k2,2n -k4,4 | awk '{if($4!="L") {if(chrt==$1 && st<=$3 && et>=$2){print $1"\t"$2"\t"$3"\tL"} else {chr=$1; s=$2; e=$3}} else {if($1==chr && $2<=e && $3>=s){print chr"\t"s"\t"e"\tL"}; chrt=$1; st=$2; et=$3;}}' | cut -f1-3 | sort -k1,1 -k2,2n | uniq > $dirER/$name.multi.bed;
+    N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
+    N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
+    N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
+    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K36me3.combine.summary
 done
 rm -rf x y
 
@@ -157,5 +195,17 @@ for bam in *.Input.*.bam
 do
     echo "Processing FindER on" $bam
     /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx10G /home/mbilenky/bin/Solexa_Java/FindER.jar -i $bam -r $reg -o $dirOut -v -m $map -bin 10 -info -cs > $dirOut/FindER_scan.$bam.log
+done
+### summary
+dirER=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/Input/
+mkdir -p $dirER 
+cd $dirOut
+> $dirER/Input.combine.summary
+for file in *.bam.log
+do
+    name=$(echo $file | sed -e 's/.bam.log//g')
+    cp $name.bin_10.minER_200.FDR_0.05.bed $dirER
+    N=`wc -l $name.bin_10.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
+    echo -e "$name\t$N" >> $dirER/Input.combine.summary
 done
 
