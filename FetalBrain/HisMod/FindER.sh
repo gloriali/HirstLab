@@ -9,6 +9,7 @@ do
     /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
 done
 
+> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
 # FindER for H3K4me1
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
@@ -40,8 +41,10 @@ do
     N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
     N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
     N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
-    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
-    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K4me1.combine.summary
+    Npeak=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    Nbase=`less $dirER/$name.multi.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K4me1\t$Npeak\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Npeak" >> $dirER/H3K4me1.combine.summary
 done
 rm -rf x y
 
@@ -72,6 +75,8 @@ do
     cp $name.minER_200.FDR_0.05.bed $dirER
     N200=`wc -l $name.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
     N300=`wc -l $name.minER_300.FDR_0.05.bed | cut -d' ' -f 1`
+    Nbase=`less $name.minER_200.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K4me3\t$N200\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
     echo -e "$name\t$N200\t$N300" >> $dirER/H3K4me3.combine.summary
 done
 
@@ -107,8 +112,10 @@ do
     N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
     N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
     N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
-    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
-    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K9me3.combine.summary
+    Npeak=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    Nbase=`less $dirER/$name.multi.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K9me3\t$Npeak\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Npeak" >> $dirER/H3K9me3.combine.summary
 done
 rm -rf x y
 
@@ -143,8 +150,10 @@ do
     N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
     N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
     N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
-    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
-    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K27me3.combine.summary
+    Npeak=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    Nbase=`less $dirER/$name.multi.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K27me3\t$Npeak\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Npeak" >> $dirER/H3K27me3.combine.summary
 done
 rm -rf x y
 
@@ -179,8 +188,10 @@ do
     N250=`wc -l $name.minER_250.FDR_0.05.bed | cut -d' ' -f 1`
     N500=`wc -l $name.minER_500.FDR_0.05.bed | cut -d' ' -f 1`
     N1000=`wc -l $name.minER_1000.FDR_0.05.bed | cut -d' ' -f 1`
-    Ncombine=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
-    echo -e "$name\t$N250\t$N500\t$N1000\t$Ncombine" >> $dirER/H3K36me3.combine.summary
+    Npeak=`wc -l $dirER/$name.multi.bed | cut -d' ' -f 1`
+    Nbase=`less $dirER/$name.multi.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K36me3\t$Npeak\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    echo -e "$name\t$N250\t$N500\t$N1000\t$Npeak" >> $dirER/H3K36me3.combine.summary
 done
 rm -rf x y
 
@@ -205,7 +216,22 @@ for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
     cp $name.bin_10.minER_200.FDR_0.05.bed $dirER
-    N=`wc -l $name.bin_10.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
-    echo -e "$name\t$N" >> $dirER/Input.combine.summary
+    Npeak=`wc -l $name.bin_10.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
+    Nbase=`less $name.bin_10.minER_200.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tInput\t$Npeak\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    echo -e "$name\t$Npeak" >> $dirER/Input.combine.summary
 done
 
+# closest genes for enhancers (K4me1): exclude overlapping genes or not? 
+dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
+cd $dirOut
+for file in *.multi.bed
+do
+    name=$(echo $file | sed -e 's/.multi.bed//g')
+    name=$(echo $name | sed -e 's/FindER_scan.//g')
+    echo "Processing" $name
+    # including overlapping genes
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/$name.closest.gene.pc
+    # excluding: nearest non-overlapping genes
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d -io | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/$name.closest.gene.pc.io
+done 
