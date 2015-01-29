@@ -8,3 +8,5 @@ Pipeline shell scripts
 * [bamstats2report.sh](./bamstats2report.sh): shell script to generate QC summary report from bamstats file.
 * [bamstats2report_all.sh](./bamstats2report_all.sh): shell script to generate QC summary report for multiple libraries.
 * [bamstats2report.combine.sh](./bamstats2report.combine.sh): shell script to combine multiple QC summary report into a single table.
+* [RunB2W.sh](./RunB2W.sh): shell script to generate wig from bam. Run on apollo.
+* [RunW2BW.sh](./RunW2BW.sh): shell script to generate BigWig from wig. Run on apollo.
