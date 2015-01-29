@@ -1,92 +1,51 @@
-Fetal Brain - Histone Modification
-========================================================
-Gloria Li          
-`r date()`
+---
+title: "Fetal Brain - Histone modifications"
+author: "Gloria Li"
+date: "January 27, 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+Update `r date()`
 
 ```{r include = FALSE}
-opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
-```
-
-## FindER results on histone modification libraries
-### Sanity check: No. of peaks, No. of enriched bases, and average peak length identified by FindER in each library   
-
-All summary statistics seem fine except No. of peaks found in input libraries for cortex-HuFNSC01 and GE-HuFNSC01 are much higher than expected. Also, all whole brain tissue libraries, esp. HuFNSC01, have low No. of peaks. May benefit from the new version of FindER.              
-
-```{r stat, results='asis', fig.width=10}
-setwd("~/快盘/FetalBrain/HistoneMods/")
-finder <- read.delim("FindER_peakCheck.txt", head = T)
-library(xtable)
-finder_table <- xtable(finder[, 3:9])
-align(finder_table) <- "rrrrcccc"
-print(finder_table, type = "html", include.rownames = F)
 library(ggplot2)
-finder$sample <- interaction(finder$Donor,finder$Tissue)
-(Npeak <- ggplot(finder, aes(x = sample, y = Npeak, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
-  theme_bw() + 
-  ggtitle("No. of peaks for all histone modification libraries"))
-ggsave(Npeak, file = "FindER_Npeak.pdf")
-(Nbase <- ggplot(finder, aes(x = sample, y = Nbase, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
-  theme_bw() + 
-  ggtitle("No. of total enriched bases for all histone modification libraries"))
-ggsave(Nbase, file = "FindER_Nbase.pdf")
-(peakLength <- ggplot(finder, aes(x = sample, y = peakLength, group = factor(Mark))) +
-  geom_line(aes(color = factor(Mark)), lwd = 1.5) +
-  theme_bw() + 
-  ggtitle("Average peak length for all histone modification libraries"))
-ggsave(peakLength, file = "FindER_peakLength.pdf")
+library(stringr)
+library(dplyr)
+library(reshape2)
+library(knitr)
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+load("~/快盘/FetalBrain/HisMods/ER/FetalBrain_FindER.Rdata")
 ```
 
-### Sample clustering on histone modification signals  
+## Sanity check   
 
-* Primary tissue samples (whole brain) and primary cell culture samples (cortex and GE) always form different clusters.    
-* Clustring on input libraries do not have obvious patterns, and present the greatest dissimilarity among all marks.          
-* Clutering within primary cell culture samples are quite different in different marks.     
-* Clustering in protein-coding genes and non-coding genes are generally similar, except in H3K36me3.       
+* No. of peaks, No. of enriched bases, and average peak length seem reasonable except for the unusual high No. of peaks in GE HuFNSC04 input library.              
 
-```{r cluster}
-load("~/快盘/FetalBrain/HistoneMods/HisMod_cluster/cor.Rdata")
+```{r summary, fig.height = 10, fig.width=10}
+(FindER_summary_figure)
+```
 
-# H3K4me1
-dist_H3K4me1_TSS2000_pc <- as.dist(1 - cor_H3K4me1_TSS2000_pc)
-hc_H3K4me1_TSS2000_pc <- as.dendrogram(hclust(dist_H3K4me1_TSS2000_pc, method="complete"))
-plot(hc_H3K4me1_TSS2000_pc, main="H3K4me1 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
-dist_H3K4me1_TSS2000_nc <- as.dist(1 - cor_H3K4me1_TSS2000_nc)
-hc_H3K4me1_TSS2000_nc <- as.dendrogram(hclust(dist_H3K4me1_TSS2000_nc, method="complete"))
-plot(hc_H3K4me1_TSS2000_nc, main="H3K4me1 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+## Correlation with protein-coding gene RPKM 
 
-# H3K4me3
-dist_H3K4me3_TSS2000_pc <- as.dist(1 - cor_H3K4me3_TSS2000_pc)
-hc_H3K4me3_TSS2000_pc <- as.dendrogram(hclust(dist_H3K4me3_TSS2000_pc, method="complete"))
-plot(hc_H3K4me3_TSS2000_pc, main="H3K4me3 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
-dist_H3K4me3_TSS2000_nc <- as.dist(1 - cor_H3K4me3_TSS2000_nc)
-hc_H3K4me3_TSS2000_nc <- as.dendrogram(hclust(dist_H3K4me3_TSS2000_nc, method="complete"))
-plot(hc_H3K4me3_TSS2000_nc, main="H3K4me3 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+* Overlapping H3K4me3 and H3K27me3 with protein-coding gene promoters (TSS +/- 1500bp), and overlapping H3K36me3 with genebody.    
+* Overall correlations are as expected, with H3K4m3 and H3K36me3 marked genes showing higher RPKM, and H3K27me3 and bivalent promoter marked showing lower RPKM.   
+* H3K4me3 unmarked genes in GE HuFNSC04 shows significantly higher RPKM than any other samples, and No. of genes marked by H3K4me3 are much lower than other samples. Biology or bad quality library?    
 
-# H3K27me3
-dist_H3K27me3_TSS2000_pc <- as.dist(1 - cor_H3K27me3_TSS2000_pc)
-hc_H3K27me3_TSS2000_pc <- as.dendrogram(hclust(dist_H3K27me3_TSS2000_pc, method="complete"))
-plot(hc_H3K27me3_TSS2000_pc, main="H3K27me3 TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
-dist_H3K27me3_TSS2000_nc <- as.dist(1 - cor_H3K27me3_TSS2000_nc)
-hc_H3K27me3_TSS2000_nc <- as.dendrogram(hclust(dist_H3K27me3_TSS2000_nc, method="complete"))
-plot(hc_H3K27me3_TSS2000_nc, main="H3K27me3 TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+```{r RPKM, fig.height = 6, fig.width = 10}
+(HisMod_RPKM_figure + ylab("RPKM"))
+```
 
-# H3K36me3
-dist_H3K36me3_genebody_pc <- as.dist(1 - cor_H3K36me3_genebody_pc)
-hc_H3K36me3_genebody_pc <- as.dendrogram(hclust(dist_H3K36me3_genebody_pc, method="complete"))
-plot(hc_H3K36me3_genebody_pc, main="H3K36me3 genebody clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
-dist_H3K36me3_genebody_nc <- as.dist(1 - cor_H3K36me3_genebody_nc)
-hc_H3K36me3_genebody_nc <- as.dendrogram(hclust(dist_H3K36me3_genebody_nc, method="complete"))
-plot(hc_H3K36me3_genebody_nc, main="H3K36me3 genebody clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+## Overlapping enhancers with WGBS UMRs
 
-# input
-dist_input_TSS2000_pc <- as.dist(1 - cor_input_TSS2000_pc)
-hc_input_TSS2000_pc <- as.dendrogram(hclust(dist_input_TSS2000_pc, method="complete"))
-plot(hc_input_TSS2000_pc, main="input TSS_2000 clustering on pc genes", horiz=TRUE, xlim = c(0.5, 0))
-dist_input_TSS2000_nc <- as.dist(1 - cor_input_TSS2000_nc)
-hc_input_TSS2000_nc <- as.dendrogram(hclust(dist_input_TSS2000_nc, method="complete"))
-plot(hc_input_TSS2000_nc, main="input TSS_2000 clustering on nc genes", horiz=TRUE, xlim = c(0.5, 0))
+* UMRs between neurospheres (cortex vs GE) are enriched in enhancers (H3K4me1 enriched regions).      
+* Between gestational weeks, GW13 UMRs are enriched in enhancers, but GW17 UMRs are not.      
+
+```{r UMR, results = 'asis', fig.height = 6, fig.width = 8}
+kable(UMR_enhancer, format = "html", row.names = F, align = "r", digits = 2)
+(UMR_enhancer_summary_figure)
 ```
 
 
