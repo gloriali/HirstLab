@@ -1,6 +1,6 @@
 dir=/home/lli/FetalBrain/HisMod/
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
-# average fragment length (fl)
+# average fragment length (fl): Avg_DNA_bp_size in LIMS minus 126 (adapter)  
 
 bam=A03269.bam; fl=$(echo 184 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
@@ -104,24 +104,24 @@ bam=A03497.bam; fl=$(echo 233 | awk '{print $1}'); name=$(echo $bam | sed -e 's/
 bam=A03499.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19303.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19303.bam; fl=$(echo 194 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19304.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19304.bam; fl=$(echo 190 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19305.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19305.bam; fl=$(echo 192 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19306.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19306.bam; fl=$(echo 209 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19307.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19307.bam; fl=$(echo 164 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19308.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19308.bam; fl=$(echo 201 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
-bam=A19309.bam; fl=$(echo 130 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
+bam=A19309.bam; fl=$(echo 165 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
