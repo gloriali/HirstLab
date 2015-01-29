@@ -125,3 +125,13 @@ bam=A19308.bam; fl=$(echo 201 | awk '{print $1}'); name=$(echo $bam | sed -e 's/
 bam=A19309.bam; fl=$(echo 165 | awk '{print $1}'); name=$(echo $bam | sed -e 's/.bam//g');
 /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $dir/$bam $dir/wigs -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 
+# wig to bigwig
+cd $dir/wigs/
+chrsize="/home/lli/hg19/hg19.chrom.sizes"
+dirOut="/gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/hg19/"
+for file in *.wig.gz
+do
+    name=$(echo $file | sed -e 's/.wig.gz//g')
+    echo "Processing" $name
+    ./home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $file $chrsize $dirOut/$name.bw
+done
