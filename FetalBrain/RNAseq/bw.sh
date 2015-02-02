@@ -11,7 +11,7 @@ do
     do
         name=$(echo $file | sed -e 's/.wig.gz//g')
         echo "Processing" $name
-        ./home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $file $chrsize $dirOut/$name.bw
+        /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $file $chrsize $dirOut/$name.bw
     done
 done
 
