@@ -72,14 +72,13 @@ cd $dirOut
 for file in *.bam.log
 do
     name=$(echo $file | sed -e 's/.bam.log//g')
-    cp $name.minER_200.FDR_0.05.bed $dirER
+    cp $name.minER_300.FDR_0.05.bed $dirER
     N200=`wc -l $name.minER_200.FDR_0.05.bed | cut -d' ' -f 1`
     N300=`wc -l $name.minER_300.FDR_0.05.bed | cut -d' ' -f 1`
-    Nbase=`less $name.minER_200.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}'`
-    echo -e "$name\tH3K4me3\t$N200\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
+    Nbase=`less $name.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}'`
+    echo -e "$name\tH3K4me3\t$N300\t$Nbase" >> /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
     echo -e "$name\t$N200\t$N300" >> $dirER/H3K4me3.combine.summary
 done
-
 
 # FindER for H3K9me3
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
@@ -226,9 +225,9 @@ done
 ## H3K4me3 with promoter
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me3/
 cd $dirOut
-for file in *.minER_200.FDR_0.05.bed
+for file in *.minER_300.FDR_0.05.bed
 do
-    name=$(echo $file | sed -e 's/.minER_200.FDR_0.05.bed//g')
+    name=$(echo $file | sed -e 's/.minER_300.FDR_0.05.bed//g')
     name=$(echo $name | sed -e 's/FindER_scan.//g')
     echo "Processing" $name
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $file -b /home/lli/hg19/hg19v65_genes_TSS_1500.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7}' > $dirOut/$name.promoter.bed
