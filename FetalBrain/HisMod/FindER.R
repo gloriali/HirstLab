@@ -97,8 +97,9 @@ HisMod_RPKM[HisMod_RPKM$Sample == "GE04" & HisMod_RPKM$id %in% H3K36me3_genebody
 HisMod_RPKM[HisMod_RPKM$Sample == "GE04" & HisMod_RPKM$id %in% H3K4me3_promoter_GE04$gene, "K4_K27"] <- "H3K4me3"
 HisMod_RPKM[HisMod_RPKM$Sample == "GE04" & HisMod_RPKM$id %in% H3K27me3_promoter_GE04$gene, "K4_K27"] <- "H3K27me3"
 HisMod_RPKM[HisMod_RPKM$Sample == "GE04" & HisMod_RPKM$id %in% H3K4me3_promoter_GE04$gene & HisMod_RPKM$id %in% H3K27me3_promoter_GE04$gene, "K4_K27"] <- "bivalent"
-HisMod_RPKM_stat <- HisMod_RPKM %>% 
-  mutate(RPKM = log10(RPKM + 1e-5), K4_K27 = factor(K4_K27, levels = c("H3K4me3", "bivalent", "H3K27me3", "neither")), K36 = factor(K36, levels = c("H3K36me3", "no_H3K36me3"))) %>%
+HisMod_RPKM[HisMod_RPKM$RPKM < 0.005, "RPKM"] <- 0.005
+HisMod_RPKM_stat <- HisMod_RPKM %>% filter(!(Sample %in% c("Cortex01", "GE01"))) %>%
+  mutate(RPKM = log10(RPKM), K4_K27 = factor(K4_K27, levels = c("H3K4me3", "bivalent", "H3K27me3", "neither")), K36 = factor(K36, levels = c("H3K36me3", "no_H3K36me3"))) %>%
   group_by(Sample, K4_K27, K36) %>% 
   summarise(count = n(), lower = quantile(RPKM, 0.25), middle = median(RPKM), upper = quantile(RPKM, 0.75), min = min(RPKM), max = max(RPKM)) %>% 
   mutate(Cell = factor(gsub("\\d+", "", Sample), levels = c("Brain", "Cortex", "GE")))
@@ -109,7 +110,7 @@ HisMod_RPKM_stat$ymax <- with(HisMod_RPKM_stat, apply(cbind(max, upper + 1.5*(up
    geom_hline(yintercept = 0) + 
    geom_text(aes(label = count, y = 4, color = Cell), size = 4, angle = 90) + 
    facet_grid(K36 ~ K4_K27, scales = "free_x", space = "free_x") + 
-   coord_cartesian(ylim = c(-5, 5)) + 
+   coord_cartesian(ylim = c(-3, 5)) + 
    scale_fill_manual(values = c("green", "red", "blue"), name = "") + 
    guides(colour=FALSE) +  
    xlab("") + 
