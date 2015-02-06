@@ -7,3 +7,4 @@ Code and summary results in Hirst Lab
 * [FetalBrain](./FetalBrain): REMC Fetal Brain data analysis
 * [Breast](./Breast): REMC Breast data analysis
 
+Directory on xhost: /home/lli/HirstLab/    
