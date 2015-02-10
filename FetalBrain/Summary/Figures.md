@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Sun Feb  8 18:23:18 2015
+Updated: Mon Feb  9 15:03:11 2015
 
 
 
@@ -95,7 +95,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ![](./Figures_files/figure-html/GW_DE_trend_GE-1.png) 
 
-### Figure 4e: Stage-specific differential expression heatmap  
+### Figure 4e,f: Stage-specific differential expression heatmap  
 
 * Heatmap for RPKM of stage-specific differential expressed genes in Figure 3c and 3d.         
 
@@ -109,7 +109,7 @@ Updated: Sun Feb  8 18:23:18 2015
 ## Supplemental Figures
 ### Supplemental 1: Asymmetry in UMRs 
 
-* UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
   
 ![](./Figures_files/figure-html/UMR_asymmetry-1.png) 
 
@@ -120,7 +120,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 2: Genomic breakdown of UMRs
 
-* Fold enrichment on log2 scale for overlapping with genomic regions in MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Fold enrichment on log2 scale for overlapping with genomic regions in MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ![](./Figures_files/figure-html/genomicBreak-1.png) 
 
@@ -131,7 +131,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 3: Fraction of DE genes with proximal UMRs
 
-* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ![](./Figures_files/figure-html/proximal_DE-1.png) 
 
@@ -142,7 +142,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 4: Venn diagram of differential expressed genes between MZ and between GW 
 
-* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (a), and between different gestational weeks (b).     
+* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (A), and between different gestational weeks (B).     
   
 ![](./Figures_files/figure-html/Venn_DE-1.png) 
 
@@ -153,7 +153,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 5: DAVID enrichment for DE genes
 
-* DAVID GO biological processes enriched for DE genes between MZ twins (a), between neurospheres cortex and GE (b), and between gestational weeks (c).    
+* DAVID GO biological processes enriched for DE genes between MZ twins (A), between neurospheres cortex and GE (B), and between gestational weeks (C).    
 
 ![](./Figures_files/figure-html/DE_DAVID-1.png) 
 
@@ -164,7 +164,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
 
-* a. For each UMR between neurospheres identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). b. UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between neurospheres cortex and GE. c. FDR for GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP neurospheres cortex UMRs (red), and GE UMRs (blue) on -log10 scale. 
+* (A). For each UMR between neurospheres identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between neurospheres cortex and GE. (C). FDR for GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP neurospheres cortex UMRs (red), and GE UMRs (blue) on -log10 scale. 
 
 ![](./Figures_files/figure-html/WGBS_valid-1.png) 
 
@@ -181,7 +181,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 8: DAVID enrichment for isoform genes   
 
-* DAVID enriched terms (FDR < 0.01) for isoforms between neurospheres (a) and gestational weeks (b).   
+* DAVID enriched terms (FDR < 0.01) for isoforms between neurospheres (A) and gestational weeks (B).   
 
 ![](./Figures_files/figure-html/isoform_DAVID-1.png) 
 
@@ -190,9 +190,9 @@ Updated: Sun Feb  8 18:23:18 2015
 ##   2
 ```
 
-### Supplemental 9: GREAT for GW UMRs  
+### Supplemental 9: GREAT enrichment for GW UMRs  
 
-* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (a), GE (b), and shared by two cell types (c). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
+* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
 
 ![](./Figures_files/figure-html/GREAT_GW-1.png) 
 
@@ -203,7 +203,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 10: Transcriptional clustering
 
-* Gene-level (a), exon-level (b), and miRNA (c) unsupervised clustering reveals breast derived cell-type relationships.        
+* Gene-level (A), exon-level (B), and miRNA (C) unsupervised clustering reveals breast derived cell-type relationships.        
 
 ![](./Figures_files/figure-html/cluster-1.png) 
 
@@ -216,7 +216,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 11: Location of UMRs across the genome 
 
-* Location of UMRs along each chromosome for MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Location of UMRs along each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ![](./Figures_files/figure-html/UMR_pos-1.png) 
 
@@ -233,7 +233,7 @@ Updated: Sun Feb  8 18:23:18 2015
 
 ### Supplemental 13: miRNA 
 
-* Unique miRNA detected (>0.1 reads per million mapped) across all samples (a). Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (a), neurospheres cortex and GE (b), and gestational weeks (c).         
+* (A). Unique miRNA detected (>0.1 reads per million mapped) across all samples. Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (B), neurospheres cortex and GE (C), and gestational weeks (D).         
 
 ![](./Figures_files/figure-html/miR-1.png) 
 
@@ -242,7 +242,13 @@ Updated: Sun Feb  8 18:23:18 2015
 ##   2
 ```
 
-### Supplemental 14: DNA methylation at exon boundaries  
+### Supplemental 14: Correlating histone modifications with transcription
+
+* Divide genes into 8 groups according to whether their genebody are marked by H3K36me3 (top panel: marked, bottom panel: not marked), and whether their promoters are marked by H3K4me3 and H3K27me3 (panels from left to right: marked by H3K4me3 only, both, H3K37me3 only, neither), and plot boxplot of gene RPKM on the log10 scale (RPKM < 0.005 are set to 0.005).   
+
+![](./Figures_files/figure-html/histone_RPKM-1.png) 
+
+### Supplemental 15: DNA methylation at exon boundaries  
 
 * Exon-intron junction mCpGs provide an inherited signature of exon expression. Average number of CpGs (black, bottom panel) and average mCpG levels (whole genome bisulfite shotgun, 20bp bins) at exon junctions +/- 200bp in cortex (solid line with round dots) and GE (dashed line with triangles). Exons are divided into four groups: 1) exons expressed in both cell types (exon RPKM > 0.1 in cortex and GE, purple); 2) cortex-specific exons (isoform exons expressed in cortex but not in GE, red); 3) GE-specific exons (isoform exons expressed in GE but not in cortex, green), and 4) exons not expressed in either cell types (all other exons, blue).           
 
@@ -253,9 +259,9 @@ Updated: Sun Feb  8 18:23:18 2015
 ##   2
 ```
 
-### Supplemental 15: Neurosphere UMR enrichemnt at chromosome ends  
+### Supplemental 16: Neurosphere UMR enrichemnt at chromosome ends  
 
-* Fraction of UMRs along normalized length of the genome in neurospheres cortex and GE UMRs (a), and gestational week UMRs (b).      
+* Fraction of UMRs along normalized length of the genome in neurospheres cortex and GE UMRs (A), and gestational week UMRs (B).      
 
 ![](./Figures_files/figure-html/chrEnd_WGBS-1.png) 
 

@@ -246,14 +246,14 @@ ggsave(GW_DE_trend_cortex_figure, file = "~/快盘/FetalBrain/Figures/Figure4c.p
 ggsave(GW_DE_trend_GE_figure, file = "~/快盘/FetalBrain/Figures/Figure4d.pdf")
 ```
 
-### Figure 4e: Stage-specific differential expression heatmap  
+### Figure 4e,f: Stage-specific differential expression heatmap  
 
 * Heatmap for RPKM of stage-specific differential expressed genes in Figure 3c and 3d.         
 
-```{r GW_DE_heatmap}
-clab <- data.frame(sample = factor(colnames(GW_DE_rpkm), levels = colnames(GW_DE_rpkm)),
+```{r GW_DE_heatmap, fig.height=20}
+clab <- data.frame(sample = factor(colnames(GW_DE_rpkm_cortex), levels = colnames(GW_DE_rpkm_cortex)),
                    y = 1, 
-                   GW = rep(c("GW13", "GW15", "GW17", "GW17"), 2))
+                   GW = c("GW13", "GW15", "GW17", "GW17"))
 clab_figure <- ggplot(clab, aes(sample, y, fill = GW)) + 
    geom_tile() + 
    scale_fill_manual(values = c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), name = "", guide = guide_legend(nrow = 1)) + 
@@ -261,24 +261,34 @@ clab_figure <- ggplot(clab, aes(sample, y, fill = GW)) +
    ylab("") + 
    theme_bw() + 
    theme(axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), plot.margin=unit(c(1,1,-0.3,1), "cm"), legend.position = "top", panel.grid = element_line(color = "white"))
-GW_DE_heatmap <- ggplot(melt(t(scale(t(GW_DE_rpkm), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm))), Sample = factor(X2, levels = colnames(GW_DE_rpkm))), aes(x=Sample, y=miR, fill=value)) + 
+GW_DE_rpkm_cortex_tall <- melt(t(scale(t(GW_DE_rpkm_cortex), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm_cortex))), Sample = factor(X2, levels = colnames(GW_DE_rpkm_cortex)))
+GW_DE_heatmap_cortex <- ggplot(GW_DE_rpkm_cortex_tall, aes(x = Sample, y = miR, fill = value)) + 
    geom_tile() + 
-   geom_hline(yintercept=as.numeric(factor(c("ENSG00000086570", "ENSG00000164929", "ENSG00000154736", "ENSG00000182580"), levels = rev(rownames(GW_DE_rpkm))))) + 
+   geom_hline(yintercept=as.numeric(factor(c("ENSG00000086570", "ENSG00000164929"), levels = rev(rownames(GW_DE_rpkm_cortex))))) + 
    scale_fill_gradient(name = "Z-score") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
    theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
-grid.arrange(clab_figure, GW_DE_heatmap, nrow = 2, heights = c(0.12, 0.88))
-pdf("~/快盘/FetalBrain/Figures/Figure4e.pdf", height = 12, width = 12)
-grid.arrange(clab_figure, GW_DE_heatmap, nrow = 2, heights = c(0.12, 0.88))
+GW_DE_rpkm_GE_tall <- melt(t(scale(t(GW_DE_rpkm_GE), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm_GE))), Sample = factor(X2, levels = colnames(GW_DE_rpkm_GE)))
+GW_DE_heatmap_GE <- ggplot(GW_DE_rpkm_GE_tall, aes(x = Sample, y = miR, fill = value)) + 
+   geom_tile() + 
+   geom_hline(yintercept=as.numeric(factor(c("ENSG00000154736", "ENSG00000182580"), levels = rev(rownames(GW_DE_rpkm_GE))))) + 
+   scale_fill_gradient(name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
+grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.085, 0.415, 0.085, 0.415))
+pdf("~/快盘/FetalBrain/Figures/Figure4e.pdf", height = 20, width = 8)
+grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.085, 0.415, 0.085, 0.415))
 dev.off()
 ```
 
 ## Supplemental Figures
 ### Supplemental 1: Asymmetry in UMRs 
 
-* UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
   
 ```{r UMR_asymmetry}
 grid.newpage()
@@ -300,7 +310,7 @@ dev.off()
 
 ### Supplemental 2: Genomic breakdown of UMRs
 
-* Fold enrichment on log2 scale for overlapping with genomic regions in MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Fold enrichment on log2 scale for overlapping with genomic regions in MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ```{r genomicBreak}
 genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "HuFNSC02 UMRs", "hypo" = "HuFNSC01 UMRs")))
@@ -352,7 +362,7 @@ dev.off()
 
 ### Supplemental 3: Fraction of DE genes with proximal UMRs
 
-* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ```{r proximal_DE}
 DMR_proximal_DE_MZ_summary <- data.frame(Sample = rownames(DMR_proximal_MZ_summary), Total.UP = rep(c(nrow(filter(brain01_brain02DE, DE == "UP")), nrow(filter(cortex01_cortex02DE, DE == "UP")), nrow(filter(GE01_GE02DE, DE == "UP"))), each = 2), Total.DN = rep(c(nrow(filter(brain01_brain02DE, DE == "DN")), nrow(filter(cortex01_cortex02DE, DE == "DN")), nrow(filter(GE01_GE02DE, DE == "DN"))), each = 2), DMR.DE = DMR_proximal_MZ_summary[, "DE.DMRs"], same.direction = DMR_proximal_MZ_summary[, "same.direction"], DMR.UP = NA, DMR.DN = NA)
@@ -429,7 +439,7 @@ dev.off()
 
 ### Supplemental 4: Venn diagram of differential expressed genes between MZ and between GW 
 
-* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (a), and between different gestational weeks (b).     
+* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (A), and between different gestational weeks (B).     
   
 ```{r Venn_DE}
 MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
@@ -452,7 +462,7 @@ dev.off()
 
 ### Supplemental 5: DAVID enrichment for DE genes
 
-* DAVID GO biological processes enriched for DE genes between MZ twins (a), between neurospheres cortex and GE (b), and between gestational weeks (c).    
+* DAVID GO biological processes enriched for DE genes between MZ twins (A), between neurospheres cortex and GE (B), and between gestational weeks (C).    
 
 ```{r DE_DAVID}
 DAVID_brain01_brain02DE <- read.delim("~/快盘/FetalBrain/RNAseq/DEfine/gene/enrich/brain01_brain02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
@@ -523,7 +533,7 @@ dev.off()
 
 ### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
 
-* a. For each UMR between neurospheres identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). b. UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between neurospheres cortex and GE. c. FDR for GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP neurospheres cortex UMRs (red), and GE UMRs (blue) on -log10 scale. 
+* (A). For each UMR between neurospheres identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between neurospheres cortex and GE. (C). FDR for GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP neurospheres cortex UMRs (red), and GE UMRs (blue) on -log10 scale. 
 
 ```{r WGBS_valid}
 GOBP_Cortex02.UMR_MeDIP <- read.delim("~/快盘/FetalBrain/MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo.tsv", head = F, as.is = T, skip = 4)
@@ -567,7 +577,7 @@ ggsave(DMR_TF_figure, file = "~/快盘/FetalBrain/Figures/FigureS7.pdf")
 
 ### Supplemental 8: DAVID enrichment for isoform genes   
 
-* DAVID enriched terms (FDR < 0.01) for isoforms between neurospheres (a) and gestational weeks (b).   
+* DAVID enriched terms (FDR < 0.01) for isoforms between neurospheres (A) and gestational weeks (B).   
 
 ```{r isoform_DAVID}
 isoform_neurospheres_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("Neurospheres") + xlab("") + 
@@ -584,9 +594,9 @@ grid.text("B", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize =
 dev.off()
 ```
 
-### Supplemental 9: GREAT for GW UMRs  
+### Supplemental 9: GREAT enrichment for GW UMRs  
 
-* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (a), GE (b), and shared by two cell types (c). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
+* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
 
 ```{r GREAT_GW}
 GREAT_GW_Cortex <- rbind(GREAT_GW_Cortex02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
@@ -637,7 +647,7 @@ dev.off()
 
 ### Supplemental 10: Transcriptional clustering
 
-* Gene-level (a), exon-level (b), and miRNA (c) unsupervised clustering reveals breast derived cell-type relationships.        
+* Gene-level (A), exon-level (B), and miRNA (C) unsupervised clustering reveals breast derived cell-type relationships.        
 
 ```{r cluster}
 gene_FetalBrain <- read.delim("~/快盘/FetalBrain/Tables/rpkm_pc.txt", as.is = T, row.names = 1)
@@ -679,7 +689,7 @@ dev.off()
 
 ### Supplemental 11: Location of UMRs across the genome 
 
-* Location of UMRs along each chromosome for MeDIP UMRs between MZ twins (a), WGBS UMRs between neurospheres cortex and GE (b), and WGBS UMRs between gestational weeks (c).     
+* Location of UMRs along each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between neurospheres cortex and GE (B), and WGBS UMRs between gestational weeks (C).     
 
 ```{r UMR_pos}
 DMR_pos_MZ_ggplot <- DMR_pos_MZ_figure@ggplot + 
@@ -736,7 +746,7 @@ ggsave(regulator_5mC_heatmap, file = "~/快盘/FetalBrain/Figures/FigureS12.pdf"
 
 ### Supplemental 13: miRNA 
 
-* Unique miRNA detected (>0.1 reads per million mapped) across all samples (a). Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (a), neurospheres cortex and GE (b), and gestational weeks (c).         
+* (A). Unique miRNA detected (>0.1 reads per million mapped) across all samples. Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (B), neurospheres cortex and GE (C), and gestational weeks (D).         
 
 ```{r miR}
 miR_summary_figure <- miR_summary_figure + ylab("No. of miRs") + 
@@ -779,7 +789,16 @@ grid.text("D", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 dev.off()
 ```
 
-### Supplemental 14: DNA methylation at exon boundaries  
+### Supplemental 14: Correlating histone modifications with transcription
+
+* Divide genes into 8 groups according to whether their genebody are marked by H3K36me3 (top panel: marked, bottom panel: not marked), and whether their promoters are marked by H3K4me3 and H3K27me3 (panels from left to right: marked by H3K4me3 only, both, H3K37me3 only, neither), and plot boxplot of gene RPKM on the log10 scale (RPKM < 0.005 are set to 0.005).   
+
+```{r histone_RPKM}
+(HisMod_RPKM_figure)
+ggsave(HisMod_RPKM_figure, file = "~/快盘/FetalBrain/Figures/FigureS14.pdf")
+```
+
+### Supplemental 15: DNA methylation at exon boundaries  
 
 * Exon-intron junction mCpGs provide an inherited signature of exon expression. Average number of CpGs (black, bottom panel) and average mCpG levels (whole genome bisulfite shotgun, 20bp bins) at exon junctions +/- 200bp in cortex (solid line with round dots) and GE (dashed line with triangles). Exons are divided into four groups: 1) exons expressed in both cell types (exon RPKM > 0.1 in cortex and GE, purple); 2) cortex-specific exons (isoform exons expressed in cortex but not in GE, red); 3) GE-specific exons (isoform exons expressed in GE but not in cortex, green), and 4) exons not expressed in either cell types (all other exons, blue).           
 
@@ -790,16 +809,16 @@ grid.newpage()
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-pdf("~/快盘/FetalBrain/Figures/FigureS14.pdf", height = 12, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 12, width = 12)
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
 dev.off()
 ```
 
-### Supplemental 15: Neurosphere UMR enrichemnt at chromosome ends  
+### Supplemental 16: Neurosphere UMR enrichemnt at chromosome ends  
 
-* Fraction of UMRs along normalized length of the genome in neurospheres cortex and GE UMRs (a), and gestational week UMRs (b).      
+* Fraction of UMRs along normalized length of the genome in neurospheres cortex and GE UMRs (A), and gestational week UMRs (B).      
 
 ```{r chrEnd_WGBS, fig.height = 6, fig.width = 12}
 chrEnd_Cortex02UMR <- read.delim("~/快盘/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed.chrom.window", head = F, as.is = T)
@@ -830,7 +849,7 @@ chrEnd_GW_figure <- ggplot(chrEnd_GW_figure$data %>% mutate(DM = revalue(DM, c("
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-pdf("~/快盘/FetalBrain/Figures/FigureS15.pdf", height = 6, width = 12)
+pdf("~/快盘/FetalBrain/Figures/FigureS16.pdf", height = 6, width = 12)
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
