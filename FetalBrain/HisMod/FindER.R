@@ -21,7 +21,7 @@ FindER_summary_tall <- melt(FindER_summary, id = c("Sample", "Mark"))
    theme(axis.text.x = element_text(angle = 90)))
 ggsave(FindER_summary_figure, file = "FindER_summary_figure.pdf", height = 10, width = 10)
 
-### correlation with expression 
+## =========== Correlation with RPKM ================
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
 colname <- c("chr", "start", "end", "id", "gene")
 gene_FetalBrain <- read.delim("/home/lli/FetalBrain/RNAseq/rpkm_pc.txt", as.is = T, row.names = 1)
@@ -118,6 +118,11 @@ HisMod_RPKM_stat$ymax <- with(HisMod_RPKM_stat, apply(cbind(max, upper + 1.5*(up
    theme_bw() + 
    theme(axis.text.x = element_text(angle = 90)))
 ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 10)
+
+### correlation with DE genes
+load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
+# brain01 vs brain02
+
 
 ## ============= enhancers: H3K4me1 =============
 ### closest genes

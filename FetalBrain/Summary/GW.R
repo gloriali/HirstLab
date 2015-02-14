@@ -398,6 +398,10 @@ ggsave(GW_DE_trend_GE_figure, file = "/projects/epigenomics/users/lli/FetalBrain
 rownames(gene_FetalBrain) <- gene_FetalBrain$Ensembl
 GW_DE_rpkm <- gene_FetalBrain[c(GW_UP_UP_cortex$id, GW_UP_UP_GE$id, GW_UP_DN_cortex$id, GW_UP_DN_GE$id, GW_DN_UP_cortex$id, GW_DN_UP_GE$id, GW_DN_DN_cortex$id, GW_DN_DN_GE$id, 
                                 GW_UP_no_cortex$id, GW_UP_no_GE$id, GW_no_UP_cortex$id, GW_no_UP_GE$id, GW_DN_no_cortex$id, GW_DN_no_GE$id, GW_no_DN_cortex$id, GW_no_DN_GE$id),c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")]
+GW_DE_rpkm_cortex <- gene_FetalBrain[c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id,  
+                                GW_UP_no_cortex$id, GW_no_UP_cortex$id, GW_DN_no_cortex$id, GW_no_DN_cortex$id),c("Cortex04", "Cortex03", "Cortex02", "Cortex01")]
+GW_DE_rpkm_GE <- gene_FetalBrain[c(GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, 
+                                GW_UP_no_GE$id, GW_no_UP_GE$id, GW_DN_no_GE$id, GW_no_DN_GE$id),c("GE04", "GE03", "GE02", "GE01")]
 clab = rep(c(rgb(250,192,144,maxColorValue = 255), rgb(247,150,70,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255), rgb(228,108,10,maxColorValue = 255)), 2)
 pdf("/projects/epigenomics/users/lli/FetalBrain/GW/DE/heat_GW_DE.pdf")
 heatmap.2(as.matrix(GW_DE_rpkm), Rowv = F, Colv = F, labRow = F, ColSideColors = clab, scale = "row", trace = "none", margins = c(11, 6), keysize = 1, density.info = "none", col = bluered(256), key.title = "", key.xlab = "")
@@ -593,7 +597,7 @@ save(GW_DMR_summary, Cortex02_Cortex04_DMR, GE02_GE04_DMR, Venn_GW_UMR_hyper, Ve
      GE01_GE03DE, GE01_GE04DE, GE02_GE03DE, GE02_GE04DE, GE03_GE04DE, GW_DE_summary, GW_DE_summary_figure, 
      GW_17_13_UP_duplicated_GE, GW_17_13_DN_duplicated_GE, GW_17_15_UP_duplicated_GE, GW_17_15_DN_duplicated_GE, 
      GW_17_13_UP_duplicated, GW_17_13_DN_duplicated, GW_17_15_UP_duplicated, GW_17_15_DN_duplicated, GW_15_13_UP_duplicated, GW_15_13_DN_duplicated, 
-     venn_GW_17_13_UP, venn_GW_17_13_DN, venn_GW_17_15_UP, venn_GW_17_15_DN, venn_GW_15_13_UP, venn_GW_15_13_DN, venn_GW_cortex, venn_GW_GE, GW_DE_rpkm, 
+     venn_GW_17_13_UP, venn_GW_17_13_DN, venn_GW_17_15_UP, venn_GW_17_15_DN, venn_GW_15_13_UP, venn_GW_15_13_DN, venn_GW_cortex, venn_GW_GE, GW_DE_rpkm, GW_DE_rpkm_cortex, GW_DE_rpkm_GE, 
      GW_UP_UP, GW_UP_DN, GW_DN_UP, GW_DN_DN, GW_UP_no, GW_DN_no, GW_no_UP, GW_no_DN, GW_DE_trend, GW_DE_trend_figure, 
      GW_UP_UP_cortex, GW_UP_DN_cortex, GW_DN_UP_cortex, GW_DN_DN_cortex, GW_UP_no_cortex, GW_DN_no_cortex, GW_no_UP_cortex, GW_no_DN_cortex, GW_DE_trend_cortex, GW_DE_trend_cortex_figure, 
      GW_UP_UP_GE, GW_UP_DN_GE, GW_DN_UP_GE, GW_DN_DN_GE, GW_UP_no_GE, GW_DN_no_GE, GW_no_UP_GE, GW_no_DN_GE, GW_DE_trend_GE, GW_DE_trend_GE_figure, 
