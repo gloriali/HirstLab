@@ -14,7 +14,6 @@ Updated: `r date()`
 ```{r setup, include = FALSE}
 library(ggplot2)
 library(plyr)
-library(dplyr)
 library(xtable)
 library(VennDiagram)
 library(gridExtra)
@@ -22,6 +21,7 @@ library(gplots)
 library(dendextend)
 library(reshape)
 library(wq)
+library(dplyr)
 load("~/快盘/FetalBrain/MeDIP/DMR_MZ.Rdata")
 load("~/快盘/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("~/快盘/FetalBrain/WGBS/WGBS.DMR.Rdata")
@@ -66,9 +66,8 @@ MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) +
    scale_y_continuous(breaks = c(-3000, -2000, -500, -100, 0, 100, 500, 2000, 3000), labels = c(3000, 2000, 500, 100, 0, 100, 500, 2000, 3000)) + 
    xlab("") + 
    ylab("") + 
-   ggtitle("MZ twins") + 
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18))
 MZ_scale_figure_gt <- ggplot_gtable(ggplot_build(MZ_scale_figure))
 grid.newpage()
 grid.draw(MZ_scale_figure_gt)
@@ -103,9 +102,8 @@ neurospheres_scale_figure <- ggplot(neurospheres_scale, aes(x = Donor, y = value
    scale_y_continuous(breaks = c(-400, -200, -50, 0, 50, 200, 400, 1000, 2000), labels = abs(c(-400, -200, -50, 0, 50, 200, 400, 1000, 2000))) + 
    xlab("") + 
    ylab("") + 
-   ggtitle("Neurospheres") + 
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18))
 neurospheres_scale_figure_gt <- ggplot_gtable(ggplot_build(neurospheres_scale_figure))
 grid.newpage()
 grid.draw(neurospheres_scale_figure_gt)
@@ -136,8 +134,9 @@ GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Term
   xlab("") + 
   ylab("-log10(FDR)") + 
   scale_fill_manual(values = c("red", "blue"), name = "") + 
-  theme_bw())
-ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "~/快盘/FetalBrain/Figures/Figure2b.pdf")
+  theme_bw() + 
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 18), legend.text = element_text(size = 18)))
+ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "~/快盘/FetalBrain/Figures/Figure2b.pdf", height = 10, width = 12)
 ```
 
 ## Figure 3: GW  
@@ -159,9 +158,8 @@ GW_scale_figure <- ggplot(GW_scale, aes(x = Cell, y = value, fill = DM_DE)) +
    scale_y_continuous(breaks = c(-200, -100, 0, 100, 250, 500, 1000, 1500, 2000), labels = abs(c(-200, -100, 0, 100, 250, 500, 1000, 1500, 2000))) + 
    xlab("") + 
    ylab("") + 
-   ggtitle("GW") + 
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18))
 GW_scale_figure_gt <- ggplot_gtable(ggplot_build(GW_scale_figure))
 grid.newpage()
 grid.draw(GW_scale_figure_gt)
@@ -191,13 +189,14 @@ UMR_enhancer_summary[UMR_enhancer_summary$compare == "Neurospheres" & UMR_enhanc
 UMR_enhancer_summary_tall <- melt(UMR_enhancer_summary %>% filter(compare == "GW"), id = c("Sample", "compare", "UMR")) %>%
   mutate(UMR = factor(UMR, levels = c("GW13/Cortex UMRs", "GW17/GE UMRs")))
 (UMR_enhancer_summary_figure <- ggplot(UMR_enhancer_summary_tall, aes(x = Sample, y = value, fill = UMR)) + 
-   geom_bar(stat = "identity", position = position_dodge()) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = .8) + 
    facet_grid(variable ~ ., scales = "free") + 
    scale_fill_manual(values = c("red", "blue"), name = "", labels = c("GW13 UMRs", "GW17 UMRs")) + 
    xlab("") + 
    ylab("") + 
-   theme_bw())
-ggsave(UMR_enhancer_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure3b.pdf")
+   theme_bw() + 
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
+ggsave(UMR_enhancer_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure3b.pdf", height = 10, width = 12)
 ```
 
 ### Figure 3c: TFBS asymmetry in GW UMRs  
@@ -205,8 +204,12 @@ ggsave(UMR_enhancer_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure3b
 * Relative abundance of transcription factor binding sites overlapping UMRs between gestational weeks.       
 
 ```{r GW_TFBS}
-(DMR_GW_TF_figure <- DMR_GW_TF_figure + xlab("Abundance near GW17 UMRs") + ylab("Abundance near GW13 UMRs") + scale_color_manual(values = c("blue", "green"), labels = c("GW17 enriched", "Equal")))
-ggsave(DMR_GW_TF_figure, file = "~/快盘/FetalBrain/Figures/Figure3c.pdf")
+(DMR_GW_TF_figure <- DMR_GW_TF_figure + 
+   xlab("Abundance near GW17 UMRs") + 
+   ylab("Abundance near GW13 UMRs") + 
+   scale_color_manual(values = c("blue", "green"), labels = c("GW17 enriched", "Equal")) + 
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
+ggsave(DMR_GW_TF_figure, file = "~/快盘/FetalBrain/Figures/Figure3c.pdf", height = 6, width = 12)
 ```
 
 ## Figure 4: Stage-specific differential expression   
@@ -215,8 +218,9 @@ ggsave(DMR_GW_TF_figure, file = "~/快盘/FetalBrain/Figures/Figure3c.pdf")
 * No. of differential expressed genes between different gestational weeks (left panel: GW17 vs GW13, middle panel: GW17 vs GW15, right panel: GW15 vs GW13) in neurospheres cortex (red), GE (blue), and shared by two cell types (purple). Bars pointing up shows up-regulation in later stages, and bars pointing down shows up-regulation in earlier stages.    
 
 ```{r GW_DE_summary}
-(GW_DE_summary_figure)
-ggsave(GW_DE_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure4a.pdf")
+(GW_DE_summary_figure + 
+   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18), legend.title = element_text(size = 0)))
+ggsave(GW_DE_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure4a.pdf", height = 10, width = 12)
 ```
 
 ### Figure 4b: Stage-specific differential expression trend - shared  
@@ -224,8 +228,10 @@ ggsave(GW_DE_summary_figure, file = "~/快盘/FetalBrain/Figures/Figure4a.pdf")
 * Patterns of expression for genes differentially expressed between gestational weeks shared by neuropsheres cortex and GE. Genes are divided into eight groups: down-regulation from both GW13 to GW15 and GW15 to GW17 (orange), down-regulation from GW13 to GW15 only (brown), down-regulation from GW13 to GW15 and up-regulated from GW15 to GW17 (yellowgreen), down-regulation from GW15 to GW17 only (green), up-regulation from GW15 to GW17 only (greenblue), up-regulation from GW13 to GW15 and down-regulated from GW15 to GW17 (blue), up-regulation from GW13 to GW15 only (purple), and up-regulation from both GW13 to GW15 and GW15 to GW17 (pink). The thickness of the line represents relative No. of genes in the category, and dashed line means no genes are in the category.                
 
 ```{r GW_DE_trend}
-(GW_DE_trend_figure <- GW_DE_trend_figure + ylab("Relative expression level"))
-ggsave(GW_DE_trend_figure, file = "~/快盘/FetalBrain/Figures/Figure4b.pdf")
+(GW_DE_trend_figure <- GW_DE_trend_figure + 
+   ylab("Relative expression level") + 
+   theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
+ggsave(GW_DE_trend_figure, file = "~/快盘/FetalBrain/Figures/Figure4b.pdf", height = 10, width = 12)
 ```
 
 ### Figure 4c: Stage-specific differential expression trend - cortex  
@@ -233,8 +239,11 @@ ggsave(GW_DE_trend_figure, file = "~/快盘/FetalBrain/Figures/Figure4b.pdf")
 * Patterns of expression for genes differentially expressed between gestational weeks shared by neuropsheres cortex. Genes are divided into the same eight groups as in Figure 3b. The thickness of the line represents relative No. of genes in the category.    
 
 ```{r GW_DE_trend_cortex}
-(GW_DE_trend_cortex_figure <- GW_DE_trend_cortex_figure + ylab("Relative expression level"))
-ggsave(GW_DE_trend_cortex_figure, file = "~/快盘/FetalBrain/Figures/Figure4c.pdf")
+(GW_DE_trend_cortex_figure <- GW_DE_trend_cortex_figure + 
+   ylab("Relative expression level") + 
+   scale_size(range = c(1, 10)) + 
+   theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
+ggsave(GW_DE_trend_cortex_figure, file = "~/快盘/FetalBrain/Figures/Figure4c.pdf", height = 10, width = 12)
 ```
 
 ### Figure 4d: Stage-specific differential expression trend - GE
@@ -242,8 +251,11 @@ ggsave(GW_DE_trend_cortex_figure, file = "~/快盘/FetalBrain/Figures/Figure4c.p
 * Patterns of expression for genes differentially expressed between gestational weeks shared by neuropsheres GE. Genes are divided into the same eight groups as in Figure 3b. The thickness of the line represents relative No. of genes in the category.    
 
 ```{r GW_DE_trend_GE}
-(GW_DE_trend_GE_figure <- GW_DE_trend_GE_figure + ylab("Relative expression level"))
-ggsave(GW_DE_trend_GE_figure, file = "~/快盘/FetalBrain/Figures/Figure4d.pdf")
+(GW_DE_trend_GE_figure <- GW_DE_trend_GE_figure + 
+   ylab("Relative expression level") + 
+   scale_size(range = c(1, 10)) + 
+   theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
+ggsave(GW_DE_trend_GE_figure, file = "~/快盘/FetalBrain/Figures/Figure4d.pdf", height = 10, width = 12)
 ```
 
 ### Figure 4e,f: Stage-specific differential expression heatmap  
@@ -260,7 +272,7 @@ clab_figure <- ggplot(clab, aes(sample, y, fill = GW)) +
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), plot.margin=unit(c(1,1,-0.3,1), "cm"), legend.position = "top", panel.grid = element_line(color = "white"))
+   theme(axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), plot.margin=unit(c(1,1,-0.3,1), "cm"), legend.position = "top", panel.grid = element_line(color = "white"), title = element_text(size = 18), legend.title = element_text(size = 18), legend.text = element_text(size = 15))
 GW_DE_rpkm_cortex_tall <- melt(t(scale(t(GW_DE_rpkm_cortex), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm_cortex))), Sample = factor(X2, levels = colnames(GW_DE_rpkm_cortex)))
 GW_DE_heatmap_cortex <- ggplot(GW_DE_rpkm_cortex_tall, aes(x = Sample, y = miR, fill = value)) + 
    geom_tile() + 
@@ -269,7 +281,7 @@ GW_DE_heatmap_cortex <- ggplot(GW_DE_rpkm_cortex_tall, aes(x = Sample, y = miR, 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom", axis.text = element_text(size = 15), legend.title = element_text(size = 18), legend.text = element_text(size = 15, angle = 90))
 GW_DE_rpkm_GE_tall <- melt(t(scale(t(GW_DE_rpkm_GE), center = T, scale = T))) %>% mutate(miR = factor(X1, levels = rev(rownames(GW_DE_rpkm_GE))), Sample = factor(X2, levels = colnames(GW_DE_rpkm_GE)))
 GW_DE_heatmap_GE <- ggplot(GW_DE_rpkm_GE_tall, aes(x = Sample, y = miR, fill = value)) + 
    geom_tile() + 
@@ -278,10 +290,10 @@ GW_DE_heatmap_GE <- ggplot(GW_DE_rpkm_GE_tall, aes(x = Sample, y = miR, fill = v
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
-grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.085, 0.415, 0.085, 0.415))
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom", axis.text = element_text(size = 15), legend.title = element_text(size = 18), legend.text = element_text(size = 15, angle = 90))
+grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.09, 0.41, 0.09, 0.41))
 pdf("~/快盘/FetalBrain/Figures/Figure4e.pdf", height = 20, width = 8)
-grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.085, 0.415, 0.085, 0.415))
+grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.09, 0.41, 0.09, 0.41))
 dev.off()
 ```
 
