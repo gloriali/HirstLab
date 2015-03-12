@@ -3,6 +3,9 @@ library(ggplot2)
 library(stringr)
 library(dplyr)
 library(reshape2)
+library(VennDiagram)
+library(gridExtra)
+source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
@@ -119,10 +122,128 @@ HisMod_RPKM_stat$ymax <- with(HisMod_RPKM_stat, apply(cbind(max, upper + 1.5*(up
    theme(axis.text.x = element_text(angle = 90)))
 ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 10)
 
-### correlation with DE genes
-load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
-# brain01 vs brain02
+## =========== Differential marked genes ================
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
+# Between MZ twins
+Brain01_Brain02_DM_K4me3 <- rbind(H3K4me3_promoter_Brain01[H3K4me3_promoter_Brain01$gene %in% setdiff(H3K4me3_promoter_Brain01$gene, H3K4me3_promoter_Brain02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
+                                  H3K4me3_promoter_Brain02[H3K4me3_promoter_Brain02$gene %in% setdiff(H3K4me3_promoter_Brain02$gene, H3K4me3_promoter_Brain01$gene), ] %>% mutate(Marked = "HuFNSC02"))
+Brain01_Brain02_DM_K27me3 <- rbind(H3K27me3_promoter_Brain01[H3K27me3_promoter_Brain01$gene %in% setdiff(H3K27me3_promoter_Brain01$gene, H3K27me3_promoter_Brain02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
+                                   H3K27me3_promoter_Brain02[H3K27me3_promoter_Brain02$gene %in% setdiff(H3K27me3_promoter_Brain02$gene, H3K27me3_promoter_Brain01$gene), ] %>% mutate(Marked = "HuFNSC02"))
+Cortex01_Cortex02_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex01[H3K27me3_promoter_Cortex01$gene %in% setdiff(H3K27me3_promoter_Cortex01$gene, H3K27me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
+                                     H3K27me3_promoter_Cortex02[H3K27me3_promoter_Cortex02$gene %in% setdiff(H3K27me3_promoter_Cortex02$gene, H3K27me3_promoter_Cortex01$gene), ] %>% mutate(Marked = "HuFNSC02"))
+GE01_GE02_DM_K27me3 <- rbind(H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
+                             H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "HuFNSC02"))
+His_DM_MZ <- rbind(Brain01_Brain02_DM_K4me3 %>% mutate(Sample = "Brain", Mark = "H3K4me3"), 
+                   Brain01_Brain02_DM_K27me3 %>% mutate(Sample = "Brain", Mark = "H3K27me3"), 
+                   Cortex01_Cortex02_DM_K27me3 %>% mutate(Sample = "Cortex", Mark = "H3K27me3"), 
+                   GE01_GE02_DM_K27me3 %>% mutate(Sample = "GE", Mark = "H3K27me3")) %>% mutate(Comparison = "MZ")
+# Between neurospheres
+Cortex01_GE01_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex01[H3K27me3_promoter_Cortex01$gene %in% setdiff(H3K27me3_promoter_Cortex01$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "Cortex"), 
+                                 H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_Cortex01$gene), ] %>% mutate(Marked = "GE"))
+Cortex02_GE02_DM_K4me3 <- rbind(H3K4me3_promoter_Cortex02[H3K4me3_promoter_Cortex02$gene %in% setdiff(H3K4me3_promoter_Cortex02$gene, H3K4me3_promoter_GE02$gene), ] %>% mutate(Marked = "Cortex"), 
+                                H3K4me3_promoter_GE02[H3K4me3_promoter_GE02$gene %in% setdiff(H3K4me3_promoter_GE02$gene, H3K4me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "GE"))
+Cortex02_GE02_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex02[H3K27me3_promoter_Cortex02$gene %in% setdiff(H3K27me3_promoter_Cortex02$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "Cortex"), 
+                                 H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "GE"))
+His_DM_neurospheres <- rbind(Cortex01_GE01_DM_K27me3 %>% mutate(Sample = "HuFNSC01", Mark = "H3K27me3"), 
+                             Cortex02_GE02_DM_K4me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K4me3"), 
+                             Cortex02_GE02_DM_K27me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K27me3")) %>% mutate(Comparison = "neurospheres")
+# Between GW
+GE01_GE04_DM_K27me3 <- rbind(H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
+                             H3K27me3_promoter_GE04[H3K27me3_promoter_GE04$gene %in% setdiff(H3K27me3_promoter_GE04$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "GW13"))
+GE02_GE04_DM_K4me3 <- rbind(H3K4me3_promoter_GE02[H3K4me3_promoter_GE02$gene %in% setdiff(H3K4me3_promoter_GE02$gene, H3K4me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
+                            H3K4me3_promoter_GE04[H3K4me3_promoter_GE04$gene %in% setdiff(H3K4me3_promoter_GE04$gene, H3K4me3_promoter_GE02$gene), ] %>% mutate(Marked = "GW13"))
+GE02_GE04_DM_K27me3 <- rbind(H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
+                             H3K27me3_promoter_GE04[H3K27me3_promoter_GE04$gene %in% setdiff(H3K27me3_promoter_GE04$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "GW13"))
+His_DM_GW <- rbind(GE01_GE04_DM_K27me3 %>% mutate(Sample = "GE01_GE04", Mark = "H3K27me3"), 
+                   GE02_GE04_DM_K4me3 %>% mutate(Sample = "GE02_GE04", Mark = "H3K4me3"), 
+                   GE02_GE04_DM_K27me3 %>% mutate(Sample = "GE02_GE04", Mark = "H3K27me3")) %>% mutate(Comparison = "GW")
+His_DM_promoter <- rbind(His_DM_MZ, His_DM_neurospheres, His_DM_GW)
+(His_DM_promoter_figure <- ggplot(His_DM, aes(x = Sample, fill = Marked)) + 
+   geom_bar(position = "dodge") + 
+   facet_grid(Mark ~ Comparison, scales = "free") + 
+   ylab("No. of genes") + 
+   theme_bw())
+ggsave(His_DM_promoter_figure, file = "His_DM_promoter_figure.pdf")
 
+## =========== Correlation with DE genes ================
+load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_MZ.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
+# Brain01 vs Brain02
+Brain01_Brain02DE_epi <- brain01_brain02DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(Brain01_Brain02DE_epi) <- Brain01_Brain02DE_epi$V1
+Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K4me3_promoter_Brain01$gene), "K4_1"] <- T
+Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K4me3_promoter_Brain02$gene), "K4_2"] <- T
+Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K27me3_promoter_Brain01$gene), "K27_1"] <- T
+Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K27me3_promoter_Brain02$gene), "K27_2"] <- T
+Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "UP" & !Brain01_Brain02DE_epi$K4_1 & Brain01_Brain02DE_epi$K4_2), "K4"] <- T
+Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "DN" & Brain01_Brain02DE_epi$K4_1 & !Brain01_Brain02DE_epi$K4_2), "K4"] <- T
+Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "UP" & Brain01_Brain02DE_epi$K27_1 & !Brain01_Brain02DE_epi$K27_2), "K27"] <- T
+Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "DN" & !Brain01_Brain02DE_epi$K27_1 & Brain01_Brain02DE_epi$K27_2), "K27"] <- T
+Brain01_Brain02DE_epi[c(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE$id, DMR_DE_Brain01_Brain02_hypo$DMR_gene_DE$id), "DMR"] <- T
+Brain01_Brain02DE_epi_list <- list(H3K4me3 = as.character(filter(Brain01_Brain02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Brain01_Brain02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Brain01_Brain02DE_epi, DMR == T)[, "V1"]))
+venn_Brain01_Brain02DE_epi <- venn.diagram(Brain01_Brain02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Brain01 vs Brain02")
+# Cortex01 vs Cortex02
+Cortex01_Cortex02DE_epi <- cortex01_cortex02DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(Cortex01_Cortex02DE_epi) <- Cortex01_Cortex02DE_epi$V1
+Cortex01_Cortex02DE_epi[intersect(cortex01_cortex02DE$V1, H3K27me3_promoter_Cortex01$gene), "K27_1"] <- T
+Cortex01_Cortex02DE_epi[intersect(cortex01_cortex02DE$V1, H3K27me3_promoter_Cortex02$gene), "K27_2"] <- T
+Cortex01_Cortex02DE_epi[(Cortex01_Cortex02DE_epi$DE == "UP" & Cortex01_Cortex02DE_epi$K27_1 & !Cortex01_Cortex02DE_epi$K27_2), "K27"] <- T
+Cortex01_Cortex02DE_epi[(Cortex01_Cortex02DE_epi$DE == "DN" & !Cortex01_Cortex02DE_epi$K27_1 & Cortex01_Cortex02DE_epi$K27_2), "K27"] <- T
+Cortex01_Cortex02DE_epi[c(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_Cortex02_hypo$DMR_gene_DE$id), "DMR"] <- T
+Cortex01_Cortex02DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_Cortex02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_Cortex02DE_epi, DMR == T)[, "V1"]))
+venn_Cortex01_Cortex02DE_epi <- venn.diagram(Cortex01_Cortex02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs Cortex02")
+# GE01 vs GE02
+GE01_GE02DE_epi <- GE01_GE02DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(GE01_GE02DE_epi) <- GE01_GE02DE_epi$V1
+GE01_GE02DE_epi[intersect(GE01_GE02DE$V1, H3K27me3_promoter_GE01$gene), "K27_1"] <- T
+GE01_GE02DE_epi[intersect(GE01_GE02DE$V1, H3K27me3_promoter_GE02$gene), "K27_2"] <- T
+GE01_GE02DE_epi[(GE01_GE02DE_epi$DE == "UP" & GE01_GE02DE_epi$K27_1 & !GE01_GE02DE_epi$K27_2), "K27"] <- T
+GE01_GE02DE_epi[(GE01_GE02DE_epi$DE == "DN" & !GE01_GE02DE_epi$K27_1 & GE01_GE02DE_epi$K27_2), "K27"] <- T
+GE01_GE02DE_epi[c(DMR_DE_GE01_GE02_hyper$DMR_gene_DE$id, DMR_DE_GE01_GE02_hypo$DMR_gene_DE$id), "DMR"] <- T
+GE01_GE02DE_epi_list <- list(H3K27me3 = as.character(filter(GE01_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(GE01_GE02DE_epi, DMR == T)[, "V1"]))
+venn_GE01_GE02DE_epi <- venn.diagram(GE01_GE02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "GE01 vs GE02")
+# Cortex01 vs GE01
+Cortex01_GE01DE_epi <- cortex01_GE01DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(Cortex01_GE01DE_epi) <- Cortex01_GE01DE_epi$V1
+Cortex01_GE01DE_epi[intersect(cortex01_GE01DE$V1, H3K27me3_promoter_Cortex01$gene), "K27_1"] <- T
+Cortex01_GE01DE_epi[intersect(cortex01_GE01DE$V1, H3K27me3_promoter_GE01$gene), "K27_2"] <- T
+Cortex01_GE01DE_epi[(Cortex01_GE01DE_epi$DE == "UP" & Cortex01_GE01DE_epi$K27_1 & !Cortex01_GE01DE_epi$K27_2), "K27"] <- T
+Cortex01_GE01DE_epi[(Cortex01_GE01DE_epi$DE == "DN" & !Cortex01_GE01DE_epi$K27_1 & Cortex01_GE01DE_epi$K27_2), "K27"] <- T
+Cortex01_GE01DE_epi[c(DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE$id), "DMR"] <- T
+Cortex01_GE01DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_GE01DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_GE01DE_epi, DMR == T)[, "V1"]))
+venn_Cortex01_GE01DE_epi <- venn.diagram(Cortex01_GE01DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs GE01")
+# Cortex02 vs GE02
+Cortex02_GE02DE_epi <- cortex02_GE02DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(Cortex02_GE02DE_epi) <- Cortex02_GE02DE_epi$V1
+Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K4me3_promoter_Cortex02$gene), "K4_1"] <- T
+Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K4me3_promoter_GE02$gene), "K4_2"] <- T
+Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K27me3_promoter_Cortex02$gene), "K27_1"] <- T
+Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K27me3_promoter_GE02$gene), "K27_2"] <- T
+Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "UP" & !Cortex02_GE02DE_epi$K4_1 & Cortex02_GE02DE_epi$K4_2), "K4"] <- T
+Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "DN" & Cortex02_GE02DE_epi$K4_1 & !Cortex02_GE02DE_epi$K4_2), "K4"] <- T
+Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "UP" & Cortex02_GE02DE_epi$K27_1 & !Cortex02_GE02DE_epi$K27_2), "K27"] <- T
+Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "DN" & !Cortex02_GE02DE_epi$K27_1 & Cortex02_GE02DE_epi$K27_2), "K27"] <- T
+Cortex02_GE02DE_epi[c(DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE$id, DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE$id), "DMR"] <- T
+Cortex02_GE02DE_epi_list <- list(H3K4me3 = as.character(filter(Cortex02_GE02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Cortex02_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex02_GE02DE_epi, DMR == T)[, "V1"]))
+venn_Cortex02_GE02DE_epi <- venn.diagram(Cortex02_GE02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Cortex02 vs GE02")
+# GE02 vs GE04
+GE02_GE04DE_epi <- GE02_GE04DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
+rownames(GE02_GE04DE_epi) <- GE02_GE04DE_epi$ID
+GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K4me3_promoter_GE02$gene), "K4_1"] <- T
+GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K4me3_promoter_GE04$gene), "K4_2"] <- T
+GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K27me3_promoter_GE02$gene), "K27_1"] <- T
+GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K27me3_promoter_GE04$gene), "K27_2"] <- T
+GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "UP" & !GE02_GE04DE_epi$K4_1 & GE02_GE04DE_epi$K4_2), "K4"] <- T
+GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "DN" & GE02_GE04DE_epi$K4_1 & !GE02_GE04DE_epi$K4_2), "K4"] <- T
+GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "UP" & GE02_GE04DE_epi$K27_1 & !GE02_GE04DE_epi$K27_2), "K27"] <- T
+GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "DN" & !GE02_GE04DE_epi$K27_1 & GE02_GE04DE_epi$K27_2), "K27"] <- T
+GE02_GE04DE_epi[c(DMR_DE_GE02_GE04_hyper$DMR_gene_DE$id, DMR_DE_GE02_GE04_hypo$DMR_gene_DE$id), "DMR"] <- T
+GE02_GE04DE_epi_list <- list(H3K4me3 = as.character(filter(GE02_GE04DE_epi, K4 == T)[, "ID"]), H3K27me3 = as.character(filter(GE02_GE04DE_epi, K27 == T)[, "ID"]), DMR = as.character(filter(GE02_GE04DE_epi, DMR == T)[, "ID"]))
+venn_GE02_GE04DE_epi <- venn.diagram(GE02_GE04DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "GE02 vs GE04")
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
+             gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
 
 ## ============= enhancers: H3K4me1 =============
 ### closest genes
@@ -159,7 +280,18 @@ UMR_enhancer_summary_tall <- melt(UMR_enhancer_summary, id = c("Sample", "compar
    ylab("") + 
    theme_bw())
 ggsave(UMR_enhancer_summary_figure, file = "UMR_enhancer_summary_figure.pdf")
+(GREAT_Cortex_UMR_enhancer_HuFNSC02 <- enrich_GREAT(file = "Cortex_UMR_enhancer_HuFNSC02", name = "Cortex_UMR_enhancer_HuFNSC02", height = 15))
+(GREAT_GE_UMR_enhancer_HuFNSC02 <- enrich_GREAT(file = "GE_UMR_enhancer_HuFNSC02", name = "GE_UMR_enhancer_HuFNSC02", height = 15))
+(GREAT_Cortex_UMR_enhancer_HuFNSC04 <- enrich_GREAT(file = "Cortex_UMR_enhancer_HuFNSC04", name = "Cortex_UMR_enhancer_HuFNSC04", height = 15))
+(GREAT_GW17_UMR_enhancer_Cortex <- enrich_GREAT(file = "GW17_UMR_enhancer_Cortex", name = "GW17_UMR_enhancer_Cortex", height = 15))
+(GREAT_GW17_UMR_enhancer_GE <- enrich_GREAT(file = "GW17_UMR_enhancer_GE", name = "GW17_UMR_enhancer_GE", height = 15))
+(GREAT_GW13_UMR_enhancer_GE <- enrich_GREAT(file = "GW13_UMR_enhancer_GE", name = "GW13_UMR_enhancer_GE", height = 15))
 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
+     GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
+     GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
+     His_DM_promoter, His_DM_promoter_figure, 
+     Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
+     venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
