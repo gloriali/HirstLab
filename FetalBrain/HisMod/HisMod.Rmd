@@ -40,11 +40,11 @@ load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rd
 
 ## Differentially marked genes
 
-* Overlapping H3K4me3 and H3K27me3 FindER peaks with protein-coding gene promoters (TSS +/- 1500bp).    
-* No. of differentially marked genes flucture a lot between samples, maybe use normalized signal level than binarized marking?    
-* Only a small fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters.      
+* Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize against total No. of reads in wig.    
+* No. of differentially marked genes flucture a lot between samples, maybe need a better way to normalize signal?    
+* A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs.      
 
-```{r DM, fig.height = 6, fig.width = 8}
+```{r DM, fig.height = 6, fig.width = 9}
 (His_DM_promoter_figure)
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
              gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)

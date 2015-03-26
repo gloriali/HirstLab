@@ -2,7 +2,7 @@
 Gloria Li  
 January 27, 2014  
 
-Update Wed Mar 11 21:13:44 2015
+Update Thu Mar 26 10:59:39 2015
 
 
 
@@ -21,9 +21,9 @@ Update Wed Mar 11 21:13:44 2015
 
 ## Differentially marked genes
 
-* Overlapping H3K4me3 and H3K27me3 FindER peaks with protein-coding gene promoters (TSS +/- 1500bp).    
-* No. of differentially marked genes flucture a lot between samples, maybe use normalized signal level than binarized marking?    
-* Only a small fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters.      
+* Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize against total No. of reads in wig.    
+* No. of differentially marked genes flucture a lot between samples, maybe need a better way to normalize signal?    
+* A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs.      
 
 ![](HisMod_files/figure-html/DM-1.png) ![](HisMod_files/figure-html/DM-2.png) 
 
