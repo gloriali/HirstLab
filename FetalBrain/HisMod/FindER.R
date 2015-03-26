@@ -5,6 +5,7 @@ library(dplyr)
 library(reshape2)
 library(VennDiagram)
 library(gridExtra)
+library(preprocessCore)
 source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
@@ -126,19 +127,26 @@ ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 
 # promoter signal file generated from ~/HirstLab/FetalBrain/HisMod/TSSsignal.sh and sinal_combine.sh
 # normalize promoter signal against the total No. of unique mapped reads in wig files, from bam2wig log files in /home/lli/FetalBrain/HisMod/wigs/
 # OR normalize against total sum of promoter signals of all genes
+# OR quantile normalization
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
 H3K4me3_TSS2000 <- read.delim("hg19v65_genes_TSS_2000.H3K4me3", head = F, as.is = T, row.names = 1)
 colnames(H3K4me3_TSS2000) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
 # Nreads_H3K4me3 <- c(Brain01 = 24536698, Brain02 = 26080706, Cortex02 = 16267106, GE02 = 17466495, GE04 = 34305005)
 # H3K4me3_TSS2000 <- as.data.frame(t(t(H3K4me3_TSS2000) * (Nreads_H3K4me3[1]/Nreads_H3K4me3)))
-colSum_H3K4me3 <- colSums(H3K4me3_TSS2000)
-H3K4me3_TSS2000 <- as.data.frame(t(t(H3K4me3_TSS2000) * (colSum_H3K4me3[1]/colSum_H3K4me3)))
+# colSum_H3K4me3 <- colSums(H3K4me3_TSS2000)
+# H3K4me3_TSS2000 <- as.data.frame(t(t(H3K4me3_TSS2000) * (colSum_H3K4me3[1]/colSum_H3K4me3)))
+rowName <- rownames(H3K4me3_TSS2000)
+H3K4me3_TSS2000 <- as.data.frame(normalize.quantiles(as.matrix(H3K4me3_TSS2000)), row.names = rowName)
+colnames(H3K4me3_TSS2000) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
 H3K27me3_TSS2000 <- read.delim("hg19v65_genes_TSS_2000.H3K27me3", head = F, as.is = T, row.names = 1)
 colnames(H3K27me3_TSS2000) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
 # Nreads_H3K27me3 <- c(Brain01 = 20882658, Brain02 = 37157778, Cortex01 = 28040379, Cortex02 = 44904699, GE01 = 76859708, GE02 = 38306253, GE04 = 35991053)
 # H3K27me3_TSS2000 <- as.data.frame(t(t(H3K27me3_TSS2000) * (Nreads_H3K27me3[1]/Nreads_H3K27me3)))
-colSum_H3K27me3 <- colSums(H3K27me3_TSS2000)
-H3K27me3_TSS2000 <- as.data.frame(t(t(H3K27me3_TSS2000) * (colSum_H3K27me3[1]/colSum_H3K27me3)))
+# colSum_H3K27me3 <- colSums(H3K27me3_TSS2000)
+# H3K27me3_TSS2000 <- as.data.frame(t(t(H3K27me3_TSS2000) * (colSum_H3K27me3[1]/colSum_H3K27me3)))
+rowName <- rownames(H3K27me3_TSS2000)
+H3K27me3_TSS2000 <- as.data.frame(normalize.quantiles(as.matrix(H3K27me3_TSS2000)), row.names = rowName)
+colnames(H3K27me3_TSS2000) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
 e <- 1e-4
 fold <- 1 # log2 fold change cutoff (2-fold difference in normailzed signal)
 cut <- 0.3 # min sum of signal of two samples, from ecdf plot
