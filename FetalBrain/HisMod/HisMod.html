@@ -76,7 +76,7 @@ img {
 </ul>
 </div>
 
-<p>Update Thu Mar 26 12:11:54 2015</p>
+<p>Update Thu Mar 26 12:22:09 2015</p>
 <div id="sanity-check" class="section level2">
 <h2>Sanity check</h2>
 <ul>
@@ -96,6 +96,7 @@ img {
 <h2>Differentially marked genes</h2>
 <ul>
 <li>Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize using quantile normalization.<br /></li>
+<li>Differential methylated promoters: promoter signal fold change &gt; 2 fold, and sum of signal of two samples &gt; 0.3 (determined from ecdf).<br /></li>
 <li>As expected, much less flucturation of No. of differentially marked genes between samples.<br /></li>
 <li>A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs. <em>Results are similar to normalize against total No. of reads although slightly smaller No. of DE genes</em></li>
 </ul>

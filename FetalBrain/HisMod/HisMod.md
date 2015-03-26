@@ -2,7 +2,7 @@
 Gloria Li  
 January 27, 2014  
 
-Update Thu Mar 26 12:11:54 2015
+Update Thu Mar 26 12:22:09 2015
 
 
 
@@ -22,6 +22,7 @@ Update Thu Mar 26 12:11:54 2015
 ## Differentially marked genes
 
 * Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize using quantile normalization.    
+* Differential methylated promoters: promoter signal fold change > 2 fold, and sum of signal of two samples > 0.3 (determined from ecdf).     
 * As expected, much less flucturation of No. of differentially marked genes between samples.        
 * A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs. _Results are similar to normalize against total No. of reads although slightly smaller No. of DE genes_      
 
