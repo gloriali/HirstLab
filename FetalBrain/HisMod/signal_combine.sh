@@ -2,11 +2,11 @@
 
 cd /projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/
 # H3K4me3: promoter (brain01 brain02 cortex02 GE02 GE04)
-paste hg19v65_genes_TSS_1500.A03486.coverage hg19v65_genes_TSS_1500.A03494.coverage hg19v65_genes_TSS_1500.A03282.coverage hg19v65_genes_TSS_1500.A03478.coverage hg19v65_genes_TSS_1500.A19304.coverage | awk '{print $5"\t"$6"\t"$13"\t"$20"\t"$27"\t"$34}' > hg19v65_genes_TSS_1500.H3K4me3
+paste hg19v65_genes_TSS_1500.A03486.coverage hg19v65_genes_TSS_1500.A03494.coverage hg19v65_genes_TSS_1500.A03282.coverage hg19v65_genes_TSS_1500.A03478.coverage hg19v65_genes_TSS_1500.A19304.coverage | awk '{print $4"\t"$6"\t"$13"\t"$20"\t"$27"\t"$34}' > hg19v65_genes_TSS_1500.H3K4me3
 less hg19v65_genes_TSS_1500.H3K4me3 | awk '/protein_coding/ {print $0}' > hg19v65_genes_TSS_1500.H3K4me3.pc
 less hg19v65_genes_TSS_1500.H3K4me3 | awk '!/protein_coding/ {print $0}' > hg19v65_genes_TSS_1500.H3K4me3.nc
 # H3K27me3: promoter (brain01 brain02 cortex01 cortex02 GE01 GE02 GE04)
-paste hg19v65_genes_TSS_1500.A03488.coverage hg19v65_genes_TSS_1500.A03496.coverage hg19v65_genes_TSS_1500.A03272.coverage hg19v65_genes_TSS_1500.A03284.coverage hg19v65_genes_TSS_1500.A03278.coverage hg19v65_genes_TSS_1500.A03480.coverage hg19v65_genes_TSS_1500.A19306.coverage | awk '{print $5"\t"$6"\t"$13"\t"$20"\t"$27"\t"$34"\t"$41"\t"$48}' > hg19v65_genes_TSS_1500.H3K27me3
+paste hg19v65_genes_TSS_1500.A03488.coverage hg19v65_genes_TSS_1500.A03496.coverage hg19v65_genes_TSS_1500.A03272.coverage hg19v65_genes_TSS_1500.A03284.coverage hg19v65_genes_TSS_1500.A03278.coverage hg19v65_genes_TSS_1500.A03480.coverage hg19v65_genes_TSS_1500.A19306.coverage | awk '{print $4"\t"$6"\t"$13"\t"$20"\t"$27"\t"$34"\t"$41"\t"$48}' > hg19v65_genes_TSS_1500.H3K27me3
 less hg19v65_genes_TSS_1500.H3K27me3 | awk '/protein_coding/ {print $0}' > hg19v65_genes_TSS_1500.H3K27me3.pc
 less hg19v65_genes_TSS_1500.H3K27me3 | awk '!/protein_coding/ {print $0}' > hg19v65_genes_TSS_1500.H3K27me3.nc
 # H3K36me3: genebody (brain01 brain02 cortex02 GE02 GE04)
