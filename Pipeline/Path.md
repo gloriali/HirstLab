@@ -6,7 +6,7 @@ File paths on xhost
 * Java: `/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java`
 * Python: `/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python`    
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`  
-* Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/`
+* Bedtools: `/projects/epigenomics/thui/software/bedtools2/bin/`
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`
