@@ -7,8 +7,9 @@ File paths on xhost
 * Python: `/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python`    
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`  
 * Bedtools: `/projects/epigenomics/software/bedtools-2.23.0/bin/`
-* Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`
+* Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`    
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
+* IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
