@@ -5,7 +5,7 @@ enrich_GREAT <- function(file, name, top = 20, dirIn = paste0(getwd(), "/enrich/
     category <- sub("GREAT_", "", f)
     category <- sub("_.*", "", category)
     great <- read.delim(file = paste0(dirIn, "/", f), head = F, as.is = T, skip = 2)
-    enrich <- rbind(enrich, data.frame(Category = rep(category, times = min(c(top, nrow(great)))), Term = great$V1[1:min(c(top, nrow(great)))], FDR = great$V4[1:min(c(top, nrow(great)))]))
+    enrich <- rbind(enrich, data.frame(Category = rep(category, times = min(c(top, nrow(great)))), Term = great$V1[1:min(c(top, nrow(great)))], FDR = as.numeric(great$V4[1:min(c(top, nrow(great)))])))
   }
   if(!is.null(categories)){
     enrich <- enrich[as.character(enrich$Category) %in% categories, ]
