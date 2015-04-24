@@ -24,7 +24,7 @@ enrich_GREAT <- function(file, name, top = 20, dirIn = paste0(getwd(), "/enrich/
   enrich$Term <- factor(enrich$Term, levels = enrich[order(enrich$Category, enrich$FDR, decreasing = T),]$Term)
   Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR), fill = Category)) +
     geom_bar(stat = "identity", width = .5) + 
-    coord_flip(ylim = c(0, max(-log10(enrich$FDR)) + 5) + 
+    coord_flip(ylim = c(0, max(-log10(enrich$FDR)) + 5)) + 
     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
     xlab("") + 
     theme_bw() +
