@@ -17,7 +17,7 @@ library(dplyr)
 library(reshape2)
 library(gridExtra)
 library(knitr)
-opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.width = 8)
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
 ```
 
@@ -40,15 +40,65 @@ load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rd
 
 ## Differentially marked genes
 
-* Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize using quantile normalization.    
-* Differential methylated promoters: promoter signal fold change > 2 fold, and sum of signal of two samples > 0.3 (determined from ecdf).     
-* As expected, much less flucturation of No. of differentially marked genes between samples.        
-* A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs. _Results are similar to normalize against total No. of reads although slightly smaller No. of DE genes_      
+* Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize against total No. of reads in wig.    
+* No. of differentially marked genes flucture a lot between samples, maybe need a better way to normalize signal?    
+* A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs.      
 
 ```{r DM, fig.height = 6, fig.width = 9}
 (His_DM_promoter_figure)
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
              gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
+```
+
+## Unique enhancers 
+
+* Overall, there are about 20-40% enhancers that are unique within each pairwise comparisons.      
+* Between MZ twins, HuFNSC01 has more unique enhancers than HuFNSC02 in all three cell types. The asymmetry between two progenitor cell types and between GWs is not supported by both samples.   
+* The intersect of two samples between both progenitors and GWs are statistically significant.    
+
+```{r unique_enhancer, results='asis', fig.height = 8}
+kable(unique_enhancers_summary, format = "html", align = c("l", "l", "c", "c", "c", "c"))
+grid.arrange(gTree(children = venn_unique_enhancer_Cortex), gTree(children = venn_unique_enhancer_GE), 
+             gTree(children = venn_unique_enhancer_GW13), gTree(children = venn_unique_enhancer_GW17), nrow = 2)
+grid.text("Neurospheres unique enhancers\n in Cortex", 0.25, 0.95)
+grid.text("Neurospheres unique enhancers\n in GE", 0.75, 0.95)
+grid.text("GW unique enhancers\n in GW13", 0.25, 0.5)
+grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
+```
+
+### Functional enrichment of unique enhancers
+
+* For MZ twins, no GREAT enriched terms in cortex and GE. In mixed brain, HuFNSC02 unique enhancers show brain organ development terms, WNT pathway, and kidney-related terms.      
+* For cortex and GE progenitors, both showed brain-related terms, more so in cortex.     
+* For GWs, both GW13 and GW17 unique enhancers showed enrichment for brain organ development terms. GW17 also showed WNT pathway terms.      
+
+```{r unique_enhancer_GREAT1, fig.height=2}
+(GREAT_unique_enhancer_Brain01)
+```
+```{r unique_enhancer_GREAT2, fig.height=12}
+(GREAT_unique_enhancer_Brain02)
+```
+```{r unique_enhancer_GREAT3, fig.height=6}
+(GREAT_unique_enhancer_Cortex)
+```
+```{r unique_enhancer_GREAT4, fig.height=4}
+(GREAT_unique_enhancer_GE)
+(GREAT_unique_enhancer_GW13)
+(GREAT_unique_enhancer_GW17)
+```
+
+### GWAS in unique enhancers 
+
+* All sets of unique enhancers showed brain or brain disease related GWAS sites including gliomas, Alzheimer's disease, Autism, Schizophrenia, attention deficit hyperactivity disorder, cognitive performance and intellegence. Below shows statistically significant (hypergeometric test) GWAS traits found in at least two samples.          
+
+```{r unique_enhancer_GWAS1, results='asis'}
+kable(GWAS_unique_enhancer_trait_sig %>% group_by(comparison, Sample) %>% summarise(No.traits = n()), format = "html", align = c("l", "l", "l"))
+```
+
+* statistically significant GWAS traits found in at least two samples:   
+
+```{r unique_enhancer_GWAS2, results='asis'}
+names(summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200)[summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200) > 1])
 ```
 
 ## Overlapping enhancers with WGBS UMRs
@@ -68,5 +118,4 @@ grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn
 (GREAT_GW17_UMR_enhancer_GE)
 (GREAT_GW13_UMR_enhancer_GE)
 ```
-
 

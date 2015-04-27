@@ -129,66 +129,68 @@ ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 
 # OR normalize against total sum of promoter signals of all genes
 # OR quantile normalization
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
-H3K4me3_TSS2000 <- read.delim("hg19v65_genes_TSS_2000.H3K4me3", head = F, as.is = T, row.names = 1)
-colnames(H3K4me3_TSS2000) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
-# Nreads_H3K4me3 <- c(Brain01 = 24536698, Brain02 = 26080706, Cortex02 = 16267106, GE02 = 17466495, GE04 = 34305005)
-# H3K4me3_TSS2000 <- as.data.frame(t(t(H3K4me3_TSS2000) * (Nreads_H3K4me3[1]/Nreads_H3K4me3)))
-# colSum_H3K4me3 <- colSums(H3K4me3_TSS2000)
-# H3K4me3_TSS2000 <- as.data.frame(t(t(H3K4me3_TSS2000) * (colSum_H3K4me3[1]/colSum_H3K4me3)))
-rowName <- rownames(H3K4me3_TSS2000)
-H3K4me3_TSS2000 <- as.data.frame(normalize.quantiles(as.matrix(H3K4me3_TSS2000)), row.names = rowName)
-colnames(H3K4me3_TSS2000) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
-H3K27me3_TSS2000 <- read.delim("hg19v65_genes_TSS_2000.H3K27me3", head = F, as.is = T, row.names = 1)
-colnames(H3K27me3_TSS2000) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
-# Nreads_H3K27me3 <- c(Brain01 = 20882658, Brain02 = 37157778, Cortex01 = 28040379, Cortex02 = 44904699, GE01 = 76859708, GE02 = 38306253, GE04 = 35991053)
-# H3K27me3_TSS2000 <- as.data.frame(t(t(H3K27me3_TSS2000) * (Nreads_H3K27me3[1]/Nreads_H3K27me3)))
-# colSum_H3K27me3 <- colSums(H3K27me3_TSS2000)
-# H3K27me3_TSS2000 <- as.data.frame(t(t(H3K27me3_TSS2000) * (colSum_H3K27me3[1]/colSum_H3K27me3)))
-rowName <- rownames(H3K27me3_TSS2000)
-H3K27me3_TSS2000 <- as.data.frame(normalize.quantiles(as.matrix(H3K27me3_TSS2000)), row.names = rowName)
-colnames(H3K27me3_TSS2000) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
+H3K4me3_TSS1500 <- read.delim("hg19v65_genes_TSS_1500.H3K4me3", head = F, as.is = T, row.names = 1)
+colnames(H3K4me3_TSS1500) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
+rownames(H3K4me3_TSS1500) <- gsub("_.*", "", rownames(H3K4me3_TSS1500))
+Nreads_H3K4me3 <- c(Brain01 = 24536698, Brain02 = 26080706, Cortex02 = 16267106, GE02 = 17466495, GE04 = 34305005)
+H3K4me3_TSS1500 <- as.data.frame(t(t(H3K4me3_TSS1500) * (Nreads_H3K4me3[1]/Nreads_H3K4me3)))
+# colSum_H3K4me3 <- colSums(H3K4me3_TSS1500)
+# H3K4me3_TSS1500 <- as.data.frame(t(t(H3K4me3_TSS1500) * (colSum_H3K4me3[1]/colSum_H3K4me3)))
+# rowName <- rownames(H3K4me3_TSS1500)
+# H3K4me3_TSS1500 <- as.data.frame(normalize.quantiles(as.matrix(H3K4me3_TSS1500)), row.names = rowName)
+# colnames(H3K4me3_TSS1500) <- c("Brain01", "Brain02", "Cortex02", "GE02", "GE04")
+H3K27me3_TSS1500 <- read.delim("hg19v65_genes_TSS_1500.H3K27me3", head = F, as.is = T, row.names = 1)
+colnames(H3K27me3_TSS1500) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
+rownames(H3K27me3_TSS1500) <- gsub("_.*", "", rownames(H3K27me3_TSS1500))
+Nreads_H3K27me3 <- c(Brain01 = 20882658, Brain02 = 37157778, Cortex01 = 28040379, Cortex02 = 44904699, GE01 = 76859708, GE02 = 38306253, GE04 = 35991053)
+H3K27me3_TSS1500 <- as.data.frame(t(t(H3K27me3_TSS1500) * (Nreads_H3K27me3[1]/Nreads_H3K27me3)))
+# colSum_H3K27me3 <- colSums(H3K27me3_TSS1500)
+# H3K27me3_TSS1500 <- as.data.frame(t(t(H3K27me3_TSS1500) * (colSum_H3K27me3[1]/colSum_H3K27me3)))
+# rowName <- rownames(H3K27me3_TSS1500)
+# H3K27me3_TSS1500 <- as.data.frame(normalize.quantiles(as.matrix(H3K27me3_TSS1500)), row.names = rowName)
+# colnames(H3K27me3_TSS1500) <- c("Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")
 e <- 1e-4
 fold <- 1 # log2 fold change cutoff (2-fold difference in normailzed signal)
 cut <- 0.3 # min sum of signal of two samples, from ecdf plot
 # Between MZ twins
-Brain01_Brain02_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$Brain01 + e)/(H3K4me3_TSS2000$Brain02 + e)) > fold & H3K4me3_TSS2000$Brain01 + H3K4me3_TSS2000$Brain02 > cut, ]), DM = "hyper"), 
-                                  data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$Brain01 + e)/(H3K4me3_TSS2000$Brain02 + e)) < -fold & H3K4me3_TSS2000$Brain01 + H3K4me3_TSS2000$Brain02 > cut, ]), DM = "hypo"))
+Brain01_Brain02_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$Brain01 + e)/(H3K4me3_TSS1500$Brain02 + e)) > fold & H3K4me3_TSS1500$Brain01 + H3K4me3_TSS1500$Brain02 > cut, ]), DM = "hyper"), 
+                                  data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$Brain01 + e)/(H3K4me3_TSS1500$Brain02 + e)) < -fold & H3K4me3_TSS1500$Brain01 + H3K4me3_TSS1500$Brain02 > cut, ]), DM = "hypo"))
 rownames(Brain01_Brain02_DM_K4me3) <- Brain01_Brain02_DM_K4me3$gene
-Brain01_Brain02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Brain01 + e)/(H3K27me3_TSS2000$Brain02 + e)) > fold & H3K27me3_TSS2000$Brain01 + H3K27me3_TSS2000$Brain02 > cut, ]), DM = "hyper"), 
-                                   data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Brain01 + e)/(H3K27me3_TSS2000$Brain02 + e)) < -fold & H3K27me3_TSS2000$Brain01 + H3K27me3_TSS2000$Brain02 > cut, ]), DM = "hypo"))
+Brain01_Brain02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Brain01 + e)/(H3K27me3_TSS1500$Brain02 + e)) > fold & H3K27me3_TSS1500$Brain01 + H3K27me3_TSS1500$Brain02 > cut, ]), DM = "hyper"), 
+                                   data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Brain01 + e)/(H3K27me3_TSS1500$Brain02 + e)) < -fold & H3K27me3_TSS1500$Brain01 + H3K27me3_TSS1500$Brain02 > cut, ]), DM = "hypo"))
 rownames(Brain01_Brain02_DM_K27me3) <- Brain01_Brain02_DM_K27me3$gene
-Cortex01_Cortex02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex01 + e)/(H3K27me3_TSS2000$Cortex02 + e)) > fold & H3K27me3_TSS2000$Cortex01 + H3K27me3_TSS2000$Cortex02 > cut, ]), DM = "hyper"), 
-                                     data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex01 + e)/(H3K27me3_TSS2000$Cortex02 + e)) < -fold & H3K27me3_TSS2000$Cortex01 + H3K27me3_TSS2000$Cortex02 > cut, ]), DM = "hypo"))
+Cortex01_Cortex02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex01 + e)/(H3K27me3_TSS1500$Cortex02 + e)) > fold & H3K27me3_TSS1500$Cortex01 + H3K27me3_TSS1500$Cortex02 > cut, ]), DM = "hyper"), 
+                                     data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex01 + e)/(H3K27me3_TSS1500$Cortex02 + e)) < -fold & H3K27me3_TSS1500$Cortex01 + H3K27me3_TSS1500$Cortex02 > cut, ]), DM = "hypo"))
 rownames(Cortex01_Cortex02_DM_K27me3) <- Cortex01_Cortex02_DM_K27me3$gene
-GE01_GE02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE01 + e)/(H3K27me3_TSS2000$GE02 + e)) > fold & H3K27me3_TSS2000$GE01 + H3K27me3_TSS2000$GE02 > cut, ]), DM = "hyper"), 
-                             data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE01 + e)/(H3K27me3_TSS2000$GE02 + e)) < -fold & H3K27me3_TSS2000$GE01 + H3K27me3_TSS2000$GE02 > cut, ]), DM = "hypo"))
+GE01_GE02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE01 + e)/(H3K27me3_TSS1500$GE02 + e)) > fold & H3K27me3_TSS1500$GE01 + H3K27me3_TSS1500$GE02 > cut, ]), DM = "hyper"), 
+                             data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE01 + e)/(H3K27me3_TSS1500$GE02 + e)) < -fold & H3K27me3_TSS1500$GE01 + H3K27me3_TSS1500$GE02 > cut, ]), DM = "hypo"))
 rownames(GE01_GE02_DM_K27me3) <- GE01_GE02_DM_K27me3$gene
 His_DM_MZ <- rbind(Brain01_Brain02_DM_K4me3 %>% mutate(Sample = "Brain", Mark = "H3K4me3"), 
                    Brain01_Brain02_DM_K27me3 %>% mutate(Sample = "Brain", Mark = "H3K27me3"), 
                    Cortex01_Cortex02_DM_K27me3 %>% mutate(Sample = "Cortex", Mark = "H3K27me3"), 
                    GE01_GE02_DM_K27me3 %>% mutate(Sample = "GE", Mark = "H3K27me3")) %>% mutate(Comparison = "MZ")
 # Between neurospheres
-Cortex01_GE01_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex01 + e)/(H3K27me3_TSS2000$GE01 + e)) > fold & H3K27me3_TSS2000$Cortex01 + H3K27me3_TSS2000$GE01 > cut, ]), DM = "hyper"), 
-                                 data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex01 + e)/(H3K27me3_TSS2000$GE01 + e)) < -fold & H3K27me3_TSS2000$Cortex01 + H3K27me3_TSS2000$GE01 > cut, ]), DM = "hypo"))
+Cortex01_GE01_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex01 + e)/(H3K27me3_TSS1500$GE01 + e)) > fold & H3K27me3_TSS1500$Cortex01 + H3K27me3_TSS1500$GE01 > cut, ]), DM = "hyper"), 
+                                 data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex01 + e)/(H3K27me3_TSS1500$GE01 + e)) < -fold & H3K27me3_TSS1500$Cortex01 + H3K27me3_TSS1500$GE01 > cut, ]), DM = "hypo"))
 rownames(Cortex01_GE01_DM_K27me3) <- Cortex01_GE01_DM_K27me3$gene
-Cortex02_GE02_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$Cortex02 + e)/(H3K4me3_TSS2000$GE02 + e)) > fold & H3K4me3_TSS2000$Cortex02 + H3K4me3_TSS2000$GE02 > cut, ]), DM = "hyper"), 
-                                data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$Cortex02 + e)/(H3K4me3_TSS2000$GE02 + e)) < -fold & H3K4me3_TSS2000$Cortex02 + H3K4me3_TSS2000$GE02 > cut, ]), DM = "hypo"))
+Cortex02_GE02_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$Cortex02 + e)/(H3K4me3_TSS1500$GE02 + e)) > fold & H3K4me3_TSS1500$Cortex02 + H3K4me3_TSS1500$GE02 > cut, ]), DM = "hyper"), 
+                                data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$Cortex02 + e)/(H3K4me3_TSS1500$GE02 + e)) < -fold & H3K4me3_TSS1500$Cortex02 + H3K4me3_TSS1500$GE02 > cut, ]), DM = "hypo"))
 rownames(Cortex02_GE02_DM_K4me3) <- Cortex02_GE02_DM_K4me3$gene
-Cortex02_GE02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex02 + e)/(H3K27me3_TSS2000$GE02 + e)) > fold & H3K27me3_TSS2000$Cortex02 + H3K27me3_TSS2000$GE02 > cut, ]), DM = "hyper"), 
-                                 data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$Cortex02 + e)/(H3K27me3_TSS2000$GE02 + e)) < -fold & H3K27me3_TSS2000$Cortex02 + H3K27me3_TSS2000$GE02 > cut, ]), DM = "hypo"))
+Cortex02_GE02_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex02 + e)/(H3K27me3_TSS1500$GE02 + e)) > fold & H3K27me3_TSS1500$Cortex02 + H3K27me3_TSS1500$GE02 > cut, ]), DM = "hyper"), 
+                                 data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$Cortex02 + e)/(H3K27me3_TSS1500$GE02 + e)) < -fold & H3K27me3_TSS1500$Cortex02 + H3K27me3_TSS1500$GE02 > cut, ]), DM = "hypo"))
 rownames(Cortex02_GE02_DM_K27me3) <- Cortex02_GE02_DM_K27me3$gene
 His_DM_neurospheres <- rbind(Cortex01_GE01_DM_K27me3 %>% mutate(Sample = "HuFNSC01", Mark = "H3K27me3"), 
                              Cortex02_GE02_DM_K4me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K4me3"), 
                              Cortex02_GE02_DM_K27me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K27me3")) %>% mutate(Comparison = "neurospheres")
 # Between GW
-GE01_GE04_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE01 + e)/(H3K27me3_TSS2000$GE04 + e)) > fold & H3K27me3_TSS2000$GE01 + H3K27me3_TSS2000$GE04 > cut, ]), DM = "hyper"), 
-                             data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE01 + e)/(H3K27me3_TSS2000$GE04 + e)) < -fold & H3K27me3_TSS2000$GE01 + H3K27me3_TSS2000$GE04 > cut, ]), DM = "hypo"))
+GE01_GE04_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE01 + e)/(H3K27me3_TSS1500$GE04 + e)) > fold & H3K27me3_TSS1500$GE01 + H3K27me3_TSS1500$GE04 > cut, ]), DM = "hyper"), 
+                             data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE01 + e)/(H3K27me3_TSS1500$GE04 + e)) < -fold & H3K27me3_TSS1500$GE01 + H3K27me3_TSS1500$GE04 > cut, ]), DM = "hypo"))
 rownames(GE01_GE04_DM_K27me3) <- GE01_GE04_DM_K27me3$gene
-GE02_GE04_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$GE02 + e)/(H3K4me3_TSS2000$GE04 + e)) > fold & H3K4me3_TSS2000$GE02 + H3K4me3_TSS2000$GE04 > cut, ]), DM = "hyper"), 
-                            data.frame(gene = rownames(H3K4me3_TSS2000[log2((H3K4me3_TSS2000$GE02 + e)/(H3K4me3_TSS2000$GE04 + e)) < -fold & H3K4me3_TSS2000$GE02 + H3K4me3_TSS2000$GE04 > cut, ]), DM = "hypo"))
+GE02_GE04_DM_K4me3 <- rbind(data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$GE02 + e)/(H3K4me3_TSS1500$GE04 + e)) > fold & H3K4me3_TSS1500$GE02 + H3K4me3_TSS1500$GE04 > cut, ]), DM = "hyper"), 
+                            data.frame(gene = rownames(H3K4me3_TSS1500[log2((H3K4me3_TSS1500$GE02 + e)/(H3K4me3_TSS1500$GE04 + e)) < -fold & H3K4me3_TSS1500$GE02 + H3K4me3_TSS1500$GE04 > cut, ]), DM = "hypo"))
 rownames(GE02_GE04_DM_K4me3) <- GE02_GE04_DM_K4me3$gene
-GE02_GE04_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE02 + e)/(H3K27me3_TSS2000$GE04 + e)) > fold & H3K27me3_TSS2000$GE02 + H3K27me3_TSS2000$GE04 > cut, ]), DM = "hyper"), 
-                             data.frame(gene = rownames(H3K27me3_TSS2000[log2((H3K27me3_TSS2000$GE02 + e)/(H3K27me3_TSS2000$GE04 + e)) < -fold & H3K27me3_TSS2000$GE02 + H3K27me3_TSS2000$GE04 > cut, ]), DM = "hypo"))
+GE02_GE04_DM_K27me3 <- rbind(data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE02 + e)/(H3K27me3_TSS1500$GE04 + e)) > fold & H3K27me3_TSS1500$GE02 + H3K27me3_TSS1500$GE04 > cut, ]), DM = "hyper"), 
+                             data.frame(gene = rownames(H3K27me3_TSS1500[log2((H3K27me3_TSS1500$GE02 + e)/(H3K27me3_TSS1500$GE04 + e)) < -fold & H3K27me3_TSS1500$GE02 + H3K27me3_TSS1500$GE04 > cut, ]), DM = "hypo"))
 rownames(GE02_GE04_DM_K27me3) <- GE02_GE04_DM_K27me3$gene
 His_DM_GW <- rbind(GE01_GE04_DM_K27me3 %>% mutate(Sample = "GE01_GE04", Mark = "H3K27me3"), 
                    GE02_GE04_DM_K4me3 %>% mutate(Sample = "GE02_GE04", Mark = "H3K4me3"), 
@@ -271,6 +273,10 @@ plot.new()
 grid.draw(venn_GE02_GE04DE_epi)
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
              gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 3)
+pdf("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/venn_DE_epi.pdf")
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
+             gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 3)
+dev.off()
 
 ## ============= enhancers: H3K4me1 =============
 ### closest genes
@@ -314,11 +320,57 @@ ggsave(UMR_enhancer_summary_figure, file = "UMR_enhancer_summary_figure.pdf")
 (GREAT_GW17_UMR_enhancer_GE <- enrich_GREAT(file = "GW17_UMR_enhancer_GE", name = "GW17_UMR_enhancer_GE", height = 15))
 (GREAT_GW13_UMR_enhancer_GE <- enrich_GREAT(file = "GW13_UMR_enhancer_GE", name = "GW13_UMR_enhancer_GE", height = 15))
 
+### unique enhancers
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique")
+unique_enhancers_summary <- read.delim("unique_enhancer.summary", as.is = T)
+venn_unique_enhancer_Cortex <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex.bed", intern = T))), category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"), main = "Neurospheres unique enhancers in Cortex")
+venn_unique_enhancer_GE <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE.bed", intern = T))), category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"), main = "Neurospheres unique enhancers in GE")
+venn_unique_enhancer_GW13 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13_01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13_02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13.bed", intern = T))), category = c("HuFNSC01_04", "HuFNSC02_04"), fill = c("red", "blue"), main = "GW unique enhancers in GW13")
+venn_unique_enhancer_GW17 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17_01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17_02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17.bed", intern = T))), category = c("HuFNSC01_04", "HuFNSC02_04"), fill = c("red", "blue"), main = "GW unique enhancers in GW17")
+pdf("venn_unique_enhancer.pdf", height = 8, width = 8)
+grid.arrange(gTree(children = venn_unique_enhancer_Cortex), gTree(children = venn_unique_enhancer_GE), 
+             gTree(children = venn_unique_enhancer_GW13), gTree(children = venn_unique_enhancer_GW17), nrow = 2)
+grid.text("Neurospheres unique enhancers\n in Cortex", 0.25, 0.95)
+grid.text("Neurospheres unique enhancers\n in GE", 0.75, 0.95)
+grid.text("GW unique enhancers\n in GW13", 0.25, 0.5)
+grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
+dev.off()
+(GREAT_unique_enhancer_Brain01 <- enrich_GREAT(file = "unique_enhancer.MZ.Brain01", name = "unique_enhancer.MZ.Brain01", height = 2))
+(GREAT_unique_enhancer_Brain02 <- enrich_GREAT(file = "unique_enhancer.MZ.Brain02", name = "unique_enhancer.MZ.Brain02", height = 12))
+(GREAT_unique_enhancer_Cortex <- enrich_GREAT(file = "unique_enhancer.Neurospheres.Cortex", name = "unique_enhancer.Neurospheres.Cortex"))
+(GREAT_unique_enhancer_GE <- enrich_GREAT(file = "unique_enhancer.Neurospheres.GE", name = "unique_enhancer.Neurospheres.GE", height = 4))
+(GREAT_unique_enhancer_GW13 <- enrich_GREAT(file = "unique_enhancer.GW.GW13", name = "unique_enhancer.GW.GW13", height = 4))
+(GREAT_unique_enhancer_GW17 <- enrich_GREAT(file = "unique_enhancer.GW.GW17", name = "unique_enhancer.GW.GW17", height = 4))
+GWAS_ref <- read.delim("/projects/epigenomics/resources/UCSC_hg19/GWAS/gwasCatalog_July2014.table", as.is = T)
+colnames <- c("enhancerChr", "enhancerStart", "enhancerEnd", "enhancerID", "gwasChr", "gwasStart", "gwasEnd", "gwasID", "trait", "genes")
+GWAS_unique_enhancer_Brain01 <- read.delim("unique_enhancer.MZ.Brain01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain01")
+GWAS_unique_enhancer_Brain02 <- read.delim("unique_enhancer.MZ.Brain02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain02")
+GWAS_unique_enhancer_Cortex01 <- read.delim("unique_enhancer.MZ.Cortex01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex01")
+GWAS_unique_enhancer_Cortex02 <- read.delim("unique_enhancer.MZ.Cortex02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex02")
+GWAS_unique_enhancer_GE01 <- read.delim("unique_enhancer.MZ.GE01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE01")
+GWAS_unique_enhancer_GE02 <- read.delim("unique_enhancer.MZ.GE02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE02")
+GWAS_unique_enhancer_Cortex <- read.delim("unique_enhancer.Neurospheres.Cortex.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "Cortex")
+GWAS_unique_enhancer_GE <- read.delim("unique_enhancer.Neurospheres.GE.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "GE")
+GWAS_unique_enhancer_GW13 <- read.delim("unique_enhancer.GW.GW13.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW13")
+GWAS_unique_enhancer_GW17 <- read.delim("unique_enhancer.GW.GW17.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW17")
+GWAS_unique_enhancer_all <- rbind(GWAS_unique_enhancer_Brain01, GWAS_unique_enhancer_Brain02, GWAS_unique_enhancer_Cortex01, GWAS_unique_enhancer_Cortex02, GWAS_unique_enhancer_GE01, GWAS_unique_enhancer_GE02, 
+                                  GWAS_unique_enhancer_Cortex, GWAS_unique_enhancer_GE, GWAS_unique_enhancer_GW13, GWAS_unique_enhancer_GW17)
+GWAS_unique_enhancer_trait <- GWAS_unique_enhancer_all %>% group_by(comparison, Sample, trait) %>% summarise(Nsample_trait = n()) %>% 
+  mutate(Nsample = sapply(Sample, function(x){return(nrow(GWAS_unique_enhancer_all[GWAS_unique_enhancer_all$Sample == x, ]))}), 
+         Ntrait = sapply(trait, function(x){return(nrow(GWAS_ref[GWAS_ref$trait == x, ]))}), 
+         Ntotal = nrow(GWAS_ref), 
+         phyper = 1 - phyper(Nsample_trait, Nsample, Ntotal-Nsample, Ntrait), 
+         FDR = p.adjust(phyper, method = "fdr")) %>% arrange(comparison, Sample, FDR)
+GWAS_unique_enhancer_trait_sig <- droplevels(GWAS_unique_enhancer_trait[GWAS_unique_enhancer_trait$FDR < 0.01, ])
+
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
      GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
      GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
-     His_DM_promoter, His_DM_promoter_figure, 
+     H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
      venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
+     unique_enhancers_summary, GWAS_unique_enhancer_all, GWAS_unique_enhancer_trait, GWAS_unique_enhancer_trait_sig, 
+     venn_unique_enhancer_Cortex, venn_unique_enhancer_GE, venn_unique_enhancer_GW13, venn_unique_enhancer_GW17, 
+     GREAT_unique_enhancer_Brain01, GREAT_unique_enhancer_Brain02, GREAT_unique_enhancer_Cortex, GREAT_unique_enhancer_GE, GREAT_unique_enhancer_GW13, GREAT_unique_enhancer_GW17, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
