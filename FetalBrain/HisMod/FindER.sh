@@ -356,14 +356,15 @@ echo -e "GW_GE\thypo\t$all_total\t$enhancer\t$GW_GE_hypo\t$GW_GE_hypo_enhancer" 
 dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/'
 dirOut=$dirIn/unique/
 mkdir -p $dirOut
+mkdir -p $dirOut/GWAS/
 cd $dirIn
 echo -e "Comparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_enhancer.summary
 ## Between MZ twins
 ### Brain
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -b $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Brain01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.Brain01.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Brain02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.Brain02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Brain01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.Brain01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Brain02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.Brain02.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.MZ.Brain01.bed | cut -d' ' -f 1`
@@ -372,8 +373,8 @@ echo -e "MZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut
 ### Cortex
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.Cortex01.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.Cortex02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.Cortex01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.Cortex02.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.MZ.Cortex01.bed | cut -d' ' -f 1`
@@ -382,8 +383,8 @@ echo -e "MZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirO
 ### GE
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.GE01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.GE01.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.GE02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.MZ.GE02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.GE01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.GE01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.GE02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.MZ.GE02.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.MZ.GE01.bed | cut -d' ' -f 1`
@@ -393,8 +394,8 @@ echo -e "MZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/uniqu
 ### HuFNSC01
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.Cortex01.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.GE01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.Cortex01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.GE01.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.Cortex01.bed | cut -d' ' -f 1`
@@ -403,8 +404,8 @@ echo -e "Neurospheres\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >>
 ### HuFNSC02
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex02.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.Cortex02.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.GE02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.Cortex02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.GE02.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.Cortex02.bed | cut -d' ' -f 1`
@@ -412,15 +413,15 @@ s2_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.GE02.bed | cut -d' ' -f 1`
 echo -e "Neurospheres\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### intersect
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex01.bed -b $dirOut/unique_enhancer.Neurospheres.Cortex02.bed > $dirOut/unique_enhancer.Neurospheres.Cortex.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.Cortex.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.Cortex.GWAS.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE01.bed -b $dirOut/unique_enhancer.Neurospheres.GE02.bed > $dirOut/unique_enhancer.Neurospheres.GE.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.Neurospheres.GE.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.Neurospheres.GE.GWAS.bed
 ## Between GW
 ### GE01 vs GE04
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW17_01.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW13_01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW17_01.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_01.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW13_01.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.GW.GW17_01.bed | cut -d' ' -f 1`
@@ -429,8 +430,8 @@ echo -e "GW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/uniqu
 ### GE02 vs GE04
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_02.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW17_02.GWAS.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW13_02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW17_02.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_02.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW13_02.GWAS.bed
 s1=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
 s2=`wc -l $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.GW.GW17_02.bed | cut -d' ' -f 1`
@@ -438,8 +439,8 @@ s2_unique=`wc -l $dirOut/unique_enhancer.GW.GW13_02.bed | cut -d' ' -f 1`
 echo -e "GW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### intersect
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_01.bed -b $dirOut/unique_enhancer.GW.GW13_02.bed > $dirOut/unique_enhancer.GW.GW13.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW13.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW13.GWAS.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_01.bed -b $dirOut/unique_enhancer.GW.GW17_02.bed > $dirOut/unique_enhancer.GW.GW17.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/unique_enhancer.GW.GW17.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/unique_enhancer.GW.GW17.GWAS.bed
 
 
