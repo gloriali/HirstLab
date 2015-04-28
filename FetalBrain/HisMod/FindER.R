@@ -343,16 +343,16 @@ dev.off()
 (GREAT_unique_enhancer_GW17 <- enrich_GREAT(file = "unique_enhancer.GW.GW17", name = "unique_enhancer.GW.GW17", height = 4))
 GWAS_ref <- read.delim("/projects/epigenomics/resources/UCSC_hg19/GWAS/gwasCatalog_July2014.table", as.is = T)
 colnames <- c("enhancerChr", "enhancerStart", "enhancerEnd", "enhancerID", "gwasChr", "gwasStart", "gwasEnd", "gwasID", "trait", "genes")
-GWAS_unique_enhancer_Brain01 <- read.delim("unique_enhancer.MZ.Brain01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain01")
-GWAS_unique_enhancer_Brain02 <- read.delim("unique_enhancer.MZ.Brain02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain02")
-GWAS_unique_enhancer_Cortex01 <- read.delim("unique_enhancer.MZ.Cortex01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex01")
-GWAS_unique_enhancer_Cortex02 <- read.delim("unique_enhancer.MZ.Cortex02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex02")
-GWAS_unique_enhancer_GE01 <- read.delim("unique_enhancer.MZ.GE01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE01")
-GWAS_unique_enhancer_GE02 <- read.delim("unique_enhancer.MZ.GE02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE02")
-GWAS_unique_enhancer_Cortex <- read.delim("unique_enhancer.Neurospheres.Cortex.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "Cortex")
-GWAS_unique_enhancer_GE <- read.delim("unique_enhancer.Neurospheres.GE.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "GE")
-GWAS_unique_enhancer_GW13 <- read.delim("unique_enhancer.GW.GW13.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW13")
-GWAS_unique_enhancer_GW17 <- read.delim("unique_enhancer.GW.GW17.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW17")
+GWAS_unique_enhancer_Brain01 <- read.delim("./GWAS/unique_enhancer.MZ.Brain01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain01")
+GWAS_unique_enhancer_Brain02 <- read.delim("./GWAS/unique_enhancer.MZ.Brain02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Brain02")
+GWAS_unique_enhancer_Cortex01 <- read.delim("./GWAS/unique_enhancer.MZ.Cortex01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex01")
+GWAS_unique_enhancer_Cortex02 <- read.delim("./GWAS/unique_enhancer.MZ.Cortex02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "Cortex02")
+GWAS_unique_enhancer_GE01 <- read.delim("./GWAS/unique_enhancer.MZ.GE01.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE01")
+GWAS_unique_enhancer_GE02 <- read.delim("./GWAS/unique_enhancer.MZ.GE02.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "MZ", Sample = "GE02")
+GWAS_unique_enhancer_Cortex <- read.delim("./GWAS/unique_enhancer.Neurospheres.Cortex.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "Cortex")
+GWAS_unique_enhancer_GE <- read.delim("./GWAS/unique_enhancer.Neurospheres.GE.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "Neurospheres", Sample = "GE")
+GWAS_unique_enhancer_GW13 <- read.delim("./GWAS/unique_enhancer.GW.GW13.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW13")
+GWAS_unique_enhancer_GW17 <- read.delim("./GWAS/unique_enhancer.GW.GW17.GWAS.bed", head = F, col.names = colnames) %>% mutate(comparison = "GW", Sample = "GW17")
 GWAS_unique_enhancer_all <- rbind(GWAS_unique_enhancer_Brain01, GWAS_unique_enhancer_Brain02, GWAS_unique_enhancer_Cortex01, GWAS_unique_enhancer_Cortex02, GWAS_unique_enhancer_GE01, GWAS_unique_enhancer_GE02, 
                                   GWAS_unique_enhancer_Cortex, GWAS_unique_enhancer_GE, GWAS_unique_enhancer_GW13, GWAS_unique_enhancer_GW17)
 GWAS_unique_enhancer_trait <- GWAS_unique_enhancer_all %>% group_by(comparison, Sample, trait) %>% summarise(Nsample_trait = n()) %>% 
@@ -362,6 +362,9 @@ GWAS_unique_enhancer_trait <- GWAS_unique_enhancer_all %>% group_by(comparison, 
          phyper = 1 - phyper(Nsample_trait, Nsample, Ntotal-Nsample, Ntrait), 
          FDR = p.adjust(phyper, method = "fdr")) %>% arrange(comparison, Sample, FDR)
 GWAS_unique_enhancer_trait_sig <- droplevels(GWAS_unique_enhancer_trait[GWAS_unique_enhancer_trait$FDR < 0.01, ])
+write.table(GWAS_unique_enhancer_all, file = "./GWAS/GWAS_unique_enhancer_all.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GWAS_unique_enhancer_trait, file = "./GWAS/GWAS_unique_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GWAS_unique_enhancer_trait_sig, file = "./GWAS/GWAS_unique_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
