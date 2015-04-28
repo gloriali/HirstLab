@@ -10,7 +10,8 @@ File paths on xhost
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`    
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
-* ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`
+* Homer: `/home/acarles/homer/bin/`
+* ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
@@ -25,7 +26,8 @@ File paths on xhost
 * Ensembl v65: `/projects/epigenomics/resources/Ensembl/hg19v65/`
 * Genome hg19: `/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa`    
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
-* Encode TFBS: `/projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz`     
+* Encode TFBS: `/projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz`    
+* GWAS: `/projects/epigenomics/resources/UCSC_hg19/GWAS/` (bed `/home/lli/hg19/gwasCatalog_July2014.bed`)
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
 * CpG +/- 25bp bins: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`  
 * Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`
