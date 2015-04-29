@@ -434,12 +434,16 @@ do
 done
 ## Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
-mkdir -p $dirOut/homer/
-cd $dirOut/
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique'
+mkdir -p $dirIn/homer/
+cd $dirIn/
 for file in unique_enhancer.*.bed
 do
-    echo "Processing "$file
-    /home/acarles/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/ -size 200 -len 8 > $dirOut/homer/$file.log
+    name=$(echo $file | sed -e 's/.bed//g' | sed -e 's/unique_enhancer.//g')
+    echo "Processing "$name
+    dirOut=$dirIn/homer/$name/
+    mkdir -p $dirOut
+    /home/acarles/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
 done
 
 
