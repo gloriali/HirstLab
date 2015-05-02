@@ -255,6 +255,7 @@ done
 
 # closest genes for enhancers (K4me1): exclude overlapping genes or not? 
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
+mkdir -p $dirOut/closest_gene/
 cd $dirOut
 for file in *.multi.bed
 do
@@ -262,92 +263,110 @@ do
     name=$(echo $name | sed -e 's/FindER_scan.//g')
     echo "Processing" $name
     # including overlapping genes
-    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/$name.closest.gene.pc
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/closest_gene/$name.closest.gene.pc
     # excluding: nearest non-overlapping genes
-    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d -io | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/$name.closest.gene.pc.io
+    /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d -io | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/closest_gene/$name.closest.gene.pc.io
 done 
 
-# consensus enhancers overlapping with WGBS UMRs
-## enhancer UMRs: H3K4me1 for Cortex02, GE02, GE04
+# core enhancers: overlapping all NPC enhancers
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
 cd $dirOut
+mkdir -p $dirOut/core/
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirOut/FindER_scan.A03477.H3K4me1.GE02.multi.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K4me1.Cortex02.GE02.bed
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.bed -b $dirOut/FindER_scan.A19303.H3K4me1.GE04.multi.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K4me1.Cortex02.GE02.GE04.bed
-enhancer=`wc -l $dirOut/H3K4me1.Cortex02.GE02.GE04.bed | cut -d' ' -f 1`
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirOut/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K4me1.Cortex02.GE02.GE04.Cortex01.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.Cortex01.bed -b $dirOut/FindER_scan.A03275.H3K4me1.GE01.multi.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/core/core_enhancers.bed
+rm H3K4me1.Cortex02.GE02*.bed
+## Intersect with GWAS sites
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/core/core_enhancers.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/core/core_enhancers.GWAS.bed
+## Homer for TFBS motifs
+PATH=$PATH:/home/acarles/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+/home/acarles/homer/bin/findMotifsGenome.pl $dirOut/core/core_enhancers.bed hg19 $dirOut/core/homer/ -size 200 -len 8 
+## Intersect with WGBS UMRs
+dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/
+mkdir -p $dirOut
+enhancer=`wc -l $dirOut/../core_enhancers.bed | cut -d' ' -f 1`
 echo -e "Sample\tUMR\tNo.enhancers\tNo.UMR\tNo.enhancerUMR" > $dirOut/WGBS_UMR_enhancers.summary
 dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/neurosphere02hyper_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/neurosphere02hyper_enhancer.bed
 neurosphere02hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed | cut -d' ' -f 1`
 neurosphere02hyper_enhancer=`wc -l $dirOut/neurosphere02hyper_enhancer.bed | cut -d' ' -f 1`
 echo -e "neurosphere02\thyper\t$enhancer\t$neurosphere02hyper\t$neurosphere02hyper_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/neurosphere02hypo_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/neurosphere02hypo_enhancer.bed
 neurosphere02hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed | cut -d' ' -f 1`
 neurosphere02hypo_enhancer=`wc -l $dirOut/neurosphere02hypo_enhancer.bed | cut -d' ' -f 1`
 echo -e "neurosphere02\thypo\t$enhancer\t$neurosphere02hypo\t$neurosphere02hypo_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/neurosphere04hyper_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/neurosphere04hyper_enhancer.bed
 neurosphere04hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed | cut -d' ' -f 1`
 neurosphere04hyper_enhancer=`wc -l $dirOut/neurosphere04hyper_enhancer.bed | cut -d' ' -f 1`
 echo -e "neurosphere04\thyper\t$enhancer\t$neurosphere04hyper\t$neurosphere04hyper_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/neurosphere04hypo_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/neurosphere04hypo_enhancer.bed
 neurosphere04hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed | cut -d' ' -f 1`
 neurosphere04hypo_enhancer=`wc -l $dirOut/neurosphere04hypo_enhancer.bed | cut -d' ' -f 1`
 echo -e "neurosphere04\thypo\t$enhancer\t$neurosphere04hypo\t$neurosphere04hypo_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
 dirIn=/projects/epigenomics/users/lli/FetalBrain/GW/DMR/
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/GW_Cortex_hyper_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/GW_Cortex_hyper_enhancer.bed
 GW_Cortex_hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed | cut -d' ' -f 1`
 GW_Cortex_hyper_enhancer=`wc -l $dirOut/GW_Cortex_hyper_enhancer.bed | cut -d' ' -f 1`
 echo -e "GW_Cortex\thyper\t$enhancer\t$GW_Cortex_hyper\t$GW_Cortex_hyper_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/GW_Cortex_hypo_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/GW_Cortex_hypo_enhancer.bed
 GW_Cortex_hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed | cut -d' ' -f 1`
 GW_Cortex_hypo_enhancer=`wc -l $dirOut/GW_Cortex_hypo_enhancer.bed | cut -d' ' -f 1`
 echo -e "GW_Cortex\thypo\t$enhancer\t$GW_Cortex_hypo\t$GW_Cortex_hypo_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/GW_GE_hyper_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa -wb > $dirOut/GW_GE_hyper_enhancer.bed
 GW_GE_hyper=`wc -l $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed | cut -d' ' -f 1`
 GW_GE_hyper_enhancer=`wc -l $dirOut/GW_GE_hyper_enhancer.bed | cut -d' ' -f 1`
 echo -e "GW_GE\thyper\t$enhancer\t$GW_GE_hyper\t$GW_GE_hyper_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/GW_GE_hypo_enhancer.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/../core_enhancers.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa -wb > $dirOut/GW_GE_hypo_enhancer.bed
 GW_GE_hypo=`wc -l $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed | cut -d' ' -f 1`
 GW_GE_hypo_enhancer=`wc -l $dirOut/GW_GE_hypo_enhancer.bed | cut -d' ' -f 1`
 echo -e "GW_GE\thypo\t$enhancer\t$GW_GE_hypo\t$GW_GE_hypo_enhancer" >> $dirOut/WGBS_UMR_enhancers.summary
-## enhancer UMRs: H3K4me1 for Cortex02, GE02, GE04 - enrichment
-dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/CpG/
+### input files for GREAT
+cd $dirOut
+for file in *.bed
+do
+    less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $file.GREAT.bed
+done
+### enhancer UMRs - enrichment
+dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/CpG/
 mkdir -p $dirOut
 cd $dirOut
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /home/lli/hg19/CG.BED -b /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/H3K4me1.Cortex02.GE02.GE04.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed
-enhancer=`wc -l $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed| cut -d' ' -f 1`
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a /home/lli/hg19/CG.BED -b /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/core_enhancers.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/core_enhancers.CpG.bed
+enhancer=`wc -l $dirOut/core_enhancers.CpG.bed| cut -d' ' -f 1`
 all_total=28217448 # wc -l /home/lli/hg19/CG.BED
 echo -e "Sample\tUMR\tNo.total\tNo.enhancers\tNo.UMR\tNo.enhancerUMR\tenrich" > $dirOut/WGBS_UMR_enhancers_enrich.summary
 dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/CpG/
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/neurosphere02hyper_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/neurosphere02hyper_enhancer.CpG.bed
 neurosphere02hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed | cut -d' ' -f 1`
 neurosphere02hyper_enhancer=`wc -l $dirOut/neurosphere02hyper_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "neurosphere02\thyper\t$all_total\t$enhancer\t$neurosphere02hyper\t$neurosphere02hyper_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/neurosphere02hypo_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/neurosphere02hypo_enhancer.CpG.bed
 neurosphere02hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed | cut -d' ' -f 1`
 neurosphere02hypo_enhancer=`wc -l $dirOut/neurosphere02hypo_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "neurosphere02\thypo\t$all_total\t$enhancer\t$neurosphere02hypo\t$neurosphere02hypo_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/neurosphere04hyper_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/neurosphere04hyper_enhancer.CpG.bed
 neurosphere04hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed | cut -d' ' -f 1`
 neurosphere04hyper_enhancer=`wc -l $dirOut/neurosphere04hyper_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "neurosphere04\thyper\t$all_total\t$enhancer\t$neurosphere04hyper\t$neurosphere04hyper_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/neurosphere04hypo_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/neurosphere04hypo_enhancer.CpG.bed
 neurosphere04hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed | cut -d' ' -f 1`
 neurosphere04hypo_enhancer=`wc -l $dirOut/neurosphere04hypo_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "neurosphere04\thypo\t$all_total\t$enhancer\t$neurosphere04hypo\t$neurosphere04hypo_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
 dirIn=/projects/epigenomics/users/lli/FetalBrain/GW/DMR/CpG/
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/GW_Cortex_hyper_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/GW_Cortex_hyper_enhancer.CpG.bed
 GW_Cortex_hyper=`wc -l $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed | cut -d' ' -f 1`
 GW_Cortex_hyper_enhancer=`wc -l $dirOut/GW_Cortex_hyper_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "GW_Cortex\thyper\t$all_total\t$enhancer\t$GW_Cortex_hyper\t$GW_Cortex_hyper_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/GW_Cortex_hypo_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/GW_Cortex_hypo_enhancer.CpG.bed
 GW_Cortex_hypo=`wc -l $dirIn/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed | cut -d' ' -f 1`
 GW_Cortex_hypo_enhancer=`wc -l $dirOut/GW_Cortex_hypo_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "GW_Cortex\thypo\t$all_total\t$enhancer\t$GW_Cortex_hypo\t$GW_Cortex_hypo_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/GW_GE_hyper_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed -wa -wb > $dirOut/GW_GE_hyper_enhancer.CpG.bed
 GW_GE_hyper=`wc -l $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.CpG.bed | cut -d' ' -f 1`
 GW_GE_hyper_enhancer=`wc -l $dirOut/GW_GE_hyper_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "GW_GE\thyper\t$all_total\t$enhancer\t$GW_GE_hyper\t$GW_GE_hyper_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.CpG.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/GW_GE_hypo_enhancer.CpG.bed
+/gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/core_enhancers.CpG.bed -b $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed -wa -wb > $dirOut/GW_GE_hypo_enhancer.CpG.bed
 GW_GE_hypo=`wc -l $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed | cut -d' ' -f 1`
 GW_GE_hypo_enhancer=`wc -l $dirOut/GW_GE_hypo_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "GW_GE\thypo\t$all_total\t$enhancer\t$GW_GE_hypo\t$GW_GE_hypo_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
@@ -434,6 +453,7 @@ do
 done
 ## Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
 dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique'
 mkdir -p $dirIn/homer/
 cd $dirIn/
