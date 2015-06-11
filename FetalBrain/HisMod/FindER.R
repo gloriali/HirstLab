@@ -287,18 +287,21 @@ write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig
 ### homer
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/homer/")
 homer_core_enhancer <- read.delim("./knownResults.txt", head = T, as.is = T) %>% 
-  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), 
+  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
          Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
          Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
          FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
   filter(q.value..Benjamini. < 0.01) %>% 
   mutate(Motif.Name = factor(Motif.Name, levels = rev(Motif.Name)))
-(homer_core_enhancer_figure <- ggplot(data = filter(homer_core_enhancer, FC >= 1.2), aes(Motif.Name, -Log.P.value)) +
+homer_core_enhancer_top <- filter(homer_core_enhancer, Percent.of.Target.Sequences.with.Motif >= 20)
+write.table(homer_core_enhancer_top, file = "homer_core_enhancer_top.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+(homer_core_enhancer_figure <- ggplot(data = homer_core_enhancer_top, aes(Motif.Name, -Log.P.value)) +
   geom_bar(stat = "identity", width = .5, fill = "blue") + 
   coord_flip() + 
   geom_text(aes(label = -Log.P.value, hjust = 0)) + 
+  xlab("") + 
   theme_bw())
-ggsave(homer_core_enhancer_figure, file = "homer_core_enhancer_figure.pdf", height = 10, width = 10)
+ggsave(homer_core_enhancer_figure, file = "homer_core_enhancer_figure.pdf")
 ### overlap with WGBS UMRs
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/")
 UMR_enhancer <- read.delim("WGBS_UMR_enhancers.summary", as.is = T) %>%
@@ -382,7 +385,7 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
      venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
-     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, homer_core_enhancer, homer_core_enhancer_figure,
+     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, homer_core_enhancer, homer_core_enhancer_top, homer_core_enhancer_figure,
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
      GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
      GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
