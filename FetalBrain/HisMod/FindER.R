@@ -7,9 +7,17 @@ library(VennDiagram)
 library(gridExtra)
 library(preprocessCore)
 source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
+load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
+# split_on_last <- function(string, pattern){
+#   library(stringr)
+#   split <- unlist(str_split(string, pattern))
+#   first <- paste(split[1:length(split)-1], collapse = pattern)
+#   second <- split[length(split)]
+#   return(c(first, second))
+# }
+# split_on_last <- Vectorize(split_on_last, vectorize.args = "string", USE.NAMES = F)
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
-load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
 ## ============ Sanity check ===============
 ### Summary 
 FindER_summary <- read.delim("FindER.summary", head = F, as.is = T, col.names = c("Sample", "Mark", "N_peak", "N_base")) %>%
@@ -276,6 +284,21 @@ GWAS_core_enhancer_trait <- GWAS_core_enhancer %>% group_by(trait) %>%
 GWAS_core_enhancer_trait_sig <- droplevels(GWAS_core_enhancer_trait[GWAS_core_enhancer_trait$FDR < 0.01, ])
 write.table(GWAS_core_enhancer_trait, file = "./GWAS_core_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+### homer
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/homer/")
+homer_core_enhancer <- read.delim("./knownResults.txt", head = T, as.is = T) %>% 
+  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), 
+         Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
+         Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
+         FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
+  filter(q.value..Benjamini. < 0.01) %>% 
+  mutate(Motif.Name = factor(Motif.Name, levels = rev(Motif.Name)))
+(homer_core_enhancer_figure <- ggplot(data = filter(homer_core_enhancer, FC >= 1.2), aes(Motif.Name, -Log.P.value)) +
+  geom_bar(stat = "identity", width = .5, fill = "blue") + 
+  coord_flip() + 
+  geom_text(aes(label = -Log.P.value, hjust = 0)) + 
+  theme_bw())
+ggsave(homer_core_enhancer_figure, file = "homer_core_enhancer_figure.pdf", height = 10, width = 10)
 ### overlap with WGBS UMRs
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/")
 UMR_enhancer <- read.delim("WGBS_UMR_enhancers.summary", as.is = T) %>%
@@ -359,7 +382,7 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
      venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
-     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, 
+     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, homer_core_enhancer, homer_core_enhancer_figure,
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
      GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
      GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
