@@ -8,14 +8,14 @@ library(gridExtra)
 library(preprocessCore)
 source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
-# split_on_last <- function(string, pattern){
-#   library(stringr)
-#   split <- unlist(str_split(string, pattern))
-#   first <- paste(split[1:length(split)-1], collapse = pattern)
-#   second <- split[length(split)]
-#   return(c(first, second))
-# }
-# split_on_last <- Vectorize(split_on_last, vectorize.args = "string", USE.NAMES = F)
+split_on_last <- function(string, pattern){
+  library(stringr)
+  split <- unlist(str_split(string, pattern))
+  first <- paste(split[1:length(split)-1], collapse = pattern)
+  second <- split[length(split)]
+  return(c(first, second))
+}
+split_on_last <- Vectorize(split_on_last, vectorize.args = "string", USE.NAMES = F)
 
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
 ## ============ Sanity check ===============
@@ -288,6 +288,7 @@ write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/homer/")
 homer_core_enhancer <- read.delim("./knownResults.txt", head = T, as.is = T) %>% 
   mutate(Motif.Name = gsub("/Homer", "", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
+         TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), Assay = split_on_last(Motif.Name, "/")[2,], 
          Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
          Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
          FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
