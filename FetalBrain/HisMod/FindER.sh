@@ -282,7 +282,9 @@ rm H3K4me1.Cortex02.GE02*.bed
 ## Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
-/home/acarles/homer/bin/findMotifsGenome.pl $dirOut/core/core_enhancers.bed hg19 $dirOut/core/homer/ -size 200 -len 8 
+/home/acarles/homer/bin/findMotifsGenome.pl $dirOut/core/core_enhancers.bed hg19 $dirOut/core/homer/ -size 200 -len 8
+mkdir -p $dirOut/core/homer/annotate/ 
+less $dirOut/core/homer/homer_core_enhancer_top.txt | awk 'NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/core/core_enhancers.bed hg19 -m ""'$dirOut'""/core/homer/"$10" > ""'$dirOut'""/core/homer/annotate/"$11".annotate")}'
 ## Intersect with WGBS UMRs
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/
 mkdir -p $dirOut
