@@ -287,7 +287,7 @@ write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig
 ### homer
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/homer/")
 homer_core_enhancer <- read.delim("./knownResults.txt", head = T, as.is = T) %>% 
-  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
+  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
          TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), Assay = split_on_last(Motif.Name, "/")[2,], 
          Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
          Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
