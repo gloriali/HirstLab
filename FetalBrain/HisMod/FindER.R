@@ -6,6 +6,7 @@ library(reshape2)
 library(VennDiagram)
 library(gridExtra)
 library(preprocessCore)
+source("/home/lli/HirstLab/Pipeline/R/enrich.R")
 source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
 split_on_last <- function(string, pattern){
@@ -382,11 +383,11 @@ write.table(GWAS_unique_enhancer_all, file = "./GWAS/GWAS_unique_enhancer_all.tx
 write.table(GWAS_unique_enhancer_trait, file = "./GWAS/GWAS_unique_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait_sig, file = "./GWAS/GWAS_unique_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ### homer
-setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
 load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
 load("/home/lli/hg19/hg19v65_genes.Rdata")
 #### GW
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
 DE_GW13_GW17_cortex <- data.frame(ID = intersect(cortex01_cortex04DE$ID, cortex02_cortex04DE$ID)) %>%
   mutate(cortex01_cortex04 = cortex01_cortex04DE[as.character(ID), "DE"], cortex02_cortex04 = cortex02_cortex04DE[as.character(ID), "DE"], 
          cortex01 = cortex01_cortex04DE[as.character(ID), "rpkm1"], cortex02 = cortex02_cortex04DE[as.character(ID), "rpkm1"], cortex04 = cortex01_cortex04DE[as.character(ID), "rpkm2"], 
@@ -411,6 +412,7 @@ homer_unique_enhancer_GW_GW17 <- read.delim("./GW.GW17/knownResults.txt", head =
          FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
   filter(q.value..Benjamini. < 0.01) %>% 
   mutate(Motif.Name = factor(Motif.Name, levels = rev(Motif.Name)))
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/GW/")
 ##### Common TFs
 homer_unique_enhancer_GW_common <- merge(homer_unique_enhancer_GW_GW13, homer_unique_enhancer_GW_GW17, by = "Motif.Name") %>% 
   mutate(Consensus = Consensus.x, TF = TF.x, Assay = Assay.x, 
@@ -418,7 +420,7 @@ homer_unique_enhancer_GW_common <- merge(homer_unique_enhancer_GW_GW13, homer_un
          GW17_logP = Log.P.value.y, GW17_q = q.value..Benjamini..y, GW17_motif_file = motif.file.y, GW17_Percent_Target = Percent.of.Target.Sequences.with.Motif.y, GW17_FC = FC.y, delta_Percent_Target = abs(GW13_Percent_Target - GW17_Percent_Target)) %>%
   select(Motif.Name, Consensus, TF, Assay, GW13_logP, GW13_q, GW13_motif_file, GW13_Percent_Target, GW13_FC, GW17_logP, GW17_q, GW17_motif_file, GW17_Percent_Target, GW17_FC, delta_Percent_Target) %>% 
   arrange(- delta_Percent_Target)
-write.table(homer_unique_enhancer_GW_common, file = "./GW/homer_unique_enhancer_GW_common.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_common, file = "homer_unique_enhancer_GW_common.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 homer_unique_enhancer_GW_common_top <- homer_unique_enhancer_GW_common %>% filter(GW13_Percent_Target >= 20 | GW17_Percent_Target >= 20) %>% arrange(GW13_Percent_Target + GW17_Percent_Target) %>% mutate(Motif.Name = factor(Motif.Name, levels = as.character(Motif.Name)))
 homer_unique_enhancer_GW_common_top <- data.frame(Motif.Name = rep(homer_unique_enhancer_GW_common_top$Motif.Name, 2), GW = rep(c("GW13", "GW17"), each = nrow(homer_unique_enhancer_GW_common_top)), Percent_Target = c(homer_unique_enhancer_GW_common_top$GW13_Percent_Target, homer_unique_enhancer_GW_common_top$GW17_Percent_Target))
 (homer_unique_enhancer_GW_common_figure <- ggplot(data = homer_unique_enhancer_GW_common_top, aes(Motif.Name, Percent_Target)) +
@@ -429,9 +431,9 @@ homer_unique_enhancer_GW_common_top <- data.frame(Motif.Name = rep(homer_unique_
    xlab("") + 
    theme_bw())
 ggsave(homer_unique_enhancer_GW_common_figure, file = "homer_unique_enhancer_GW_common_figure.pdf")
-homer_unique_enhancer_GW_GW13_common_Sox3 <- read.delim("./GW/Common_GW13_Sox3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
+homer_unique_enhancer_GW_GW13_common_Sox3 <- read.delim("Common_GW13_Sox3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
 row.names(homer_unique_enhancer_GW_GW13_common_Sox3) <- homer_unique_enhancer_GW_GW13_common_Sox3$Nearest.Ensembl
-homer_unique_enhancer_GW_GW17_common_Sox3 <- read.delim("./GW/Common_GW17_Sox3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
+homer_unique_enhancer_GW_GW17_common_Sox3 <- read.delim("Common_GW17_Sox3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
 row.names(homer_unique_enhancer_GW_GW17_common_Sox3) <- homer_unique_enhancer_GW_GW17_common_Sox3$Nearest.Ensembl
 homer_unique_enhancer_GW_common_Sox3_list <- list(GW13 = homer_unique_enhancer_GW_GW13_common_Sox3$Nearest.Ensembl, GW17 = homer_unique_enhancer_GW_GW17_common_Sox3$Nearest.Ensembl, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
 Venn_homer_unique_enhancer_GW_common_Sox3 <- venn.diagram(homer_unique_enhancer_GW_common_Sox3_list, filename = NULL, fill = c("red", "blue", "green"), main = "GW common Sox3", force.unique = T)
@@ -441,13 +443,13 @@ homer_unique_enhancer_GW_common_Sox3 <- data.frame(ID = unique(c(homer_unique_en
   mutate(GW13 = homer_unique_enhancer_GW_GW13_common_Sox3[as.character(ID), 1], GW17 = homer_unique_enhancer_GW_GW17_common_Sox3[as.character(ID), 1])
 homer_unique_enhancer_GW_common_Sox3_DE_cortex <- merge(homer_unique_enhancer_GW_common_Sox3, DE_GW13_GW17_cortex, by = "ID") %>% mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13.y + GW13.y >= 0.2) %>% arrange(-abs(log2FC))
 homer_unique_enhancer_GW_common_Sox3_DE_GE <- merge(homer_unique_enhancer_GW_common_Sox3, DE_GW13_GW17_GE, by = "ID") %>% mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13.y + GW13.y >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_common_Sox3_DE_cortex, file = "./GW/homer_unique_enhancer_GW_common_Sox3_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-write.table(homer_unique_enhancer_GW_common_Sox3_DE_GE, file = "./GW/homer_unique_enhancer_GW_common_Sox3_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_common_Sox3_DE_cortex, file = "homer_unique_enhancer_GW_common_Sox3_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_common_Sox3_DE_GE, file = "homer_unique_enhancer_GW_common_Sox3_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ##### GW13 TFs
 homer_unique_enhancer_GW_GW13only <- homer_unique_enhancer_GW_GW13[!(homer_unique_enhancer_GW_GW13$Motif.Name %in% homer_unique_enhancer_GW_GW17$Motif.Name), ] %>%
   select(Motif.Name, TF, Assay, motif.file, Consensus, Log.P.value, q.value..Benjamini., Percent.of.Target.Sequences.with.Motif, Percent.of.Background.Sequences.with.Motif, FC) %>% 
   arrange(- Percent.of.Target.Sequences.with.Motif) %>% mutate(Motif.Name = factor(Motif.Name, levels = rev(as.character(Motif.Name))))
-write.table(homer_unique_enhancer_GW_GW13only, file = "./GW/homer_unique_enhancer_GW_GW13only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_GW13only, file = "homer_unique_enhancer_GW_GW13only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 (homer_unique_enhancer_GW_GW13only_figure <- ggplot(data = homer_unique_enhancer_GW_GW13only, aes(Motif.Name, Percent.of.Target.Sequences.with.Motif)) +
    geom_bar(fill = "blue", stat = "identity", width = .5) + 
    coord_flip() + 
@@ -459,7 +461,7 @@ ggsave(homer_unique_enhancer_GW_GW13only_figure, file = "homer_unique_enhancer_G
 homer_unique_enhancer_GW_GW17only <- homer_unique_enhancer_GW_GW17[!(homer_unique_enhancer_GW_GW17$Motif.Name %in% homer_unique_enhancer_GW_GW13$Motif.Name), ] %>%
   select(Motif.Name, TF, Assay, motif.file, Consensus, Log.P.value, q.value..Benjamini., Percent.of.Target.Sequences.with.Motif, Percent.of.Background.Sequences.with.Motif, FC) %>% 
   arrange(- Percent.of.Target.Sequences.with.Motif) %>% mutate(Motif.Name = factor(Motif.Name, levels = rev(as.character(Motif.Name))))
-write.table(homer_unique_enhancer_GW_GW17only, file = "./GW/homer_unique_enhancer_GW_GW17only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_GW17only, file = "homer_unique_enhancer_GW_GW17only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 (homer_unique_enhancer_GW_GW17only_figure <- ggplot(data = filter(homer_unique_enhancer_GW_GW17only, Percent.of.Target.Sequences.with.Motif >= 20), aes(Motif.Name, Percent.of.Target.Sequences.with.Motif)) +
    geom_bar(fill = "blue", stat = "identity", width = .5) + 
    coord_flip() + 
@@ -467,7 +469,7 @@ write.table(homer_unique_enhancer_GW_GW17only, file = "./GW/homer_unique_enhance
    xlab("") + 
    theme_bw())
 ggsave(homer_unique_enhancer_GW_GW17only_figure, file = "homer_unique_enhancer_GW_GW17only_figure.pdf", height = 4)
-homer_unique_enhancer_GW_GW17only_Olig2 <- read.delim("./GW/GW17only_Olig2.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
+homer_unique_enhancer_GW_GW17only_Olig2 <- read.delim("GW17only_Olig2.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
   mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
 row.names(homer_unique_enhancer_GW_GW17only_Olig2) <- homer_unique_enhancer_GW_GW17only_Olig2$ID
 homer_unique_enhancer_GW_GW17only_Olig2_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Olig2$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
@@ -476,10 +478,100 @@ plot.new()
 grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Olig2)
 homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_cortex, by = "ID") %>% 
   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, file = "./GW/homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 homer_unique_enhancer_GW_GW17only_Olig2_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_GE, by = "ID") %>% 
   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, file = "./GW/homer_unique_enhancer_GW_GW17only_Olig2_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex", erminej = F, fdr = 0.05, height = 2))
+(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_GE", erminej = F, fdr = 0.05, height = 8))
+#### Neurospheres
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
+cortex_GE_UP_duplicated <- c(cortex01_GE01UP$V1, cortex02_GE02UP$V1, cortex03_GE03UP$V1, cortex04_GE04UP$V1)
+cortex_GE_UP_duplicated <- ensembl[unique(cortex_GE_UP_duplicated[duplicated(cortex_GE_UP_duplicated)]), ]
+cortex_GE_DN_duplicated <- c(cortex01_GE01DN$V1, cortex02_GE02DN$V1, cortex03_GE03DN$V1, cortex04_GE04DN$V1)
+cortex_GE_DN_duplicated <- ensembl[unique(cortex_GE_DN_duplicated[duplicated(cortex_GE_DN_duplicated)]), ]
+cortex_GE_DE_duplicated <- rbind(data.frame(cortex_GE_UP_duplicated, DE = "UP"), data.frame(cortex_GE_DN_duplicated, DE = "DN"))
+homer_unique_enhancer_Neurospheres_Cortex <- read.delim("./Neurospheres.Cortex/knownResults.txt", head = T, as.is = T) %>% 
+  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
+         TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), Assay = split_on_last(Motif.Name, "/")[2,], 
+         Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
+         Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
+         FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
+  filter(q.value..Benjamini. < 0.01) %>% 
+  mutate(Motif.Name = factor(Motif.Name, levels = rev(Motif.Name)))
+homer_unique_enhancer_Neurospheres_GE <- read.delim("./Neurospheres.GE/knownResults.txt", head = T, as.is = T) %>% 
+  mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), motif.file = paste0("./knownResults/known", 1:n(), ".motif"), 
+         TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), Assay = split_on_last(Motif.Name, "/")[2,], 
+         Percent.of.Target.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif)), 
+         Percent.of.Background.Sequences.with.Motif = as.numeric(gsub("%", "", X..of.Background.Sequences.with.Motif)), 
+         FC = Percent.of.Target.Sequences.with.Motif/Percent.of.Background.Sequences.with.Motif) %>% 
+  filter(q.value..Benjamini. < 0.01) %>% 
+  mutate(Motif.Name = factor(Motif.Name, levels = rev(Motif.Name)))
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/Neurospheres/")
+##### Common TFs
+homer_unique_enhancer_Neurospheres_common <- merge(homer_unique_enhancer_Neurospheres_Cortex, homer_unique_enhancer_Neurospheres_GE, by = "Motif.Name") %>% 
+  mutate(Consensus = Consensus.x, TF = TF.x, Assay = Assay.x, 
+         Cortex_logP = Log.P.value.x, Cortex_q = q.value..Benjamini..x, Cortex_motif_file = motif.file.x, Cortex_Percent_Target = Percent.of.Target.Sequences.with.Motif.x, Cortex_FC = FC.x, 
+         GE_logP = Log.P.value.y, GE_q = q.value..Benjamini..y, GE_motif_file = motif.file.y, GE_Percent_Target = Percent.of.Target.Sequences.with.Motif.y, GE_FC = FC.y, delta_Percent_Target = abs(Cortex_Percent_Target - GE_Percent_Target)) %>%
+  select(Motif.Name, Consensus, TF, Assay, Cortex_logP, Cortex_q, Cortex_motif_file, Cortex_Percent_Target, Cortex_FC, GE_logP, GE_q, GE_motif_file, GE_Percent_Target, GE_FC, delta_Percent_Target) %>% 
+  arrange(- delta_Percent_Target)
+write.table(homer_unique_enhancer_Neurospheres_common, file = "homer_unique_enhancer_Neurospheres_common.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+homer_unique_enhancer_Neurospheres_common_top <- homer_unique_enhancer_Neurospheres_common %>% filter(Cortex_Percent_Target >= 20 | GE_Percent_Target >= 20) %>% arrange(Cortex_Percent_Target + GE_Percent_Target) %>% mutate(Motif.Name = factor(Motif.Name, levels = as.character(Motif.Name)))
+homer_unique_enhancer_Neurospheres_common_top <- data.frame(Motif.Name = rep(homer_unique_enhancer_Neurospheres_common_top$Motif.Name, 2), Neurospheres = rep(c("Cortex", "GE"), each = nrow(homer_unique_enhancer_Neurospheres_common_top)), Percent_Target = c(homer_unique_enhancer_Neurospheres_common_top$Cortex_Percent_Target, homer_unique_enhancer_Neurospheres_common_top$GE_Percent_Target))
+(homer_unique_enhancer_Neurospheres_common_figure <- ggplot(data = homer_unique_enhancer_Neurospheres_common_top, aes(Motif.Name, Percent_Target)) +
+   geom_bar(aes(fill = Neurospheres), stat = "identity", width = .5, position = position_dodge()) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   ylab("Percent of Enhancers with Motif") + 
+   xlab("") + 
+   theme_bw())
+ggsave(homer_unique_enhancer_Neurospheres_common_figure, file = "homer_unique_enhancer_Neurospheres_common_figure.pdf")
+homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3 <- read.delim("Common_Cortex_Lhx3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
+row.names(homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3) <- homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3$Nearest.Ensembl
+homer_unique_enhancer_Neurospheres_GE_common_Lhx3 <- read.delim("Common_GE_Lhx3.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl)
+row.names(homer_unique_enhancer_Neurospheres_GE_common_Lhx3) <- homer_unique_enhancer_Neurospheres_GE_common_Lhx3$Nearest.Ensembl
+homer_unique_enhancer_Neurospheres_common_Lhx3_list <- list(Cortex = homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3$Nearest.Ensembl, GE = homer_unique_enhancer_Neurospheres_GE_common_Lhx3$Nearest.Ensembl, DE = cortex_GE_DE_duplicated$id)
+Venn_homer_unique_enhancer_Neurospheres_common_Lhx3 <- venn.diagram(homer_unique_enhancer_Neurospheres_common_Lhx3_list, filename = NULL, fill = c("red", "blue", "green"), main = "Neurospheres common Lhx3", force.unique = T)
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_Neurospheres_common_Lhx3)
+homer_unique_enhancer_Neurospheres_common_Lhx3 <- data.frame(id = unique(c(homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3$Nearest.Ensembl, homer_unique_enhancer_Neurospheres_GE_common_Lhx3$Nearest.Ensembl))) %>%
+  mutate(Cortex = homer_unique_enhancer_Neurospheres_Cortex_common_Lhx3[as.character(id), 1], GE = homer_unique_enhancer_Neurospheres_GE_common_Lhx3[as.character(id), 1])
+homer_unique_enhancer_Neurospheres_common_Lhx3_DE <- merge(homer_unique_enhancer_Neurospheres_common_Lhx3, cortex_GE_DE_duplicated, by = "id") 
+write.table(homer_unique_enhancer_Neurospheres_common_Lhx3_DE, file = "homer_unique_enhancer_Neurospheres_common_Lhx3_DE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+##### Cortex TFs
+homer_unique_enhancer_Neurospheres_CortexOnly <- homer_unique_enhancer_Neurospheres_Cortex[!(homer_unique_enhancer_Neurospheres_Cortex$Motif.Name %in% homer_unique_enhancer_Neurospheres_GE$Motif.Name), ] %>%
+  select(Motif.Name, TF, Assay, motif.file, Consensus, Log.P.value, q.value..Benjamini., Percent.of.Target.Sequences.with.Motif, Percent.of.Background.Sequences.with.Motif, FC) %>% 
+  arrange(- Percent.of.Target.Sequences.with.Motif) %>% mutate(Motif.Name = factor(Motif.Name, levels = rev(as.character(Motif.Name))))
+write.table(homer_unique_enhancer_Neurospheres_CortexOnly, file = "homer_unique_enhancer_Neurospheres_CortexOnly.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+(homer_unique_enhancer_Neurospheres_CortexOnly_figure <- ggplot(data = homer_unique_enhancer_Neurospheres_CortexOnly, aes(Motif.Name, Percent.of.Target.Sequences.with.Motif)) +
+   geom_bar(fill = "blue", stat = "identity", width = .5) + 
+   coord_flip() + 
+   ylab("Percent of Enhancers with Motif") + 
+   xlab("") + 
+   theme_bw())
+ggsave(homer_unique_enhancer_Neurospheres_CortexOnly_figure, file = "homer_unique_enhancer_Neurospheres_CortexOnly_figure.pdf")
+##### GE TFs
+homer_unique_enhancer_Neurospheres_GEonly <- homer_unique_enhancer_Neurospheres_GE[!(homer_unique_enhancer_Neurospheres_GE$Motif.Name %in% homer_unique_enhancer_Neurospheres_Cortex$Motif.Name), ] %>%
+  select(Motif.Name, TF, Assay, motif.file, Consensus, Log.P.value, q.value..Benjamini., Percent.of.Target.Sequences.with.Motif, Percent.of.Background.Sequences.with.Motif, FC) %>% 
+  arrange(- Percent.of.Target.Sequences.with.Motif) %>% mutate(Motif.Name = factor(Motif.Name, levels = rev(as.character(Motif.Name))))
+write.table(homer_unique_enhancer_Neurospheres_GEonly, file = "homer_unique_enhancer_Neurospheres_GEonly.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+(homer_unique_enhancer_Neurospheres_GEonly_figure <- ggplot(data = filter(homer_unique_enhancer_Neurospheres_GEonly, Percent.of.Target.Sequences.with.Motif >= 20), aes(Motif.Name, Percent.of.Target.Sequences.with.Motif)) +
+   geom_bar(fill = "blue", stat = "identity", width = .5) + 
+   coord_flip() + 
+   ylab("Percent of Enhancers with Motif") + 
+   xlab("") + 
+   theme_bw())
+ggsave(homer_unique_enhancer_Neurospheres_GEonly_figure, file = "homer_unique_enhancer_Neurospheres_GEonly_figure.pdf", height = 4)
+homer_unique_enhancer_Neurospheres_GEonly_Olig2 <- read.delim("GEonly_Olig2.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
+  mutate(id = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(id, Enhancer, Annotation, Distance.to.TSS)
+row.names(homer_unique_enhancer_Neurospheres_GEonly_Olig2) <- homer_unique_enhancer_Neurospheres_GEonly_Olig2$id
+homer_unique_enhancer_Neurospheres_GEonly_Olig2_list <- list(GE = homer_unique_enhancer_Neurospheres_GEonly_Olig2$id, DE = cortex_GE_DE_duplicated$id)
+Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2 <- venn.diagram(homer_unique_enhancer_Neurospheres_GEonly_Olig2_list, filename = NULL, fill = c("red", "blue"), main = "Neurospheres GE_only Olig2", force.unique = T)
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2)
+homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE <- merge(homer_unique_enhancer_Neurospheres_GEonly_Olig2, cortex_GE_DE_duplicated, by = "id") 
+write.table(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, file = "homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID <- enrich("homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE", erminej = F, fdr = 0.05, height = 8))
 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
@@ -495,5 +587,9 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      homer_unique_enhancer_GW_GW13, homer_unique_enhancer_GW_GW17, homer_unique_enhancer_GW_common, Venn_homer_unique_enhancer_GW_common_Sox3, 
      DE_GW13_GW17_cortex, DE_GW13_GW17_GE, homer_unique_enhancer_GW_common_Sox3_DE_cortex, homer_unique_enhancer_GW_common_Sox3_DE_GE, 
      homer_unique_enhancer_GW_GW13only, homer_unique_enhancer_GW_GW13only_figure, homer_unique_enhancer_GW_GW17only, homer_unique_enhancer_GW_GW17only_Olig2, Venn_homer_unique_enhancer_GW_GW17only_Olig2, 
-     homer_unique_enhancer_GW_GW17only_figure, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, 
+     homer_unique_enhancer_GW_GW17only_figure, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID, 
+     homer_unique_enhancer_Neurospheres_Cortex, homer_unique_enhancer_Neurospheres_GE, homer_unique_enhancer_Neurospheres_common, homer_unique_enhancer_Neurospheres_common_figure, 
+     cortex_GE_DE_duplicated, Venn_homer_unique_enhancer_Neurospheres_common_Lhx3, homer_unique_enhancer_Neurospheres_common_Lhx3_DE, 
+     homer_unique_enhancer_Neurospheres_CortexOnly, homer_unique_enhancer_Neurospheres_CortexOnly_figure, homer_unique_enhancer_Neurospheres_GEonly, homer_unique_enhancer_Neurospheres_GEonly_figure, 
+     homer_unique_enhancer_Neurospheres_GEonly_Olig2, Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
