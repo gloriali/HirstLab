@@ -474,6 +474,13 @@ dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
 less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
 less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
 less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR==6 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
+### Neurospheres
+PATH=$PATH:/home/acarles/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
+less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_common.txt | awk 'NR==3 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.Neurospheres.Cortex.bed hg19 -m ""'$dirOut'""/homer/Neurospheres.Cortex/"$7" > ""'$dirOut'""/homer/Neurospheres/Common_Cortex_"$3".annotate")}'
+less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_common.txt | awk 'NR==3 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.Neurospheres.GE.bed hg19 -m ""'$dirOut'""/homer/Neurospheres.GE/"$12" > ""'$dirOut'""/homer/Neurospheres/Common_GE_"$3".annotate")}'
+less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_GEonly.txt | awk 'NR==5 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.Neurospheres.GE.bed hg19 -m ""'$dirOut'""/homer/Neurospheres.GE/"$4" > ""'$dirOut'""/homer/Neurospheres/GEonly_"$2".annotate")}'
 
 
 
