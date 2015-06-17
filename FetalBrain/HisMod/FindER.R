@@ -283,8 +283,11 @@ GWAS_core_enhancer_trait <- GWAS_core_enhancer %>% group_by(trait) %>%
          phyper = 1 - phyper(Nsample_trait, Nsample, Ntotal-Nsample, Ntrait), 
          FDR = p.adjust(phyper, method = "fdr")) %>% arrange(FDR)
 GWAS_core_enhancer_trait_sig <- droplevels(GWAS_core_enhancer_trait[GWAS_core_enhancer_trait$FDR < 0.01, ])
+GWAS_core_enhancer_trait_sig_brain <- GWAS_core_enhancer %>% filter(trait %in% c("Cortical structure", "Glaucoma (exfoliation)", "Glioblastoma", "Neuranatomic and neurocognitive phenotypes", "Neuroblastoma (high-risk)", "Odorant perception (isobutyraldehyde)", "Schizophrenia (cytomegalovirus infection interaction)", "Alzheimer's disease biomarkers")) %>% 
+  arrange(trait)
 write.table(GWAS_core_enhancer_trait, file = "./GWAS_core_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GWAS_core_enhancer_trait_sig_brain, file = "./GWAS_core_enhancer_trait_sig_brain.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ### homer
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/homer/")
 homer_core_enhancer <- read.delim("./knownResults.txt", head = T, as.is = T) %>% 
@@ -379,9 +382,15 @@ GWAS_unique_enhancer_trait <- GWAS_unique_enhancer_all %>% group_by(comparison, 
          phyper = 1 - phyper(Nsample_trait, Nsample, Ntotal-Nsample, Ntrait), 
          FDR = p.adjust(phyper, method = "fdr")) %>% arrange(comparison, Sample, FDR)
 GWAS_unique_enhancer_trait_sig <- droplevels(GWAS_unique_enhancer_trait[GWAS_unique_enhancer_trait$FDR < 0.01, ])
+GWAS_unique_enhancer_trait_sig_brain <- GWAS_unique_enhancer_all %>% 
+  filter(trait %in% c("Gliomas", "Alzheimer's disease (cognitive decline)", "Response to cholinesterase inhibitors in Alzheimer's disease", "Autism", "Schizophrenia or bipolar disorder", "Attention deficit hyperactivity disorder", 
+                      "Cognitive test performance", "Information processing speed", "Corneal astigmatism", "Hippocampal atrophy", "Central corneal thickness", "Neuroblastoma (high-risk)", "Psychosis (methamphetamine induced)", 
+                      "Hearing impairment", "Hippocampal volume", "Optic nerve measurement (cup-to-disc ratio)", "Cerebrospinal AB1-42 levels", "Cerebrospinal P-tau181p levels", "Optic nerve measurement (cup area)", "Myopia (pathological)", 
+                      "Cognitive performance", "Migraine - clinic-based", "Intelligence (childhood)", "Inattentive symptoms", "Behavioural disinhibition (generation interaction)", "Normalized brain volume", "Corneal curvature", "Intelligence"))
 write.table(GWAS_unique_enhancer_all, file = "./GWAS/GWAS_unique_enhancer_all.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait, file = "./GWAS/GWAS_unique_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait_sig, file = "./GWAS/GWAS_unique_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GWAS_unique_enhancer_trait_sig_brain, file = "./GWAS/GWAS_unique_enhancer_trait_sig_brain.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ### homer
 load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
@@ -577,11 +586,12 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
      venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
-     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, homer_core_enhancer, homer_core_enhancer_top, homer_core_enhancer_figure, homer_unique_enhancer_GW_common_figure, 
+     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, GWAS_core_enhancer_trait_sig_brain, 
+     homer_core_enhancer, homer_core_enhancer_top, homer_core_enhancer_figure, homer_unique_enhancer_GW_common_figure, 
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
      GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
      GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
-     unique_enhancers_summary, GWAS_unique_enhancer_all, GWAS_unique_enhancer_trait, GWAS_unique_enhancer_trait_sig, 
+     unique_enhancers_summary, GWAS_unique_enhancer_all, GWAS_unique_enhancer_trait, GWAS_unique_enhancer_trait_sig, GWAS_unique_enhancer_trait_sig_brain, 
      venn_unique_enhancer_Cortex, venn_unique_enhancer_GE, venn_unique_enhancer_GW13, venn_unique_enhancer_GW17, 
      GREAT_unique_enhancer_Brain01, GREAT_unique_enhancer_Brain02, GREAT_unique_enhancer_Cortex, GREAT_unique_enhancer_GE, GREAT_unique_enhancer_GW13, GREAT_unique_enhancer_GW17, 
      homer_unique_enhancer_GW_GW13, homer_unique_enhancer_GW_GW17, homer_unique_enhancer_GW_common, Venn_homer_unique_enhancer_GW_common_Sox3, 
