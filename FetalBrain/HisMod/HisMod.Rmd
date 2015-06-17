@@ -17,8 +17,8 @@ library(dplyr)
 library(reshape2)
 library(gridExtra)
 library(knitr)
-opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.width = 8)
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
+opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.width = 8)
 ```
 
 ## Sanity check   
@@ -48,6 +48,51 @@ load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rd
 (His_DM_promoter_figure)
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
              gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
+```
+
+## Core enhancers 
+
+* Overlapping all NPC enhancers (Cortex01, Cortex02, GE01, GE02, GE04), in total `r system("wc -l /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/core_enhancers.bed | awk '{print $1}'", intern = T)` regions, average length `r system("less /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/core_enhancers.bed | awk '{s=s+$3-$2; c=c+1}END{print s/c}'", intern = T)`bp.     
+
+### GWAS in core enhancers  
+
+* `r length(unique(GWAS_core_enhancer$enhancerID))` enhancers overlap with GWAS, involved in `r nrow(GWAS_core_enhancer_trait)` traits, and `r nrow(GWAS_core_enhancer_trait_sig)` traits are significantly (hypergeometric test FDR < 0.01) enriched in core enhancers.     
+* Among the significantly enriched traits, 8 are related to brain development and function: Cortical structure, Glaucoma (exfoliation), Glioblastoma, Neuranatomic and neurocognitive phenotypes, Neuroblastoma (high-risk), Odorant perception (isobutyraldehyde), Schizophrenia (cytomegalovirus infection interaction), Alzheimer's disease biomarkers.        
+
+```{r core_enhancer_GWAS, results='asis'}
+kable(GWAS_core_enhancer_trait_sig_brain, format = "html", align = "l")
+```
+
+### Homer TFBSs
+
+* There are `r nrow(homer_core_enhancer_top)` TFs significantly (Benjamini q value < 0.01) enriched in core enhancers and present in > 20% of the core enhancers.    
+* Ptf1a: plays an important role in cerebellar and pancreatic development.       
+* Isl1: central to the development of pancreatic cell lineages and may also be required for motor neuron generation.        
+* Lhx3: involved in the development of interneurons and motor neurons.    
+* NF1: negative regulator of the ras signal transduction pathway, associated with neurofibromatosis type 1.     
+* Sox3: function as a switch in neuronal development. Keeps neural cells undifferentiated by counteracting the activity of proneural proteins and suppresses neuronal differentiation.       
+* Olig2: oligodendrocyte specific marker.      
+
+```{r core_enhancer_homer}
+(homer_core_enhancer_figure)
+```
+
+### Overlapping with WGBS UMRs
+
+* UMRs between neurospheres (cortex vs GE) are enriched in enhancers (H3K4me1 enriched regions).      
+* Between gestational weeks, GW13 UMRs are enriched in enhancers, but GW17 UMRs are not.      
+* UMRs overlaped with enhancers are highly enriched for brain development terms. For comparing between neurospheres, GE enhancer UMRs in HuFNSC04 have no significant enrichment. And for comparing between gestational weeks, GW13 enhancer UMRs in Cortex also have no enriched terms.       
+
+```{r core_enhancer_UMR, fig.height = 6, fig.width = 8}
+(UMR_enhancer_summary_figure)
+```
+```{r core_enhancer_UMR_GREAT, fig.height = 15, fig.width = 8}
+(GREAT_Cortex_UMR_enhancer_HuFNSC02)
+(GREAT_GE_UMR_enhancer_HuFNSC02)
+(GREAT_Cortex_UMR_enhancer_HuFNSC04)
+(GREAT_GW17_UMR_enhancer_Cortex)
+(GREAT_GW17_UMR_enhancer_GE)
+(GREAT_GW13_UMR_enhancer_GE)
 ```
 
 ## Unique enhancers 
@@ -89,33 +134,58 @@ grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
 
 ### GWAS in unique enhancers 
 
-* All sets of unique enhancers showed brain or brain disease related GWAS sites including gliomas, Alzheimer's disease, Autism, Schizophrenia, attention deficit hyperactivity disorder, cognitive performance and intellegence. Below shows statistically significant (hypergeometric test) GWAS traits found in at least two samples.          
+* All sets of unique enhancers showed brain or brain disease related GWAS sites, such as Gliomas, Alzheimer's disease, Autism, Schizophrenia or bipolar disorder, Cognitive performance, Neuroblastoma (high-risk), Normalized brain volume, Intelligence. In total, there are `r nrow(GWAS_unique_enhancer_trait_sig_brain)` enhancers associated with brain related GWAS traits.                 
 
 ```{r unique_enhancer_GWAS1, results='asis'}
 kable(GWAS_unique_enhancer_trait_sig %>% group_by(comparison, Sample) %>% summarise(No.traits = n()), format = "html", align = c("l", "l", "l"))
 ```
 
-* statistically significant GWAS traits found in at least two samples:   
+* statistically significant (hypergeometric test FDR < 0.01) GWAS traits found in at least two samples:   
 
 ```{r unique_enhancer_GWAS2, results='asis'}
 names(summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200)[summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200) > 1])
 ```
 
-## Overlapping enhancers with WGBS UMRs
+### Homer TFBSs
+#### Unique enhancers between GW13 and GW17 
 
-* UMRs between neurospheres (cortex vs GE) are enriched in enhancers (H3K4me1 enriched regions).      
-* Between gestational weeks, GW13 UMRs are enriched in enhancers, but GW17 UMRs are not.      
-* UMRs overlaped with enhancers are highly enriched for brain development terms. For comparing between neurospheres, GE enhancer UMRs in HuFNSC04 have no significant enrichment. And for comparing between gestational weeks, GW13 enhancer UMRs in Cortex also have no enriched terms.       
+* Intersect of unique enhancers between GE01 vs GE04 and GE02 vs GE04. There are `r system("wc -l /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/unique_enhancer.GW.GW13.bed | awk '{print $1}'", intern = T)` GW13-specific enhancers, and `r system("wc -l /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/unique_enhancer.GW.GW17.bed | awk '{print $1}'", intern = T)` GW17-specific enhancers.          
+* There are `r nrow(homer_unique_enhancer_GW_GW13)` TFs significantly (Benjamini q-value < 0.01) enriched in GW13-specific enhancers, and `r nrow(homer_unique_enhancer_GW_GW17)` in GW17-specific enhancers. Among them, `r nrow(homer_unique_enhancer_GW_common)` TFs are in common.        
+* In the common TFs, `r nrow(homer_unique_enhancer_GW_common %>% filter(GW13_Percent_Target >= 20 | GW17_Percent_Target >= 20))` are present in > 20% enhancers in either GW13 or GW17. Their percent occupancy in GW13 and GW17 specific enhancers are similar, and downstream target genes are significantly overlapped (for example, Sox3 hypergeometric test p-value = 0).      
+* There are only `r nrow(homer_unique_enhancer_GW_GW13only)` GW13-specific TFs, and they all present in < 5% of the enhancers.    
+* There are `r nrow(homer_unique_enhancer_GW_GW17only)` GW17-specific TFs, and `r nrow(filter(homer_unique_enhancer_GW_GW17only, Percent.of.Target.Sequences.with.Motif >= 20))` of them are present in > 20% of the enhancers, including Olig2.      
+* GW17-specific enhancers overlapped with Olig2 binding sites are associated with `r nrow(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex)` GW-specific DE genes in cortex, and `r nrow(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE)` in GE. Both gene lists are enriched for neuron development terms.              
 
-```{r UMR, fig.height = 6, fig.width = 8}
-(UMR_enhancer_summary_figure)
+```{r unique_enhancer_homer_GW}
+(homer_unique_enhancer_GW_common_figure + ggtitle("Common TFs in GW unique enhancers"))
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_GW_common_Sox3)
+(homer_unique_enhancer_GW_GW13only_figure + ggtitle("GW13-specific TFs in GW unique enhancers"))
+(homer_unique_enhancer_GW_GW17only_figure + ggtitle("GW17-specific TFs in GW unique enhancers"))
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Olig2)
+(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID)
+(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID)
 ```
-```{r UMR_GREAT, fig.height = 15, fig.width = 8}
-(GREAT_Cortex_UMR_enhancer_HuFNSC02)
-(GREAT_GE_UMR_enhancer_HuFNSC02)
-(GREAT_Cortex_UMR_enhancer_HuFNSC04)
-(GREAT_GW17_UMR_enhancer_Cortex)
-(GREAT_GW17_UMR_enhancer_GE)
-(GREAT_GW13_UMR_enhancer_GE)
+
+#### Unique enhancers between cortex and GE
+
+* Intersect of unique enhancers between cortex01 vs GE01 and cortex02 vs GE02. There are `r system("wc -l /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/unique_enhancer.Neurospheres.Cortex.bed | awk '{print $1}'", intern = T)` cortex-specific enhancers, and `r system("wc -l /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/unique_enhancer.Neurospheres.GE.bed | awk '{print $1}'", intern = T)` GE-specific enhancers.     
+* There are `r nrow(homer_unique_enhancer_Neurospheres_Cortex)` TFs significantly (Benjamini q-value < 0.01) enriched in cortex-specific enhancers, and `r nrow(homer_unique_enhancer_Neurospheres_GE)` in GE-specific enhancers. Among them, `r nrow(homer_unique_enhancer_Neurospheres_common)` TFs are in common.        
+* In the common TFs, `r nrow(homer_unique_enhancer_Neurospheres_common %>% filter(Cortex_Percent_Target >= 20 | GE_Percent_Target >= 20))` are present in > 20% enhancers in either cortex or GE. Their percent occupancy in cortex and GE specific enhancers are similar, and downstream target genes are significantly overlapped (for example, Lhx3 hypergeometric test p-value = 0).      
+* There are only `r nrow(homer_unique_enhancer_Neurospheres_CortexOnly)` cortex-specific TFs, and they all present in < 20% of the enhancers.    
+* There are `r nrow(homer_unique_enhancer_Neurospheres_GEonly)` GW17-specific TFs, and `r nrow(filter(homer_unique_enhancer_Neurospheres_GEonly, Percent.of.Target.Sequences.with.Motif >= 20))` of them are present in > 20% of the enhancers, including Olig2.      
+* `r nrow(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE)` GE-specific enhancers overlapped with Olig2 binding sites are associated with NPC-specific DE genes, and the DE genes are enriched for neuron development terms.              
+
+```{r unique_enhancer_homer_neurospheres}
+(homer_unique_enhancer_Neurospheres_common_figure + ggtitle("Common TFs in NPC unique enhancers"))
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_Neurospheres_common_Lhx3)
+(homer_unique_enhancer_Neurospheres_CortexOnly_figure + ggtitle("cortex-specific TFs in NPC unique enhancers"))
+(homer_unique_enhancer_Neurospheres_GEonly_figure + ggtitle("GE-specific TFs in NPC unique enhancers"))
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2)
+(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID)
 ```
+
 
