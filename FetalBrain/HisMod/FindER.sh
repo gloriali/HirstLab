@@ -330,7 +330,6 @@ for file in *.bed
 do
     less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $file.GREAT.bed
 done
-
 ### enhancer UMRs - enrichment
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/CpG/
 mkdir -p $dirOut
@@ -373,7 +372,7 @@ echo -e "GW_GE\thyper\t$all_total\t$enhancer\t$GW_GE_hyper\t$GW_GE_hyper_enhance
 GW_GE_hypo=`wc -l $dirIn/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.CpG.bed | cut -d' ' -f 1`
 GW_GE_hypo_enhancer=`wc -l $dirOut/GW_GE_hypo_enhancer.CpG.bed | cut -d' ' -f 1`
 echo -e "GW_GE\thypo\t$all_total\t$enhancer\t$GW_GE_hypo\t$GW_GE_hypo_enhancer" | awk '{print $0"\t"($6/$5)/($4/$3)}' >> $dirOut/WGBS_UMR_enhancers_enrich.summary
-## Homer for TFBS motifs
+### Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/UMR/'
