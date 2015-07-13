@@ -56,12 +56,8 @@ grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn
 
 ### GWAS in core enhancers  
 
-* `r length(unique(GWAS_core_enhancer$enhancerID))` enhancers overlap with GWAS, involved in `r nrow(GWAS_core_enhancer_trait)` traits, and `r nrow(GWAS_core_enhancer_trait_sig)` traits are significantly (hypergeometric test FDR < 0.01) enriched in core enhancers.     
-* Among the significantly enriched traits, 8 are related to brain development and function: Cortical structure, Glaucoma (exfoliation), Glioblastoma, Neuranatomic and neurocognitive phenotypes, Neuroblastoma (high-risk), Odorant perception (isobutyraldehyde), Schizophrenia (cytomegalovirus infection interaction), Alzheimer's disease biomarkers.        
-
-```{r core_enhancer_GWAS, results='asis'}
-kable(GWAS_core_enhancer_trait_sig_brain, format = "html", align = "l")
-```
+* `r length(unique(GWAS_core_enhancer$enhancerID))` enhancers overlap with GWAS, involved in `r nrow(GWAS_core_enhancer_trait)` traits.     
+* Several traits are related to brain development and function: Cortical structure, Glaucoma (exfoliation), Glioblastoma, Neuranatomic and neurocognitive phenotypes, Neuroblastoma (high-risk), Odorant perception (isobutyraldehyde), Schizophrenia (cytomegalovirus infection interaction), Alzheimer's disease biomarkers.        
 
 ### Homer TFBSs
 
@@ -134,17 +130,7 @@ grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
 
 ### GWAS in unique enhancers 
 
-* All sets of unique enhancers showed brain or brain disease related GWAS sites, such as Gliomas, Alzheimer's disease, Autism, Schizophrenia or bipolar disorder, Cognitive performance, Neuroblastoma (high-risk), Normalized brain volume, Intelligence. In total, there are `r nrow(GWAS_unique_enhancer_trait_sig_brain)` enhancers associated with brain related GWAS traits.                 
-
-```{r unique_enhancer_GWAS1, results='asis'}
-kable(GWAS_unique_enhancer_trait_sig %>% group_by(comparison, Sample) %>% summarise(No.traits = n()), format = "html", align = c("l", "l", "l"))
-```
-
-* statistically significant (hypergeometric test FDR < 0.01) GWAS traits found in at least two samples:   
-
-```{r unique_enhancer_GWAS2, results='asis'}
-names(summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200)[summary(GWAS_unique_enhancer_trait_sig$trait, maxsum = 200) > 1])
-```
+* All sets of unique enhancers showed brain or brain disease related GWAS sites, such as Gliomas, Alzheimer's disease, Autism, Schizophrenia or bipolar disorder, Cognitive performance, Neuroblastoma (high-risk), Normalized brain volume, Intelligence.               
 
 ### Homer TFBSs
 #### Unique enhancers between GW13 and GW17 
@@ -167,6 +153,19 @@ grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Olig2)
 (homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID)
 (homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID)
 ```
+
+* Olig2 downstream DE genes in cortex (distance to TSS < 10kb)    
+  + EMX2: Empty Spiracles Homeobox 2. acts to generate the boundary between the roof and archipallium in the developing brain. May function in combinations with OTX1/2 to specify cell fates in the developing central nervous system.       
+  + RGS10: Regulator Of G-Protein Signaling 10. associated with schizophrenia.     
+  + LGI1: Leucine-Rich, Glioma Inactivated 1. This gene is predominantly expressed in neural tissues and its expression is reduced in low grade brain tumors and significantly reduced or absent in malignant gliomas. Mutations in this gene result in autosomal dominant lateral temporal epilepsy. May play a role in the control of neuroblastoma cell survival.     
+  
+![Olig2_cortex_DE](./HisMod_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network.png)          
+
+* Olig2 downstream DE genes in GE (distance to TSS < 10kb)      
+  + PAX6: Paired Box 6. expressed in the developing nervous system, and in developing eyes. Mutations in this gene are known to cause ocular disorders such as aniridia and Peter's anomaly.     
+  + HIVEP2: Human Immunodeficiency Virus Type I Enhancer Binding Protein 2. zinc finger-containing transcription factors. The encoded protein regulates transcription by binding to regulatory regions of various cellular and viral genes that maybe involved in growth, development and metastasis.    
+  
+![Olig2_GE_DE](./HisMod_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.png)       
 
 #### Unique enhancers between cortex and GE
 
