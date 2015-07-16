@@ -278,7 +278,9 @@ mkdir -p $dirOut/core/
 /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/intersectBed -a $dirOut/H3K4me1.Cortex02.GE02.GE04.Cortex01.bed -b $dirOut/FindER_scan.A03275.H3K4me1.GE01.multi.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/core/core_enhancers.bed
 rm H3K4me1.Cortex02.GE02*.bed
 ## Intersect with GWAS sites
-/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/core/core_enhancers.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/core/core_enhancers.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/core/core_enhancers.bed -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/core/core_enhancers.GWAS.txt
+less $dirOut/core/core_enhancers.GWAS.txt | awk -F"\t" '{print $5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$4}' > $dirOut/core/core_enhancers.GWAS.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/core/core_enhancers.GWAS.bed -b /projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz -wa -wb > $dirOut/core/core_enhancers.GWAS.TFBS.txt
 ## Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -417,6 +419,9 @@ s2=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
 s1_unique=`wc -l $dirOut/unique_enhancer.MZ.GE01.bed | cut -d' ' -f 1`
 s2_unique=`wc -l $dirOut/unique_enhancer.MZ.GE02.bed | cut -d' ' -f 1`
 echo -e "MZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+### Intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex01.bed -b $dirOut/unique_enhancer.MZ.GE01.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.HuFNSC01.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex02.bed -b $dirOut/unique_enhancer.MZ.GE02.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.HuFNSC02.bed
 ## Between neurospheres
 ### HuFNSC01
 /projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex01.bed
@@ -466,6 +471,7 @@ do
     echo "Processing "$name
     /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/$file -b /home/lli/hg19/gwasCatalog_July2014.bed -wa -wb > $dirOut/GWAS/$name.GWAS.bed
 done
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/GWAS/GWAS_unique_enhancer_all.bed -b /projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz -wa -wb > /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/GWAS/GWAS_unique_enhancer_all_TFBS.txt
 ## Homer for TFBS motifs
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
