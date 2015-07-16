@@ -581,6 +581,22 @@ grid.draw(Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2)
 homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE <- merge(homer_unique_enhancer_Neurospheres_GEonly_Olig2, cortex_GE_DE_duplicated, by = "id") 
 write.table(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, file = "homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 (homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID <- enrich("homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE", erminej = F, fdr = 0.05, height = 8))
+#### cytoscape
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/GW/")
+homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node <- homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex %>% 
+  filter(abs(Distance.to.TSS) < 10000) %>% select(name, log2FC, cortex01_cortex04) %>% mutate(log2FC = abs(log2FC))
+homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network <- homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node %>% mutate(Source = "OLIG2", Interaction = "activate")
+homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network[homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network$cortex01_cortex04 == "DN", "Interaction"] <- "repress"
+homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node <- rbind(data.frame(name = "OLIG2", log2FC = abs(DE_GW13_GW17_cortex[DE_GW13_GW17_cortex$ID == "ENSG00000205927", "log2FC"]), cortex01_cortex04 = DE_GW13_GW17_cortex[DE_GW13_GW17_cortex$ID == "ENSG00000205927", "cortex01_cortex04"]), homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node <- homer_unique_enhancer_GW_GW17only_Olig2_DE_GE %>% 
+  filter(abs(Distance.to.TSS) < 10000) %>% select(name, log2FC, GE01_GE04) %>% mutate(log2FC = abs(log2FC))
+homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network <- homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node %>% mutate(Source = "OLIG2", Interaction = "activate")
+homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network[homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network$GE01_GE04 == "DN", "Interaction"] <- "repress"
+homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node <- rbind(data.frame(name = "OLIG2", log2FC = abs(DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "log2FC"]), GE01_GE04 = DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "GE01_GE04"]), homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
@@ -602,4 +618,5 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      cortex_GE_DE_duplicated, Venn_homer_unique_enhancer_Neurospheres_common_Lhx3, homer_unique_enhancer_Neurospheres_common_Lhx3_DE, 
      homer_unique_enhancer_Neurospheres_CortexOnly, homer_unique_enhancer_Neurospheres_CortexOnly_figure, homer_unique_enhancer_Neurospheres_GEonly, homer_unique_enhancer_Neurospheres_GEonly_figure, 
      homer_unique_enhancer_Neurospheres_GEonly_Olig2, Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID, 
+     homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")

@@ -2,7 +2,7 @@
 Gloria Li  
 January 27, 2014  
 
-Update Wed Jun 17 11:58:51 2015
+Update Mon Jul 13 14:23:08 2015
 
 
 
@@ -33,207 +33,8 @@ Update Wed Jun 17 11:58:51 2015
 
 ### GWAS in core enhancers  
 
-* 1460 enhancers overlap with GWAS, involved in 546 traits, and 39 traits are significantly (hypergeometric test FDR < 0.01) enriched in core enhancers.     
-* Among the significantly enriched traits, 8 are related to brain development and function: Cortical structure, Glaucoma (exfoliation), Glioblastoma, Neuranatomic and neurocognitive phenotypes, Neuroblastoma (high-risk), Odorant perception (isobutyraldehyde), Schizophrenia (cytomegalovirus infection interaction), Alzheimer's disease biomarkers.        
-
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> enhancerChr </th>
-   <th style="text-align:left;"> enhancerStart </th>
-   <th style="text-align:left;"> enhancerEnd </th>
-   <th style="text-align:left;"> enhancerID </th>
-   <th style="text-align:left;"> gwasChr </th>
-   <th style="text-align:left;"> gwasStart </th>
-   <th style="text-align:left;"> gwasEnd </th>
-   <th style="text-align:left;"> gwasID </th>
-   <th style="text-align:left;"> trait </th>
-   <th style="text-align:left;"> genes </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> chr12 </td>
-   <td style="text-align:left;"> 106106593 </td>
-   <td style="text-align:left;"> 106109109 </td>
-   <td style="text-align:left;"> chr12:106106593-106109109 </td>
-   <td style="text-align:left;"> chr12 </td>
-   <td style="text-align:left;"> 106108718 </td>
-   <td style="text-align:left;"> 106108719 </td>
-   <td style="text-align:left;"> rs10219670 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> NUAK1, C12orf75 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45394471 </td>
-   <td style="text-align:left;"> 45396937 </td>
-   <td style="text-align:left;"> chr19:45394471-45396937 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45395265 </td>
-   <td style="text-align:left;"> 45395266 </td>
-   <td style="text-align:left;"> rs157580 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> TOMM40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45394471 </td>
-   <td style="text-align:left;"> 45396937 </td>
-   <td style="text-align:left;"> chr19:45394471-45396937 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45395618 </td>
-   <td style="text-align:left;"> 45395619 </td>
-   <td style="text-align:left;"> rs2075650 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> TOMM40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45394471 </td>
-   <td style="text-align:left;"> 45396937 </td>
-   <td style="text-align:left;"> chr19:45394471-45396937 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45396664 </td>
-   <td style="text-align:left;"> 45396665 </td>
-   <td style="text-align:left;"> rs59007384 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> TOMM40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45406411 </td>
-   <td style="text-align:left;"> 45410891 </td>
-   <td style="text-align:left;"> chr19:45406411-45410891 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45410001 </td>
-   <td style="text-align:left;"> 45410002 </td>
-   <td style="text-align:left;"> rs769449 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> APOE, TOMM40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45406411 </td>
-   <td style="text-align:left;"> 45410891 </td>
-   <td style="text-align:left;"> chr19:45406411-45410891 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45410001 </td>
-   <td style="text-align:left;"> 45410002 </td>
-   <td style="text-align:left;"> rs769449 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> APOE, TOMM40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45413089 </td>
-   <td style="text-align:left;"> 45419053 </td>
-   <td style="text-align:left;"> chr19:45413089-45419053 </td>
-   <td style="text-align:left;"> chr19 </td>
-   <td style="text-align:left;"> 45414450 </td>
-   <td style="text-align:left;"> 45414451 </td>
-   <td style="text-align:left;"> rs439401 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> LOC100129500 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr6 </td>
-   <td style="text-align:left;"> 157008503 </td>
-   <td style="text-align:left;"> 157010091 </td>
-   <td style="text-align:left;"> chr6:157008503-157010091 </td>
-   <td style="text-align:left;"> chr6 </td>
-   <td style="text-align:left;"> 157009380 </td>
-   <td style="text-align:left;"> 157009381 </td>
-   <td style="text-align:left;"> rs9384488 </td>
-   <td style="text-align:left;"> Alzheimer's disease biomarkers </td>
-   <td style="text-align:left;"> ARID1B </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr20 </td>
-   <td style="text-align:left;"> 5587477 </td>
-   <td style="text-align:left;"> 5590831 </td>
-   <td style="text-align:left;"> chr20:5587477-5590831 </td>
-   <td style="text-align:left;"> chr20 </td>
-   <td style="text-align:left;"> 5588448 </td>
-   <td style="text-align:left;"> 5588449 </td>
-   <td style="text-align:left;"> rs238295 </td>
-   <td style="text-align:left;"> Cortical structure </td>
-   <td style="text-align:left;"> GPCPD1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr15 </td>
-   <td style="text-align:left;"> 74213889 </td>
-   <td style="text-align:left;"> 74219909 </td>
-   <td style="text-align:left;"> chr15:74213889-74219909 </td>
-   <td style="text-align:left;"> chr15 </td>
-   <td style="text-align:left;"> 74219581 </td>
-   <td style="text-align:left;"> 74219582 </td>
-   <td style="text-align:left;"> rs3825942 </td>
-   <td style="text-align:left;"> Glaucoma (exfoliation) </td>
-   <td style="text-align:left;"> LOXL1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr5 </td>
-   <td style="text-align:left;"> 80713961 </td>
-   <td style="text-align:left;"> 80719751 </td>
-   <td style="text-align:left;"> chr5:80713961-80719751 </td>
-   <td style="text-align:left;"> chr5 </td>
-   <td style="text-align:left;"> 80719124 </td>
-   <td style="text-align:left;"> 80719125 </td>
-   <td style="text-align:left;"> rs7732320 </td>
-   <td style="text-align:left;"> Glioblastoma </td>
-   <td style="text-align:left;"> SSBP2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr1 </td>
-   <td style="text-align:left;"> 231813261 </td>
-   <td style="text-align:left;"> 231816901 </td>
-   <td style="text-align:left;"> chr1:231813261-231816901 </td>
-   <td style="text-align:left;"> chr1 </td>
-   <td style="text-align:left;"> 231816841 </td>
-   <td style="text-align:left;"> 231816842 </td>
-   <td style="text-align:left;"> rs12042938 </td>
-   <td style="text-align:left;"> Neuranatomic and neurocognitive phenotypes </td>
-   <td style="text-align:left;"> DISC1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr2 </td>
-   <td style="text-align:left;"> 215669971 </td>
-   <td style="text-align:left;"> 215673473 </td>
-   <td style="text-align:left;"> chr2:215669971-215673473 </td>
-   <td style="text-align:left;"> chr2 </td>
-   <td style="text-align:left;"> 215672545 </td>
-   <td style="text-align:left;"> 215672546 </td>
-   <td style="text-align:left;"> rs6435862 </td>
-   <td style="text-align:left;"> Neuroblastoma (high-risk) </td>
-   <td style="text-align:left;"> BARD1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr2 </td>
-   <td style="text-align:left;"> 240895573 </td>
-   <td style="text-align:left;"> 240901609 </td>
-   <td style="text-align:left;"> chr2:240895573-240901609 </td>
-   <td style="text-align:left;"> chr2 </td>
-   <td style="text-align:left;"> 240900120 </td>
-   <td style="text-align:left;"> 240900121 </td>
-   <td style="text-align:left;"> rs13424612 </td>
-   <td style="text-align:left;"> Odorant perception (isobutyraldehyde) </td>
-   <td style="text-align:left;"> NDUFA10,OR6B2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> chr10 </td>
-   <td style="text-align:left;"> 68596219 </td>
-   <td style="text-align:left;"> 68598745 </td>
-   <td style="text-align:left;"> chr10:68596219-68598745 </td>
-   <td style="text-align:left;"> chr10 </td>
-   <td style="text-align:left;"> 68598291 </td>
-   <td style="text-align:left;"> 68598292 </td>
-   <td style="text-align:left;"> rs7902091 </td>
-   <td style="text-align:left;"> Schizophrenia (cytomegalovirus infection interaction) </td>
-   <td style="text-align:left;"> CTNNA3 </td>
-  </tr>
-</tbody>
-</table>
+* 1460 enhancers overlap with GWAS, involved in 546 traits.     
+* Several traits are related to brain development and function: Cortical structure, Glaucoma (exfoliation), Glioblastoma, Neuranatomic and neurocognitive phenotypes, Neuroblastoma (high-risk), Odorant perception (isobutyraldehyde), Schizophrenia (cytomegalovirus infection interaction), Alzheimer's disease biomarkers.        
 
 ### Homer TFBSs
 
@@ -348,91 +149,7 @@ Update Wed Jun 17 11:58:51 2015
 
 ### GWAS in unique enhancers 
 
-* All sets of unique enhancers showed brain or brain disease related GWAS sites, such as Gliomas, Alzheimer's disease, Autism, Schizophrenia or bipolar disorder, Cognitive performance, Neuroblastoma (high-risk), Normalized brain volume, Intelligence. In total, there are 140 enhancers associated with brain related GWAS traits.                 
-
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> comparison </th>
-   <th style="text-align:left;"> Sample </th>
-   <th style="text-align:left;"> No.traits </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> GW </td>
-   <td style="text-align:left;"> GW13 </td>
-   <td style="text-align:left;"> 30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> GW </td>
-   <td style="text-align:left;"> GW17 </td>
-   <td style="text-align:left;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> Brain01 </td>
-   <td style="text-align:left;"> 18 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> Brain02 </td>
-   <td style="text-align:left;"> 19 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> Cortex01 </td>
-   <td style="text-align:left;"> 6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> Cortex02 </td>
-   <td style="text-align:left;"> 23 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> GE01 </td>
-   <td style="text-align:left;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MZ </td>
-   <td style="text-align:left;"> GE02 </td>
-   <td style="text-align:left;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Neurospheres </td>
-   <td style="text-align:left;"> Cortex </td>
-   <td style="text-align:left;"> 16 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Neurospheres </td>
-   <td style="text-align:left;"> GE </td>
-   <td style="text-align:left;"> 37 </td>
-  </tr>
-</tbody>
-</table>
-
-* statistically significant (hypergeometric test FDR < 0.01) GWAS traits found in at least two samples:   
-
- [1] "Alzheimer's disease (cognitive decline)"                         
- [2] "Lentiform nucleus volume"                                        
- [3] "Lipid metabolism phenotypes"                                     
- [4] "Nephrotic syndrome (acquired)"                                   
- [5] "Obesity"                                                         
- [6] "Systolic blood pressure"                                         
- [7] "Diastolic blood pressure"                                        
- [8] "Schizophrenia or bipolar disorder"                               
- [9] "Cholesterol"                                                     
-[10] "End-stage renal disease (non-diabetic)"                          
-[11] "Response to antipsychotic therapy (extrapyramidal side effects)" 
-[12] "Restless legs syndrome"                                          
-[13] "Renal sinus fat"                                                 
-[14] "Cognitive test performance"                                      
-[15] "Conduct disorder (symptom count)"                                
-[16] "Economic and political preferences (feminism/equality)"          
-[17] "Immune reponse to smallpox (secreted IL-10)"                     
-[18] "Central corneal thickness"                                       
-[19] "Homeostasis model assessment of beta-cell function (interaction)"
+* All sets of unique enhancers showed brain or brain disease related GWAS sites, such as Gliomas, Alzheimer's disease, Autism, Schizophrenia or bipolar disorder, Cognitive performance, Neuroblastoma (high-risk), Normalized brain volume, Intelligence.               
 
 ### Homer TFBSs
 #### Unique enhancers between GW13 and GW17 
@@ -445,6 +162,19 @@ Update Wed Jun 17 11:58:51 2015
 * GW17-specific enhancers overlapped with Olig2 binding sites are associated with 92 GW-specific DE genes in cortex, and 200 in GE. Both gene lists are enriched for neuron development terms.              
 
 ![](HisMod_files/figure-html/unique_enhancer_homer_GW-1.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-2.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-3.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-4.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-5.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-6.png) ![](HisMod_files/figure-html/unique_enhancer_homer_GW-7.png) 
+
+* Olig2 downstream DE genes in cortex (distance to TSS < 10kb)    
+  + EMX2: Empty Spiracles Homeobox 2. acts to generate the boundary between the roof and archipallium in the developing brain. May function in combinations with OTX1/2 to specify cell fates in the developing central nervous system.       
+  + RGS10: Regulator Of G-Protein Signaling 10. associated with schizophrenia.     
+  + LGI1: Leucine-Rich, Glioma Inactivated 1. This gene is predominantly expressed in neural tissues and its expression is reduced in low grade brain tumors and significantly reduced or absent in malignant gliomas. Mutations in this gene result in autosomal dominant lateral temporal epilepsy. May play a role in the control of neuroblastoma cell survival.     
+  
+![Olig2_cortex_DE](./HisMod_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network.png)          
+
+* Olig2 downstream DE genes in GE (distance to TSS < 10kb)      
+  + PAX6: Paired Box 6. expressed in the developing nervous system, and in developing eyes. Mutations in this gene are known to cause ocular disorders such as aniridia and Peter's anomaly.     
+  + HIVEP2: Human Immunodeficiency Virus Type I Enhancer Binding Protein 2. zinc finger-containing transcription factors. The encoded protein regulates transcription by binding to regulatory regions of various cellular and viral genes that maybe involved in growth, development and metastasis.    
+  
+![Olig2_GE_DE](./HisMod_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.png)       
 
 #### Unique enhancers between cortex and GE
 
