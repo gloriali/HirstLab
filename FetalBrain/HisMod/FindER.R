@@ -274,7 +274,14 @@ dev.off()
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/")
 GWAS_ref <- read.delim("/projects/epigenomics/resources/UCSC_hg19/GWAS/gwasCatalog_July2014.table", as.is = T)
 colnames <- c("enhancerChr", "enhancerStart", "enhancerEnd", "enhancerID", "gwasChr", "gwasStart", "gwasEnd", "gwasID", "trait", "genes")
-GWAS_core_enhancer <- read.delim("./core_enhancers.GWAS.bed", head = F, col.names = colnames) 
+GWAS_core_enhancer <- read.delim("./core_enhancers.GWAS.txt", head = F, col.names = colnames) 
+GWAS_core_enhancer_TFBS <- read.delim("./core_enhancers.GWAS.TFBS.txt", head = F)[, 1:10]
+colnames(GWAS_core_enhancer_TFBS) <- c("gwasChr", "gwasStart", "gwasEnd", "gwasID", "trait", "enhancerID", "TFBSchr", "TFBSstart", "TFBSend", "TF")
+GWAS_core_enhancer_TFBS_brain <- GWAS_core_enhancer_TFBS %>%
+  filter(as.character(trait) %in% c("Schizophrenia", "Response to antipsychotic treatment in schizophrenia (reasoning)", "Parkinson's disease", "Attention deficit hyperactivity disorder and conduct disorder", "Response to antipsychotic treatment in schizophrenia (working memory)", "Alzheimer's disease", "Bipolar disorder and schizophrenia", "Depression (quantitative trait)", "Optic disc parameters", "Optic nerve measurement (disc area)", "Optic nerve measurement (cup area)", 
+                                    "Bipolar disorder", "Attention deficit hyperactivity disorder", "Migraine", "Alzheimer's disease (cognitive decline)", "Glaucoma (primary open-angle)", "Response to antipsychotic treatment", "Brain structure", "Glioma", "Myopia (pathological)", "Autism spectrum disorder, attention deficit-hyperactivity disorder, bipolar disorder, major depressive disorder, and schizophrenia (combined)", "Migraine without aura", "Migraine - clinic-based", "Central corneal thickness", 
+                                    "Cognitive performance", "Non-word repetition", "Word reading", "Corneal astigmatism", "Corneal curvature", "Corneal structure", "Glaucoma (exfoliation)", "Behavioural disinhibition (generation interaction)", "Epilepsy (generalized)", "White matter hyperintensity burden", "Alzheimer's disease biomarkers", "Bipolar disorder (mood-incongruent)", "Attention deficit hyperactivity disorder (hyperactivity-impulsivity symptoms)", "Attention deficit hyperactivity disorder (combined symptoms)", 
+                                    "Neuroblastoma (high-risk)", "Brain imaging in schizophrenia (interaction)", "Hippocampal atrophy", "Intelligence", "Conduct disorder (interaction)", "Response to antidepressant treatment", "Conduct disorder", "Autism", "Normalized brain volume", "Neuroblastoma", "Brain lesion load", "Alzheimer's disease (late onset)", "Psychosis (atypical)", "Personality dimensions", "Schizophrenia, bipolar disorder and depression (combined)", "Hypersomnia (HLA-DQB1*06:02 negative)"))
 GWAS_core_enhancer_trait <- GWAS_core_enhancer %>% group_by(trait) %>% 
   summarise(Nsample_trait = n()) %>%                                                         # No. of records of the specific trait in the sample
   mutate(Nsample = nrow(GWAS_core_enhancer),                                                 # No. of records in the sample
@@ -285,6 +292,7 @@ GWAS_core_enhancer_trait <- GWAS_core_enhancer %>% group_by(trait) %>%
 GWAS_core_enhancer_trait_sig <- droplevels(GWAS_core_enhancer_trait[GWAS_core_enhancer_trait$FDR < 0.01, ])
 GWAS_core_enhancer_trait_sig_brain <- GWAS_core_enhancer %>% filter(trait %in% c("Cortical structure", "Glaucoma (exfoliation)", "Glioblastoma", "Neuranatomic and neurocognitive phenotypes", "Neuroblastoma (high-risk)", "Odorant perception (isobutyraldehyde)", "Schizophrenia (cytomegalovirus infection interaction)", "Alzheimer's disease biomarkers")) %>% 
   arrange(trait)
+write.table(GWAS_core_enhancer_TFBS_brain, file = "./GWAS_core_enhancer_TFBS_brain.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_core_enhancer_trait, file = "./GWAS_core_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_core_enhancer_trait_sig, file = "./GWAS_core_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_core_enhancer_trait_sig_brain, file = "./GWAS_core_enhancer_trait_sig_brain.txt", sep = "\t", col.names = T, row.names = F, quote = F)
@@ -341,21 +349,26 @@ ggsave(UMR_enhancer_summary_figure, file = "UMR_enhancer_summary_figure.pdf")
 ### Intersections
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique")
 unique_enhancers_summary <- read.delim("unique_enhancer.summary", as.is = T)
+venn_unique_enhancer_HuFNSC01 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.Cortex01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.GE01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.HuFNSC01.bed", intern = T))), category = c("Cortex", "GE"), fill = c("red", "blue"), main = "MZ unique enhancers in HuFNSC01")
+venn_unique_enhancer_HuFNSC02 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.Cortex02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.GE02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.MZ.HuFNSC02.bed", intern = T))), category = c("Cortex", "GE"), fill = c("red", "blue"), main = "MZ unique enhancers in HuFNSC02")
 venn_unique_enhancer_Cortex <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.Cortex.bed", intern = T))), category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"), main = "Neurospheres unique enhancers in Cortex")
 venn_unique_enhancer_GE <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.Neurospheres.GE.bed", intern = T))), category = c("HuFNSC01", "HuFNSC02"), fill = c("red", "blue"), main = "Neurospheres unique enhancers in GE")
 venn_unique_enhancer_GW13 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13_01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13_02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW13.bed", intern = T))), category = c("HuFNSC01_04", "HuFNSC02_04"), fill = c("red", "blue"), main = "GW unique enhancers in GW13")
 venn_unique_enhancer_GW17 <- draw.pairwise.venn(as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17_01.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17_02.bed", intern = T))), as.numeric(gsub(" .*", "", system("wc -l unique_enhancer.GW.GW17.bed", intern = T))), category = c("HuFNSC01_04", "HuFNSC02_04"), fill = c("red", "blue"), main = "GW unique enhancers in GW17")
 pdf("venn_unique_enhancer.pdf", height = 8, width = 8)
-grid.arrange(gTree(children = venn_unique_enhancer_Cortex), gTree(children = venn_unique_enhancer_GE), 
-             gTree(children = venn_unique_enhancer_GW13), gTree(children = venn_unique_enhancer_GW17), nrow = 2)
-grid.text("Neurospheres unique enhancers\n in Cortex", 0.25, 0.95)
-grid.text("Neurospheres unique enhancers\n in GE", 0.75, 0.95)
-grid.text("GW unique enhancers\n in GW13", 0.25, 0.5)
-grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
+grid.arrange(gTree(children = venn_unique_enhancer_HuFNSC01), gTree(children = venn_unique_enhancer_HuFNSC02),  
+             gTree(children = venn_unique_enhancer_Cortex), gTree(children = venn_unique_enhancer_GE), 
+             gTree(children = venn_unique_enhancer_GW13), gTree(children = venn_unique_enhancer_GW17), nrow = 3)
+grid.text("MZ unique enhancers\n in HuFNSC01", 0.25, 0.95)
+grid.text("MZ unique enhancers\n in HuFNSC02", 0.75, 0.95)
+grid.text("Neurospheres unique enhancers\n in Cortex", 0.25, 0.65)
+grid.text("Neurospheres unique enhancers\n in GE", 0.75, 0.65)
+grid.text("GW unique enhancers\n in GW13", 0.25, 0.35)
+grid.text("GW unique enhancers\n in GW17", 0.75, 0.35)
 dev.off()
 ### Functional analysis - GREAT
-(GREAT_unique_enhancer_Brain01 <- enrich_GREAT(file = "unique_enhancer.MZ.Brain01", name = "unique_enhancer.MZ.Brain01", height = 2))
-(GREAT_unique_enhancer_Brain02 <- enrich_GREAT(file = "unique_enhancer.MZ.Brain02", name = "unique_enhancer.MZ.Brain02", height = 12))
+(GREAT_unique_enhancer_HuFNSC01 <- enrich_GREAT(file = "unique_enhancer.MZ.HuFNSC01", name = "unique_enhancer.MZ.HuFNSC01", height = 12, top = 10))
+(GREAT_unique_enhancer_HuFNSC02 <- enrich_GREAT(file = "unique_enhancer.MZ.HuFNSC02", name = "unique_enhancer.MZ.HuFNSC02", height = 8))
 (GREAT_unique_enhancer_Cortex <- enrich_GREAT(file = "unique_enhancer.Neurospheres.Cortex", name = "unique_enhancer.Neurospheres.Cortex"))
 (GREAT_unique_enhancer_GE <- enrich_GREAT(file = "unique_enhancer.Neurospheres.GE", name = "unique_enhancer.Neurospheres.GE", height = 4))
 (GREAT_unique_enhancer_GW13 <- enrich_GREAT(file = "unique_enhancer.GW.GW13", name = "unique_enhancer.GW.GW13", height = 4))
@@ -388,9 +401,17 @@ GWAS_unique_enhancer_trait_sig_brain <- GWAS_unique_enhancer_all %>%
                       "Hearing impairment", "Hippocampal volume", "Optic nerve measurement (cup-to-disc ratio)", "Cerebrospinal AB1-42 levels", "Cerebrospinal P-tau181p levels", "Optic nerve measurement (cup area)", "Myopia (pathological)", 
                       "Cognitive performance", "Migraine - clinic-based", "Intelligence (childhood)", "Inattentive symptoms", "Behavioural disinhibition (generation interaction)", "Normalized brain volume", "Corneal curvature", "Intelligence"))
 write.table(GWAS_unique_enhancer_all, file = "./GWAS/GWAS_unique_enhancer_all.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GWAS_unique_enhancer_all[, c(5:9, 4, 11:12)], file = "./GWAS/GWAS_unique_enhancer_all.bed", sep = "\t", col.names = F, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait, file = "./GWAS/GWAS_unique_enhancer_trait.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait_sig, file = "./GWAS/GWAS_unique_enhancer_trait_sig.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 write.table(GWAS_unique_enhancer_trait_sig_brain, file = "./GWAS/GWAS_unique_enhancer_trait_sig_brain.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+GWAS_unique_enhancer_all_TFBS <- read.delim("./GWAS/GWAS_unique_enhancer_all_TFBS.txt", head = F)[, 1:12]
+colnames(GWAS_unique_enhancer_all_TFBS) <- c("gwasChr", "gwasStart", "gwasEnd", "gwasID", "trait", "enhancerID", "comparison", "sample", "TFBSchr", "TFBSstart", "TFBSend", "TF")
+GWAS_unique_enhancer_brain_TFBS <- GWAS_unique_enhancer_all_TFBS %>% 
+  filter(as.character(trait) %in% c("Amyotrophic lateral sclerosis (age of onset)", "Response to antipsychotic treatment in schizophrenia (reasoning)", "Bipolar disorder", "Schizophrenia", "Intraocular pressure", "Attention deficit hyperactivity disorder (combined symptoms)", "Neuroblastoma (high-risk)", "Attention deficit hyperactivity disorder", "Brain lesion load", "Personality dimensions", "Cognitive performance", "Bipolar disorder and schizophrenia", 
+                                    "White matter hyperintensity burden", "Major depressive disorder", "Autism spectrum disorder, attention deficit-hyperactivity disorder, bipolar disorder, major depressive disorder, and schizophrenia (combined)", "Alzheimer's disease biomarkers", "Intelligence", "Attention deficit hyperactivity disorder symptoms (interaction)", "Intelligence (childhood)", "Word reading", "Parkinson's disease (age of onset)", "Glaucoma", 
+                                    "Alzheimer's disease (late onset)", "Parkinson's disease", "Alzheimer's disease (cognitive decline)", "Brain structure", "Behavioural disinhibition (generation interaction)", "Panic disorder", "Alzheimer's disease", "Corneal structure", "Central corneal thickness"))
+write.table(GWAS_unique_enhancer_brain_TFBS, file = "./GWAS/GWAS_unique_enhancer_brain_TFBS.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ### homer
 load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
@@ -602,14 +623,14 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
      venn_Brain01_Brain02DE_epi, venn_Cortex01_Cortex02DE_epi, venn_GE01_GE02DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, venn_GE02_GE04DE_epi, 
-     GWAS_core_enhancer, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, GWAS_core_enhancer_trait_sig_brain, 
+     GWAS_core_enhancer, GWAS_core_enhancer_TFBS, GWAS_core_enhancer_TFBS_brain, GWAS_core_enhancer_trait, GWAS_core_enhancer_trait_sig, GWAS_core_enhancer_trait_sig_brain, 
      homer_core_enhancer, homer_core_enhancer_top, homer_core_enhancer_figure, homer_unique_enhancer_GW_common_figure, 
      UMR_enhancer, UMR_enhancer_enrich, UMR_enhancer_summary_figure, 
      GREAT_Cortex_UMR_enhancer_HuFNSC02, GREAT_GE_UMR_enhancer_HuFNSC02, GREAT_Cortex_UMR_enhancer_HuFNSC04, 
      GREAT_GW17_UMR_enhancer_Cortex, GREAT_GW17_UMR_enhancer_GE, GREAT_GW13_UMR_enhancer_GE, 
-     unique_enhancers_summary, GWAS_unique_enhancer_all, GWAS_unique_enhancer_trait, GWAS_unique_enhancer_trait_sig, GWAS_unique_enhancer_trait_sig_brain, 
-     venn_unique_enhancer_Cortex, venn_unique_enhancer_GE, venn_unique_enhancer_GW13, venn_unique_enhancer_GW17, 
-     GREAT_unique_enhancer_Brain01, GREAT_unique_enhancer_Brain02, GREAT_unique_enhancer_Cortex, GREAT_unique_enhancer_GE, GREAT_unique_enhancer_GW13, GREAT_unique_enhancer_GW17, 
+     unique_enhancers_summary, GWAS_unique_enhancer_all, GWAS_unique_enhancer_all_TFBS, GWAS_unique_enhancer_brain_TFBS, GWAS_unique_enhancer_trait, GWAS_unique_enhancer_trait_sig, GWAS_unique_enhancer_trait_sig_brain, 
+     venn_unique_enhancer_HuFNSC01, venn_unique_enhancer_HuFNSC02, venn_unique_enhancer_Cortex, venn_unique_enhancer_GE, venn_unique_enhancer_GW13, venn_unique_enhancer_GW17, 
+     GREAT_unique_enhancer_HuFNSC01, GREAT_unique_enhancer_HuFNSC02, GREAT_unique_enhancer_Cortex, GREAT_unique_enhancer_GE, GREAT_unique_enhancer_GW13, GREAT_unique_enhancer_GW17, 
      homer_unique_enhancer_GW_GW13, homer_unique_enhancer_GW_GW17, homer_unique_enhancer_GW_common, Venn_homer_unique_enhancer_GW_common_Sox3, 
      DE_GW13_GW17_cortex, DE_GW13_GW17_GE, homer_unique_enhancer_GW_common_Sox3_DE_cortex, homer_unique_enhancer_GW_common_Sox3_DE_GE, 
      homer_unique_enhancer_GW_GW13only, homer_unique_enhancer_GW_GW13only_figure, homer_unique_enhancer_GW_GW17only, homer_unique_enhancer_GW_GW17only_Olig2, Venn_homer_unique_enhancer_GW_GW17only_Olig2, 
