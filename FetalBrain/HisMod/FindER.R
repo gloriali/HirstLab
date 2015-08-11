@@ -514,6 +514,20 @@ homer_unique_enhancer_GW_GW17only_Olig2_DE_GE <- merge(homer_unique_enhancer_GW_
 write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 (homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex", erminej = F, fdr = 0.05, height = 2))
 (homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_GE", erminej = F, fdr = 0.05, height = 8))
+
+homer_unique_enhancer_GW_GW17only_Foxo1 <- read.delim("GW17only_Foxo1.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
+  mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
+row.names(homer_unique_enhancer_GW_GW17only_Foxo1) <- homer_unique_enhancer_GW_GW17only_Foxo1$ID
+homer_unique_enhancer_GW_GW17only_Foxo1_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Foxo1$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
+Venn_homer_unique_enhancer_GW_GW17only_Foxo1 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Foxo1_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Foxo1", force.unique = T)
+plot.new()
+grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Foxo1)
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_cortex, by = "ID") %>% 
+  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_GE, by = "ID") %>% 
+  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 #### Neurospheres
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
 cortex_GE_UP_duplicated <- c(cortex01_GE01UP$V1, cortex02_GE02UP$V1, cortex03_GE03UP$V1, cortex04_GE04UP$V1)
@@ -618,6 +632,21 @@ homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network[homer_unique_enhancer_GW_G
 homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node <- rbind(data.frame(name = "OLIG2", log2FC = abs(DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "log2FC"]), GE01_GE04 = DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "GE01_GE04"]), homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node)
 write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node <- homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex %>% 
+  filter(abs(Distance.to.TSS) < 10000) %>% select(name, log2FC, cortex01_cortex04) %>% mutate(log2FC = abs(log2FC))
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_network <- homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node %>% mutate(Source = "Foxo1", Interaction = "activate")
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_network[homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_network$cortex01_cortex04 == "DN", "Interaction"] <- "repress"
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node <- rbind(data.frame(name = "Foxo1", log2FC = abs(DE_GW13_GW17_cortex[DE_GW13_GW17_cortex$ID == "ENSG00000205927", "log2FC"]), cortex01_cortex04 = DE_GW13_GW17_cortex[DE_GW13_GW17_cortex$ID == "ENSG00000205927", "cortex01_cortex04"]), homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node)
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_network, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node <- homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE %>% 
+  filter(abs(Distance.to.TSS) < 10000) %>% select(name, log2FC, GE01_GE04) %>% mutate(log2FC = abs(log2FC))
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network <- homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node %>% mutate(Source = "Foxo1", Interaction = "activate")
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network[homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network$GE01_GE04 == "DN", "Interaction"] <- "repress"
+homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node <- rbind(data.frame(name = "Foxo1", log2FC = abs(DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "log2FC"]), GE01_GE04 = DE_GW13_GW17_GE[DE_GW13_GW17_GE$ID == "ENSG00000205927", "GE01_GE04"]), homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node)
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
