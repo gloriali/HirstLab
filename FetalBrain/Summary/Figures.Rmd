@@ -54,11 +54,13 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics/users/lli/FetalBrain/Figu
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
 ```{r MZ_scale, fig.height = 10, fig.width = 8}
+FindER_enrichedBases <- FindER_summary %>% filter(Mark == "H3K4me1")
+rownames(FindER_enrichedBases) <- FindER_enrichedBases$Sample
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
                         Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 7), 
                         DM_DE = factor(c(rep(rep(c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP", "Isoforms")), 
-                        Assay = factor(c(rep(c("UMRs", "Unique enhancers", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "Unique enhancers", "DE genes", "Isoforms")), 
-                        value = c(-(filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, unique_enhancers_summary[1:5, "Sample1_unique"], -unique_enhancers_summary[1:5, "Sample2_unique"], individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
+                        Assay = factor(c(rep(c("UMRs", "Enhancers", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "Enhancers", "DE genes", "Isoforms")), 
+                        value = c(-(filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, (FindER_enrichedBases[c("Brain01", "Cortex01", "GE01", "Cortex01", "Cortex02"), "N_base"])/10^6, -(FindER_enrichedBases[c("Brain02", "Cortex02", "GE02", "GE01", "GE02"), "N_base"])/10^6, individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
 MZ_scale$Sample <- factor(gsub("-HuFNSC.+", "", MZ_scale$Sample), levels = c("Brain", "Cortex", "GE"))
 MZ_scale <- MZ_scale %>% filter(as.character(Category) == "Individual specific", as.character(DM_DE) != "Isoforms")
 MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) + 
@@ -66,7 +68,7 @@ MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) +
    geom_hline(yintercept = 0) + 
    facet_grid(Assay ~ ., scales = "free", space = "free_x") + 
    scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   scale_y_continuous(breaks = c(-30000, -10000, -2000, -500, -50, 50, 500, 2000, 10000, 30000), labels = c(-30000, 10000, 2000, 500, 50, 50, 500, 2000, 10000, 30000)) + 
+   scale_y_continuous(breaks = c(-500, -250, -50, 50, 250, 500), labels = c(500, 250, 50, 50, 250, 500)) + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
@@ -74,14 +76,14 @@ MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) +
 MZ_scale_figure_gt <- ggplot_gtable(ggplot_build(MZ_scale_figure))
 grid.newpage()
 grid.draw(MZ_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of unique enhancers", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of enriched\nbases(Mb)", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
 pdf("Figure1c.pdf", height = 10, width = 8)
 grid.draw(MZ_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of unique enhancers", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of enriched\nbases(Mb)", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
 dev.off()
 ```
 
