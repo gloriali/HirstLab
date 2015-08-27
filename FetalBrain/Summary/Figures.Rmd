@@ -53,7 +53,7 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics/users/lli/FetalBrain/Figu
 * MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins. HuFNSC01-specific UMRs and genes upregulated in HuFNSC01 are shown in red, and HuFNSC02-specific UMRs and genes upregulated in HuFNSC02 are shown in blue.        
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
-```{r MZ_scale, fig.height = 10, fig.width = 12}
+```{r MZ_scale, fig.height = 10, fig.width = 8}
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
                         Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 7), 
                         DM_DE = factor(c(rep(rep(c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP", "Isoforms")), 
@@ -77,7 +77,7 @@ grid.draw(MZ_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of unique enhancers", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure1c.pdf", height = 10, width = 12)
+pdf("Figure1c.pdf", height = 10, width = 8)
 grid.draw(MZ_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of unique enhancers", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
@@ -179,7 +179,7 @@ grid.draw(GW_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("UMR Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure3a.pdf", height = 10, width = 10)
+pdf("Figure3a.pdf", height = 10, width = 8)
 grid.draw(GW_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("UMR Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
@@ -256,8 +256,7 @@ dev.off()
 
 * Cytoscape network of OLIG2 target genes that are differential expressed.       
 
-![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network.png)     
-![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.png)     
+![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_network.png)     
 
 ## Figure 4: Stage-specific differential expression   
 ### Figure 4a: summary  

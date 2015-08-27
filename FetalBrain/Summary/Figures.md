@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Wed Aug 26 17:19:39 2015
+Updated: Wed Aug 26 22:42:25 2015
 
 
 
@@ -98,8 +98,7 @@ Updated: Wed Aug 26 17:19:39 2015
 
 * Cytoscape network of OLIG2 target genes that are differential expressed.       
 
-![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network.png)     
-![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network.png)     
+![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_network.png)     
 
 ## Figure 4: Stage-specific differential expression   
 ### Figure 4a: summary  
