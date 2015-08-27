@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Tue Aug 11 16:30:02 2015
+Updated: Wed Aug 26 17:19:39 2015
 
 
 
@@ -19,7 +19,7 @@ Updated: Tue Aug 11 16:30:02 2015
     
 ### Figure 1c: Scale of UMRs and DE genes between MZ twins and NPCs 
 
-* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
+* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins. HuFNSC01-specific UMRs and genes upregulated in HuFNSC01 are shown in red, and HuFNSC02-specific UMRs and genes upregulated in HuFNSC02 are shown in blue.        
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
 ![](Figures_files/figure-html/MZ_scale-1.png) 
@@ -72,17 +72,27 @@ Updated: Tue Aug 11 16:30:02 2015
 
 ![](Figures_files/figure-html/GW_enhancer_TFBS-1.png) 
 
+```
+## png 
+##   2
+```
+
 ### Figure 3c: OLIG2
 
 * UCSC genome browser shot of Oligodendrocyte Lineage Transcription Factor 2 (OLIG2) hypomethylated in promoter region and upregulated in GW17.     
 
 ![](./Figures_files/figure-html/OLIG2.png)     
 
-### Figure 3d: DAVID enrichment of OLIG2 target genes   
+### Figure 3d: Heatmap of OLIG2 target genes   
 
-* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
+* Heatmap of RPKM of OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
 
-![](Figures_files/figure-html/GW_OLIG2_DAVID-1.png) 
+![](Figures_files/figure-html/GW_OLIG2_heatmap-1.png) 
+
+```
+## png 
+##   2
+```
 
 ### Figure 3e: Differential expressed OLIG2 target genes   
 
@@ -194,6 +204,12 @@ Updated: Tue Aug 11 16:30:02 2015
 ##   2
 ```
 
+### Supplemental 7: TFBS asymmetry between neurosphere UMRs
+
+* Relative abundance of transcription factor binding sites overlapping UMRs in NPCs cortex and GE cells reveals regulatory asymmetry between cell types. Red represents transcription factor more enriched in cortex, and blue represents transcription factor enriched in GE.    
+
+![](Figures_files/figure-html/NPCs_TFBS-1.png) 
+
 ### Supplemental 8: DAVID enrichment for isoform genes   
 
 * DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs (A) and across gestational weeks (B).      
@@ -228,18 +244,6 @@ Updated: Tue Aug 11 16:30:02 2015
 ```
 
 -----
-
-### Supplemental X: TFBS asymmetry in GW UMRs  
-
-* Relative abundance of transcription factor binding sites overlapping UMRs between gestational weeks.       
-
-![](Figures_files/figure-html/GW_TFBS-1.png) 
-
-### Supplemental 7: TFBS asymmetry between neurosphere UMRs
-
-* Relative abundance of transcription factor binding sites overlapping UMRs in NPCs cortex and GE cells reveals regulatory asymmetry between cell types. Red represents transcription factor more enriched in cortex, and blue represents transcription factor enriched in GE.    
-
-![](Figures_files/figure-html/NPCs_TFBS-1.png) 
 
 ### Supplemental 11: Location of UMRs across the genome 
 
@@ -297,6 +301,31 @@ Updated: Tue Aug 11 16:30:02 2015
 ##   2
 ```
 
+### Supplemental 17: Scale of UMRs and DE genes between MZ twins and NPCs 
+
+* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
+* _Note the opposite direction of UMRs and unique enhancers, why?_      
+
+![](Figures_files/figure-html/MZ_compare-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Supplemental 18: DAVID enrichment of OLIG2 target genes   
+
+* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
+
+![](Figures_files/figure-html/GW_OLIG2_DAVID-1.png) 
+
+### Supplemental 19: TFBS asymmetry in GW UMRs  
+
+* Relative abundance of transcription factor binding sites overlapping UMRs between gestational weeks.       
+
+![](Figures_files/figure-html/GW_TFBS-1.png) 
+
+----------------------------------------
 <!--
 ### Supplemental : GREAT analysis on UMRs between MZ twins - GOBP 
 
