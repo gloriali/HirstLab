@@ -1,11 +1,27 @@
 #!/bin/sh
 
+# generate delta M UCSC tracks
+dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/
+dirOut=/gsc/www/bcgsc.ca/downloads/mb/BrainHubs/WGBSHub/hg19/
+awk 'NR==FNR {h[$1]=$4; next} {if($1 in h){printf("%s\t%.10f\n", $1, h[$1]-$4)}}' $dirIn/A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine $dirIn/A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine | sed -e 's/:/\t/g' | sed -e 's/-/\t/g' | sort -T /projects/epigenomics/temp -k1,1 -k2,2n > $dirOut/WGBS.NPC.Cortex04-GE04.bedgraph
+awk 'NR==FNR {h[$1]=$4; next} {if($1 in h){printf("%s\t%.10f\n", $1, h[$1]-$4)}}' $dirIn/A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine $dirIn/A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine | sed -e 's/:/\t/g' | sed -e 's/-/\t/g' | sort -T /projects/epigenomics/temp -k1,1 -k2,2n > $dirOut/WGBS.NPC.Cortex02-GE02.bedgraph
+awk 'NR==FNR {h[$1]=$4; next} {if($1 in h){printf("%s\t%.10f\n", $1, h[$1]-$4)}}' $dirIn/A22477.WGBS.NeurospheresCortex04.sam.bedGraph.combine $dirIn/A22475.WGBS.NeurospheresCortex02.sam.bedGraph.combine | sed -e 's/:/\t/g' | sed -e 's/-/\t/g' | sort -T /projects/epigenomics/temp -k1,1 -k2,2n > $dirOut/WGBS.NPC.Cortex02-Cortex04.bedgraph
+awk 'NR==FNR {h[$1]=$4; next} {if($1 in h){printf("%s\t%.10f\n", $1, h[$1]-$4)}}' $dirIn/A22476.WGBS.NeurospheresGE04.sam.bedGraph.combine $dirIn/A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph.combine | sed -e 's/:/\t/g' | sed -e 's/-/\t/g' | sort -T /projects/epigenomics/temp -k1,1 -k2,2n > $dirOut/WGBS.GW.GE02-GE04.bedgraph
+cd $dirOut
+for file in *.bedgraph
+do
+    name=$(echo $file | sed -e s/'.bedgraph'//g)
+    echo $name
+    /home/lli/HirstLab/Pipeline/UCSC/bedGraphToBigWig $file /home/lli/hg19/hg19.chrom.sizes $name.bw
+done
+rm *.bedgraph
+
 # DM CpGs between Cortex vs GE WGBS
 dirIn=/projects/epigenomics/users/lli/FetalBrain/WGBS/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/
 m=0.75 # fractional methylation in at least one sample need to > m  
 cd $dirIn
-for file in *.sam.bedGraph
+for file in *.sam.bedGraph.gz
 do
     /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file 
 done
