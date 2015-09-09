@@ -58,7 +58,7 @@ FindER_enrichedBases <- FindER_summary %>% filter(Mark == "H3K4me1")
 rownames(FindER_enrichedBases) <- FindER_enrichedBases$Sample
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
                         Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 7), 
-                        DM_DE = factor(c(rep(rep(c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("HuFNSC01 UMR/UP", "HuFNSC02 UMR/UP", "Isoforms")), 
+                        DM_DE = factor(c(rep(rep(c("Individual01", "Individual02"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("Individual01", "Individual02", "Isoforms")), 
                         Assay = factor(c(rep(c("UMRs", "Enhancers", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "Enhancers", "DE genes", "Isoforms")), 
                         value = c(-(filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, (FindER_enrichedBases[c("Brain01", "Cortex01", "GE01", "Cortex01", "Cortex02"), "N_base"])/10^6, -(FindER_enrichedBases[c("Brain02", "Cortex02", "GE02", "GE01", "GE02"), "N_base"])/10^6, individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
 MZ_scale$Sample <- factor(gsub("-HuFNSC.+", "", MZ_scale$Sample), levels = c("Brain", "Cortex", "GE"))
@@ -96,9 +96,9 @@ dev.off()
 NPCs_scale <- data.frame(Donor = c(rep(c("HuFNSC02", "HuFNSC04", "HuFNSC02", "HuFNSC04", "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 2), "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 
                                  GW = c(rep(c("GW17", "GW13", "GW17", "GW13", "GW17", "GW17", "GW13", "GW13"), 2), "GW17", "GW17", "GW13", "GW13"), 
                                  Assay = factor(c(rep(c(rep("UMRs", 2), rep("Enhancer UMRs", 2), rep("DE genes", 4)), 2), rep("Isoforms", 4)), levels = c("UMRs", "Enhancer UMRs", "DE genes", "Isoforms")), 
-                                 DM_DE = c(rep(c("Cortex UMR/UP", "GE UMR/UP"), each = 8), rep("Isoform", 4)), 
+                                 DM_DE = c(rep(c("Cortex", "GE"), each = 8), rep("Isoform", 4)), 
                                  value = c((filter(DMR_freq_WGBS_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = -mean(freq)))$m, UMR_enhancer_enrich[c(2,4), "enrich"], cortex_GE_DE_summary$UP, (filter(DMR_freq_WGBS_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, UMR_enhancer_enrich[c(1,3), "enrich"], cortex_GE_DE_summary$DN, cortex_GE_summary[, "isoform_genes"]))
-NPCs_scale[NPCs_scale$DM_DE == "GE UMR/UP", "value"] <- -NPCs_scale[NPCs_scale$DM_DE == "GE UMR/UP", "value"]
+NPCs_scale[NPCs_scale$DM_DE == "GE", "value"] <- -NPCs_scale[NPCs_scale$DM_DE == "GE", "value"]
 NPCs_scale <- filter(NPCs_scale, Donor %in% c("HuFNSC02", "HuFNSC04"), as.character(Assay) != "Enhancer UMRs")
 NPCs_scale_figure <- ggplot(NPCs_scale, aes(x = Donor, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.4) + 
@@ -116,7 +116,7 @@ grid.draw(NPCs_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure2a.pdf", height = 10, width = 12)
+pdf("Figure2a.pdf", height = 10, width = 10)
 grid.draw(NPCs_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
@@ -161,10 +161,10 @@ ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "Figure2b.pdf", height = 10, width
 ```{r GW_scale, fig.height = 10, fig.width = 12}
 GW_scale <- data.frame(Cell = rep(c("Cortex", "GE"), 7), 
                        Assay = factor(c(rep(c(rep("UMRs", 2), rep("Enhancer UMRs", 2), rep("DE genes", 2)), 2), rep("Isoforms", 2)), levels = c("UMRs", "Enhancer UMRs", "DE genes", "Isoforms")), 
-                       DM_DE = c(rep(c("GW17 UMR/UP", "GW13 UMR/UP"), each = 6), rep("Isoform", 2)), 
+                       DM_DE = c(rep(c("GW17", "GW13"), each = 6), rep("Isoform", 2)), 
                        value = c((filter(DMR_freq_GW_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = -mean(freq)))$m, UMR_enhancer_enrich[c(6, 8), "enrich"], GW_DE_summary[GW_DE_summary$Sample %in% c("GW17-GW13.2_cortex", "GW17-GW13.2_GE"), ]$UP, (filter(DMR_freq_GW_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, UMR_enhancer_enrich[c(5, 7), "enrich"], GW_DE_summary[GW_DE_summary$Sample %in% c("GW17-GW13.2_cortex", "GW17-GW13.2_GE"), ]$DN, as.numeric(as.vector(GW_isoform_summary[GW_isoform_summary$Sample %in% c("Cortex-HuFNSC02_Cortex-HuFNSC04", "GE-HuFNSC02_GE-HuFNSC04"), "isoform_genes"])))) %>%
   filter(as.character(DM_DE) != "Isoform")
-GW_scale[GW_scale$DM_DE == "GW13 UMR/UP", "value"] <- -GW_scale[GW_scale$DM_DE == "GW13 UMR/UP", "value"]
+GW_scale[GW_scale$DM_DE == "GW13", "value"] <- -GW_scale[GW_scale$DM_DE == "GW13", "value"]
 GW_scale_figure <- ggplot(GW_scale, aes(x = Cell, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.4) + 
    geom_hline(yintercept = 0) + 
@@ -194,7 +194,7 @@ dev.off()
 * Transcription factors exclusively statistically enriched (Benjamini corrected p-value < 0.01, and percent of enhancers with motif > 20%) in GW17 unique enhancers.     
 
 ```{r GW_enhancer_TFBS, fig.height=4, fig.width=12}
-homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(Category = "Percent of Enhancers with Motif", EnsemblID = c("ENSG00000169083", "ENSG00000168267", "ENSG00000082175", "ENSG00000150907", "ENSG00000205927"), RPKM_cortex_GW13 = geneRPKM[EnsemblID, "cortex04"], RPKM_cortex_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_cortex = (cortex01 + cortex02)/2))$GW17_cortex, RPKM_GE_GW13 = geneRPKM[EnsemblID, "ge04"], RPKM_GE_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_GE = (ge01 + ge02)/2))$GW17_GE) 
+homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(Motif.Name = factor(TF, levels = rev(TF)), Category = "Percent of Enhancers with Motif", EnsemblID = c("ENSG00000169083", "ENSG00000168267", "ENSG00000082175", "ENSG00000150907", "ENSG00000205927"), RPKM_cortex_GW13 = geneRPKM[EnsemblID, "cortex04"], RPKM_cortex_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_cortex = (cortex01 + cortex02)/2))$GW17_cortex, RPKM_GE_GW13 = geneRPKM[EnsemblID, "ge04"], RPKM_GE_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_GE = (ge01 + ge02)/2))$GW17_GE) 
 homer_unique_enhancer_GW_GW17only_RPKM <- melt(homer_unique_enhancer_GW_GW17only_figure$data[, c("TF", grep("RPKM", colnames(homer_unique_enhancer_GW_GW17only_figure$data), value = T))], id = "TF") %>% mutate(Category = gsub("_GW.+", "", variable), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
 homer_unique_enhancer_GW_GW17only_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_RPKM, aes(TF, value, fill = GW)) +
    geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
@@ -225,7 +225,7 @@ dev.off()
 * Heatmap of RPKM of OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
 
 ```{r GW_OLIG2_heatmap, fig.height = 8, fig.width = 6}
-GW_Olig2_RPKM <- na.omit(geneRPKM[homer_unique_enhancer_GW_GW17only_Olig2[abs(homer_unique_enhancer_GW_GW17only_Olig2$Distance.to.TSS) < 10000, "ID"], ]) 
+GW_Olig2_RPKM <- na.omit(geneRPKM[homer_unique_enhancer_GW_GW17only_Olig2[abs(homer_unique_enhancer_GW_GW17only_Olig2$Distance.to.TSS) < 1500, "ID"], ]) 
 colnames(GW_Olig2_RPKM) <- gsub("ge", "GE", colnames(GW_Olig2_RPKM))
 GW_Olig2_RPKM_scale <- na.omit(data.frame(id = GW_Olig2_RPKM$id, t(scale(t(GW_Olig2_RPKM %>% select(-id, -brain01, -brain02)), center = T, scale = T)))) %>% arrange(cortex04+GE04, cortex01+cortex02+GE01+GE02)
 GW_Olig2_RPKM_tall <- melt(GW_Olig2_RPKM_scale, id = "id") %>% mutate(id = factor(id, levels = rev(GW_Olig2_RPKM_scale$id)), Sample = factor(variable, levels = c("cortex04", "cortex03", "cortex02", "cortex01", "GE04", "GE03", "GE02", "GE01")))
@@ -266,8 +266,9 @@ dev.off()
 * No. of differential expressed genes between different gestational weeks (left panel: GW17 vs GW13, middle panel: GW17 vs GW15, right panel: GW15 vs GW13) in NPCs cortex (red), GE (blue), and shared by two cell types (purple). Bars pointing up shows upregulation in later stages, and bars pointing down shows upregulation in earlier stages.    
 
 ```{r GW_DE_summary}
-(GW_DE_summary_figure + 
-   theme(strip.text = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18), legend.title = element_text(size = 0)))
+(GW_DE_summary_figure <- GW_DE_summary_figure + 
+   scale_y_continuous(limits=c(-700, 700)) + 
+   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15), legend.title = element_text(size = 0)))
 ggsave(GW_DE_summary_figure, file = "Figure4a.pdf", height = 10, width = 12)
 ```
 
@@ -276,7 +277,10 @@ ggsave(GW_DE_summary_figure, file = "Figure4a.pdf", height = 10, width = 12)
 * Patterns of expression for genes differentially expressed between gestational weeks shared by cortex and GE NPCs. Genes are divided into eight expression profile groups, represented by eight different colours. The thickness of the line represents relative No. of genes in the category, and dashed line means no genes are in the category.                
 
 ```{r GW_DE_trend}
+GW_DE_trend_figure$data$trend <- gsub("notDE", "ST", GW_DE_trend_figure$data$trend)
 (GW_DE_trend_figure <- GW_DE_trend_figure + 
+   scale_size_continuous(name = "No. of genes", limits = c(0, 500), breaks = c(50, 100, 200, 300, 400, 500), range = c(1, 10)) + 
+   scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
 ggsave(GW_DE_trend_figure, file = "Figure4b.pdf", height = 10, width = 12)
@@ -287,9 +291,11 @@ ggsave(GW_DE_trend_figure, file = "Figure4b.pdf", height = 10, width = 12)
 * Patterns of expression for genes differentially expressed between gestational weeks in cortex NPCs.           
 
 ```{r GW_DE_trend_cortex}
+GW_DE_trend_cortex_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_cortex_figure$data$trend), levels = c("UP-UP", "DN-DN" , "UP-DN", "DN-UP", "ST-UP", "DN-ST", "ST-DN", "UP-ST"))
 (GW_DE_trend_cortex_figure <- GW_DE_trend_cortex_figure + 
+   scale_size_continuous(name = "No. of genes", limits = c(0, 500), breaks = c(50, 100, 200, 300, 400, 500), range = c(1, 10)) + 
+   scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
-   scale_size(range = c(1, 10)) + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
 ggsave(GW_DE_trend_cortex_figure, file = "Figure4c.pdf", height = 10, width = 12)
 ```
@@ -299,9 +305,11 @@ ggsave(GW_DE_trend_cortex_figure, file = "Figure4c.pdf", height = 10, width = 12
 * Patterns of expression for genes differentially expressed between gestational weeks in GE NPCs.       
 
 ```{r GW_DE_trend_GE}
+GW_DE_trend_GE_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_GE_figure$data$trend), levels = c("UP-UP", "DN-DN" , "UP-DN", "DN-UP", "DN-ST", "ST-DN", "UP-ST", "ST-UP"))
 (GW_DE_trend_GE_figure <- GW_DE_trend_GE_figure + 
+   scale_size_continuous(name = "No. of genes", limits = c(0, 500), breaks = c(50, 100, 200, 300, 400, 500), range = c(1, 10)) + 
+   scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
-   scale_size(range = c(1, 10)) + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
 ggsave(GW_DE_trend_GE_figure, file = "Figure4d.pdf", height = 10, width = 12)
 ```
@@ -345,8 +353,51 @@ grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure 
 dev.off()
 ```
 
+-------------------------
+
 ## Supplemental Figures
-### Supplemental 1: Asymmetry in UMRs 
+### Supplemental 1: Scale of UMRs and DE genes between MZ twins and NPCs 
+
+* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
+* _Note the opposite direction of UMRs and unique enhancers, why?_      
+
+```{r MZ_scale_compare, fig.height = 10, fig.width = 12}
+FindER_enrichedBases <- FindER_summary %>% filter(Mark == "H3K4me1")
+rownames(FindER_enrichedBases) <- FindER_enrichedBases$Sample
+MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
+                        Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 7), 
+                        DM_DE = factor(c(rep(rep(c("Individual01", "Individual02"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("Individual01", "Individual02", "Isoforms")), 
+                        Assay = factor(c(rep(c("UMRs", "Enhancers", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "Enhancers", "DE genes", "Isoforms")), 
+                        value = c(-(filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, (FindER_enrichedBases[c("Brain01", "Cortex01", "GE01", "Cortex01", "Cortex02"), "N_base"])/10^6, -(FindER_enrichedBases[c("Brain02", "Cortex02", "GE02", "GE01", "GE02"), "N_base"])/10^6, individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
+MZ_scale$Sample <- factor(gsub("-HuFNSC", "", MZ_scale$Sample), levels = c("Brain01_Brain02", "Cortex01_Cortex02", "GE01_GE02", "Cortex01_GE01", "Cortex02_GE02"))
+MZ_scale$Category <- factor(MZ_scale$Category, levels = c("Individual specific", "Cell type specific"))
+MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) + 
+   geom_bar(stat="identity", position = "identity", width = 0.5) + 
+   geom_hline(yintercept = 0) + 
+   facet_grid(Assay ~ Category, scales = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
+   scale_y_continuous(breaks = c(-30000, -10000, -2000, -500, -100, 100, 500, 2000, 10000, 30000), labels = c(-30000, 10000, 2000, 500, 100, 100, 500, 2000, 10000, 30000)) + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
+MZ_scale_figure_gt <- ggplot_gtable(ggplot_build(MZ_scale_figure))
+grid.newpage()
+grid.draw(MZ_scale_figure_gt)
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.028, "npc"), y = unit(0.85, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of enriched\nbases(Mb)", x = unit(0.028, "npc"), y = unit(0.62, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.4, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.17, "npc"), rot = 90, gp=gpar(fontsize=12))
+pdf("FigureS1.pdf", height = 12, width = 12)
+grid.draw(MZ_scale_figure_gt)
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.028, "npc"), y = unit(0.85, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of enriched\nbases(Mb)", x = unit(0.028, "npc"), y = unit(0.62, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.4, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.17, "npc"), rot = 90, gp=gpar(fontsize=12))
+dev.off()
+```
+
+### Supplemental 2: Asymmetry in UMRs 
 
 * UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
   
@@ -358,7 +409,7 @@ layOut(list(DMR_freq_MZ_figure + ggtitle("UMRs between MZ twins") + scale_fill_m
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
 grid.text("C", x = unit(0.515, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf(file = "FigureS1.pdf", height = 12, width = 12)
+pdf(file = "FigureS2.pdf", height = 12, width = 12)
 layOut(list(DMR_freq_MZ_figure + ggtitle("UMRs between MZ twins") + scale_fill_manual(values = c("blue", "red"), label = c("HuFNSC02 UMRs", "HuFNSC01 UMRs"), name = ""), 1, 1:3), 
        list(DMR_freq_WGBS_figure + ggtitle("UMRs between NPCs") + scale_fill_manual(values = c("blue", "red"), label = c("GE UMRs", "Cortex UMRs"), name = ""), 2, 1:2), 
        list(DMR_freq_GW_figure + ggtitle("UMRs between GW") + scale_fill_manual(values = c("red", "blue"), labels = c("GW13 UMRs", "GW17 UMRs"), name = ""), 2, 3:4))
@@ -368,7 +419,274 @@ grid.text("C", x = unit(0.515, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize =
 dev.off()
 ```
 
-### Supplemental 2: Genomic breakdown of UMRs
+### Supplemental 3: Venn diagram of differential expressed genes between MZ and between GW 
+
+* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (A), and between different gestational weeks (B).     
+  
+```{r Venn_DE}
+MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
+venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE UP")
+MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
+venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE DN")
+GW_cortex <- list(GW17_GW13 = c(GW_17_13_UP_duplicated_cortex$id, GW_17_13_DN_duplicated_cortex$id), GW17_GW15 = c(GW_17_15_UP_duplicated_cortex$id, GW_17_15_DN_duplicated_cortex$id), GW15_GW13 = cortex03_cortex04DE$ID)
+venn_GW_cortex <- venn.diagram(GW_cortex, filename = NULL, fill = c("red", "blue", "green"), main = "GW DE in cortex", category.names = c("17 vs 13", "15 vs 13", "17 vs 15"))
+GW_GE <- list(GW17_GW13 = c(GW_17_13_UP_duplicated_GE$id, GW_17_13_DN_duplicated_GE$id), GW17_GW15 = c(GW_17_15_UP_duplicated_GE$id, GW_17_15_DN_duplicated_GE$id), GW15_GW13 = GE03_GE04DE$ID)
+venn_GW_GE <- venn.diagram(GW_GE, filename = NULL, fill = c("red", "blue", "green"), main = "GW DE in GE", category.names = c("17 vs 13", "15 vs 13", "17 vs 15"))
+grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 2)
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS3.pdf", height = 12, width = 12)
+grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 2)
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 4: DAVID enrichment for DE genes
+
+* DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
+
+```{r DE_DAVID}
+DAVID_brain01_brain02DE <- read.delim("../RNAseq/DEfine/gene/enrich/brain01_brain02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+DAVID_cortex01_cortex02DE <- read.delim("../RNAseq/DEfine/gene/enrich/cortex01_cortex02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+DAVID_GE01_GE02DE <- read.delim("../RNAseq/DEfine/gene/enrich/GE01_GE02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+Terms <- unique(c(DAVID_brain01_brain02DE[DAVID_brain01_brain02DE$FDR < 0.01, "Term"], DAVID_cortex01_cortex02DE[DAVID_cortex01_cortex02DE$FDR < 0.01, "Term"], DAVID_GE01_GE02DE[DAVID_GE01_GE02DE$FDR < 0.01, "Term"]))
+DAVID_MZ <- rbind(filter(DAVID_brain01_brain02DE, Term %in% Terms) %>% mutate(Cell = "Brain"), filter(DAVID_cortex01_cortex02DE, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(DAVID_GE01_GE02DE, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
+DAVID_MZ$Term <- factor(DAVID_MZ$Term, levels = rev(unique(DAVID_MZ[order(DAVID_MZ$FDR, decreasing = T), "Term"])))
+DAVID_MZ_figure <- ggplot(DAVID_MZ, aes(x = Term, y = FDR, fill = Cell)) + 
+   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
+   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
+   xlab("") + 
+   ylab("-log10(FDR)") + 
+   ggtitle("MZ twins") + 
+   theme_bw()
+DAVID_cortex_GE_UP <- read.delim("../RNAseq/DEfine/gene/enrich/cortex_GE_UP_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+DAVID_cortex_GE_DN <- read.delim("../RNAseq/DEfine/gene/enrich/cortex_GE_DN_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+Terms <- unique(c(DAVID_cortex_GE_UP[DAVID_cortex_GE_UP$FDR < 0.01, "Term"], DAVID_cortex_GE_DN[DAVID_cortex_GE_DN$FDR < 0.01, "Term"]))
+DAVID_NPCs <- rbind(filter(DAVID_cortex_GE_UP, Term %in% Terms) %>% mutate(DE = "UP"), filter(DAVID_cortex_GE_DN, Term %in% Terms) %>% mutate(DE = "DN")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(DE, Term, FDR)
+DAVID_NPCs$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_NPCs$Term)
+DAVID_NPCs$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_NPCs$Term)
+DAVID_NPCs$Term <- factor(DAVID_NPCs$Term, levels = rev(unique(DAVID_NPCs[order(DAVID_NPCs$FDR, decreasing = T), "Term"])))
+DAVID_NPCs_figure <- ggplot(DAVID_NPCs, aes(x = Term, y = FDR, fill = DE)) + 
+   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("blue", "red"), labels = c("UP in GE", "UP in Cortex"), name = "") + 
+   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
+   xlab("") + 
+   ylab("-log10(FDR)") + 
+   ggtitle("NPCs") + 
+   theme_bw()
+# write.table(c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id, GW_UP_no_cortex$id, GW_no_UP_cortex$id, GW_DN_no_cortex$id, GW_no_DN_cortex$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_cortex.txt", row.names = F, col.names = F, quote = F)
+GW_DE_cortex_DAVID <- read.delim("../GW/DE/enrich/GW_DE_cortex_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+# write.table(c(GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, GW_UP_no_GE$id, GW_no_UP_GE$id, GW_DN_no_GE$id, GW_no_DN_GE$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_GE.txt", row.names = F, col.names = F, quote = F)
+GW_DE_GE_DAVID <- read.delim("../GW/DE/enrich/GW_DE_GE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
+Terms <- unique(c(GW_DE_cortex_DAVID[GW_DE_cortex_DAVID$FDR < 0.01, "Term"], GW_DE_GE_DAVID[GW_DE_GE_DAVID$FDR < 0.01, "Term"]))
+DAVID_GW <- rbind(filter(GW_DE_cortex_DAVID, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(GW_DE_GE_DAVID, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
+DAVID_GW$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_GW$Term)
+DAVID_GW$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_GW$Term)
+DAVID_GW$Term <- factor(DAVID_GW$Term, levels = rev(unique(DAVID_GW[order(DAVID_GW$FDR, decreasing = T), "Term"])))
+DAVID_GW_figure <- ggplot(DAVID_GW, aes(x = Term, y = FDR, fill = Cell)) + 
+   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+   coord_flip() + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
+   xlab("") + 
+   ylab("-log10(FDR)") + 
+   ggtitle("GW") + 
+   theme_bw()
+grid.newpage()
+layOut(list(DAVID_MZ_figure, 1:2, 1), 
+       list(DAVID_NPCs_figure, 1:4, 2), 
+       list(DAVID_GW_figure, 3:5, 1))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS4.pdf", height = 12, width = 12)
+layOut(list(DAVID_MZ_figure, 1:2, 1), 
+       list(DAVID_NPCs_figure, 1:4, 2), 
+       list(DAVID_GW_figure, 3:5, 1))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 5: Validate WGBS UMRs with MeDIP/MRE
+
+* (A). For each UMR between NPCs identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between cortex and GE NPCs. (C). GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP cortex UMRs (red), and GE UMRs (blue). 
+
+```{r WGBS_valid}
+GOBP_Cortex02.UMR_MeDIP <- read.delim("../MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo.tsv", head = F, as.is = T, skip = 4)
+GOBP_GE02.UMR_MeDIP <- read.delim("../MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hyper.tsv", head = F, as.is = T, skip = 4)
+GOBP_Cortex02_GE02_MeDIP <- rbind(select(mutate(filter(GOBP_Cortex02.UMR_MeDIP, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "Cortex.UMR", FDR = -log10(V7), Term = V3), UMR, Term, FDR),
+                                 select(mutate(filter(GOBP_GE02.UMR_MeDIP, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "GE.UMR", FDR = log10(V7), Term = V3), UMR, Term, FDR))
+Terms <- unique(c(arrange(filter(GOBP_Cortex02_GE02_MeDIP, UMR == "Cortex.UMR"), desc(FDR))[1:20, "Term"], rev(arrange(filter(GOBP_Cortex02_GE02_MeDIP, UMR == "GE.UMR"), FDR)[1:20, "Term"])))
+GOBP_Cortex02_GE02_MeDIP <- mutate(filter(GOBP_Cortex02_GE02_MeDIP, Term %in% Terms), Term = factor(Term, levels = rev(Terms)))
+GOBP_Cortex02_GE02_MeDIP_figure <- ggplot(data = GOBP_Cortex02_GE02_MeDIP, aes(Term, FDR, fill = UMR)) +
+  geom_bar(position = "identity", stat = "identity", width = .5) + 
+  coord_flip() + 
+  xlab("") + 
+  ylab("-log10(FDR)") + 
+  scale_fill_manual(values = c("blue", "red"), name = "") + 
+  theme_bw()
+grid.newpage()
+layOut(list(valid_boxplot, 1, 1:2), 
+       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
+       list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS5.pdf", height = 12, width = 12)
+layOut(list(valid_boxplot, 1, 1:2), 
+       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
+       list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 6: DAVID enrichment for isoform genes   
+
+* DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs (A) and across gestational weeks (B).      
+
+```{r isoform_DAVID}
+isoform_NPCs_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("NPCs") + xlab("") + 
+  theme(plot.margin=unit(c(1,1.35,1,1), "cm"))
+enrich_GW_isoform_gene_dup <- enrich_GW_isoform_gene_dup + ggtitle("GW") + xlab("") + 
+  theme(plot.margin=unit(c(1,1,1,2.5), "cm"))
+grid.arrange(isoform_NPCs_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS6.pdf", height = 12, width = 12)
+grid.arrange(isoform_NPCs_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 7: GREAT enrichment for GW UMRs  
+
+* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
+
+```{r GREAT_GW}
+GREAT_GW_Cortex <- rbind(GREAT_GW_Cortex02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
+                         GREAT_GW_Cortex04.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW13 UMRs", FDR = log(FDR))) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
+GREAT_GW_Cortex_figure <- ggplot(data = GREAT_GW_Cortex, aes(Term, FDR, fill = UMR)) +
+  geom_bar(position = "identity", stat = "identity", width = .5) + 
+  coord_flip() + 
+  xlab("") + 
+  ylab("-log10(FDR)") + 
+  ggtitle("Cortex") + 
+  scale_fill_manual(values = c("red", "blue"), name = "", guide = F) + 
+  theme_bw()
+GREAT_GW_GE <- rbind(GREAT_GW_GE02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
+                     GREAT_GW_GE04.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW13 UMRs", FDR = log(FDR))) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
+GREAT_GW_GE_figure <- ggplot(data = GREAT_GW_GE, aes(Term, FDR, fill = UMR)) +
+  geom_bar(position = "identity", stat = "identity", width = .5) + 
+  coord_flip() + 
+  xlab("") + 
+  ylab("-log10(FDR)") + 
+  ggtitle("GE") + 
+  scale_fill_manual(values = c("red", "blue"), name = "") + 
+  scale_y_continuous(breaks = c(-20, 0, 20), labels = c(20, 0, 20)) + 
+  theme_bw()
+GREAT_GW_shared <- GREAT_GW_17week.UMR$data %>% filter(Category == "GOBP") %>% mutate(FDR = -log(FDR)) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
+GREAT_GW_shared_figure <- ggplot(data = GREAT_GW_shared, aes(Term, FDR)) +
+  geom_bar(position = "identity", stat = "identity", width = .5, fill = "blue") + 
+  coord_flip() + 
+  xlab("") + 
+  ylab("-log10(FDR)") + 
+  ggtitle("shared") + 
+  theme_bw()
+grid.newpage()
+layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
+       list(GREAT_GW_GE_figure, 1:3, 5:9), 
+       list(GREAT_GW_shared_figure, 3:4, 1:4))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS7.pdf", height = 12, width = 12)
+layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
+       list(GREAT_GW_GE_figure, 1:3, 5:9), 
+       list(GREAT_GW_shared_figure, 3:4, 1:4))
+grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
+grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+dev.off()
+```
+
+### Supplemental 8: DAVID enrichment of OLIG2 target genes   
+
+* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
+
+```{r GW_OLIG2_DAVID, fig.height = 7, fig.width = 8}
+unique_enhancer_GW_Olig2_DE_DAVID <- rbind(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID$data %>% mutate(Cell = "cortex"), homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID$data %>% mutate(Cell = "GE")) %>% filter(as.character(Category) == "GOBP") %>% arrange(FDR) %>% mutate(Cell = factor(Cell, levels = c("cortex", "GE")), log10FDR = log10(FDR))
+unique_enhancer_GW_Olig2_DE_DAVID[as.character(unique_enhancer_GW_Olig2_DE_DAVID$Cell) == "cortex", "log10FDR"] <- - unique_enhancer_GW_Olig2_DE_DAVID[as.character(unique_enhancer_GW_Olig2_DE_DAVID$Cell) == "cortex", "log10FDR"]
+unique_enhancer_GW_Olig2_DE_DAVID <- unique_enhancer_GW_Olig2_DE_DAVID %>% mutate(Term = factor(Term, levels = rev(unique(as.character(unique_enhancer_GW_Olig2_DE_DAVID$Term))))) 
+(unique_enhancer_GW_Olig2_DE_DAVID_figure <- ggplot(data = unique_enhancer_GW_Olig2_DE_DAVID, aes(Term, -log10FDR, fill = Cell)) +
+  geom_bar(stat = "identity", width = .5, position = "identity") + 
+  coord_flip() + 
+  xlab("") +
+  scale_fill_manual(values = c("red", "blue"), name = "") + 
+  scale_y_continuous(breaks = c(-2, 0, 2, 4), labels = abs(c(-2, 0, 2, 4))) + 
+  theme_bw() +
+  theme(axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
+ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "FigureS8.pdf", height = 12, width = 12)
+```
+
+### Supplemental 9: Transcriptional clustering
+
+* Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
+
+```{r cluster}
+gene_FetalBrain <- read.delim("../Tables/rpkm_pc.txt", as.is = T, row.names = 1)
+gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
+exon_FetalBrain <- read.delim("../Tables/rpkm_exon.txt", as.is = T, row.names = 1)
+exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(exon_FetalBrain), TF_value = 2)
+colnames(miR_FetalBrain) <- gsub("(\\d+)", "\\.HuFNSC\\1", colnames(miR_FetalBrain))
+highExpr <- as.character(miR_FetalBrain[rowSums(miR_FetalBrain[, 2:11] > 100) > 0, "Gene"])
+miR_dend <- (1- (miR_FetalBrain[highExpr, -1] %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(miR_FetalBrain[, -1]), TF_value = 2)
+op <- par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
+plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
+mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
+mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
+mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot.new()
+legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
+par(op)
+pdf("FigureS9.pdf", height = 12, width = 12)
+par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
+plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
+mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
+mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
+mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot.new()
+legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
+dev.off()
+```
+
+-----------------
+
+### Supplemental 10: Genomic breakdown of UMRs
 
 * Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
 
@@ -410,7 +728,7 @@ layOut(list(genomicBreak_MZ_figure, 1, 1),
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS2.pdf", height = 12, width = 12)
+pdf("FigureS10.pdf", height = 12, width = 12)
 layOut(list(genomicBreak_MZ_figure, 1, 1), 
        list(genomicBreak_WGBS_figure, 1, 2), 
        list(genomicBreak_GW_figure, 2, 1))
@@ -420,7 +738,7 @@ grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize =
 dev.off()
 ```
 
-### Supplemental 3: Fraction of DE genes with proximal UMRs
+### Supplemental 11: Fraction of DE genes with proximal UMRs
 
 * Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
 
@@ -487,7 +805,7 @@ layOut(list(DMR_proximal_DE_MZ_figure, 1, 1),
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS3.pdf", height = 12, width = 12)
+pdf("FigureS11.pdf", height = 12, width = 12)
 layOut(list(DMR_proximal_DE_MZ_figure, 1, 1), 
        list(DMR_proximal_DE_NPCs_figure, 1, 2), 
        list(DMR_proximal_DE_GW_figure, 2, 1))
@@ -497,264 +815,16 @@ grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize =
 dev.off()
 ```
 
-### Supplemental 4: Venn diagram of differential expressed genes between MZ and between GW 
-
-* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (A), and between different gestational weeks (B).     
-  
-```{r Venn_DE}
-MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
-venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE UP")
-MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
-venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE DN")
-GW_cortex <- list(GW17_GW13 = c(GW_17_13_UP_duplicated_cortex$id, GW_17_13_DN_duplicated_cortex$id), GW17_GW15 = c(GW_17_15_UP_duplicated_cortex$id, GW_17_15_DN_duplicated_cortex$id), GW15_GW13 = cortex03_cortex04DE$ID)
-venn_GW_cortex <- venn.diagram(GW_cortex, filename = NULL, fill = c("red", "blue", "green"), main = "GW DE in cortex", category.names = c("17 vs 13", "15 vs 13", "17 vs 15"))
-GW_GE <- list(GW17_GW13 = c(GW_17_13_UP_duplicated_GE$id, GW_17_13_DN_duplicated_GE$id), GW17_GW15 = c(GW_17_15_UP_duplicated_GE$id, GW_17_15_DN_duplicated_GE$id), GW15_GW13 = GE03_GE04DE$ID)
-venn_GW_GE <- venn.diagram(GW_GE, filename = NULL, fill = c("red", "blue", "green"), main = "GW DE in GE", category.names = c("17 vs 13", "15 vs 13", "17 vs 15"))
-grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 2)
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS4.pdf", height = 12, width = 12)
-grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), gTree(children = venn_GW_cortex), gTree(children = venn_GW_GE), nrow = 2)
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-dev.off()
-```
-
-### Supplemental 5: DAVID enrichment for DE genes
-
-* DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
-
-```{r DE_DAVID}
-DAVID_brain01_brain02DE <- read.delim("../RNAseq/DEfine/gene/enrich/brain01_brain02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-DAVID_cortex01_cortex02DE <- read.delim("../RNAseq/DEfine/gene/enrich/cortex01_cortex02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-DAVID_GE01_GE02DE <- read.delim("../RNAseq/DEfine/gene/enrich/GE01_GE02DE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-Terms <- unique(c(DAVID_brain01_brain02DE[DAVID_brain01_brain02DE$FDR < 0.01, "Term"], DAVID_cortex01_cortex02DE[DAVID_cortex01_cortex02DE$FDR < 0.01, "Term"], DAVID_GE01_GE02DE[DAVID_GE01_GE02DE$FDR < 0.01, "Term"]))
-DAVID_MZ <- rbind(filter(DAVID_brain01_brain02DE, Term %in% Terms) %>% mutate(Cell = "Brain"), filter(DAVID_cortex01_cortex02DE, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(DAVID_GE01_GE02DE, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
-DAVID_MZ$Term <- factor(DAVID_MZ$Term, levels = rev(unique(DAVID_MZ[order(DAVID_MZ$FDR, decreasing = T), "Term"])))
-DAVID_MZ_figure <- ggplot(DAVID_MZ, aes(x = Term, y = FDR, fill = Cell)) + 
-   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
-   coord_flip() + 
-   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
-   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
-   xlab("") + 
-   ylab("-log10(FDR)") + 
-   ggtitle("MZ twins") + 
-   theme_bw()
-DAVID_cortex_GE_UP <- read.delim("../RNAseq/DEfine/gene/enrich/cortex_GE_UP_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-DAVID_cortex_GE_DN <- read.delim("../RNAseq/DEfine/gene/enrich/cortex_GE_DN_duplicated_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-Terms <- unique(c(DAVID_cortex_GE_UP[DAVID_cortex_GE_UP$FDR < 0.01, "Term"], DAVID_cortex_GE_DN[DAVID_cortex_GE_DN$FDR < 0.01, "Term"]))
-DAVID_NPCs <- rbind(filter(DAVID_cortex_GE_UP, Term %in% Terms) %>% mutate(DE = "UP"), filter(DAVID_cortex_GE_DN, Term %in% Terms) %>% mutate(DE = "DN")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(DE, Term, FDR)
-DAVID_NPCs$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_NPCs$Term)
-DAVID_NPCs$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_NPCs$Term)
-DAVID_NPCs$Term <- factor(DAVID_NPCs$Term, levels = rev(unique(DAVID_NPCs[order(DAVID_NPCs$FDR, decreasing = T), "Term"])))
-DAVID_NPCs_figure <- ggplot(DAVID_NPCs, aes(x = Term, y = FDR, fill = DE)) + 
-   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
-   coord_flip() + 
-   scale_fill_manual(values = c("blue", "red"), labels = c("UP in GE", "UP in Cortex"), name = "") + 
-   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
-   xlab("") + 
-   ylab("-log10(FDR)") + 
-   ggtitle("NPCs") + 
-   theme_bw()
-# write.table(c(GW_UP_UP_cortex$id, GW_UP_DN_cortex$id, GW_DN_UP_cortex$id, GW_DN_DN_cortex$id, GW_UP_no_cortex$id, GW_no_UP_cortex$id, GW_DN_no_cortex$id, GW_no_DN_cortex$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_cortex.txt", row.names = F, col.names = F, quote = F)
-GW_DE_cortex_DAVID <- read.delim("../GW/DE/enrich/GW_DE_cortex_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-# write.table(c(GW_UP_UP_GE$id, GW_UP_DN_GE$id, GW_DN_UP_GE$id, GW_DN_DN_GE$id, GW_UP_no_GE$id, GW_no_UP_GE$id, GW_DN_no_GE$id, GW_no_DN_GE$id), file = "~/快盘/FetalBrain/GW/DE/GW_DE_GE.txt", row.names = F, col.names = F, quote = F)
-GW_DE_GE_DAVID <- read.delim("../GW/DE/enrich/GW_DE_GE_DAVID.txt", as.is = T) %>% filter(Category == "GOTERM_BP_5")
-Terms <- unique(c(GW_DE_cortex_DAVID[GW_DE_cortex_DAVID$FDR < 0.01, "Term"], GW_DE_GE_DAVID[GW_DE_GE_DAVID$FDR < 0.01, "Term"]))
-DAVID_GW <- rbind(filter(GW_DE_cortex_DAVID, Term %in% Terms) %>% mutate(Cell = "Cortex"), filter(GW_DE_GE_DAVID, Term %in% Terms) %>% mutate(Cell = "GE")) %>% mutate(Term = gsub("GO:\\d+~", "", Term), FDR = -log10(FDR) -2) %>% select(Cell, Term, FDR)
-DAVID_GW$Term <- gsub("cell morphogenesis involved in neuron differentiation", "cell morphogenesis involved in\n neuron differentiation", DAVID_GW$Term)
-DAVID_GW$Term <- gsub("cell morphogenesis involved in differentiation", "cell morphogenesis involved in\n differentiation", DAVID_GW$Term)
-DAVID_GW$Term <- factor(DAVID_GW$Term, levels = rev(unique(DAVID_GW[order(DAVID_GW$FDR, decreasing = T), "Term"])))
-DAVID_GW_figure <- ggplot(DAVID_GW, aes(x = Term, y = FDR, fill = Cell)) + 
-   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
-   coord_flip() + 
-   scale_fill_manual(values = c("red", "blue"), name = "") + 
-   scale_y_continuous(breaks = seq(-4, 6, by = 2), labels = seq(-2, 8, by = 2)) + 
-   xlab("") + 
-   ylab("-log10(FDR)") + 
-   ggtitle("GW") + 
-   theme_bw()
-grid.newpage()
-layOut(list(DAVID_MZ_figure, 1:2, 1), 
-       list(DAVID_NPCs_figure, 1:4, 2), 
-       list(DAVID_GW_figure, 3:5, 1))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS5.pdf", height = 12, width = 12)
-layOut(list(DAVID_MZ_figure, 1:2, 1), 
-       list(DAVID_NPCs_figure, 1:4, 2), 
-       list(DAVID_GW_figure, 3:5, 1))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.58, "npc"), gp=gpar(fontsize = 20))
-dev.off()
-```
-
-### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
-
-* (A). For each UMR between NPCs identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between cortex and GE NPCs. (C). GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP cortex UMRs (red), and GE UMRs (blue). 
-
-```{r WGBS_valid}
-GOBP_Cortex02.UMR_MeDIP <- read.delim("../MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hypo.tsv", head = F, as.is = T, skip = 4)
-GOBP_GE02.UMR_MeDIP <- read.delim("../MeDIP/DMR/enrich/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02_GE-HuFNSC02.hyper.tsv", head = F, as.is = T, skip = 4)
-GOBP_Cortex02_GE02_MeDIP <- rbind(select(mutate(filter(GOBP_Cortex02.UMR_MeDIP, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "Cortex.UMR", FDR = -log10(V7), Term = V3), UMR, Term, FDR),
-                                 select(mutate(filter(GOBP_GE02.UMR_MeDIP, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "GE.UMR", FDR = log10(V7), Term = V3), UMR, Term, FDR))
-Terms <- unique(c(arrange(filter(GOBP_Cortex02_GE02_MeDIP, UMR == "Cortex.UMR"), desc(FDR))[1:20, "Term"], rev(arrange(filter(GOBP_Cortex02_GE02_MeDIP, UMR == "GE.UMR"), FDR)[1:20, "Term"])))
-GOBP_Cortex02_GE02_MeDIP <- mutate(filter(GOBP_Cortex02_GE02_MeDIP, Term %in% Terms), Term = factor(Term, levels = rev(Terms)))
-GOBP_Cortex02_GE02_MeDIP_figure <- ggplot(data = GOBP_Cortex02_GE02_MeDIP, aes(Term, FDR, fill = UMR)) +
-  geom_bar(position = "identity", stat = "identity", width = .5) + 
-  coord_flip() + 
-  xlab("") + 
-  ylab("-log10(FDR)") + 
-  scale_fill_manual(values = c("blue", "red"), name = "") + 
-  theme_bw()
-grid.newpage()
-layOut(list(valid_boxplot, 1, 1:2), 
-       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
-       list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS6.pdf", height = 12, width = 12)
-layOut(list(valid_boxplot, 1, 1:2), 
-       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
-       list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-dev.off()
-```
-
-### Supplemental 7: TFBS asymmetry between neurosphere UMRs
+### Supplemental 12: TFBS asymmetry between neurosphere UMRs
 
 * Relative abundance of transcription factor binding sites overlapping UMRs in NPCs cortex and GE cells reveals regulatory asymmetry between cell types. Red represents transcription factor more enriched in cortex, and blue represents transcription factor enriched in GE.    
 
 ```{r NPCs_TFBS}
 (DMR_TF_figure <- DMR_TF_figure + xlab("Abundance near Cortex UMRs") + ylab("Abundance near GE UMRs")) 
-ggsave(DMR_TF_figure, file = "FigureS7.pdf")
+ggsave(DMR_TF_figure, file = "FigureS12.pdf")
 ```
 
-### Supplemental 8: DAVID enrichment for isoform genes   
-
-* DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs (A) and across gestational weeks (B).      
-
-```{r isoform_DAVID}
-isoform_NPCs_DAVID <- isoform_cortex_GE_enrich$figure + ggtitle("NPCs") + xlab("") + 
-  theme(plot.margin=unit(c(1,1.35,1,1), "cm"))
-enrich_GW_isoform_gene_dup <- enrich_GW_isoform_gene_dup + ggtitle("GW") + xlab("") + 
-  theme(plot.margin=unit(c(1,1,1,2.5), "cm"))
-grid.arrange(isoform_NPCs_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS8.pdf", height = 12, width = 12)
-grid.arrange(isoform_NPCs_DAVID, enrich_GW_isoform_gene_dup, nrow = 2, heights = 9:5)
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.015, "npc"), y = unit(0.42, "npc"), gp=gpar(fontsize = 20))
-dev.off()
-```
-
-### Supplemental 9: GREAT enrichment for GW UMRs  
-
-* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
-
-```{r GREAT_GW}
-GREAT_GW_Cortex <- rbind(GREAT_GW_Cortex02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
-                         GREAT_GW_Cortex04.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW13 UMRs", FDR = log(FDR))) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
-GREAT_GW_Cortex_figure <- ggplot(data = GREAT_GW_Cortex, aes(Term, FDR, fill = UMR)) +
-  geom_bar(position = "identity", stat = "identity", width = .5) + 
-  coord_flip() + 
-  xlab("") + 
-  ylab("-log10(FDR)") + 
-  ggtitle("Cortex") + 
-  scale_fill_manual(values = c("red", "blue"), name = "", guide = F) + 
-  theme_bw()
-GREAT_GW_GE <- rbind(GREAT_GW_GE02.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW17 UMRs", FDR = -log(FDR)), 
-                     GREAT_GW_GE04.UMR$data %>% filter(Category == "GOBP") %>% mutate(UMR = "GW13 UMRs", FDR = log(FDR))) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
-GREAT_GW_GE_figure <- ggplot(data = GREAT_GW_GE, aes(Term, FDR, fill = UMR)) +
-  geom_bar(position = "identity", stat = "identity", width = .5) + 
-  coord_flip() + 
-  xlab("") + 
-  ylab("-log10(FDR)") + 
-  ggtitle("GE") + 
-  scale_fill_manual(values = c("red", "blue"), name = "") + 
-  scale_y_continuous(breaks = c(-20, 0, 20), labels = c(20, 0, 20)) + 
-  theme_bw()
-GREAT_GW_shared <- GREAT_GW_17week.UMR$data %>% filter(Category == "GOBP") %>% mutate(FDR = -log(FDR)) %>% arrange(-FDR) %>% mutate(Term = factor(Term, levels = rev(Term)))
-GREAT_GW_shared_figure <- ggplot(data = GREAT_GW_shared, aes(Term, FDR)) +
-  geom_bar(position = "identity", stat = "identity", width = .5, fill = "blue") + 
-  coord_flip() + 
-  xlab("") + 
-  ylab("-log10(FDR)") + 
-  ggtitle("shared") + 
-  theme_bw()
-grid.newpage()
-layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
-       list(GREAT_GW_GE_figure, 1:3, 5:9), 
-       list(GREAT_GW_shared_figure, 3:4, 1:4))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS9.pdf", height = 12, width = 12)
-layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
-       list(GREAT_GW_GE_figure, 1:3, 5:9), 
-       list(GREAT_GW_shared_figure, 3:4, 1:4))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-dev.off()
-```
-
-### Supplemental 10: Transcriptional clustering
-
-* Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
-
-```{r cluster}
-gene_FetalBrain <- read.delim("../Tables/rpkm_pc.txt", as.is = T, row.names = 1)
-gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
-  set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
-exon_FetalBrain <- read.delim("../Tables/rpkm_exon.txt", as.is = T, row.names = 1)
-exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
-  set("by_labels_branches_lwd", value = colnames(exon_FetalBrain), TF_value = 2)
-colnames(miR_FetalBrain) <- gsub("(\\d+)", "\\.HuFNSC\\1", colnames(miR_FetalBrain))
-highExpr <- as.character(miR_FetalBrain[rowSums(miR_FetalBrain[, 2:11] > 100) > 0, "Gene"])
-miR_dend <- (1- (miR_FetalBrain[highExpr, -1] %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
-  set("by_labels_branches_lwd", value = colnames(miR_FetalBrain[, -1]), TF_value = 2)
-op <- par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
-plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
-mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
-mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
-mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot.new()
-legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
-par(op)
-pdf("FigureS10.pdf", height = 12, width = 12)
-par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
-plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
-mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
-mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
-mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot.new()
-legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
-dev.off()
-```
-
------
-
-### Supplemental 11: Location of UMRs across the genome 
+### Supplemental 13: Location of UMRs across the genome 
 
 * Locations of UMRs along each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).             
 
@@ -784,7 +854,7 @@ layOut(list(DMR_pos_MZ_ggplot, 1, 1:3),
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
 grid.text("C", x = unit(0.515, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS11.pdf", height = 12, width = 12)
+pdf("FigureS13.pdf", height = 12, width = 12)
 layOut(list(DMR_pos_MZ_ggplot, 1, 1:3), 
        list(DMR_pos_NPCs_ggplot, 2, 1:2), 
        list(DMR_pos_GW_ggplot, 2, 3:4))
@@ -794,7 +864,7 @@ grid.text("C", x = unit(0.515, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize =
 dev.off()
 ```
 
-### Supplemental 12: Expression of DNA methylation reulators
+### Supplemental 14: Expression of DNA methylation reulators
 
 * Heatmap of RPKM for DNA methylation regulators across all samples.         
 
@@ -808,10 +878,10 @@ regulator_5mC <- as.matrix(regulator_5mC[, 2:ncol(regulator_5mC)])
    ylab("") + 
    theme_bw() + 
    theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90)))
-ggsave(regulator_5mC_heatmap, file = "FigureS12.pdf", height = 12, width = 12)
+ggsave(regulator_5mC_heatmap, file = "FigureS14.pdf", height = 12, width = 12)
 ```
 
-### Supplemental 13: miRNA 
+### Supplemental 15: miRNA 
 
 * (A). Unique miRNA detected (>0.1 reads per million mapped) across all samples. Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (B), cortex and GE NPCs (C), and gestational weeks (D).         
 
@@ -847,7 +917,7 @@ grid.text("A", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("B", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("C", x=unit(.02, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 grid.text("D", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
-pdf("FigureS13.pdf", height = 12, width = 12)
+pdf("FigureS15.pdf", height = 12, width = 12)
 grid.arrange(miR_summary_figure, miR_DE_MZ_heatmap, miR_DE_NPCs_heatmap, miR_DE_GW_heatmap, nrow = 2)
 grid.text("A", x=unit(.02, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
 grid.text("B", x=unit(.52, "npc"), y=unit(.98, "npc"), gp=gpar(fontsize=20))
@@ -856,16 +926,16 @@ grid.text("D", x=unit(.52, "npc"), y=unit(.48, "npc"), gp=gpar(fontsize=20))
 dev.off()
 ```
 
-### Supplemental 14: Correlating histone modifications with transcription
+### Supplemental 16: Correlating histone modifications with transcription
 
 * Divide genes into 8 groups according to whether their genebody are marked by H3K36me3 (top panel: marked, bottom panel: not marked), and whether their promoters are marked by H3K4me3 and H3K27me3 (panels from left to right: marked by H3K4me3 only, both, H3K37me3 only, neither), and plot boxplot of gene RPKM on the log10 scale (RPKM < 0.005 are set to 0.005).   
 
 ```{r histone_RPKM}
 (HisMod_RPKM_figure)
-ggsave(HisMod_RPKM_figure, file = "FigureS14.pdf")
+ggsave(HisMod_RPKM_figure, file = "FigureS16.pdf")
 ```
 
-### Supplemental 15: DNA methylation at exon boundaries  
+### Supplemental 17: DNA methylation at exon boundaries  
 
 * Exon-intron junction mCpGs provide an inherited signature of exon expression. Average number of CpGs (black, bottom panel) and average mCpG levels (whole genome bisulfite shotgun, 20bp bins) at exon junctions +/- 200bp in cortex (solid line with round dots) and GE (dashed line with triangles). Exons are divided into four groups: 1) exons expressed in both cell types (exon RPKM > 0.1 in cortex and GE, purple); 2) cortex-specific exons (isoform exons expressed in cortex but not in GE, red); 3) GE-specific exons (isoform exons expressed in GE but not in cortex, green), and 4) exons not expressed in either cell types (all other exons, blue).           
 
@@ -876,14 +946,14 @@ grid.newpage()
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
-pdf("FigureS15.pdf", height = 12, width = 12)
+pdf("FigureS17.pdf", height = 12, width = 12)
 grid.draw(gt) 
 grid.text("Average DNA methylation", x = unit(0.015, "npc"), y = unit(0.65, "npc"), rot = 90)
 grid.text("CpG density", x = unit(0.015, "npc"), y = unit(0.15, "npc"), rot = 90)
 dev.off()
 ```
 
-### Supplemental 16: Neurosphere UMR enrichemnt at chromosome ends  
+### Supplemental 18: Neurosphere UMR enrichemnt at chromosome ends  
 
 * Fraction of UMRs along normalized length of the genome in cortex and GE specific UMRs (A), and GW specific UMRs (B).          
 
@@ -916,68 +986,11 @@ chrEnd_GW_figure <- ggplot(chrEnd_GW_figure$data %>% mutate(DM = revalue(DM, c("
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS16.pdf", height = 6, width = 12)
+pdf("FigureS18.pdf", height = 6, width = 12)
 grid.arrange(chrEnd_WGBS_figure, chrEnd_GW_figure, nrow = 1, widths = 5:6)
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.48, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 dev.off()
-```
-
-### Supplemental 17: Scale of UMRs and DE genes between MZ twins and NPCs 
-
-* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
-* _Note the opposite direction of UMRs and unique enhancers, why?_      
-
-```{r MZ_compare, fig.height = 10, fig.width = 12}
-MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
-                        Category = rep(c(rep("Individual specific", nrow(DMR_MZ_summary)), rep("Cell type specific", nrow(DMR_neurospheres_summary))), 7), 
-                        DM_DE = factor(c(rep(rep(c("Sample1 specific/UP", "Sample2 specific/UP"), each = nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)), 3), rep("Isoforms", nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))), levels = c("Sample1 specific/UP", "Sample2 specific/UP", "Isoforms")), 
-                        Assay = factor(c(rep(c("UMRs", "Unique enhancers", "DE genes"), each = (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary))*2), rep("Isoforms", (nrow(DMR_MZ_summary) + nrow(DMR_neurospheres_summary)))), levels = c("UMRs", "Unique enhancers", "DE genes", "Isoforms")), 
-                        value = c(-(filter(DMR_freq_MZ_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_MZ_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, -(filter(DMR_freq_neurospheres_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, unique_enhancers_summary[1:5, "Sample1_unique"], -unique_enhancers_summary[1:5, "Sample2_unique"], individual_DE_summary$UP[1:3], cortex_GE_DE_summary$UP[1:2], -individual_DE_summary$DN[1:3], -cortex_GE_DE_summary$DN[1:2], individual_summary[1:3, "isoform_genes"], cortex_GE_summary[1:2, "isoform_genes"]))
-MZ_scale$Sample <- factor(gsub("-HuFNSC", "", MZ_scale$Sample), levels = c("Brain01_Brain02", "Cortex01_Cortex02", "GE01_GE02", "Cortex01_GE01", "Cortex02_GE02"))
-MZ_scale$Category <- factor(MZ_scale$Category, levels = c("Individual specific", "Cell type specific"))
-MZ_scale_figure <- ggplot(MZ_scale, aes(x = Sample, y = value, fill = DM_DE)) + 
-   geom_bar(stat="identity", position = "identity", width = 0.5) + 
-   geom_hline(yintercept = 0) + 
-   facet_grid(Assay ~ Category, scales = "free", space = "free_x") + 
-   scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   scale_y_continuous(breaks = c(-30000, -10000, -2000, -500, -100, 100, 500, 2000, 10000, 30000), labels = c(-30000, 10000, 2000, 500, 100, 100, 500, 2000, 10000, 30000)) + 
-   xlab("") + 
-   ylab("") + 
-   theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
-MZ_scale_figure_gt <- ggplot_gtable(ggplot_build(MZ_scale_figure))
-grid.newpage()
-grid.draw(MZ_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.85, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of enhancers", x = unit(0.015, "npc"), y = unit(0.62, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.3, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("FigureS17.pdf", height = 10, width = 12)
-grid.newpage()
-grid.draw(MZ_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.85, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of enhancers", x = unit(0.015, "npc"), y = unit(0.62, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of genes", x = unit(0.015, "npc"), y = unit(0.3, "npc"), rot = 90, gp=gpar(fontsize=15))
-dev.off()
-```
-
-### Supplemental 18: DAVID enrichment of OLIG2 target genes   
-
-* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
-
-```{r GW_OLIG2_DAVID, fig.height = 7, fig.width = 8}
-unique_enhancer_GW_Olig2_DE_DAVID <- rbind(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID$data %>% mutate(Cell = "cortex"), homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID$data %>% mutate(Cell = "GE")) %>% filter(as.character(Category) == "GOBP") %>% arrange(FDR) %>% mutate(Cell = factor(Cell, levels = c("cortex", "GE")), log10FDR = log10(FDR))
-unique_enhancer_GW_Olig2_DE_DAVID[as.character(unique_enhancer_GW_Olig2_DE_DAVID$Cell) == "cortex", "log10FDR"] <- - unique_enhancer_GW_Olig2_DE_DAVID[as.character(unique_enhancer_GW_Olig2_DE_DAVID$Cell) == "cortex", "log10FDR"]
-unique_enhancer_GW_Olig2_DE_DAVID <- unique_enhancer_GW_Olig2_DE_DAVID %>% mutate(Term = factor(Term, levels = rev(unique(as.character(unique_enhancer_GW_Olig2_DE_DAVID$Term))))) 
-(unique_enhancer_GW_Olig2_DE_DAVID_figure <- ggplot(data = unique_enhancer_GW_Olig2_DE_DAVID, aes(Term, -log10FDR, fill = Cell)) +
-  geom_bar(stat = "identity", width = .5, position = "identity") + 
-  coord_flip() + 
-  xlab("") +
-  scale_fill_manual(values = c("red", "blue"), name = "") + 
-  scale_y_continuous(breaks = c(-2, 0, 2, 4), labels = abs(c(-2, 0, 2, 4))) + 
-  theme_bw() +
-  theme(axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15)))
-ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "FigureS18.pdf", height = 7, width = 8)
 ```
 
 ### Supplemental 19: TFBS asymmetry in GW UMRs  

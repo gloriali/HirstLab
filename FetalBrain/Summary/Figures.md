@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Thu Aug 27 09:11:47 2015
+Updated: Wed Sep  9 14:17:33 2015
 
 
 
@@ -136,8 +136,22 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
+-------------------------
+
 ## Supplemental Figures
-### Supplemental 1: Asymmetry in UMRs 
+### Supplemental 1: Scale of UMRs and DE genes between MZ twins and NPCs 
+
+* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
+* _Note the opposite direction of UMRs and unique enhancers, why?_      
+
+![](Figures_files/figure-html/MZ_scale_compare-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Supplemental 2: Asymmetry in UMRs 
 
 * UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
   
@@ -148,29 +162,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 2: Genomic breakdown of UMRs
-
-* Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
-
-![](Figures_files/figure-html/genomicBreak-1.png) 
-
-```
-## png 
-##   2
-```
-
-### Supplemental 3: Fraction of DE genes with proximal UMRs
-
-* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
-
-![](Figures_files/figure-html/proximal_DE-1.png) 
-
-```
-## png 
-##   2
-```
-
-### Supplemental 4: Venn diagram of differential expressed genes between MZ and between GW 
+### Supplemental 3: Venn diagram of differential expressed genes between MZ and between GW 
 
 * Venn diagrame of No. of differential expressed genes between MZ twins in different cell types (A), and between different gestational weeks (B).     
   
@@ -181,7 +173,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 5: DAVID enrichment for DE genes
+### Supplemental 4: DAVID enrichment for DE genes
 
 * DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
 
@@ -192,7 +184,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 6: Validate WGBS UMRs with MeDIP/MRE
+### Supplemental 5: Validate WGBS UMRs with MeDIP/MRE
 
 * (A). For each UMR between NPCs identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between cortex and GE NPCs. (C). GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP cortex UMRs (red), and GE UMRs (blue). 
 
@@ -203,13 +195,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 7: TFBS asymmetry between neurosphere UMRs
-
-* Relative abundance of transcription factor binding sites overlapping UMRs in NPCs cortex and GE cells reveals regulatory asymmetry between cell types. Red represents transcription factor more enriched in cortex, and blue represents transcription factor enriched in GE.    
-
-![](Figures_files/figure-html/NPCs_TFBS-1.png) 
-
-### Supplemental 8: DAVID enrichment for isoform genes   
+### Supplemental 6: DAVID enrichment for isoform genes   
 
 * DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs (A) and across gestational weeks (B).      
 
@@ -220,7 +206,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 9: GREAT enrichment for GW UMRs  
+### Supplemental 7: GREAT enrichment for GW UMRs  
 
 * GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
 
@@ -231,7 +217,13 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 10: Transcriptional clustering
+### Supplemental 8: DAVID enrichment of OLIG2 target genes   
+
+* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
+
+![](Figures_files/figure-html/GW_OLIG2_DAVID-1.png) 
+
+### Supplemental 9: Transcriptional clustering
 
 * Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
 
@@ -242,9 +234,37 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
------
+-----------------
 
-### Supplemental 11: Location of UMRs across the genome 
+### Supplemental 10: Genomic breakdown of UMRs
+
+* Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
+
+![](Figures_files/figure-html/genomicBreak-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Supplemental 11: Fraction of DE genes with proximal UMRs
+
+* Fraction of differential expressed genes proximally (TSS +/- 1500bp) associated with MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).     
+
+![](Figures_files/figure-html/proximal_DE-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Supplemental 12: TFBS asymmetry between neurosphere UMRs
+
+* Relative abundance of transcription factor binding sites overlapping UMRs in NPCs cortex and GE cells reveals regulatory asymmetry between cell types. Red represents transcription factor more enriched in cortex, and blue represents transcription factor enriched in GE.    
+
+![](Figures_files/figure-html/NPCs_TFBS-1.png) 
+
+### Supplemental 13: Location of UMRs across the genome 
 
 * Locations of UMRs along each chromosome for MeDIP UMRs between MZ twins (A), WGBS UMRs between cortex and GE NPCs (B), and WGBS UMRs between GW13 and GW17 (C).             
 
@@ -255,13 +275,13 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 12: Expression of DNA methylation reulators
+### Supplemental 14: Expression of DNA methylation reulators
 
 * Heatmap of RPKM for DNA methylation regulators across all samples.         
 
 ![](Figures_files/figure-html/heatmap_5mC_regulator-1.png) 
 
-### Supplemental 13: miRNA 
+### Supplemental 15: miRNA 
 
 * (A). Unique miRNA detected (>0.1 reads per million mapped) across all samples. Heatmap of differential expressed and highly expressed (RPM > 100) miRNAs between MZ twins (B), cortex and GE NPCs (C), and gestational weeks (D).         
 
@@ -272,13 +292,13 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 14: Correlating histone modifications with transcription
+### Supplemental 16: Correlating histone modifications with transcription
 
 * Divide genes into 8 groups according to whether their genebody are marked by H3K36me3 (top panel: marked, bottom panel: not marked), and whether their promoters are marked by H3K4me3 and H3K27me3 (panels from left to right: marked by H3K4me3 only, both, H3K37me3 only, neither), and plot boxplot of gene RPKM on the log10 scale (RPKM < 0.005 are set to 0.005).   
 
 ![](Figures_files/figure-html/histone_RPKM-1.png) 
 
-### Supplemental 15: DNA methylation at exon boundaries  
+### Supplemental 17: DNA methylation at exon boundaries  
 
 * Exon-intron junction mCpGs provide an inherited signature of exon expression. Average number of CpGs (black, bottom panel) and average mCpG levels (whole genome bisulfite shotgun, 20bp bins) at exon junctions +/- 200bp in cortex (solid line with round dots) and GE (dashed line with triangles). Exons are divided into four groups: 1) exons expressed in both cell types (exon RPKM > 0.1 in cortex and GE, purple); 2) cortex-specific exons (isoform exons expressed in cortex but not in GE, red); 3) GE-specific exons (isoform exons expressed in GE but not in cortex, green), and 4) exons not expressed in either cell types (all other exons, blue).           
 
@@ -289,7 +309,7 @@ Updated: Thu Aug 27 09:11:47 2015
 ##   2
 ```
 
-### Supplemental 16: Neurosphere UMR enrichemnt at chromosome ends  
+### Supplemental 18: Neurosphere UMR enrichemnt at chromosome ends  
 
 * Fraction of UMRs along normalized length of the genome in cortex and GE specific UMRs (A), and GW specific UMRs (B).          
 
@@ -299,24 +319,6 @@ Updated: Thu Aug 27 09:11:47 2015
 ## png 
 ##   2
 ```
-
-### Supplemental 17: Scale of UMRs and DE genes between MZ twins and NPCs 
-
-* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
-* _Note the opposite direction of UMRs and unique enhancers, why?_      
-
-![](Figures_files/figure-html/MZ_compare-1.png) 
-
-```
-## png 
-##   2
-```
-
-### Supplemental 18: DAVID enrichment of OLIG2 target genes   
-
-* Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
-
-![](Figures_files/figure-html/GW_OLIG2_DAVID-1.png) 
 
 ### Supplemental 19: TFBS asymmetry in GW UMRs  
 
