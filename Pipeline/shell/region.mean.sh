@@ -34,16 +34,16 @@ done
 
 if [ "$MEAN" = YES ]; then
     echo "Processing "$file ": compute regional mean for "$region ", output to "$dirOut/$name.mean.bed
-    less $dirOut/$name.intersect | awk '{sum[$8]=sum[$8]+$4; count[$8]=count[$8]+1; chr[$8]=$5; start[$8]=$6; end[$8]=$7;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]/count[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/users/lli/tmp/ > $dirOut/$name.mean.bed
+    less $dirOut/$name.intersect | awk '{sum[$8]=sum[$8]+$4; count[$8]=count[$8]+1; chr[$8]=$5; start[$8]=$6; end[$8]=$7;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]/count[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/temp/ > $dirOut/$name.mean.bed
 fi
 
 if [ "$SUM" = YES ]; then
     echo "Processing "$file ": compute regional sum for "$region ", output to "$dirOut/$name.sum.bed
-    less $dirOut/$name.intersect | awk '{sum[$8]=sum[$8]+$4; chr[$8]=$5; start[$8]=$6; end[$8]=$7;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/users/lli/tmp/ > $dirOut/$name.sum.bed
+    less $dirOut/$name.intersect | awk '{sum[$8]=sum[$8]+$4; chr[$8]=$5; start[$8]=$6; end[$8]=$7;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/temp/ > $dirOut/$name.sum.bed
 fi
 
 if [ "$WEIGHT" = YES ]; then
     echo "Processing "$file ": compute regional weighted mean for "$region ", output to "$dirOut/$name.weighted.mean.bed
-    less $dirOut/$name.intersect | awk '{sum[$9]=sum[$9]+$4*$5; weight[$9]=weight[$9]+$5; chr[$9]=$6; start[$9]=$7; end[$9]=$8;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]/weight[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/users/lli/tmp/ > $dirOut/$name.weighted.mean.bed
+    less $dirOut/$name.intersect | awk '{sum[$9]=sum[$9]+$4*$5; weight[$9]=weight[$9]+$5; chr[$9]=$6; start[$9]=$7; end[$9]=$8;} END {for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"sum[i]/weight[i]}}' | sort -k1,1 -k 2,2n -T /projects/epigenomics/temp/ > $dirOut/$name.weighted.mean.bed
 fi
 rm $dirOut/$name.intersect
