@@ -7,6 +7,6 @@ Code and summary results in Hirst Lab
 * [FetalBrain](./FetalBrain): REMC Fetal Brain data analysis
 * [Glioma](./Glioma): CEMT Glioma data analysis
 * [Breast](./Breast): REMC Breast data analysis
-* [IDH](./IDH): General analysis related to IDH mutant gliomas and AML _(Thesis)_     
+* [Others](./Others): General analysis related to thesis or commands for others   
 
 Directory on xhost: /home/lli/HirstLab/    
