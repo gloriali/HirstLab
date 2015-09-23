@@ -490,9 +490,14 @@ done
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
+less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
+less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
+less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" -nmotifs > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
+cd $dirOut/homer/GW/
+for file in *.annotate; do
+    echo -e "Processing "$file
+    less $file | awk 'BEGIN {FS="\t"}; NR==1 {print $0} {if($22>0&&sqrt($10^2)<=2000){print $0}}' > $file.motif
+done
 ### Neurospheres
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -532,9 +537,10 @@ rm $dirOut/unique_enhancer.GW.GW13.5mC_GE02.weighted.mean.bed $dirOut/unique_enh
 paste $dirOut/unique_enhancer.GW.GW17.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW17.5mC_GE04.weighted.mean.bed | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$10"\t"$5-$10}' > $dirOut/unique_enhancer.GW.GW17.5mC_GE02-04.bed
 rm $dirOut/unique_enhancer.GW.GW17.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW17.5mC_GE04.weighted.mean.bed
 cd $dirr/homer/GW/
-for file in GW17only_*.annotate; do
+for file in GW17only_*.annotate.motif; do
     echo "Processing "$file
-    awk 'NR==FNR {mc[$4]=$7; next} {print $0"\t"mc[$1]}' $dirOut/unique_enhancer.GW.GW17.5mC_GE02-04.bed $file > $dirr/homer/GW/$file.mC
+    awk 'NR==FNR {mc[$4]=$7; mc1[$4]=$5; mc2[$4]=$6; next} {print $0"\t"mc1[$1]"\t"mc2[$1]"\t"mc[$1]}' $dirOut/unique_enhancer.GW.GW17.5mC_GE02-04.bed $file > $dirOut/$file.mC
+    less $dirOut/$file.mC | awk 'BEGIN {FS="\t"}; NR==1 {print $0} $0~ /protein-coding/ {if($25<-0.2){print $0}}' > $dirr/$file.UMR
 done
 
 
