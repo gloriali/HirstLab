@@ -187,3 +187,13 @@ do
     rm $dirOut/$file.CGI
 done
 
+# WGBS fractional calls
+cd /projects/epigenomics/users/lli/FetalBrain/WGBS
+for file in *.combine; do
+    name=$(echo $file | sed -e s/'.combine'//g)
+    echo "Processing"$name
+    less $file | awk '{print $1"\t"$4"\t"$2+$3}' | sed -e s/":"/"\t"/g | sed -e s/"-"/"\t"/g | sort -k1,1 -k2,2n -T /projects/epigenomics/temp/ > $name
+done
+rm *.combine *.gz
+
+
