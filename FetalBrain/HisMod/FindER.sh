@@ -501,5 +501,40 @@ less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_common.txt | 
 less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_common.txt | awk 'NR==3 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.Neurospheres.GE.bed hg19 -m ""'$dirOut'""/homer/Neurospheres.GE/"$12" > ""'$dirOut'""/homer/Neurospheres/Common_GE_"$3".annotate")}'
 less $dirOut/homer/Neurospheres/homer_unique_enhancer_Neurospheres_GEonly.txt | awk 'NR==5 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.Neurospheres.GE.bed hg19 -m ""'$dirOut'""/homer/Neurospheres.GE/"$4" > ""'$dirOut'""/homer/Neurospheres/GEonly_"$2".annotate")}'
 
+## UMR enhancers
+dirGW='/projects/epigenomics/users/lli/FetalBrain/GW/DMR/'
+dirNPC='/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/'
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
+dirOut=$dirIn'/UMR_enhancer/'
+mkdir -p $dirOut
+cd $dirOut
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirIn/unique_enhancer.GW.GW13_02.bed -b $dirGW/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa > $dirOut/UMR_enhancer.GW.GW13_02.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirIn/unique_enhancer.GW.GW17_02.bed -b $dirGW/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa > $dirOut/UMR_enhancer.GW.GW17_02.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirIn/unique_enhancer.Neurospheres.Cortex02.bed -b $dirNPC/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed -wa > $dirOut/UMR_enhancer.Neurospheres.Cortex02.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirIn/unique_enhancer.Neurospheres.GE02.bed -b $dirNPC/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed -wa > $dirOut/UMR_enhancer.Neurospheres.GE02.bed
+for file in UMR_enhancer*.bed; do
+    name=$(echo $file | sed -e 's/.bed//g')
+    echo "Processing"$name
+    /projects/epigenomics/software/bedtools-2.23.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.pc.bed -d > $dirOut/$name.closest.gene
+done
+
+## Enhancer fractional methylation call
+dirr='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique'
+dirIn='/projects/epigenomics/users/lli/FetalBrain/WGBS/'
+dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/fractional'
+mkdir -p $dirOut
+/home/lli/HirstLab/Pipeline/shell/region.mean.sh -i $dirIn -o $dirOut -f A22476.WGBS.NeurospheresGE04.sam.bedGraph -r $dirr/unique_enhancer.GW.GW13.bed -n unique_enhancer.GW.GW13.5mC_GE04 -w 
+/home/lli/HirstLab/Pipeline/shell/region.mean.sh -i $dirIn -o $dirOut -f A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph -r $dirr/unique_enhancer.GW.GW13.bed -n unique_enhancer.GW.GW13.5mC_GE02 -w 
+paste $dirOut/unique_enhancer.GW.GW13.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW13.5mC_GE04.weighted.mean.bed | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$10"\t"$5-$10}' > $dirOut/unique_enhancer.GW.GW13.5mC_GE02-04.bed
+rm $dirOut/unique_enhancer.GW.GW13.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW13.5mC_GE04.weighted.mean.bed
+/home/lli/HirstLab/Pipeline/shell/region.mean.sh -i $dirIn -o $dirOut -f A22476.WGBS.NeurospheresGE04.sam.bedGraph -r $dirr/unique_enhancer.GW.GW17.bed -n unique_enhancer.GW.GW17.5mC_GE04 -w 
+/home/lli/HirstLab/Pipeline/shell/region.mean.sh -i $dirIn -o $dirOut -f A17784-A13819.WGBS.NeurospheresGE02.sam.bedGraph -r $dirr/unique_enhancer.GW.GW17.bed -n unique_enhancer.GW.GW17.5mC_GE02 -w 
+paste $dirOut/unique_enhancer.GW.GW17.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW17.5mC_GE04.weighted.mean.bed | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$10"\t"$5-$10}' > $dirOut/unique_enhancer.GW.GW17.5mC_GE02-04.bed
+rm $dirOut/unique_enhancer.GW.GW17.5mC_GE02.weighted.mean.bed $dirOut/unique_enhancer.GW.GW17.5mC_GE04.weighted.mean.bed
+cd $dirr/homer/GW/
+for file in GW17only_*.annotate; do
+    echo "Processing "$file
+    awk 'NR==FNR {mc[$4]=$7; next} {print $0"\t"mc[$1]}' $dirOut/unique_enhancer.GW.GW17.5mC_GE02-04.bed $file > $dirr/homer/GW/$file.mC
+done
 
 
