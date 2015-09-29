@@ -6,6 +6,7 @@ library(reshape2)
 library(VennDiagram)
 library(gridExtra)
 library(preprocessCore)
+library(wq)
 source("/home/lli/HirstLab/Pipeline/R/enrich.R")
 source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 load("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
@@ -416,6 +417,8 @@ write.table(GWAS_unique_enhancer_brain_TFBS, file = "./GWAS/GWAS_unique_enhancer
 load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
 load("/home/lli/hg19/hg19v65_genes.Rdata")
+geneRPKM <- read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_pc.txt", as.is = T, row.names = 1)
+colnames(geneRPKM) <- gsub(".HuFNSC", "", colnames(geneRPKM))
 #### GW
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
 DE_GW13_GW17_cortex <- data.frame(ID = intersect(cortex01_cortex04DE$ID, cortex02_cortex04DE$ID)) %>%
@@ -499,35 +502,108 @@ write.table(homer_unique_enhancer_GW_GW17only, file = "homer_unique_enhancer_GW_
    xlab("") + 
    theme_bw())
 ggsave(homer_unique_enhancer_GW_GW17only_figure, file = "homer_unique_enhancer_GW_GW17only_figure.pdf", height = 4)
-homer_unique_enhancer_GW_GW17only_Olig2 <- read.delim("GW17only_Olig2.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
-  mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
-row.names(homer_unique_enhancer_GW_GW17only_Olig2) <- homer_unique_enhancer_GW_GW17only_Olig2$ID
-homer_unique_enhancer_GW_GW17only_Olig2_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Olig2$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
-Venn_homer_unique_enhancer_GW_GW17only_Olig2 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Olig2_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Olig2", force.unique = T)
-plot.new()
-grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Olig2)
-homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_cortex, by = "ID") %>% 
-  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-homer_unique_enhancer_GW_GW17only_Olig2_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_GE, by = "ID") %>% 
-  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex", erminej = F, fdr = 0.05, height = 2))
-(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_GE", erminej = F, fdr = 0.05, height = 8))
+homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(Motif.Name = factor(TF, levels = rev(TF)), Category = "Percent of Enhancers with Motif", EnsemblID = c("ENSG00000169083", "ENSG00000168267", "ENSG00000082175", "ENSG00000150907", "ENSG00000205927"), 
+                                                                                                          RPKM_cortex_GW13 = geneRPKM[EnsemblID, "Cortex04"], RPKM_cortex_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_cortex = (Cortex01 + Cortex02)/2))$GW17_cortex, RPKM_GE_GW13 = geneRPKM[EnsemblID, "GE04"], RPKM_GE_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_GE = (GE01 + GE02)/2))$GW17_GE) 
+homer_unique_enhancer_GW_GW17only_RPKM <- melt(homer_unique_enhancer_GW_GW17only_figure$data[, c("TF", grep("RPKM", colnames(homer_unique_enhancer_GW_GW17only_figure$data), value = T))], id = "TF") %>% mutate(Category = paste0("TF_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+(homer_unique_enhancer_GW_GW17only_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_RPKM, aes(TF, log10(value)+3, fill = GW)) +
+  geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
+  scale_y_continuous(breaks = c(0,1,2,3,4,5), labels = c(-3,-2,-1,0,1,2)) + 
+  coord_flip() + 
+  facet_grid(. ~ Category) + 
+  scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), guide = "none") + 
+  ylab("log10(RPKM)") + 
+  xlab("") + 
+  theme_bw() + 
+  theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,0,1,-0.6), "cm")))
+homer_unique_enhancer_GW_GW17only_targets <- read.delim("GW17only_motif.annotate", head = T, as.is = T, fill = T) %>% 
+  filter(abs(Distance.to.TSS)<=2000, Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>% select(-(Strand:Focus.Ratio.Region.Size), -(Nearest.PromoterID:Nearest.Refseq))
+colnames(homer_unique_enhancer_GW_GW17only_targets) <- c("ID", colnames(homer_unique_enhancer_GW_GW17only_targets)[2:14], "ARhalfsite_logOdds", "Ptf1a_logOdds", "PR_logOdds", "Foxo1_logOdds", "Olig2_logOdds")
+homer_unique_enhancer_GW_GW17only_K4me1 <- read.delim("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/signal/unique_enhancer.GW.GW17.bed.K4me1.coverage", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "GE01_K4me1", "GE02_K4me1", "GE04_K4me1")) %>% distinct(ID)
+rownames(homer_unique_enhancer_GW_GW17only_K4me1) <- homer_unique_enhancer_GW_GW17only_K4me1$ID
+homer_unique_enhancer_GW_GW17only_5mC <- read.delim("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/fractional/unique_enhancer.GW.GW17.5mC_GE02-04.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "GE02_5mC", "GE04_5mC", "delta_5mC")) %>% distinct(ID)
+rownames(homer_unique_enhancer_GW_GW17only_5mC) <- homer_unique_enhancer_GW_GW17only_5mC$ID
+homer_unique_enhancer_GW_GW17only_targets <- na.omit(data.frame(homer_unique_enhancer_GW_GW17only_targets, 
+                                                                homer_unique_enhancer_GW_GW17only_K4me1[homer_unique_enhancer_GW_GW17only_targets$ID, c("GE01_K4me1", "GE02_K4me1", "GE04_K4me1")],
+                                                                homer_unique_enhancer_GW_GW17only_5mC[homer_unique_enhancer_GW_GW17only_targets$ID, c("GE02_5mC", "GE04_5mC", "delta_5mC")], 
+                                                                geneRPKM[homer_unique_enhancer_GW_GW17only_targets$Nearest.Ensembl,]))
+cut_Odds <- 8
+homer_unique_enhancer_GW_GW17only_targets_TF <- rbind(homer_unique_enhancer_GW_GW17only_targets %>% filter(ARhalfsite_logOdds>=cut_Odds) %>% mutate(TF = "AR-halfsite"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Ptf1a_logOdds>=cut_Odds) %>% mutate(TF = "Ptf1a"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(PR_logOdds>=cut_Odds) %>% mutate(TF = "PR"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Foxo1_logOdds>=cut_Odds) %>% mutate(TF = "Foxo1"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Olig2_logOdds>=cut_Odds) %>% mutate(TF = "Olig2")) %>% filter(abs(delta_5mC)>=0.2)
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(RPKM_cortex_GW13 = Cortex04, RPKM_cortex_GW17 = (Cortex01+Cortex02)/2, RPKM_GE_GW13 = GE04, RPKM_GE_GW17 = (GE01+GE02)/2) %>%
+  select(TF, RPKM_cortex_GW13, RPKM_cortex_GW17, RPKM_GE_GW13, RPKM_GE_GW17)
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, id = "TF") %>% mutate(Category = paste0("Target_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, aes(TF, log10(value), fill = GW)) +
+   geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
+   coord_flip() + 
+   facet_grid(. ~ Category) + 
+   scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), name = "") + 
+   ylab("log10(RPKM)") + 
+   xlab("") + 
+   theme_bw() + 
+   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,1,1,-0.6), "cm")))
+homer_unique_enhancer_GW_GW17only_targets_TF <- rbind(homer_unique_enhancer_GW_GW17only_targets %>% filter(ARhalfsite_logOdds>=cut_Odds) %>% mutate(TF = "AR-halfsite"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Ptf1a_logOdds>=cut_Odds) %>% mutate(TF = "Ptf1a"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(PR_logOdds>=cut_Odds) %>% mutate(TF = "PR"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Foxo1_logOdds>=cut_Odds) %>% mutate(TF = "Foxo1"), 
+                                                      homer_unique_enhancer_GW_GW17only_targets %>% filter(Olig2_logOdds>=cut_Odds) %>% mutate(TF = "Olig2")) 
+homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- homer_unique_enhancer_GW_GW17only_targets_TF %>% select(TF, GE02_5mC, GE04_5mC)
+homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_5mC, id = "TF") %>% mutate(Category = "5mC", GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+(homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_5mC, aes(TF, value, fill = GW)) +
+   geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
+   coord_flip() + 
+   facet_grid(. ~ Category) + 
+   scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), name = "") + 
+   ylab("Fractional methylation") + 
+   xlab("") + 
+   theme_bw()) 
+   #theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,1,1,-0.6), "cm")))
+grid.newpage()
+layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
+       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7), 
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, 1, 8:11)) 
+pdf("homer_unique_enhancer_GW_GW17only_TF.pdf", height = 4, width = 12)
+layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
+       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7), 
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, 1, 8:11)) 
+dev.off()
 
-homer_unique_enhancer_GW_GW17only_Foxo1 <- read.delim("GW17only_Foxo1.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
-  mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
-row.names(homer_unique_enhancer_GW_GW17only_Foxo1) <- homer_unique_enhancer_GW_GW17only_Foxo1$ID
-homer_unique_enhancer_GW_GW17only_Foxo1_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Foxo1$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
-Venn_homer_unique_enhancer_GW_GW17only_Foxo1 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Foxo1_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Foxo1", force.unique = T)
-plot.new()
-grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Foxo1)
-homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_cortex, by = "ID") %>% 
-  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_GE, by = "ID") %>% 
-  mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
-write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+
+
+
+
+# homer_unique_enhancer_GW_GW17only_Olig2 <- read.delim("GW17only_Olig2.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
+#   mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
+# row.names(homer_unique_enhancer_GW_GW17only_Olig2) <- homer_unique_enhancer_GW_GW17only_Olig2$ID
+# homer_unique_enhancer_GW_GW17only_Olig2_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Olig2$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
+# Venn_homer_unique_enhancer_GW_GW17only_Olig2 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Olig2_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Olig2", force.unique = T)
+# plot.new()
+# grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Olig2)
+# homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_cortex, by = "ID") %>% 
+#   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+# write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# homer_unique_enhancer_GW_GW17only_Olig2_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Olig2, DE_GW13_GW17_GE, by = "ID") %>% 
+#   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+# write.table(homer_unique_enhancer_GW_GW17only_Olig2_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Olig2_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# (homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex", erminej = F, fdr = 0.05, height = 2))
+# (homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2_DE_GE", erminej = F, fdr = 0.05, height = 8))
+# 
+# homer_unique_enhancer_GW_GW17only_Foxo1 <- read.delim("GW17only_Foxo1.annotate", head = T, as.is = T) %>% filter(Gene.Type == "protein-coding", Nearest.Ensembl != "") %>% distinct(Nearest.Ensembl) %>%
+#   mutate(ID = Nearest.Ensembl, Enhancer = paste0(Chr, ":", Start, "-", End)) %>% select(ID, Enhancer, Annotation, Distance.to.TSS)
+# row.names(homer_unique_enhancer_GW_GW17only_Foxo1) <- homer_unique_enhancer_GW_GW17only_Foxo1$ID
+# homer_unique_enhancer_GW_GW17only_Foxo1_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Foxo1$ID, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
+# Venn_homer_unique_enhancer_GW_GW17only_Foxo1 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Foxo1_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Foxo1", force.unique = T)
+# plot.new()
+# grid.draw(Venn_homer_unique_enhancer_GW_GW17only_Foxo1)
+# homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_cortex, by = "ID") %>% 
+#   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+# write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_cortex.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE <- merge(homer_unique_enhancer_GW_GW17only_Foxo1, DE_GW13_GW17_GE, by = "ID") %>% 
+#   mutate(name = ensembl[as.character(ID), "name"], description = ensembl[as.character(ID), "description"]) %>% filter(GW13 + GW13 >= 0.2) %>% arrange(-abs(log2FC))
+# write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+
 #### Neurospheres
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/homer/")
 cortex_GE_UP_duplicated <- c(cortex01_GE01UP$V1, cortex02_GE02UP$V1, cortex03_GE03UP$V1, cortex04_GE04UP$V1)
@@ -653,6 +729,85 @@ homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node <- rbind(data.frame(name = "F
 write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_node.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 write.table(homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network, file = "homer_unique_enhancer_GW_GW17only_Foxo1_DE_GE_network.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 
+#### Fractional call for unique enhancers
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/fractional")
+GW17only_Olig2_mC <- read.delim("GW17only_Olig2.annotate.motif.mC", as.is = T, skip = 1)
+colnames(GW17only_Olig2_mC) <- c("ID", colnames(GW17only_Olig2_mC)[2:21], "No.ofPeaks", "deltamC")
+GW17only_Foxo1_mC <- read.delim("GW17only_Foxo1.annotate.motif.mC", as.is = T, skip = 1)
+colnames(GW17only_Foxo1_mC) <- c("ID", colnames(GW17only_Foxo1_mC)[2:21], "No.ofPeaks", "deltamC")
+GW17only_PR_mC <- read.delim("GW17only_PR.annotate.motif.mC", as.is = T, skip = 1)
+colnames(GW17only_PR_mC) <- c("ID", colnames(GW17only_PR_mC)[2:21], "No.ofPeaks", "deltamC")
+GW17only_Ptf1a_mC <- read.delim("GW17only_Ptf1a.annotate.motif.mC", as.is = T, skip = 1)
+colnames(GW17only_Ptf1a_mC) <- c("ID", colnames(GW17only_Ptf1a_mC)[2:21], "No.ofPeaks", "deltamC")
+GW17only_AR_halfsite_mC <- read.delim("GW17only_AR-halfsite.annotate.motif.mC", as.is = T, skip = 1)
+colnames(GW17only_AR_halfsite_mC) <- c("ID", colnames(GW17only_AR_halfsite_mC)[2:21], "No.ofPeaks", "deltamC")
+GW17only_mC <- rbind(GW17only_Olig2_mC %>% mutate(TF = "Olig2"), 
+                     GW17only_Foxo1_mC %>% mutate(TF = "Foxo1"), 
+                     GW17only_PR_mC %>% mutate(TF = "PR"), 
+                     GW17only_Ptf1a_mC %>% mutate(TF = "Ptf1a"), 
+                     GW17only_AR_halfsite_mC %>% mutate(TF = "AR-halfsite"))
+(GW17only_mC_figure <- ggplot(GW17only_mC, aes(x = TF, y = deltamC)) + 
+   geom_boxplot(width = 0.5) + 
+   xlab("") + 
+   ylab("mC GW17-GW13") + 
+   theme_bw())
+ggsave(GW17only_mC_figure, file = "GW17only_mC_figure.pdf", height = 6, width = 6)
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/")
+GW17only_Olig2_UMR <- read.delim("GW17only_Olig2.annotate.motif.UMR", as.is = T) 
+colnames(GW17only_Olig2_UMR) <- c("ID", colnames(GW17only_Olig2_UMR)[2:21], "No.ofPeaks", "GW17mC", "GW13mC", "deltamC")
+GW17only_Olig2_UMR$Focus.Ratio.Region.Size <- NULL
+GW17only_Olig2_UMR <- na.omit(data.frame(GW17only_Olig2_UMR, geneRPKM[GW17only_Olig2_UMR$Nearest.Ensembl,])) %>% arrange(deltamC)
+GW17only_Olig2_UMR_mC <- GW17only_Olig2_UMR %>% select(Nearest.Ensembl, GW17mC, GW13mC)
+GW17only_Olig2_UMR_mC_tall <- melt(GW17only_Olig2_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(GW17only_Olig2_UMR$Nearest.Ensembl)), GW = gsub("mC", "", variable))
+(GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = GW, y = id, fill = value)) + 
+  geom_tile() + 
+  scale_fill_gradient(name = "Fractional methylation") + 
+  xlab("") + 
+  ylab("") + 
+  theme_bw() + 
+  theme(plot.margin = unit(c(1,0,1,1), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom"))
+ggsave(GW17only_Olig2_UMR_mC_heatmap, file = "GW17only_Olig2_UMR_mC_heatmap.pdf", height = 6, width = 4)
+GW17only_Olig2_UMR_RPKM <- GW17only_Olig2_UMR %>% select(Nearest.Ensembl, Cortex.HuFNSC04, Cortex.HuFNSC03, Cortex.HuFNSC01, Cortex.HuFNSC02, GE.HuFNSC04, GE.HuFNSC03, GE.HuFNSC01, GE.HuFNSC02)
+colnames(GW17only_Olig2_UMR_RPKM) <- gsub("\\.HuFNSC", "", colnames(GW17only_Olig2_UMR_RPKM))
+GW17only_Olig2_UMR_RPKM_scale <- na.omit(data.frame(id = GW17only_Olig2_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Olig2_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
+GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM_scale, id = "id") %>% mutate(id = factor(id, levels = rev(GW17only_Olig2_UMR$Nearest.Ensembl)), Sample = factor(variable, levels = c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")))
+(GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = Sample, y = id, fill = value)) + 
+   geom_tile() + 
+   scale_fill_gradient(name = "RPKM Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(plot.margin = unit(c(1,1,1,0), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom"))
+ggsave(GW17only_Olig2_UMR_RPKM_heatmap, file = "GW17only_Olig2_UMR_RPKM_heatmap.pdf", height = 6, width = 8)
+grid.arrange(GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 1, widths = c(0.3, 0.7))
+GW17only_Foxo1_UMR <- read.delim("GW17only_Foxo1.annotate.motif.UMR", as.is = T) 
+colnames(GW17only_Foxo1_UMR) <- c("ID", colnames(GW17only_Foxo1_UMR)[2:21], "No.ofPeaks", "GW17mC", "GW13mC", "deltamC")
+GW17only_Foxo1_UMR$Focus.Ratio.Region.Size <- NULL
+GW17only_Foxo1_UMR <- na.omit(data.frame(GW17only_Foxo1_UMR, geneRPKM[GW17only_Foxo1_UMR$Nearest.Ensembl,])) %>% arrange(deltamC)
+GW17only_Foxo1_UMR_mC <- GW17only_Foxo1_UMR %>% select(Nearest.Ensembl, GW17mC, GW13mC)
+GW17only_Foxo1_UMR_mC_tall <- melt(GW17only_Foxo1_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(GW17only_Foxo1_UMR$Nearest.Ensembl)), GW = gsub("mC", "", variable))
+(GW17only_Foxo1_UMR_mC_heatmap <- ggplot(GW17only_Foxo1_UMR_mC_tall, aes(x = GW, y = id, fill = value)) + 
+   geom_tile() + 
+   scale_fill_gradient(name = "Fractional methylation") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(plot.margin = unit(c(1,0,1,1), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom"))
+ggsave(GW17only_Foxo1_UMR_mC_heatmap, file = "GW17only_Foxo1_UMR_mC_heatmap.pdf", height = 6, width = 4)
+GW17only_Foxo1_UMR_RPKM <- GW17only_Foxo1_UMR %>% select(Nearest.Ensembl, Cortex.HuFNSC04, Cortex.HuFNSC03, Cortex.HuFNSC01, Cortex.HuFNSC02, GE.HuFNSC04, GE.HuFNSC03, GE.HuFNSC01, GE.HuFNSC02)
+colnames(GW17only_Foxo1_UMR_RPKM) <- gsub("\\.HuFNSC", "", colnames(GW17only_Foxo1_UMR_RPKM))
+GW17only_Foxo1_UMR_RPKM_scale <- na.omit(data.frame(id = GW17only_Foxo1_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Foxo1_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
+GW17only_Foxo1_UMR_RPKM_tall <- melt(GW17only_Foxo1_UMR_RPKM_scale, id = "id") %>% mutate(id = factor(id, levels = rev(GW17only_Foxo1_UMR$Nearest.Ensembl)), Sample = factor(variable, levels = c("Cortex04", "Cortex03", "Cortex02", "Cortex01", "GE04", "GE03", "GE02", "GE01")))
+(GW17only_Foxo1_UMR_RPKM_heatmap <- ggplot(GW17only_Foxo1_UMR_RPKM_tall, aes(x = Sample, y = id, fill = value)) + 
+   geom_tile() + 
+   scale_fill_gradient(name = "RPKM Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(plot.margin = unit(c(1,1,1,0), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom"))
+ggsave(GW17only_Foxo1_UMR_RPKM_heatmap, file = "GW17only_Foxo1_UMR_RPKM_heatmap.pdf", height = 6, width = 8)
+grid.arrange(GW17only_Foxo1_UMR_mC_heatmap, GW17only_Foxo1_UMR_RPKM_heatmap, nrow = 1, widths = c(0.3, 0.7))
+
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
@@ -674,4 +829,5 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      homer_unique_enhancer_Neurospheres_CortexOnly, homer_unique_enhancer_Neurospheres_CortexOnly_figure, homer_unique_enhancer_Neurospheres_GEonly, homer_unique_enhancer_Neurospheres_GEonly_figure, 
      homer_unique_enhancer_Neurospheres_GEonly_Olig2, Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID, 
      homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, 
+     GW17only_mC_figure, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, GW17only_Foxo1_UMR_mC_heatmap, GW17only_Foxo1_UMR_RPKM_heatmap,  
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
