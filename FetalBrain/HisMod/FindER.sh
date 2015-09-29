@@ -490,14 +490,16 @@ done
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
-less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" -nmotifs > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
-cd $dirOut/homer/GW/
-for file in *.annotate; do
-    echo -e "Processing "$file
-    less $file | awk 'BEGIN {FS="\t"}; NR==1 {print $0} {if($22>0&&sqrt($10^2)<=2000){print $0}}' > $file.motif
-done
+dirMotif='/home/acarles/homer/data/knownTFs/motifs/'
+/home/acarles/homer/bin/annotatePeaks.pl $dirOut/unique_enhancer.GW.GW17.bed hg19 -m $dirMotif/ar-half.motif $dirMotif/ptf1a.motif $dirMotif/pr.motif $dirMotif/foxo1.motif $dirMotif/olig2.motif -mscore > $dirOut/homer/GW/GW17only_motif.annotate
+#less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
+#less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
+#less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" -nmotifs > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
+#cd $dirOut/homer/GW/
+#for file in *.annotate; do
+#    echo -e "Processing "$file
+#    less $file | awk 'BEGIN {FS="\t"}; NR==1 {print $0} {if($22>0&&sqrt($10^2)<=2000){print $0}}' > $file.motif
+#done
 ### Neurospheres
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -543,4 +545,20 @@ for file in GW17only_*.annotate.motif; do
     less $dirOut/$file.mC | awk 'BEGIN {FS="\t"}; NR==1 {print $0} $0~ /protein-coding/ {if($25<-0.2){print $0}}' > $dirr/$file.UMR
 done
 
+## Enhancer K4me1 signal
+out=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/signal/
+mkdir -p $out
+cd $out
+reg=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/unique_enhancer.GW.GW17.bed
+name=GE01.K4me1
+wig=/home/lli/FetalBrain/HisMod/wigs/A03275.bam.q5.F1028.SET_204.wig.gz
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $out -s hg19 -n $name > $out$name.coverage.log
+name=GE02.K4me1
+wig=/home/lli/FetalBrain/HisMod/wigs/A03477.bam.q5.F1028.SET_232.wig.gz
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $out -s hg19 -n $name > $out$name.coverage.log
+name=GE04.K4me1
+wig=/home/lli/FetalBrain/HisMod/wigs/A19303.q5.F1028.SET_194.wig.gz
+/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $out -s hg19 -n $name > $out$name.coverage.log
+# normaliazed to No. of mapped reads (GE04 as reference)
+paste unique_enhancer.GW.GW17.bed.GE01.K4me1.coverage unique_enhancer.GW.GW17.bed.GE02.K4me1.coverage unique_enhancer.GW.GW17.bed.GE04.K4me1.coverage | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5*30778793/96165980"\t"$11*30778793/38955337"\t"$17}' > unique_enhancer.GW.GW17.bed.K4me1.coverage
 
