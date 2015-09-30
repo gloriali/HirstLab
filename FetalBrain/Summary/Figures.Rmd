@@ -194,23 +194,14 @@ dev.off()
 * Transcription factors exclusively statistically enriched (Benjamini corrected p-value < 0.01, and percent of enhancers with motif > 20%) in GW17 unique enhancers.     
 
 ```{r GW_enhancer_TFBS, fig.height=4, fig.width=12}
-homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(Motif.Name = factor(TF, levels = rev(TF)), Category = "Percent of Enhancers with Motif", EnsemblID = c("ENSG00000169083", "ENSG00000168267", "ENSG00000082175", "ENSG00000150907", "ENSG00000205927"), RPKM_cortex_GW13 = geneRPKM[EnsemblID, "cortex04"], RPKM_cortex_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_cortex = (cortex01 + cortex02)/2))$GW17_cortex, RPKM_GE_GW13 = geneRPKM[EnsemblID, "ge04"], RPKM_GE_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_GE = (ge01 + ge02)/2))$GW17_GE) 
-homer_unique_enhancer_GW_GW17only_RPKM <- melt(homer_unique_enhancer_GW_GW17only_figure$data[, c("TF", grep("RPKM", colnames(homer_unique_enhancer_GW_GW17only_figure$data), value = T))], id = "TF") %>% mutate(Category = gsub("_GW.+", "", variable), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
-homer_unique_enhancer_GW_GW17only_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_RPKM, aes(TF, value, fill = GW)) +
-   geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
-   coord_flip() + 
-   facet_grid(. ~ Category) + 
-   scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), name = "") + 
-   ylab("RPKM") + 
-   xlab("") + 
-   theme_bw() + 
-   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,1,1,-0.6), "cm"))
 grid.newpage()
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
-       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7)) 
+       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7), 
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, 1, 8:11)) 
 pdf("Figure3b.pdf", height = 4, width = 12)
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
-       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7)) 
+       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7), 
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, 1, 8:11)) 
 dev.off()
 ```
 
