@@ -491,15 +491,20 @@ PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 dirOut='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/unique/'
 dirMotif='/home/acarles/homer/data/knownTFs/motifs/'
-/home/acarles/homer/bin/annotatePeaks.pl $dirOut/unique_enhancer.GW.GW17.bed hg19 -m $dirMotif/ar-half.motif $dirMotif/ptf1a.motif $dirMotif/pr.motif $dirMotif/foxo1.motif $dirMotif/olig2.motif -mscore > $dirOut/homer/GW/GW17only_motif.annotate
+#/home/acarles/homer/bin/annotatePeaks.pl $dirOut/unique_enhancer.GW.GW17.bed hg19 -m $dirMotif/ar-half.motif $dirMotif/ptf1a.motif $dirMotif/pr.motif $dirMotif/foxo1.motif $dirMotif/olig2.motif -mscore > $dirOut/homer/GW/GW17only_motif.annotate
+#/home/acarles/homer/bin/findMotifsGenome.pl $dirOut/unique_enhancer.GW.GW17.bed hg19 $dirOut/homer/GW/ -find $dirOut/homer/GW.GW17/knownResults/known21.motif > $dirOut/homer/GW/Olig2.test.txt
 #less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW13.bed hg19 -m ""'$dirOut'""/homer/GW.GW13/"$7" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW13_"$3".annotate")}'
 #less $dirOut/homer/GW/homer_unique_enhancer_GW_common.txt | awk 'NR==2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$12" -nmotifs > ""'$dirOut'""/homer/GW/Common_GW17_"$3".annotate")}'
-#less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/annotatePeaks.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 -m ""'$dirOut'""/homer/GW.GW17/"$4" -nmotifs > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
-#cd $dirOut/homer/GW/
-#for file in *.annotate; do
-#    echo -e "Processing "$file
-#    less $file | awk 'BEGIN {FS="\t"}; NR==1 {print $0} {if($22>0&&sqrt($10^2)<=2000){print $0}}' > $file.motif
-#done
+less $dirOut/homer/GW/homer_unique_enhancer_GW_GW17only.txt | awk 'NR<=6&&NR>=2 {system("/home/acarles/homer/bin/findMotifsGenome.pl ""'$dirOut'""/unique_enhancer.GW.GW17.bed hg19 ""'$dirOut'""/homer/GW/ -find ""'$dirOut'""/homer/GW.GW17/"$4" > ""'$dirOut'""/homer/GW/GW17only_"$2".annotate")}'
+cd $dirOut/homer/GW/
+for file in GW17only_*.annotate; do
+    tf=$(echo -e $file | sed -e 's/GW17only_//g' | sed -e 's/.annotate//g')
+    echo -e "Processing "$tf
+    less $file | sed -e s/:/"\t"/g | sed -e s/-/"\t"/g | awk 'NR>1 {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"}' | sort -k1,1 -k2,2n -T /projects/epigenomics/temp/ > $file.motif.bed
+    /projects/epigenomics/software/bedtools-2.23.0/bin/closestBed -a $file.motif.bed -b /home/lli/hg19/hg19v65_genes_TSS_1500.bed -d | awk '{print $0"\t""'$tf'"}' > $file.motif.gene
+done
+cat GW17only_*.annotate.motif.gene > GW17only_TF_motif.gene
+
 ### Neurospheres
 PATH=$PATH:/home/acarles/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
