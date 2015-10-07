@@ -495,29 +495,33 @@ homer_unique_enhancer_GW_GW17only <- homer_unique_enhancer_GW_GW17[!(homer_uniqu
   select(Motif.Name, TF, Assay, motif.file, Consensus, Log.P.value, q.value..Benjamini., Percent.of.Target.Sequences.with.Motif, Percent.of.Background.Sequences.with.Motif, FC) %>% 
   arrange(- Percent.of.Target.Sequences.with.Motif) %>% mutate(Motif.Name = factor(Motif.Name, levels = rev(as.character(Motif.Name))))
 write.table(homer_unique_enhancer_GW_GW17only, file = "homer_unique_enhancer_GW_GW17only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-(homer_unique_enhancer_GW_GW17only_figure <- ggplot(data = filter(homer_unique_enhancer_GW_GW17only, Percent.of.Target.Sequences.with.Motif >= 20), aes(Motif.Name, Percent.of.Target.Sequences.with.Motif)) +
-   geom_bar(fill = "blue", stat = "identity", width = .5) + 
+homer_unique_enhancer_GW_GW17only_sig <- filter(homer_unique_enhancer_GW_GW17only, Percent.of.Target.Sequences.with.Motif >= 20) %>% arrange(-Log.P.value) %>% mutate(GW = "GW17", TF = factor(TF, levels = TF)) 
+homer_unique_enhancer_GW_GW17only_sig <- rbind(homer_unique_enhancer_GW_GW17only_sig %>% select(TF, Log.P.value, GW), 
+                                               read.delim("../GW.GW13/knownResults.txt", head = T, as.is = T) %>% mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), GW = "GW13") %>% filter(as.character(Motif.Name) %in% as.character(homer_unique_enhancer_GW_GW17only_sig$Motif.Name)) %>% select(TF, Log.P.value, GW)) %>% mutate(Category = "-Log P vale")
+(homer_unique_enhancer_GW_GW17only_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_sig, aes(TF, -Log.P.value, fill = GW)) +
+   geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
+   scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), guide = "none") + 
    coord_flip() + 
-   ylab("Percent of Enhancers with Motif") + 
+   facet_grid(. ~ Category) + 
+   ylab("-Log.P.value") + 
    xlab("") + 
    theme_bw())
 #ggsave(homer_unique_enhancer_GW_GW17only_figure, file = "homer_unique_enhancer_GW_GW17only_figure.pdf", height = 4)
-homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(Motif.Name = factor(TF, levels = rev(TF)), Category = "Percent of Enhancers with Motif", EnsemblID = c("ENSG00000169083", "ENSG00000168267", "ENSG00000082175", "ENSG00000150907", "ENSG00000205927"), 
+homer_unique_enhancer_GW_GW17only_sig <- homer_unique_enhancer_GW_GW17only_sig %>% filter(GW == "GW17") %>% mutate(Category = "Log.P.value", EnsemblID = c("ENSG00000169083", "ENSG00000082175", "ENSG00000150907", "ENSG00000168267", "ENSG00000205927"), 
                                                                                                           RPKM_cortex_GW13 = geneRPKM[EnsemblID, "Cortex04"], RPKM_cortex_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_cortex = (Cortex01 + Cortex02)/2))$GW17_cortex, RPKM_GE_GW13 = geneRPKM[EnsemblID, "GE04"], RPKM_GE_GW17 = (geneRPKM[EnsemblID, ] %>% mutate(GW17_GE = (GE01 + GE02)/2))$GW17_GE) 
-homer_unique_enhancer_GW_GW17only_RPKM <- melt(homer_unique_enhancer_GW_GW17only_figure$data[, c("TF", grep("RPKM", colnames(homer_unique_enhancer_GW_GW17only_figure$data), value = T))], id = "TF") %>% mutate(Category = paste0("TF_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
-(homer_unique_enhancer_GW_GW17only_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_RPKM, aes(TF, log10(value)+1, fill = GW)) +
-  geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
-  scale_y_continuous(breaks = c(-2,-1,0,1,2,3), labels = c(-3,-2,-1,0,1,2)) + 
+homer_unique_enhancer_GW_GW17only_RPKM <- melt(homer_unique_enhancer_GW_GW17only_sig[, c("TF", grep("RPKM", colnames(homer_unique_enhancer_GW_GW17only_sig), value = T))], id = "TF") %>% mutate(Category = paste0("TF_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable))
+(homer_unique_enhancer_GW_GW17only_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_RPKM, aes(TF, log10(value), color = GW)) +
+  geom_point(position = position_dodge(), size = 8) + 
   coord_flip() + 
   facet_grid(. ~ Category) + 
-  scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), guide = "none") + 
+  scale_color_manual(values = c("GW13" = "red", "GW17" = "blue")) + 
   ylab("log10(RPKM)") + 
   xlab("") + 
   theme_bw() + 
   theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,0,1,-0.6), "cm")))
 grid.newpage()
-layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
-       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7)) 
+layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
+       list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:9)) 
 pdf("homer_unique_enhancer_GW_GW17only_figure.pdf", height = 4, width = 12)
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + facet_grid(. ~ Category) + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
        list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:7)) 
@@ -535,9 +539,9 @@ homer_unique_enhancer_GW_GW17only_targets <- na.omit(data.frame(homer_unique_enh
                                                                 geneRPKM[homer_unique_enhancer_GW_GW17only_targets$Nearest.Ensembl,]))
 cut_dis <- 2000
 cut_5mC <- 0.2
-homer_unique_enhancer_GW_GW17only_targets_TF <- homer_unique_enhancer_GW_GW17only_targets %>% filter(abs(dis) <= cut_dis) 
+homer_unique_enhancer_GW_GW17only_targets_TF <- homer_unique_enhancer_GW_GW17only_targets %>% filter(abs(dis) <= cut_dis) %>% mutate(TF = factor(TF, levels = levels(homer_unique_enhancer_GW_GW17only_sig$TF)))
 homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- homer_unique_enhancer_GW_GW17only_targets_TF %>% select(TF, GE02_5mC, GE04_5mC)
-homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_5mC, id = "TF") %>% mutate(Category = "5mC", GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_5mC, id = "TF") %>% mutate(Category = "5mC", GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW))
 (homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_5mC, aes(TF, value, fill = GW)) +
    #geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
    geom_violin(width = .5, position = position_dodge(), color = "grey") + 
@@ -549,7 +553,7 @@ homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- melt(homer_unique_enhancer_G
    theme_bw()) 
   #theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,1,1,-0.6), "cm")))
 ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure, file = "homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure.pdf")
-(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(Category = "delta_5mC", TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2")))), aes(TF, delta_5mC)) +
+(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(Category = "delta_5mC"), aes(TF, delta_5mC)) +
    geom_violin(width = .5, color = "grey") + 
    geom_boxplot(fill = "blue", width = .2, color = "grey", outlier.shape = NA) + 
    geom_hline(yintercept = -0.2) + 
@@ -563,7 +567,7 @@ ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure, file = "hom
 homer_unique_enhancer_GW_GW17only_targets_TF <- homer_unique_enhancer_GW_GW17only_targets_TF %>% filter(abs(delta_5mC)>=cut_5mC)
 homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(RPKM_cortex_GW13 = Cortex04, RPKM_cortex_GW17 = (Cortex01+Cortex02)/2, RPKM_GE_GW13 = GE04, RPKM_GE_GW17 = (GE01+GE02)/2) %>%
   select(TF, RPKM_cortex_GW13, RPKM_cortex_GW17, RPKM_GE_GW13, RPKM_GE_GW17)
-homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, id = "TF") %>% mutate(Category = paste0("Target_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, id = "TF") %>% mutate(Category = paste0("Target_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable))
 (homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, aes(TF, log10(value), fill = GW)) +
    #geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
    geom_violin(width = .5, position = position_dodge(), color = "grey") + 
@@ -578,7 +582,7 @@ ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, file = "homer_u
 e <- 1e-4
 homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC <- homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(RPKM_cortex_GW13 = Cortex04, RPKM_cortex_GW17 = (Cortex01+Cortex02)/2, RPKM_GE_GW13 = GE04, RPKM_GE_GW17 = (GE01+GE02)/2, RPKM_cortex_FC = (RPKM_cortex_GW17+e)/(RPKM_cortex_GW13+e), RPKM_GE_FC = (RPKM_GE_GW17+e)/(RPKM_GE_GW13+e)) %>%
   select(TF, RPKM_cortex_FC, RPKM_GE_FC)
-homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC, id = "TF") %>% mutate(Category = paste0("Target_", variable), TF = factor(TF, levels = rev(c("AR-halfsite", "Ptf1a", "PR", "Foxo1", "Olig2"))))
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC, id = "TF") %>% mutate(Category = paste0("Target_", variable))
 (homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC, aes(TF, log2(value))) +
    geom_violin(width = .5, color = "grey") + 
    geom_boxplot(fill = "blue", width = .2, color = "grey", outlier.shape = NA) + 
@@ -590,7 +594,6 @@ homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC <- melt(homer_unique_enhanc
    theme_bw()) 
 #theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), plot.margin=unit(c(1,1,1,-0.6), "cm")))
 ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure, file = "homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure.pdf")
-e <- 1e-4
 ###### Olig2
 homer_unique_enhancer_GW_GW17only_Olig2 <- homer_unique_enhancer_GW_GW17only_targets %>% filter(TF == "Olig2", abs(delta_5mC)>=cut_5mC) %>% distinct(ID) %>% 
   mutate(Gene.Name = ensembl[Nearest.Ensembl, "name"], description = ensembl[Nearest.Ensembl, "description"], RPKM_cortex_GW13 = Cortex04, RPKM_cortex_GW17 = (Cortex01+Cortex02)/2, RPKM_GE_GW13 = GE04, RPKM_GE_GW17 = (GE01+GE02)/2, RPKM_cortex_FC = log2((RPKM_cortex_GW17+e)/(RPKM_cortex_GW13+e)), RPKM_GE_FC = log2((RPKM_GE_GW17+e)/(RPKM_GE_GW13+e)), group = "hypo_UP")
@@ -599,33 +602,19 @@ homer_unique_enhancer_GW_GW17only_Olig2[homer_unique_enhancer_GW_GW17only_Olig2$
 homer_unique_enhancer_GW_GW17only_Olig2[homer_unique_enhancer_GW_GW17only_Olig2$delta_5mC>0 & abs(homer_unique_enhancer_GW_GW17only_Olig2$RPKM_GE_FC) <= 1, "group"] <- "hyper_ST"
 homer_unique_enhancer_GW_GW17only_Olig2[homer_unique_enhancer_GW_GW17only_Olig2$delta_5mC>0 & homer_unique_enhancer_GW_GW17only_Olig2$RPKM_GE_FC < -1, "group"] <- "hyper_DN"
 homer_unique_enhancer_GW_GW17only_Olig2[homer_unique_enhancer_GW_GW17only_Olig2$delta_5mC>0 & homer_unique_enhancer_GW_GW17only_Olig2$RPKM_GE_FC > 1, "group"] <- "hyper_UP"
-homer_unique_enhancer_GW_GW17only_Olig2 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% mutate(group = factor(group)) %>% arrange(group, -(GE01_K4me1 + GE02_K4me1)) 
+homer_unique_enhancer_GW_GW17only_Olig2 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% mutate(group = factor(group)) %>% arrange(group, -(GE02_K4me1)) 
 write.table(homer_unique_enhancer_GW_GW17only_Olig2, file = "homer_unique_enhancer_GW_GW17only_Olig2.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 #(homer_unique_enhancer_GW_GW17only_Olig2_DAVID <- enrich("homer_unique_enhancer_GW_GW17only_Olig2", erminej = F, fdr = 0.05, height = 2))
-clab <- data.frame(sample = c("GE01", "GE02", "GE03", "GE04"), y = 1, 
-                   GW = c("GW17", "GW17", "GW15", "GW13"))
-clab_K4me1_figure <- ggplot(clab %>% filter(sample != "GE03"), aes(sample, y, fill = GW)) + 
+clab <- data.frame(sample = c("GE02", "GE04"), y = 1, 
+                   GW = c("GW17", "GW13"))
+clab_figure <- ggplot(clab, aes(GW, y, fill = GW)) + 
   geom_tile() + 
-  scale_fill_manual(values = c("GW13" = rgb(250,192,144,maxColorValue = 255), "GW15" = rgb(247,150,70,maxColorValue = 255), "GW17" = rgb(228,108,10,maxColorValue = 255)), guide = "none") + 
-  xlab("") + 
-  ylab("") + 
-  theme_bw() + 
-  theme(plot.margin=unit(c(1,0,0,-0.5), "cm"), axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"))
-clab_5mC_figure <- ggplot(clab %>% filter(sample == "GE02" | sample == "GE04"), aes(sample, y, fill = GW)) + 
-  geom_tile() + 
-  scale_fill_manual(values = c("GW13" = rgb(250,192,144,maxColorValue = 255), "GW15" = rgb(247,150,70,maxColorValue = 255), "GW17" = rgb(228,108,10,maxColorValue = 255)), guide = "none") + 
+  scale_fill_manual(values = c("GW13" = rgb(250,192,144,maxColorValue = 255), "GW17" = rgb(228,108,10,maxColorValue = 255)), guide = "none") + 
   xlab("") + 
   ylab("") + 
   theme_bw() + 
   theme(plot.margin=unit(c(1,0,0,-0.8), "cm"), axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"))
-clab_RPKM_figure <- ggplot(clab, aes(sample, y, fill = GW)) + 
-  geom_tile() + 
-  scale_fill_manual(values = c("GW13" = rgb(250,192,144,maxColorValue = 255), "GW15" = rgb(247,150,70,maxColorValue = 255), "GW17" = rgb(228,108,10,maxColorValue = 255)), guide = "none") + 
-  xlab("") + 
-  ylab("") + 
-  theme_bw() + 
-  theme(plot.margin=unit(c(1,0,0,-0.8), "cm"), axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"))
-GW17only_Olig2_UMR_K4me1 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE01_K4me1, GE02_K4me1, GE04_K4me1)
+GW17only_Olig2_UMR_K4me1 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02_K4me1, GE04_K4me1)
 GW17only_Olig2_UMR_K4me1_tall <- melt(GW17only_Olig2_UMR_K4me1, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = gsub("*_K4me1", "", variable), GW = gsub("GE01_5K4me1", "GW17", variable), GW = gsub("GE02_5K4me1", "GW17", GW), GW = gsub("GE04_5K4me1", "GW13", GW))
 GW17only_Olig2_UMR_K4me1_heatmap <- ggplot(GW17only_Olig2_UMR_K4me1_tall, aes(x = Sample, y = id, fill = value)) + 
    geom_tile() + 
@@ -643,19 +632,19 @@ GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = Samp
    ylab("") + 
    theme_bw() + 
    theme(plot.margin = unit(c(-0.8,0,1,-0.8), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
-GW17only_Olig2_UMR_RPKM <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE01, GE02, GE03, GE04)
-GW17only_Olig2_UMR_RPKM_scale <- na.omit(data.frame(Nearest.Ensembl = GW17only_Olig2_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Olig2_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
-GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM_scale, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(variable), GW = gsub("(GE01)|(GE02)", "GW17", variable), GW = gsub("GE03", "GW15", GW), GW = gsub("GE04", "GW13", GW))
-GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = Sample, y = id, fill = value)) + 
+GW17only_Olig2_UMR_RPKM <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02, GE04)
+#GW17only_Olig2_UMR_RPKM_scale <- na.omit(data.frame(Nearest.Ensembl = GW17only_Olig2_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Olig2_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
+GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(variable), GW = gsub("(GE01)|(GE02)", "GW17", variable), GW = gsub("GE03", "GW15", GW), GW = gsub("GE04", "GW13", GW))
+GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = Sample, y = id, fill = log10(value + e))) + 
    geom_tile() + 
-   scale_fill_gradient(name = " RPKM\nZ-score", low = "black", high = "darkgreen") + 
+   scale_fill_gradient(name = "log10(RPKM)", low = "black", high = "darkgreen") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
    theme(plot.margin = unit(c(-0.8,0,1,-0.8), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
-grid.arrange(clab_K4me1_figure, clab_5mC_figure, clab_RPKM_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.3, 0.2, 0.5), heights = c(0.11, 0.89))
+grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
 pdf("GW17only_Olig2_UMR_heatmap.pdf", height = 8, width = 8)
-grid.arrange(clab_K4me1_figure, clab_5mC_figure, clab_RPKM_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.3, 0.2, 0.5), heights = c(0.11, 0.89))
+grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
 dev.off()
 homer_unique_enhancer_GW_GW17only_Olig2_list <- list(GW17 = homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl, DE = c(as.character(DE_GW13_GW17_cortex$ID), as.character(DE_GW13_GW17_GE$ID)))
 Venn_homer_unique_enhancer_GW_GW17only_Olig2 <- venn.diagram(homer_unique_enhancer_GW_GW17only_Olig2_list, filename = NULL, fill = c("red", "blue"), main = "GW GW17only Olig2", force.unique = T)
@@ -862,5 +851,6 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      homer_unique_enhancer_Neurospheres_CortexOnly, homer_unique_enhancer_Neurospheres_CortexOnly_figure, homer_unique_enhancer_Neurospheres_GEonly, homer_unique_enhancer_Neurospheres_GEonly_figure, 
      homer_unique_enhancer_Neurospheres_GEonly_Olig2, Venn_homer_unique_enhancer_Neurospheres_GEonly_Olig2, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID, 
      homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, 
-     GW17only_mC_figure, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, GW17only_Foxo1_UMR_mC_heatmap, GW17only_Foxo1_UMR_RPKM_heatmap,  
+     GW17only_mC_figure, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, GW17only_Foxo1_UMR_mC_heatmap, GW17only_Foxo1_UMR_RPKM_heatmap,clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, 
+     homer_unique_enhancer_GW_GW17only_RPKM_figure, homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure, homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure, homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
