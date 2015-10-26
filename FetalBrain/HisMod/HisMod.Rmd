@@ -40,14 +40,110 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.width = 8)
 
 ## Differentially marked genes
 
-* Calculate H3K4me3 and H3K27me3 signal from wig at protein-coding gene promoters (TSS +/- 2000bp) and normalize against total No. of reads in wig.    
-* No. of differentially marked genes flucture a lot between samples, maybe need a better way to normalize signal?    
-* A significant fraction of DE genes are differentially marked by either H3K4me3 or H3K27me3 in their promoters, more than DMRs.      
+* Calculate H3K4me3 and H3K27me3 signal from wig at promoters (TSS +/- 1500bp) and rank all genes (pc + nc).    
+* Differential marked genes are defined as rank difference >= 5000.           
+* For H3K27me3 differential marked genes, there are opposite trends in pc and nc, _why?_           
 
-```{r DM, fig.height = 6, fig.width = 9}
-(His_DM_promoter_figure)
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
-             gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
+### MZ twins
+
+```{r DM_MZ1, fig.height = 6}
+(H3K4me3_H3K27me3_promoter_drank_MZ_figure)
+(DM_H3K4me3_Brain_Subject1_DAVID)
+(DM_H3K4me3_Brain_Subject2_DAVID)
+```
+```{r DM_MZ2, fig.height=2}
+(DM_H3K27me3_Brain_Subject1_DAVID)
+(DM_H3K27me3_Brain_Subject2_DAVID)
+(DM_H3K27me3_Cortex_Subject1_DAVID)
+(DM_H3K27me3_Cortex_Subject2_DAVID)
+```
+```{r DM_MZ3, fig.height=12}
+(DM_H3K27me3_GE_Subject1_DAVID)
+```
+```{r DM_MZ4, fig.height=5}
+(DM_H3K27me3_GE_Subject2_DAVID)
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+```
+
+* Brain01 vs Brain02: DE genes that are DM in both H3K4me3 and H3K27me3         
+```{r DM_MZ5, results='asis'}
+kable(Brain01_Brain02DE_epi_H3K4me3_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+* Brain01 vs Brain02: DE genes that are DM in both DMR and H3K27me3         
+
+```{r DM_MZ6, results='asis'}
+kable(Brain01_Brain02DE_epi_DMR_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+* Cortex01 vs Cortex02: DE genes that are DM in both DMR and H3K27me3         
+
+```{r DM_MZ7, results='asis'}
+kable(Cortex01_Cortex02DE_epi_DMR_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+* GE01 vs GE02: DE genes that are DM in both DMR and H3K27me3         
+
+```{r DM_MZ8, results='asis'}
+kable(GE01_GE02DE_epi_DMR_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+### NPCs
+
+```{r DM_NPC1, fig.height=6}
+(H3K4me3_H3K27me3_promoter_drank_NPC_figure)
+(DM_H3K4me3_NPC_Subject2_Cortex_DAVID)
+(DM_H3K4me3_NPC_Subject2_GE_DAVID)
+```
+```{r DM_NPC2, fig.height=2}
+(DM_H3K27me3_NPC_Subject1_Cortex_DAVID)
+```
+```{r DM_NPC3, fig.height=6}
+(DM_H3K27me3_NPC_Subject1_GE_DAVID)
+(DM_H3K27me3_NPC_Subject2_Cortex_DAVID)
+(DM_H3K27me3_NPC_Subject2_GE_DAVID)
+grid.arrange(gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), nrow = 1)
+(DM_H3K27me3_DE_NPC_Subject1_DAVID)
+(DM_H3K4me3_DE_NPC_Subject2_DAVID)
+(DM_H3K27me3_DE_NPC_Subject2_DAVID)
+```
+
+* Cortex01 vs GE01: DE genes that are DM in both DMR and H3K7me3        
+
+```{r DM_NPC4, results='asis'}
+kable(Cortex01_GE01DE_epi_DMR_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+* Cortex02 vs GE02: DE genes that are DM in DMR, H3K4me3, and H3K7me3        
+
+```{r DM_NPC5, results='asis'}
+kable(Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
+```
+
+### GW
+
+```{r DM_GW1, fig.height=6}
+(H3K4me3_H3K27me3_promoter_drank_GW_figure)
+```
+```{r DM_GW2, fig.height=8}
+(DM_H3K4me3_GW_GE_GW13_DAVID)
+(DM_H3K4me3_GW_GE_GW17_DAVID)
+(DM_H3K27me3_GW_GE_GW13_DAVID)
+(DM_H3K27me3_GW_GE_GW17_DAVID)
+grid.newpage()
+grid.draw(venn_GE02_GE04DE_epi)
+```
+```{r DM_GW3, fig.height=2}
+(DM_H3K4me3_DE_GW_GE_DAVID)
+```
+```{r DM_GW4, fig.height=5}
+(DM_H3K27me3_DE_GW_GE_DAVID)
+```
+
+* GE02 vs GE04: DE genes that are DM in DMR, H3K4me3, and H3K27me3      
+
+```{r DM_GW5, results='asis'}
+kable(GE02_GE04DE_epi_DMR_H3K4me3_H3K27me3%>%select(name, description), format = "html", align = c("r", "r"))
 ```
 
 ## Core enhancers 
@@ -113,11 +209,11 @@ grid.text("GW unique enhancers\n in GW17", 0.75, 0.5)
 * For cortex and GE progenitors, both showed brain-related terms, more so in cortex.     
 * For GWs, both GW13 and GW17 unique enhancers showed enrichment for brain organ development terms. GW17 also showed WNT pathway terms.      
 
-```{r unique_enhancer_GREAT1, fig.height=2}
-(GREAT_unique_enhancer_Brain01)
+```{r unique_enhancer_GREAT1, fig.height=12}
+(GREAT_unique_enhancer_HuFNSC01)
 ```
-```{r unique_enhancer_GREAT2, fig.height=12}
-(GREAT_unique_enhancer_Brain02)
+```{r unique_enhancer_GREAT2, fig.height=8}
+(GREAT_unique_enhancer_HuFNSC02)
 ```
 ```{r unique_enhancer_GREAT3, fig.height=6}
 (GREAT_unique_enhancer_Cortex)

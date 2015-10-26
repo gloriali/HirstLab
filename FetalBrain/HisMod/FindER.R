@@ -134,127 +134,189 @@ HisMod_RPKM_stat$ymax <- with(HisMod_RPKM_stat, apply(cbind(max, upper + 1.5*(up
 ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 10)
 
 ## =========== Differential marked genes ================
-setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/")
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
+rank_cut <- 5000
+H3K4me3_promoter <- read.delim("hg19v65_genes_TSS_1500.H3K4me3", head = F, as.is = T, col.names = c("ID", "Brain01", "Brain02", "Cortex02", "GE02", "GE04")) %>% 
+  mutate(Ensembl = gsub("_.+", "", ID), Type = gsub("ENSG\\d+_", "", ID), Category = ifelse(Type == "protein_coding", "pc", "nc"), Brain01rank = rank(Brain01), Brain02rank = rank(Brain02), Cortex02rank = rank(Cortex02), GE02rank = rank(GE02), GE04rank = rank(GE04), 
+         Brain01_Brain02 = Brain01rank - Brain02rank, Cortex02_GE02 = Cortex02rank - GE02rank, GE02_GE04 = GE02rank - GE04rank)
+H3K27me3_promoter <- read.delim("hg19v65_genes_TSS_1500.H3K27me3", head = F, as.is = T, col.names = c("ID", "Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")) %>% 
+  mutate(Ensembl = gsub("_.+", "", ID), Type = gsub("ENSG\\d+_", "", ID), Category = ifelse(Type == "protein_coding", "pc", "nc"), Brain01rank = rank(Brain01), Brain02rank = rank(Brain02), Cortex01rank = rank(Cortex01), Cortex02rank = rank(Cortex02), GE01rank = rank(GE01), GE02rank = rank(GE02), GE04rank = rank(GE04), 
+         Brain01_Brain02 = Brain01rank - Brain02rank, Cortex01_Cortex02 = Cortex01rank - Cortex02rank, GE01_GE02 = GE01rank - GE02rank, Cortex01_GE01 = Cortex01rank - GE01rank, Cortex02_GE02 = Cortex02rank - GE02rank, GE01_GE04 = GE01rank - GE04rank, GE02_GE04 = GE02rank - GE04rank)
 ### Between MZ twins
-Brain01_Brain02_DM_K4me3 <- rbind(H3K4me3_promoter_Brain01[H3K4me3_promoter_Brain01$gene %in% setdiff(H3K4me3_promoter_Brain01$gene, H3K4me3_promoter_Brain02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
-                                  H3K4me3_promoter_Brain02[H3K4me3_promoter_Brain02$gene %in% setdiff(H3K4me3_promoter_Brain02$gene, H3K4me3_promoter_Brain01$gene), ] %>% mutate(Marked = "HuFNSC02"))
-Brain01_Brain02_DM_K27me3 <- rbind(H3K27me3_promoter_Brain01[H3K27me3_promoter_Brain01$gene %in% setdiff(H3K27me3_promoter_Brain01$gene, H3K27me3_promoter_Brain02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
-                                   H3K27me3_promoter_Brain02[H3K27me3_promoter_Brain02$gene %in% setdiff(H3K27me3_promoter_Brain02$gene, H3K27me3_promoter_Brain01$gene), ] %>% mutate(Marked = "HuFNSC02"))
-Cortex01_Cortex02_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex01[H3K27me3_promoter_Cortex01$gene %in% setdiff(H3K27me3_promoter_Cortex01$gene, H3K27me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
-                                     H3K27me3_promoter_Cortex02[H3K27me3_promoter_Cortex02$gene %in% setdiff(H3K27me3_promoter_Cortex02$gene, H3K27me3_promoter_Cortex01$gene), ] %>% mutate(Marked = "HuFNSC02"))
-GE01_GE02_DM_K27me3 <- rbind(H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "HuFNSC01"), 
-                             H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "HuFNSC02"))
-His_DM_MZ <- rbind(Brain01_Brain02_DM_K4me3 %>% mutate(Sample = "Brain", Mark = "H3K4me3"), 
-                   Brain01_Brain02_DM_K27me3 %>% mutate(Sample = "Brain", Mark = "H3K27me3"), 
-                   Cortex01_Cortex02_DM_K27me3 %>% mutate(Sample = "Cortex", Mark = "H3K27me3"), 
-                   GE01_GE02_DM_K27me3 %>% mutate(Sample = "GE", Mark = "H3K27me3")) %>% mutate(Comparison = "MZ")
-### Between neurospheres
-Cortex01_GE01_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex01[H3K27me3_promoter_Cortex01$gene %in% setdiff(H3K27me3_promoter_Cortex01$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "Cortex"), 
-                                 H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_Cortex01$gene), ] %>% mutate(Marked = "GE"))
-Cortex02_GE02_DM_K4me3 <- rbind(H3K4me3_promoter_Cortex02[H3K4me3_promoter_Cortex02$gene %in% setdiff(H3K4me3_promoter_Cortex02$gene, H3K4me3_promoter_GE02$gene), ] %>% mutate(Marked = "Cortex"), 
-                                H3K4me3_promoter_GE02[H3K4me3_promoter_GE02$gene %in% setdiff(H3K4me3_promoter_GE02$gene, H3K4me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "GE"))
-Cortex02_GE02_DM_K27me3 <- rbind(H3K27me3_promoter_Cortex02[H3K27me3_promoter_Cortex02$gene %in% setdiff(H3K27me3_promoter_Cortex02$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "Cortex"), 
-                                 H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_Cortex02$gene), ] %>% mutate(Marked = "GE"))
-His_DM_neurospheres <- rbind(Cortex01_GE01_DM_K27me3 %>% mutate(Sample = "HuFNSC01", Mark = "H3K27me3"), 
-                             Cortex02_GE02_DM_K4me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K4me3"), 
-                             Cortex02_GE02_DM_K27me3 %>% mutate(Sample = "HuFNSC02", Mark = "H3K27me3")) %>% mutate(Comparison = "neurospheres")
-### Between GW
-GE01_GE04_DM_K27me3 <- rbind(H3K27me3_promoter_GE01[H3K27me3_promoter_GE01$gene %in% setdiff(H3K27me3_promoter_GE01$gene, H3K27me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
-                             H3K27me3_promoter_GE04[H3K27me3_promoter_GE04$gene %in% setdiff(H3K27me3_promoter_GE04$gene, H3K27me3_promoter_GE01$gene), ] %>% mutate(Marked = "GW13"))
-GE02_GE04_DM_K4me3 <- rbind(H3K4me3_promoter_GE02[H3K4me3_promoter_GE02$gene %in% setdiff(H3K4me3_promoter_GE02$gene, H3K4me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
-                            H3K4me3_promoter_GE04[H3K4me3_promoter_GE04$gene %in% setdiff(H3K4me3_promoter_GE04$gene, H3K4me3_promoter_GE02$gene), ] %>% mutate(Marked = "GW13"))
-GE02_GE04_DM_K27me3 <- rbind(H3K27me3_promoter_GE02[H3K27me3_promoter_GE02$gene %in% setdiff(H3K27me3_promoter_GE02$gene, H3K27me3_promoter_GE04$gene), ] %>% mutate(Marked = "GW17"), 
-                             H3K27me3_promoter_GE04[H3K27me3_promoter_GE04$gene %in% setdiff(H3K27me3_promoter_GE04$gene, H3K27me3_promoter_GE02$gene), ] %>% mutate(Marked = "GW13"))
-His_DM_GW <- rbind(GE01_GE04_DM_K27me3 %>% mutate(Sample = "GE01_GE04", Mark = "H3K27me3"), 
-                   GE02_GE04_DM_K4me3 %>% mutate(Sample = "GE02_GE04", Mark = "H3K4me3"), 
-                   GE02_GE04_DM_K27me3 %>% mutate(Sample = "GE02_GE04", Mark = "H3K27me3")) %>% mutate(Comparison = "GW")
-His_DM_promoter <- rbind(His_DM_MZ, His_DM_neurospheres, His_DM_GW)
-(His_DM_promoter_figure <- ggplot(His_DM_promoter, aes(x = Sample, fill = Marked)) + 
-   geom_bar(position = "dodge") + 
-   facet_grid(Mark ~ Comparison, scales = "free") + 
-   ylab("No. of genes") + 
+H3K4me3_H3K27me3_promoter_drank_MZ <- rbind(H3K4me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
+                                            H3K27me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
+                                            H3K27me3_promoter %>% filter(abs(Cortex01_Cortex02) >= rank_cut) %>% mutate(Subject1 = Cortex01, Subject2 = Cortex02, Rank1 = Cortex01rank, Rank2 = Cortex02rank, drank = Cortex01_Cortex02, Marked = ifelse(Cortex01_Cortex02 > 0, "Subject1", "Subject2"), Cell = "Cortex", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
+                                            H3K27me3_promoter %>% filter(abs(GE01_GE02) >= rank_cut) %>% mutate(Subject1 = GE01, Subject2 = GE02, Rank1 = GE01rank, Rank2 = GE02rank, drank = GE01_GE02, Marked = ifelse(GE01_GE02 > 0, "Subject1", "Subject2"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_MZ_summary <- H3K4me3_H3K27me3_promoter_drank_MZ %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Subject1", Ngenes, -Ngenes))
+(H3K4me3_H3K27me3_promoter_drank_MZ_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_MZ_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
+   geom_bar(stat = "identity", position = "identity", width = 0.5) + 
+   geom_hline(yintercept = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   scale_y_continuous(breaks = c(-10000, -5000, 0, 5000, 10000), labels = c(10000, 5000, 0, 5000, 10000)) + 
+   xlab("") +
+   ylab("No. of DM genes") + 
    theme_bw())
-ggsave(His_DM_promoter_figure, file = "His_DM_promoter_figure.pdf")
+ggsave(H3K4me3_H3K27me3_promoter_drank_MZ_figure, file = "H3K4me3_H3K27me3_promoter_drank_MZ_figure.pdf")
+DM_H3K4me3_Brain_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Category == "pc", Marked == "Subject1")
+DM_H3K4me3_Brain_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Category == "pc", Marked == "Subject2")
+write.table(DM_H3K4me3_Brain_Subject1.pc, file = "DM_H3K4me3_Brain_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K4me3_Brain_Subject2.pc, file = "DM_H3K4me3_Brain_Subject2.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K4me3_Brain_Subject1_DAVID <- enrich("DM_H3K4me3_Brain_Subject1.pc", erminej = F)
+DM_H3K4me3_Brain_Subject2_DAVID <- enrich("DM_H3K4me3_Brain_Subject2.pc", erminej = F)
+DM_H3K27me3_Brain_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain", Category == "pc", Marked == "Subject1")
+DM_H3K27me3_Brain_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain", Category == "pc", Marked == "Subject2")
+write.table(DM_H3K27me3_Brain_Subject1.pc, file = "DM_H3K27me3_Brain_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_Brain_Subject2.pc, file = "DM_H3K27me3_Brain_Subject2.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_Brain_Subject1_DAVID <- enrich("DM_H3K27me3_Brain_Subject1.pc", erminej = F, height = 3)
+DM_H3K27me3_Brain_Subject2_DAVID <- enrich("DM_H3K27me3_Brain_Subject2.pc", erminej = F)
+DM_H3K27me3_Cortex_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex", Category == "pc", Marked == "Subject1")
+DM_H3K27me3_Cortex_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex", Category == "pc", Marked == "Subject2")
+write.table(DM_H3K27me3_Cortex_Subject1.pc, file = "DM_H3K27me3_Cortex_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_Cortex_Subject2.pc, file = "DM_H3K27me3_Cortex_Subject2.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_Cortex_Subject1_DAVID <- enrich("DM_H3K27me3_Cortex_Subject1.pc", erminej = F, height = 2)
+DM_H3K27me3_Cortex_Subject2_DAVID <- enrich("DM_H3K27me3_Cortex_Subject2.pc", erminej = F)
+DM_H3K27me3_GE_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE", Category == "pc", Marked == "Subject1")
+DM_H3K27me3_GE_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE", Category == "pc", Marked == "Subject2")
+write.table(DM_H3K27me3_GE_Subject1.pc, file = "DM_H3K27me3_GE_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_GE_Subject2.pc, file = "DM_H3K27me3_GE_Subject2.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_GE_Subject1_DAVID <- enrich("DM_H3K27me3_GE_Subject1.pc", erminej = F, height = 12)
+DM_H3K27me3_GE_Subject2_DAVID <- enrich("DM_H3K27me3_GE_Subject2.pc", erminej = F)
+DM_H3K27me3_intersect_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Category == "pc", Mark=="H3K27me3", Marked=="Subject1")%>%group_by(Ensembl)%>%summarize(N=n())%>%filter(N==3)
+DM_H3K27me3_intersect_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Category == "pc", Mark=="H3K27me3", Marked=="Subject2")%>%group_by(Ensembl)%>%summarize(N=n())%>%filter(N==3)
+write.table(DM_H3K27me3_intersect_Subject1.pc, file = "DM_H3K27me3_intersect_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_intersect_Subject2.pc, file = "DM_H3K27me3_intersect_Subject2.pc", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_intersect_Subject1_DAVID <- enrich("DM_H3K27me3_intersect_Subject1.pc", erminej = F)
+DM_H3K27me3_intersect_Subject2_DAVID <- enrich("DM_H3K27me3_intersect_Subject2.pc", erminej = F)
+### NPC
+H3K4me3_H3K27me3_promoter_drank_NPC <- rbind(H3K4me3_promoter %>% filter(abs(Cortex02_GE02) >= rank_cut) %>% mutate(NPC1 = Cortex02, NPC2 = GE02, Rank1 = Cortex02rank, Rank2 = GE02rank, drank = Cortex02_GE02, Marked = ifelse(Cortex02_GE02 > 0, "Cortex", "GE"), Subject = "Subject2", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
+                                             H3K27me3_promoter %>% filter(abs(Cortex01_GE01) >= rank_cut) %>% mutate(NPC1 = Cortex01, NPC2 = GE01, Rank1 = Cortex01rank, Rank2 = GE01rank, drank = Cortex01_GE01, Marked = ifelse(Cortex01_GE01 > 0, "Cortex", "GE"), Subject = "Subject1", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
+                                             H3K27me3_promoter %>% filter(abs(Cortex02_GE02) >= rank_cut) %>% mutate(NPC1 = Cortex02, NPC2 = GE02, Rank1 = Cortex02rank, Rank2 = GE02rank, drank = Cortex02_GE02, Marked = ifelse(Cortex02_GE02 > 0, "Cortex", "GE"), Subject = "Subject2", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_NPC_summary <- H3K4me3_H3K27me3_promoter_drank_NPC %>% group_by(Mark, Subject, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Cortex", Ngenes, -Ngenes))
+(H3K4me3_H3K27me3_promoter_drank_NPC_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_NPC_summary, aes(x = Subject, y = Ngenes, fill = Marked)) + 
+   geom_bar(stat = "identity", position = "identity", width = 0.5) + 
+   geom_hline(yintercept = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   scale_y_continuous(breaks = c(-10000, -5000, 0, 5000, 10000), labels = c(10000, 5000, 0, 5000, 10000)) + 
+   xlab("") +
+   ylab("No. of DM genes") + 
+   theme_bw())
+ggsave(H3K4me3_H3K27me3_promoter_drank_NPC_figure, file = "H3K4me3_H3K27me3_promoter_drank_NPC_figure.pdf")
+DM_H3K4me3_NPC_Subject2_Cortex.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Category == "pc", Marked == "Cortex")
+DM_H3K4me3_NPC_Subject2_GE.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Category == "pc", Marked == "GE")
+write.table(DM_H3K4me3_NPC_Subject2_Cortex.pc, file = "DM_H3K4me3_NPC_Subject2_Cortex.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K4me3_NPC_Subject2_GE.pc, file = "DM_H3K4me3_NPC_Subject2_GE.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K4me3_NPC_Subject2_Cortex_DAVID <- enrich("DM_H3K4me3_NPC_Subject2_Cortex.pc", erminej = F)
+DM_H3K4me3_NPC_Subject2_GE_DAVID <- enrich("DM_H3K4me3_NPC_Subject2_GE.pc", erminej = F)
+DM_H3K27me3_NPC_Subject1_Cortex.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject1", Category == "pc", Marked == "Cortex")
+DM_H3K27me3_NPC_Subject1_GE.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject1", Category == "pc", Marked == "GE")
+write.table(DM_H3K27me3_NPC_Subject1_Cortex.pc, file = "DM_H3K27me3_NPC_Subject1_Cortex.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_NPC_Subject1_GE.pc, file = "DM_H3K27me3_NPC_Subject1_GE.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_NPC_Subject1_Cortex_DAVID <- enrich("DM_H3K27me3_NPC_Subject1_Cortex.pc", erminej = F)
+DM_H3K27me3_NPC_Subject1_GE_DAVID <- enrich("DM_H3K27me3_NPC_Subject1_GE.pc", erminej = F)
+DM_H3K27me3_NPC_Subject2_Cortex.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Category == "pc", Marked == "Cortex")
+DM_H3K27me3_NPC_Subject2_GE.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Category == "pc", Marked == "GE")
+write.table(DM_H3K27me3_NPC_Subject2_Cortex.pc, file = "DM_H3K27me3_NPC_Subject2_Cortex.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_NPC_Subject2_GE.pc, file = "DM_H3K27me3_NPC_Subject2_GE.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_NPC_Subject2_Cortex_DAVID <- enrich("DM_H3K27me3_NPC_Subject2_Cortex.pc", erminej = F)
+DM_H3K27me3_NPC_Subject2_GE_DAVID <- enrich("DM_H3K27me3_NPC_Subject2_GE.pc", erminej = F)
+### GW
+H3K4me3_H3K27me3_promoter_drank_GW <- rbind(H3K4me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
+                                            H3K27me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_GW_summary <- H3K4me3_H3K27me3_promoter_drank_GW %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "GW13", Ngenes, -Ngenes))
+(H3K4me3_H3K27me3_promoter_drank_GW_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_GW_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
+   geom_bar(stat = "identity", position = "identity", width = 0.5) + 
+   geom_hline(yintercept = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   scale_y_continuous(breaks = c(-10000, -5000, 0, 5000, 10000), labels = c(10000, 5000, 0, 5000, 10000)) + 
+   xlab("") +
+   ylab("No. of DM genes") + 
+   theme_bw())
+ggsave(H3K4me3_H3K27me3_promoter_drank_GW_figure, file = "H3K4me3_H3K27me3_promoter_drank_GW_figure.pdf")
+DM_H3K4me3_GW_GE_GW13.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE", Category == "pc", Marked == "GW13")
+DM_H3K4me3_GW_GE_GW17.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE", Category == "pc", Marked == "GW17")
+write.table(DM_H3K4me3_GW_GE_GW13.pc, file = "DM_H3K4me3_GW_GE_GW13.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K4me3_GW_GE_GW17.pc, file = "DM_H3K4me3_GW_GE_GW17.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K4me3_GW_GE_GW13_DAVID <- enrich("DM_H3K4me3_GW_GE_GW13.pc", erminej = F)
+DM_H3K4me3_GW_GE_GW17_DAVID <- enrich("DM_H3K4me3_GW_GE_GW17.pc", erminej = F)
+DM_H3K27me3_GW_GE_GW13.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Cell == "GE", Category == "pc", Marked == "GW13")
+DM_H3K27me3_GW_GE_GW17.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Cell == "GE", Category == "pc", Marked == "GW17")
+write.table(DM_H3K27me3_GW_GE_GW13.pc, file = "DM_H3K27me3_GW_GE_GW13.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+write.table(DM_H3K27me3_GW_GE_GW17.pc, file = "DM_H3K27me3_GW_GE_GW17.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+DM_H3K27me3_GW_GE_GW13_DAVID <- enrich("DM_H3K27me3_GW_GE_GW13.pc", erminej = F)
+DM_H3K27me3_GW_GE_GW17_DAVID <- enrich("DM_H3K27me3_GW_GE_GW17.pc", erminej = F)
 
 ## =========== Correlation with DE genes ================
 load("/home/lli/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_MZ.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
-### Brain01 vs Brain02
-Brain01_Brain02DE_epi <- brain01_brain02DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(Brain01_Brain02DE_epi) <- Brain01_Brain02DE_epi$V1
-Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K4me3_promoter_Brain01$gene), "K4_1"] <- T
-Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K4me3_promoter_Brain02$gene), "K4_2"] <- T
-Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K27me3_promoter_Brain01$gene), "K27_1"] <- T
-Brain01_Brain02DE_epi[intersect(brain01_brain02DE$V1, H3K27me3_promoter_Brain02$gene), "K27_2"] <- T
-Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "UP" & !Brain01_Brain02DE_epi$K4_1 & Brain01_Brain02DE_epi$K4_2), "K4"] <- T
-Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "DN" & Brain01_Brain02DE_epi$K4_1 & !Brain01_Brain02DE_epi$K4_2), "K4"] <- T
-Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "UP" & Brain01_Brain02DE_epi$K27_1 & !Brain01_Brain02DE_epi$K27_2), "K27"] <- T
-Brain01_Brain02DE_epi[(Brain01_Brain02DE_epi$DE == "DN" & !Brain01_Brain02DE_epi$K27_1 & Brain01_Brain02DE_epi$K27_2), "K27"] <- T
-Brain01_Brain02DE_epi[c(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE$id, DMR_DE_Brain01_Brain02_hypo$DMR_gene_DE$id), "DMR"] <- T
+### MZ twins
+Brain01_Brain02DE_epi <- brain01_brain02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
+                                                      K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain"))$Ensembl), T, F), 
+                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain"))$Ensembl), T, F), 
+                                                      DMR = ifelse((V1 %in% c(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[,"id"], DMR_DE_Brain01_Brain02_hypo$DMR_gene_DE[,"id"])), T, F))
 Brain01_Brain02DE_epi_list <- list(H3K4me3 = as.character(filter(Brain01_Brain02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Brain01_Brain02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Brain01_Brain02DE_epi, DMR == T)[, "V1"]))
 venn_Brain01_Brain02DE_epi <- venn.diagram(Brain01_Brain02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Brain01 vs Brain02")
-### Cortex01 vs Cortex02
-Cortex01_Cortex02DE_epi <- cortex01_cortex02DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(Cortex01_Cortex02DE_epi) <- Cortex01_Cortex02DE_epi$V1
-Cortex01_Cortex02DE_epi[intersect(cortex01_cortex02DE$V1, H3K27me3_promoter_Cortex01$gene), "K27_1"] <- T
-Cortex01_Cortex02DE_epi[intersect(cortex01_cortex02DE$V1, H3K27me3_promoter_Cortex02$gene), "K27_2"] <- T
-Cortex01_Cortex02DE_epi[(Cortex01_Cortex02DE_epi$DE == "UP" & Cortex01_Cortex02DE_epi$K27_1 & !Cortex01_Cortex02DE_epi$K27_2), "K27"] <- T
-Cortex01_Cortex02DE_epi[(Cortex01_Cortex02DE_epi$DE == "DN" & !Cortex01_Cortex02DE_epi$K27_1 & Cortex01_Cortex02DE_epi$K27_2), "K27"] <- T
-Cortex01_Cortex02DE_epi[c(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_Cortex02_hypo$DMR_gene_DE$id), "DMR"] <- T
+Cortex01_Cortex02DE_epi <- cortex01_cortex02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
+                                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex"))$Ensembl), T, F), 
+                                                          DMR = ifelse((V1 %in% c(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex01_Cortex02_hypo$DMR_gene_DE[,"id"])), T, F))
 Cortex01_Cortex02DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_Cortex02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_Cortex02DE_epi, DMR == T)[, "V1"]))
 venn_Cortex01_Cortex02DE_epi <- venn.diagram(Cortex01_Cortex02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs Cortex02")
-### GE01 vs GE02
-GE01_GE02DE_epi <- GE01_GE02DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(GE01_GE02DE_epi) <- GE01_GE02DE_epi$V1
-GE01_GE02DE_epi[intersect(GE01_GE02DE$V1, H3K27me3_promoter_GE01$gene), "K27_1"] <- T
-GE01_GE02DE_epi[intersect(GE01_GE02DE$V1, H3K27me3_promoter_GE02$gene), "K27_2"] <- T
-GE01_GE02DE_epi[(GE01_GE02DE_epi$DE == "UP" & GE01_GE02DE_epi$K27_1 & !GE01_GE02DE_epi$K27_2), "K27"] <- T
-GE01_GE02DE_epi[(GE01_GE02DE_epi$DE == "DN" & !GE01_GE02DE_epi$K27_1 & GE01_GE02DE_epi$K27_2), "K27"] <- T
-GE01_GE02DE_epi[c(DMR_DE_GE01_GE02_hyper$DMR_gene_DE$id, DMR_DE_GE01_GE02_hypo$DMR_gene_DE$id), "DMR"] <- T
+GE01_GE02DE_epi <- GE01_GE02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
+                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE"))$Ensembl), T, F), 
+                                          DMR = ifelse((V1 %in% c(DMR_DE_GE01_GE02_hyper$DMR_gene_DE[,"id"], DMR_DE_GE01_GE02_hypo$DMR_gene_DE[,"id"])), T, F))
 GE01_GE02DE_epi_list <- list(H3K27me3 = as.character(filter(GE01_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(GE01_GE02DE_epi, DMR == T)[, "V1"]))
 venn_GE01_GE02DE_epi <- venn.diagram(GE01_GE02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "GE01 vs GE02")
-### Cortex01 vs GE01
-Cortex01_GE01DE_epi <- cortex01_GE01DE %>% mutate(K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(Cortex01_GE01DE_epi) <- Cortex01_GE01DE_epi$V1
-Cortex01_GE01DE_epi[intersect(cortex01_GE01DE$V1, H3K27me3_promoter_Cortex01$gene), "K27_1"] <- T
-Cortex01_GE01DE_epi[intersect(cortex01_GE01DE$V1, H3K27me3_promoter_GE01$gene), "K27_2"] <- T
-Cortex01_GE01DE_epi[(Cortex01_GE01DE_epi$DE == "UP" & Cortex01_GE01DE_epi$K27_1 & !Cortex01_GE01DE_epi$K27_2), "K27"] <- T
-Cortex01_GE01DE_epi[(Cortex01_GE01DE_epi$DE == "DN" & !Cortex01_GE01DE_epi$K27_1 & Cortex01_GE01DE_epi$K27_2), "K27"] <- T
-Cortex01_GE01DE_epi[c(DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE$id, DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE$id), "DMR"] <- T
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+write.table(Brain01_Brain02DE_epi%>%filter(K4==T), file = "DM_H3K4me3_DE_Brain.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(Brain01_Brain02DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_Brain.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(Cortex01_Cortex02DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_Cortex.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GE01_GE02DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_GE.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+DM_H3K4me3_DE_Brain_DAVID <- enrich("DM_H3K4me3_DE_Brain.pc", erminej = F, fdr = 0.05)
+DM_H3K27me3_DE_Brain_DAVID <- enrich("DM_H3K27me3_DE_Brain.pc", erminej = F, fdr = 0.05)
+DM_H3K27me3_DE_Cortex_DAVID <- enrich("DM_H3K27me3_DE_Cortex.pc", erminej = F, fdr = 0.05, height = 2)
+DM_H3K27me3_DE_GE_DAVID <- enrich("DM_H3K27me3_DE_GE.pc", erminej = F, fdr = 0.05)
+Brain01_Brain02DE_epi_H3K4me3_H3K27me3 <- Brain01_Brain02DE_epi %>% filter(K4==T, K27==T)
+Brain01_Brain02DE_epi_DMR_H3K27me3 <- Brain01_Brain02DE_epi %>% filter(DMR==T, K27==T)
+Cortex01_Cortex02DE_epi_DMR_H3K27me3 <- Cortex01_Cortex02DE_epi %>% filter(DMR==T, K27==T)
+GE01_GE02DE_epi_DMR_H3K27me3 <- GE01_GE02DE_epi %>% filter(DMR==T, K27==T)
+### NPC
+Cortex01_GE01DE_epi <- cortex01_GE01DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
+                                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject1"))$Ensembl), T, F), 
+                                                          DMR = ifelse((V1 %in% c(DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE[,"id"])), T, F))
 Cortex01_GE01DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_GE01DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_GE01DE_epi, DMR == T)[, "V1"]))
 venn_Cortex01_GE01DE_epi <- venn.diagram(Cortex01_GE01DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs GE01")
-### Cortex02 vs GE02
-Cortex02_GE02DE_epi <- cortex02_GE02DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(Cortex02_GE02DE_epi) <- Cortex02_GE02DE_epi$V1
-Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K4me3_promoter_Cortex02$gene), "K4_1"] <- T
-Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K4me3_promoter_GE02$gene), "K4_2"] <- T
-Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K27me3_promoter_Cortex02$gene), "K27_1"] <- T
-Cortex02_GE02DE_epi[intersect(cortex02_GE02DE$V1, H3K27me3_promoter_GE02$gene), "K27_2"] <- T
-Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "UP" & !Cortex02_GE02DE_epi$K4_1 & Cortex02_GE02DE_epi$K4_2), "K4"] <- T
-Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "DN" & Cortex02_GE02DE_epi$K4_1 & !Cortex02_GE02DE_epi$K4_2), "K4"] <- T
-Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "UP" & Cortex02_GE02DE_epi$K27_1 & !Cortex02_GE02DE_epi$K27_2), "K27"] <- T
-Cortex02_GE02DE_epi[(Cortex02_GE02DE_epi$DE == "DN" & !Cortex02_GE02DE_epi$K27_1 & Cortex02_GE02DE_epi$K27_2), "K27"] <- T
-Cortex02_GE02DE_epi[c(DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE$id, DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE$id), "DMR"] <- T
+Cortex02_GE02DE_epi <- cortex02_GE02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
+                                                  K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2"))$Ensembl), T, F), 
+                                                  K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2"))$Ensembl), T, F), 
+                                                  DMR = ifelse((V1 %in% c(DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE[,"id"])), T, F))
 Cortex02_GE02DE_epi_list <- list(H3K4me3 = as.character(filter(Cortex02_GE02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Cortex02_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex02_GE02DE_epi, DMR == T)[, "V1"]))
 venn_Cortex02_GE02DE_epi <- venn.diagram(Cortex02_GE02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Cortex02 vs GE02")
-### GE02 vs GE04
-GE02_GE04DE_epi <- GE02_GE04DE %>% mutate(K4_1 = F, K4_2 = F, K4 = F, K27_1 = F, K27_2 = F, K27 = F, DMR = F)
-rownames(GE02_GE04DE_epi) <- GE02_GE04DE_epi$ID
-GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K4me3_promoter_GE02$gene), "K4_1"] <- T
-GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K4me3_promoter_GE04$gene), "K4_2"] <- T
-GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K27me3_promoter_GE02$gene), "K27_1"] <- T
-GE02_GE04DE_epi[intersect(GE02_GE04DE$ID, H3K27me3_promoter_GE04$gene), "K27_2"] <- T
-GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "UP" & !GE02_GE04DE_epi$K4_1 & GE02_GE04DE_epi$K4_2), "K4"] <- T
-GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "DN" & GE02_GE04DE_epi$K4_1 & !GE02_GE04DE_epi$K4_2), "K4"] <- T
-GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "UP" & GE02_GE04DE_epi$K27_1 & !GE02_GE04DE_epi$K27_2), "K27"] <- T
-GE02_GE04DE_epi[(GE02_GE04DE_epi$DE == "DN" & !GE02_GE04DE_epi$K27_1 & GE02_GE04DE_epi$K27_2), "K27"] <- T
-GE02_GE04DE_epi[c(DMR_DE_GE02_GE04_hyper$DMR_gene_DE$id, DMR_DE_GE02_GE04_hypo$DMR_gene_DE$id), "DMR"] <- T
+grid.arrange(gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), nrow = 1)
+write.table(Cortex01_GE01DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_NPC_Subject1.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(Cortex02_GE02DE_epi%>%filter(K4==T), file = "DM_H3K4me3_DE_NPC_Subject2.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(Cortex02_GE02DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_NPC_Subject2.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+DM_H3K27me3_DE_NPC_Subject1_DAVID <- enrich("DM_H3K27me3_DE_NPC_Subject1.pc", erminej = F, fdr = 0.05)
+DM_H3K4me3_DE_NPC_Subject2_DAVID <- enrich("DM_H3K4me3_DE_NPC_Subject2.pc", erminej = F, fdr = 0.05)
+DM_H3K27me3_DE_NPC_Subject2_DAVID <- enrich("DM_H3K27me3_DE_NPC_Subject2.pc", erminej = F, fdr = 0.05)
+Cortex01_GE01DE_epi_DMR_H3K27me3 <- Cortex01_GE01DE_epi %>% filter(DMR==T, K27==T)
+Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3 <- Cortex02_GE02DE_epi %>% filter(DMR==T, K4==T, K27==T)
+### GW
+GE02_GE04DE_epi <- GE02_GE04DE %>% mutate(name = ensembl[ID, "name"], description = ensembl[ID, "description"], 
+                                          K4 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE"))$Ensembl), T, F), 
+                                          K27 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Cell == "GE"))$Ensembl), T, F), 
+                                          DMR = ifelse((ID %in% c(DMR_DE_GE02_GE04_hyper$DMR_gene_DE[,"id"], DMR_DE_GE02_GE04_hypo$DMR_gene_DE[,"id"])), T, F))
 GE02_GE04DE_epi_list <- list(H3K4me3 = as.character(filter(GE02_GE04DE_epi, K4 == T)[, "ID"]), H3K27me3 = as.character(filter(GE02_GE04DE_epi, K27 == T)[, "ID"]), DMR = as.character(filter(GE02_GE04DE_epi, DMR == T)[, "ID"]))
 venn_GE02_GE04DE_epi <- venn.diagram(GE02_GE04DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "GE02 vs GE04")
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
-             gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
+grid.draw(venn_GE02_GE04DE_epi)
+write.table(GE02_GE04DE_epi%>%filter(K4==T), file = "DM_H3K4me3_DE_GW_GE.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(GE02_GE04DE_epi%>%filter(K27==T), file = "DM_H3K27me3_DE_GW_GE.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+DM_H3K4me3_DE_GW_GE_DAVID <- enrich("DM_H3K4me3_DE_GW_GE.pc", erminej = F, fdr = 0.05)
+DM_H3K27me3_DE_GW_GE_DAVID <- enrich("DM_H3K27me3_DE_GW_GE.pc", erminej = F, fdr = 0.05)
+GE02_GE04DE_epi_DMR_H3K4me3_H3K27me3 <- GE02_GE04DE_epi %>% filter(DMR==T, K4==T, K27==T)
 pdf("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/venn_DE_epi.pdf")
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), 
              gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), gTree(children = venn_GE02_GE04DE_epi), nrow = 2)
@@ -546,7 +608,7 @@ homer_unique_enhancer_GW_GW17only_targets_TF_5mC <- melt(homer_unique_enhancer_G
    #geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
    geom_violin(width = .5, position = position_dodge(), color = "grey") + 
    coord_flip() + 
-   facet_grid(. ~ Category) + 
+   #facet_grid(. ~ Category) + 
    scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), name = "") + 
    ylab("Fractional methylation") + 
    xlab("") + 
@@ -558,7 +620,7 @@ ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure, file = "homer_un
    geom_boxplot(fill = "blue", width = .2, color = "grey", outlier.shape = NA) + 
    geom_hline(yintercept = -0.2) + 
    coord_flip() + 
-   facet_grid(. ~ Category) + 
+   #facet_grid(. ~ Category) + 
    ylab("GW17-GW13 5mC") + 
    xlab("") + 
    theme_bw()) 
@@ -568,11 +630,12 @@ homer_unique_enhancer_GW_GW17only_targets_TF <- homer_unique_enhancer_GW_GW17onl
 homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- homer_unique_enhancer_GW_GW17only_targets_TF %>% mutate(RPKM_cortex_GW13 = Cortex04, RPKM_cortex_GW17 = (Cortex01+Cortex02)/2, RPKM_GE_GW13 = GE04, RPKM_GE_GW17 = (GE01+GE02)/2) %>%
   select(TF, RPKM_cortex_GW13, RPKM_cortex_GW17, RPKM_GE_GW13, RPKM_GE_GW17)
 homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- melt(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, id = "TF") %>% mutate(Category = paste0("Target_", gsub("_GW.+", "", variable)), GW = gsub("RPKM_.+_", "", variable))
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM <- homer_unique_enhancer_GW_GW17only_targets_TF_RPKM %>% filter(Category == "Target_RPKM_GE")
 (homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_targets_TF_RPKM, aes(TF, log10(value), fill = GW)) +
    #geom_boxplot(width = .5, position = position_dodge(), color = "grey", outlier.shape = NA) + 
    geom_violin(width = .5, position = position_dodge(), color = "grey") + 
    coord_flip() + 
-   facet_grid(. ~ Category) + 
+   #facet_grid(. ~ Category) + 
    scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), name = "") + 
    ylab("log10(RPKM)") + 
    xlab("") + 
@@ -588,7 +651,7 @@ homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC <- melt(homer_unique_enhanc
    geom_boxplot(fill = "blue", width = .2, color = "grey", outlier.shape = NA) + 
    geom_hline(yintercept = 1) + 
    coord_flip() + 
-   facet_grid(. ~ Category) + 
+   #facet_grid(. ~ Category) + 
    ylab("log2(RPKM FC)") + 
    xlab("") + 
    theme_bw()) 
@@ -614,8 +677,9 @@ clab_figure <- ggplot(clab, aes(GW, y, fill = GW)) +
   ylab("") + 
   theme_bw() + 
   theme(plot.margin=unit(c(1,0,0,-0.8), "cm"), axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"))
+homer_unique_enhancer_GW_GW17only_Olig2 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% filter(group == "hypo_UP")
 GW17only_Olig2_UMR_K4me1 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02_K4me1, GE04_K4me1)
-GW17only_Olig2_UMR_K4me1_tall <- melt(GW17only_Olig2_UMR_K4me1, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = gsub("*_K4me1", "", variable), GW = gsub("GE01_5K4me1", "GW17", variable), GW = gsub("GE02_5K4me1", "GW17", GW), GW = gsub("GE04_5K4me1", "GW13", GW))
+GW17only_Olig2_UMR_K4me1_tall <- melt(GW17only_Olig2_UMR_K4me1, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_K4me1", "", variable), levels = c("GE04", "GE02")), GW = gsub("GE01_5K4me1", "GW17", variable), GW = gsub("GE02_5K4me1", "GW17", GW), GW = gsub("GE04_5K4me1", "GW13", GW))
 GW17only_Olig2_UMR_K4me1_heatmap <- ggplot(GW17only_Olig2_UMR_K4me1_tall, aes(x = Sample, y = id, fill = value)) + 
    geom_tile() + 
    scale_fill_gradient(name = "H3K4me1\n  signal", low = "black") + 
@@ -624,7 +688,7 @@ GW17only_Olig2_UMR_K4me1_heatmap <- ggplot(GW17only_Olig2_UMR_K4me1_tall, aes(x 
    theme_bw() + 
    theme(plot.margin = unit(c(-0.8,0,1,-0.5), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 GW17only_Olig2_UMR_mC <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02_5mC, GE04_5mC)
-GW17only_Olig2_UMR_mC_tall <- melt(GW17only_Olig2_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = gsub("*_5mC", "", variable), GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW))
+GW17only_Olig2_UMR_mC_tall <- melt(GW17only_Olig2_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_5mC", "", variable), levels = c("GE04", "GE02")), GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW))
 GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = Sample, y = id, fill = value)) + 
    geom_tile() + 
    scale_fill_gradient(name = " Fractional\nmethylation", low = "black", high = "darkred") + 
@@ -634,7 +698,7 @@ GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = Samp
    theme(plot.margin = unit(c(-0.8,0,1,-0.8), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 GW17only_Olig2_UMR_RPKM <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02, GE04)
 #GW17only_Olig2_UMR_RPKM_scale <- na.omit(data.frame(Nearest.Ensembl = GW17only_Olig2_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Olig2_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
-GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(variable), GW = gsub("(GE01)|(GE02)", "GW17", variable), GW = gsub("GE03", "GW15", GW), GW = gsub("GE04", "GW13", GW))
+GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(factor(variable), levels = c("GE04", "GE02")), GW = gsub("(GE01)|(GE02)", "GW17", variable), GW = gsub("GE03", "GW15", GW), GW = gsub("GE04", "GW13", GW))
 GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = Sample, y = id, fill = log10(value + e))) + 
    geom_tile() + 
    scale_fill_gradient(name = "log10(RPKM)", low = "black", high = "darkgreen") + 
@@ -829,7 +893,7 @@ write.table(homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE, file = "homer_un
 (homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE_DAVID <- enrich("homer_unique_enhancer_Neurospheres_GEonly_Olig2_DE", erminej = F, fdr = 0.05, height = 8))
 
 
-
+## =========== save workspace ============== 
 save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure, 
      H3K4me3_TSS1500, H3K27me3_TSS1500, His_DM_promoter, His_DM_promoter_figure, 
      Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, Cortex01_GE01DE_epi, Cortex02_GE02DE_epi, GE02_GE04DE_epi, 
@@ -853,4 +917,11 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_cortex_node, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_network, homer_unique_enhancer_GW_GW17only_Olig2_DE_GE_node, 
      GW17only_mC_figure, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, GW17only_Foxo1_UMR_mC_heatmap, GW17only_Foxo1_UMR_RPKM_heatmap,clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, 
      homer_unique_enhancer_GW_GW17only_RPKM_figure, homer_unique_enhancer_GW_GW17only_targets_TF_5mC_figure, homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure, homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_figure, homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure, 
+     H3K4me3_H3K27me3_promoter_drank_MZ_figure, DM_H3K4me3_Brain_Subject1_DAVID, DM_H3K4me3_Brain_Subject2_DAVID, DM_H3K27me3_Brain_Subject1_DAVID, DM_H3K27me3_Brain_Subject2_DAVID, DM_H3K27me3_Cortex_Subject1_DAVID, DM_H3K27me3_Cortex_Subject2_DAVID, DM_H3K27me3_GE_Subject1_DAVID, DM_H3K27me3_GE_Subject2_DAVID,
+     H3K4me3_H3K27me3_promoter_drank_NPC_figure, DM_H3K4me3_NPC_Subject2_Cortex_DAVID, DM_H3K4me3_NPC_Subject2_GE_DAVID, DM_H3K27me3_NPC_Subject1_Cortex_DAVID, DM_H3K27me3_NPC_Subject1_GE_DAVID, DM_H3K27me3_NPC_Subject2_Cortex_DAVID, DM_H3K27me3_NPC_Subject2_GE_DAVID, 
+     H3K4me3_H3K27me3_promoter_drank_GW_figure, DM_H3K4me3_GW_GE_GW13_DAVID, DM_H3K4me3_GW_GE_GW17_DAVID, DM_H3K27me3_GW_GE_GW13_DAVID, DM_H3K27me3_GW_GE_GW17_DAVID, 
+     Brain01_Brain02DE_epi, venn_Brain01_Brain02DE_epi, Cortex01_Cortex02DE_epi, venn_Cortex01_Cortex02DE_epi, GE01_GE02DE_epi, venn_GE01_GE02DE_epi, 
+     Brain01_Brain02DE_epi_H3K4me3_H3K27me3, Brain01_Brain02DE_epi_DMR_H3K27me3, Cortex01_Cortex02DE_epi_DMR_H3K27me3, GE01_GE02DE_epi_DMR_H3K27me3, 
+     Cortex01_GE01DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, DM_H3K27me3_DE_NPC_Subject1_DAVID, DM_H3K4me3_DE_NPC_Subject2_DAVID, DM_H3K27me3_DE_NPC_Subject2_DAVID, Cortex01_GE01DE_epi_DMR_H3K27me3, Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3, 
+     GE02_GE04DE_epi, venn_GE02_GE04DE_epi, DM_H3K4me3_DE_GW_GE_DAVID, DM_H3K27me3_DE_GW_GE_DAVID, GE02_GE04DE_epi_DMR_H3K4me3_H3K27me3, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
