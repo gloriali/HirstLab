@@ -6,7 +6,7 @@ if [ "$1" == "-h" ] ; then
 Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand>
     <dirIn>: input directory
     <dirOut>: output directory
-    <file>: WGBS .sam.bedGraph input file
+    <file>: WGBS .sam.bedGraph input file, format chr\tstart\tend\tfractional_methylation\tcoverage      
     <CG.strand>: mapping of stranded CpG IDs and combined CpG IDs"
     exit 0
 fi
