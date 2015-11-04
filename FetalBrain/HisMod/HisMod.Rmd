@@ -48,6 +48,7 @@ opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, fig.width = 8)
 
 ```{r DM_MZ1, fig.height = 6}
 (H3K4me3_H3K27me3_promoter_drank_MZ_figure)
+(H3K4me3_H3K27me3_promoter_drank_MZ_RPKM_figure)
 (DM_H3K4me3_Brain_Subject1_DAVID)
 (DM_H3K4me3_Brain_Subject2_DAVID)
 ```
@@ -92,6 +93,7 @@ kable(GE01_GE02DE_epi_DMR_H3K27me3%>%select(name, description), format = "html",
 
 ```{r DM_NPC1, fig.height=6}
 (H3K4me3_H3K27me3_promoter_drank_NPC_figure)
+(H3K4me3_H3K27me3_promoter_drank_NPC_RPKM_figure)
 (DM_H3K4me3_NPC_Subject2_Cortex_DAVID)
 (DM_H3K4me3_NPC_Subject2_GE_DAVID)
 ```
@@ -124,6 +126,7 @@ kable(Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3%>%select(name, description), form
 
 ```{r DM_GW1, fig.height=6}
 (H3K4me3_H3K27me3_promoter_drank_GW_figure)
+(H3K4me3_H3K27me3_promoter_drank_GW_RPKM_figure)
 ```
 ```{r DM_GW2, fig.height=8}
 (DM_H3K4me3_GW_GE_GW13_DAVID)

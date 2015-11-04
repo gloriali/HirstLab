@@ -135,19 +135,28 @@ ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 
 
 ## =========== Differential marked genes ================
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
-rank_cut <- 5000
+geneRPKM <- rbind(read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_pc.txt", as.is = T) %>% mutate(Category = "pc"), 
+                  read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_nc.txt", as.is = T) %>% mutate(Category = "nc"))
+colnames(geneRPKM) <- gsub(".HuFNSC", "", colnames(geneRPKM))
+rownames(geneRPKM) <- geneRPKM$Ensembl
 H3K4me3_promoter <- read.delim("hg19v65_genes_TSS_1500.H3K4me3", head = F, as.is = T, col.names = c("ID", "Brain01", "Brain02", "Cortex02", "GE02", "GE04")) %>% 
   mutate(Ensembl = gsub("_.+", "", ID), Type = gsub("ENSG\\d+_", "", ID), Category = ifelse(Type == "protein_coding", "pc", "nc"), Brain01rank = rank(Brain01), Brain02rank = rank(Brain02), Cortex02rank = rank(Cortex02), GE02rank = rank(GE02), GE04rank = rank(GE04), 
          Brain01_Brain02 = Brain01rank - Brain02rank, Cortex02_GE02 = Cortex02rank - GE02rank, GE02_GE04 = GE02rank - GE04rank)
 H3K27me3_promoter <- read.delim("hg19v65_genes_TSS_1500.H3K27me3", head = F, as.is = T, col.names = c("ID", "Brain01", "Brain02", "Cortex01", "Cortex02", "GE01", "GE02", "GE04")) %>% 
   mutate(Ensembl = gsub("_.+", "", ID), Type = gsub("ENSG\\d+_", "", ID), Category = ifelse(Type == "protein_coding", "pc", "nc"), Brain01rank = rank(Brain01), Brain02rank = rank(Brain02), Cortex01rank = rank(Cortex01), Cortex02rank = rank(Cortex02), GE01rank = rank(GE01), GE02rank = rank(GE02), GE04rank = rank(GE04), 
          Brain01_Brain02 = Brain01rank - Brain02rank, Cortex01_Cortex02 = Cortex01rank - Cortex02rank, GE01_GE02 = GE01rank - GE02rank, Cortex01_GE01 = Cortex01rank - GE01rank, Cortex02_GE02 = Cortex02rank - GE02rank, GE01_GE04 = GE01rank - GE04rank, GE02_GE04 = GE02rank - GE04rank)
+rank_cut <- 5000
+max_rank <- nrow(H3K4me3_promoter)*0
+RPKM_cut <- 0
+e <- 1e-4
 ### Between MZ twins
-H3K4me3_H3K27me3_promoter_drank_MZ <- rbind(H3K4me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
-                                            H3K27me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
-                                            H3K27me3_promoter %>% filter(abs(Cortex01_Cortex02) >= rank_cut) %>% mutate(Subject1 = Cortex01, Subject2 = Cortex02, Rank1 = Cortex01rank, Rank2 = Cortex02rank, drank = Cortex01_Cortex02, Marked = ifelse(Cortex01_Cortex02 > 0, "Subject1", "Subject2"), Cell = "Cortex", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
-                                            H3K27me3_promoter %>% filter(abs(GE01_GE02) >= rank_cut) %>% mutate(Subject1 = GE01, Subject2 = GE02, Rank1 = GE01rank, Rank2 = GE02rank, drank = GE01_GE02, Marked = ifelse(GE01_GE02 > 0, "Subject1", "Subject2"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
-H3K4me3_H3K27me3_promoter_drank_MZ_summary <- H3K4me3_H3K27me3_promoter_drank_MZ %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Subject1", Ngenes, -Ngenes))
+H3K4me3_H3K27me3_promoter_drank_MZ <- rbind(H3K4me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut, pmax(Brain01rank, Brain02rank) >= max_rank) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
+                                            H3K27me3_promoter %>% filter(abs(Brain01_Brain02) >= rank_cut, pmax(Brain01rank, Brain02rank) >= max_rank) %>% mutate(Subject1 = Brain01, Subject2 = Brain02, Rank1 = Brain01rank, Rank2 = Brain02rank, drank = Brain01_Brain02, Marked = ifelse(Brain01_Brain02 > 0, "Subject1", "Subject2"), Cell = "Brain", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
+                                            H3K27me3_promoter %>% filter(abs(Cortex01_Cortex02) >= rank_cut, pmax(Cortex01rank, Cortex02rank) >= max_rank) %>% mutate(Subject1 = Cortex01, Subject2 = Cortex02, Rank1 = Cortex01rank, Rank2 = Cortex02rank, drank = Cortex01_Cortex02, Marked = ifelse(Cortex01_Cortex02 > 0, "Subject1", "Subject2"), Cell = "Cortex", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
+                                            H3K27me3_promoter %>% filter(abs(GE01_GE02) >= rank_cut, pmax(GE01rank, GE02rank) >= max_rank) %>% mutate(Subject1 = GE01, Subject2 = GE02, Rank1 = GE01rank, Rank2 = GE02rank, drank = GE01_GE02, Marked = ifelse(GE01_GE02 > 0, "Subject1", "Subject2"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_MZ <- H3K4me3_H3K27me3_promoter_drank_MZ %>% mutate(RPKM1 = ifelse(Cell == "Brain", geneRPKM[Ensembl, "Brain01"], ifelse(Cell == "Cortex", geneRPKM[Ensembl, "Cortex01"], geneRPKM[Ensembl, "GE01"])), 
+                                                                                    RPKM2 = ifelse(Cell == "Brain", geneRPKM[Ensembl, "Brain02"], ifelse(Cell == "Cortex", geneRPKM[Ensembl, "Cortex02"], geneRPKM[Ensembl, "GE02"])), FC = (RPKM1+e)/(RPKM2+e))
+H3K4me3_H3K27me3_promoter_drank_MZ_summary <- H3K4me3_H3K27me3_promoter_drank_MZ %>% filter(RPKM1+RPKM2 >= RPKM_cut) %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Subject1", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_MZ_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_MZ_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
    geom_hline(yintercept = 0) + 
@@ -158,6 +167,14 @@ H3K4me3_H3K27me3_promoter_drank_MZ_summary <- H3K4me3_H3K27me3_promoter_drank_MZ
    ylab("No. of DM genes") + 
    theme_bw())
 ggsave(H3K4me3_H3K27me3_promoter_drank_MZ_figure, file = "H3K4me3_H3K27me3_promoter_drank_MZ_figure.pdf")
+(H3K4me3_H3K27me3_promoter_drank_MZ_RPKM_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_MZ, aes(x = Cell, y = log2(FC), fill = Marked)) + 
+   geom_boxplot(color = "grey", width = 0.5, posistion = position_dodge(), outlier.size = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   coord_cartesian(ylim = c(-1.5, 1.5)) + 
+   xlab("") +
+   ylab("log2 RPKM FC") + 
+   theme_bw())
 DM_H3K4me3_Brain_Subject1.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Category == "pc", Marked == "Subject1")
 DM_H3K4me3_Brain_Subject2.pc <- H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Category == "pc", Marked == "Subject2")
 write.table(DM_H3K4me3_Brain_Subject1.pc, file = "DM_H3K4me3_Brain_Subject1.pc", sep = "\t", quote = F, row.names = F, col.names = T)
@@ -192,6 +209,8 @@ DM_H3K27me3_intersect_Subject2_DAVID <- enrich("DM_H3K27me3_intersect_Subject2.p
 H3K4me3_H3K27me3_promoter_drank_NPC <- rbind(H3K4me3_promoter %>% filter(abs(Cortex02_GE02) >= rank_cut) %>% mutate(NPC1 = Cortex02, NPC2 = GE02, Rank1 = Cortex02rank, Rank2 = GE02rank, drank = Cortex02_GE02, Marked = ifelse(Cortex02_GE02 > 0, "Cortex", "GE"), Subject = "Subject2", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
                                              H3K27me3_promoter %>% filter(abs(Cortex01_GE01) >= rank_cut) %>% mutate(NPC1 = Cortex01, NPC2 = GE01, Rank1 = Cortex01rank, Rank2 = GE01rank, drank = Cortex01_GE01, Marked = ifelse(Cortex01_GE01 > 0, "Cortex", "GE"), Subject = "Subject1", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")),
                                              H3K27me3_promoter %>% filter(abs(Cortex02_GE02) >= rank_cut) %>% mutate(NPC1 = Cortex02, NPC2 = GE02, Rank1 = Cortex02rank, Rank2 = GE02rank, drank = Cortex02_GE02, Marked = ifelse(Cortex02_GE02 > 0, "Cortex", "GE"), Subject = "Subject2", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_NPC <- H3K4me3_H3K27me3_promoter_drank_NPC %>% mutate(RPKM1 = ifelse(Subject == "Subject1", geneRPKM[Ensembl, "Cortex01"], geneRPKM[Ensembl, "Cortex02"]), 
+                                                                                      RPKM2 = ifelse(Subject == "Subject1", geneRPKM[Ensembl, "GE01"], geneRPKM[Ensembl, "GE02"]), FC = (RPKM1+e)/(RPKM2+e))
 H3K4me3_H3K27me3_promoter_drank_NPC_summary <- H3K4me3_H3K27me3_promoter_drank_NPC %>% group_by(Mark, Subject, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Cortex", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_NPC_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_NPC_summary, aes(x = Subject, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
@@ -203,6 +222,14 @@ H3K4me3_H3K27me3_promoter_drank_NPC_summary <- H3K4me3_H3K27me3_promoter_drank_N
    ylab("No. of DM genes") + 
    theme_bw())
 ggsave(H3K4me3_H3K27me3_promoter_drank_NPC_figure, file = "H3K4me3_H3K27me3_promoter_drank_NPC_figure.pdf")
+(H3K4me3_H3K27me3_promoter_drank_NPC_RPKM_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_NPC, aes(x = Subject, y = log2(FC), fill = Marked)) + 
+   geom_boxplot(color = "grey", width = 0.5, posistion = position_dodge(), outlier.size = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   coord_cartesian(ylim = c(-1.5, 1.5)) + 
+   xlab("") +
+   ylab("log2 RPKM FC") + 
+   theme_bw())
 DM_H3K4me3_NPC_Subject2_Cortex.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Category == "pc", Marked == "Cortex")
 DM_H3K4me3_NPC_Subject2_GE.pc <- H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Category == "pc", Marked == "GE")
 write.table(DM_H3K4me3_NPC_Subject2_Cortex.pc, file = "DM_H3K4me3_NPC_Subject2_Cortex.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
@@ -224,6 +251,7 @@ DM_H3K27me3_NPC_Subject2_GE_DAVID <- enrich("DM_H3K27me3_NPC_Subject2_GE.pc", er
 ### GW
 H3K4me3_H3K27me3_promoter_drank_GW <- rbind(H3K4me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
                                             H3K27me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
+H3K4me3_H3K27me3_promoter_drank_GW <- H3K4me3_H3K27me3_promoter_drank_GW %>% mutate(RPKM1 = geneRPKM[Ensembl, "GE04"], RPKM2 = geneRPKM[Ensembl, "GE02"], FC = (RPKM1+e)/(RPKM2+e))
 H3K4me3_H3K27me3_promoter_drank_GW_summary <- H3K4me3_H3K27me3_promoter_drank_GW %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "GW13", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_GW_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_GW_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
@@ -235,6 +263,14 @@ H3K4me3_H3K27me3_promoter_drank_GW_summary <- H3K4me3_H3K27me3_promoter_drank_GW
    ylab("No. of DM genes") + 
    theme_bw())
 ggsave(H3K4me3_H3K27me3_promoter_drank_GW_figure, file = "H3K4me3_H3K27me3_promoter_drank_GW_figure.pdf")
+(H3K4me3_H3K27me3_promoter_drank_GW_RPKM_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_GW, aes(x = Cell, y = log2(FC), fill = Marked)) + 
+   geom_boxplot(color = "grey", width = 0.5, posistion = position_dodge(), outlier.size = 0) + 
+   facet_grid(Category ~ Mark, scale = "free", space = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   coord_cartesian(ylim = c(-1.5, 1.5)) + 
+   xlab("") +
+   ylab("log2 RPKM FC") + 
+   theme_bw())
 DM_H3K4me3_GW_GE_GW13.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE", Category == "pc", Marked == "GW13")
 DM_H3K4me3_GW_GE_GW17.pc <- H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE", Category == "pc", Marked == "GW17")
 write.table(DM_H3K4me3_GW_GE_GW13.pc, file = "DM_H3K4me3_GW_GE_GW13.pc.txt", sep = "\t", quote = F, row.names = F, col.names = T)
@@ -924,4 +960,5 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      Brain01_Brain02DE_epi_H3K4me3_H3K27me3, Brain01_Brain02DE_epi_DMR_H3K27me3, Cortex01_Cortex02DE_epi_DMR_H3K27me3, GE01_GE02DE_epi_DMR_H3K27me3, 
      Cortex01_GE01DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, DM_H3K27me3_DE_NPC_Subject1_DAVID, DM_H3K4me3_DE_NPC_Subject2_DAVID, DM_H3K27me3_DE_NPC_Subject2_DAVID, Cortex01_GE01DE_epi_DMR_H3K27me3, Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3, 
      GE02_GE04DE_epi, venn_GE02_GE04DE_epi, DM_H3K4me3_DE_GW_GE_DAVID, DM_H3K27me3_DE_GW_GE_DAVID, GE02_GE04DE_epi_DMR_H3K4me3_H3K27me3, 
+     H3K4me3_H3K27me3_promoter_drank_MZ_RPKM_figure, H3K4me3_H3K27me3_promoter_drank_NPC_RPKM_figure, H3K4me3_H3K27me3_promoter_drank_GW_RPKM_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")

@@ -2,7 +2,7 @@
 Gloria Li  
 January 27, 2014  
 
-Update Mon Oct 26 00:19:17 2015
+Update Wed Nov  4 13:24:03 2015
 
 
 
@@ -27,7 +27,7 @@ Update Mon Oct 26 00:19:17 2015
 
 ### MZ twins
 
-![](HisMod_files/figure-html/DM_MZ1-1.png) ![](HisMod_files/figure-html/DM_MZ1-2.png) ![](HisMod_files/figure-html/DM_MZ1-3.png) 
+![](HisMod_files/figure-html/DM_MZ1-1.png) ![](HisMod_files/figure-html/DM_MZ1-2.png) ![](HisMod_files/figure-html/DM_MZ1-3.png) ![](HisMod_files/figure-html/DM_MZ1-4.png) 
 ![](HisMod_files/figure-html/DM_MZ2-1.png) 
 
 ```
@@ -351,7 +351,7 @@ Update Mon Oct 26 00:19:17 2015
 
 ### NPCs
 
-![](HisMod_files/figure-html/DM_NPC1-1.png) ![](HisMod_files/figure-html/DM_NPC1-2.png) ![](HisMod_files/figure-html/DM_NPC1-3.png) 
+![](HisMod_files/figure-html/DM_NPC1-1.png) ![](HisMod_files/figure-html/DM_NPC1-2.png) ![](HisMod_files/figure-html/DM_NPC1-3.png) ![](HisMod_files/figure-html/DM_NPC1-4.png) 
 ![](HisMod_files/figure-html/DM_NPC2-1.png) 
 ![](HisMod_files/figure-html/DM_NPC3-1.png) ![](HisMod_files/figure-html/DM_NPC3-2.png) ![](HisMod_files/figure-html/DM_NPC3-3.png) ![](HisMod_files/figure-html/DM_NPC3-4.png) ![](HisMod_files/figure-html/DM_NPC3-5.png) ![](HisMod_files/figure-html/DM_NPC3-6.png) ![](HisMod_files/figure-html/DM_NPC3-7.png) 
 
@@ -603,7 +603,7 @@ Update Mon Oct 26 00:19:17 2015
 
 ### GW
 
-![](HisMod_files/figure-html/DM_GW1-1.png) 
+![](HisMod_files/figure-html/DM_GW1-1.png) ![](HisMod_files/figure-html/DM_GW1-2.png) 
 ![](HisMod_files/figure-html/DM_GW2-1.png) ![](HisMod_files/figure-html/DM_GW2-2.png) ![](HisMod_files/figure-html/DM_GW2-3.png) ![](HisMod_files/figure-html/DM_GW2-4.png) ![](HisMod_files/figure-html/DM_GW2-5.png) 
 ![](HisMod_files/figure-html/DM_GW3-1.png) 
 ![](HisMod_files/figure-html/DM_GW4-1.png) 
