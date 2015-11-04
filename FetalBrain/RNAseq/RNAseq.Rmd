@@ -14,14 +14,76 @@ Updated: `r date()`
 ```{r setup, include = FALSE}
 library(knitr)
 library(ggplot2)
+library(dplyr)
+library(reshape2)
 library(xtable)
 library(VennDiagram)
 library(grid) 
-load("~/快盘/FetalBrain/RNAseq/DEfine/gene/FetalBrain_DEgenes.Rdata")
-load("~/快盘/FetalBrain/RNAseq/isoform/FetalBrain_isoform.Rdata")
-load("~/快盘/FetalBrain/RNAseq/junction/FetalBrain_isoform_valid.Rdata")
-load("~/快盘/FetalBrain/RNAseq/epiProfile/exonProfile_Rmd.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/RNAseq/FetalBrain_DEgenes.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/RNAseq/FetalBrain_isoform.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/RNAseq/FetalBrain_isoform_valid.Rdata")
+load("/projects/epigenomics/users/lli/FetalBrain/RNAseq/exonProfile_Rmd.Rdata")
 opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE)
+```
+
+## No. of expressed genes
+
+* No. of expressed pc genes   
+
+```{r Nexp_pc}
+pc_FetalBrain <- read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_pc.txt", as.is = T)
+colnames(pc_FetalBrain) <- gsub(".HuFNSC", "", colnames(pc_FetalBrain))
+rownames(pc_FetalBrain) <- pc_FetalBrain$Ensembl
+pc_summary <- data.frame(Sample = colnames(pc_FetalBrain)[-1], 
+                          N_0.1 = c(filter(pc_FetalBrain, Brain01 > 0.1) %>% nrow, filter(pc_FetalBrain, Brain02 > 0.1) %>% nrow, filter(pc_FetalBrain, Cortex01 > 0.1) %>% nrow, filter(pc_FetalBrain, Cortex02 > 0.1) %>% nrow, filter(pc_FetalBrain, Cortex03 > 0.1) %>% nrow, filter(pc_FetalBrain, Cortex04 > 0.1) %>% nrow, filter(pc_FetalBrain, GE01 > 0.1) %>% nrow, filter(pc_FetalBrain, GE02 > 0.1) %>% nrow, filter(pc_FetalBrain, GE03 > 0.1) %>% nrow, filter(pc_FetalBrain, GE04 > 0.1) %>% nrow), 
+                          N_1 = c(filter(pc_FetalBrain, Brain01 > 1) %>% nrow, filter(pc_FetalBrain, Brain02 > 1) %>% nrow, filter(pc_FetalBrain, Cortex01 > 1) %>% nrow, filter(pc_FetalBrain, Cortex02 > 1) %>% nrow, filter(pc_FetalBrain, Cortex03 > 1) %>% nrow, filter(pc_FetalBrain, Cortex04 > 1) %>% nrow, filter(pc_FetalBrain, GE01 > 1) %>% nrow, filter(pc_FetalBrain, GE02 > 1) %>% nrow, filter(pc_FetalBrain, GE03 > 1) %>% nrow, filter(pc_FetalBrain, GE04 > 1) %>% nrow), 
+                          N_10 = c(filter(pc_FetalBrain, Brain01 > 10) %>% nrow, filter(pc_FetalBrain, Brain02 > 10) %>% nrow, filter(pc_FetalBrain, Cortex01 > 10) %>% nrow, filter(pc_FetalBrain, Cortex02 > 10) %>% nrow, filter(pc_FetalBrain, Cortex03 > 10) %>% nrow, filter(pc_FetalBrain, Cortex04 > 10) %>% nrow, filter(pc_FetalBrain, GE01 > 10) %>% nrow, filter(pc_FetalBrain, GE02 > 10) %>% nrow, filter(pc_FetalBrain, GE03 > 10) %>% nrow, filter(pc_FetalBrain, GE04 > 10) %>% nrow), 
+                          N_100 = c(filter(pc_FetalBrain, Brain01 > 100) %>% nrow, filter(pc_FetalBrain, Brain02 > 100) %>% nrow, filter(pc_FetalBrain, Cortex01 > 100) %>% nrow, filter(pc_FetalBrain, Cortex02 > 100) %>% nrow, filter(pc_FetalBrain, Cortex03 > 100) %>% nrow, filter(pc_FetalBrain, Cortex04 > 100) %>% nrow, filter(pc_FetalBrain, GE01 > 100) %>% nrow, filter(pc_FetalBrain, GE02 > 100) %>% nrow, filter(pc_FetalBrain, GE03 > 100) %>% nrow, filter(pc_FetalBrain, GE04 > 100) %>% nrow))
+rownames(pc_summary) <- colnames(pc_FetalBrain)[-1]
+pc_summary_tall <- melt(pc_summary, id = "Sample")
+(pc_summary_figure <- ggplot(pc_summary_tall, aes(x = Sample, y = value, fill = variable)) + 
+   geom_bar(stat = "identity", position = "dodge") + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   scale_fill_discrete(labels=c("N > 0.1","N > 1","N > 10", "N > 100"), name = "") + 
+   theme_bw())
+```
+
+* No. of expressed nc genes   
+
+```{r Nexp_nc}
+nc_FetalBrain <- read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_nc.txt", as.is = T)
+colnames(nc_FetalBrain) <- gsub(".HuFNSC", "", colnames(nc_FetalBrain))
+rownames(nc_FetalBrain) <- nc_FetalBrain$Ensembl
+nc_summary <- data.frame(Sample = colnames(nc_FetalBrain)[-1], 
+                          N_0.1 = c(filter(nc_FetalBrain, Brain01 > 0.1) %>% nrow, filter(nc_FetalBrain, Brain02 > 0.1) %>% nrow, filter(nc_FetalBrain, Cortex01 > 0.1) %>% nrow, filter(nc_FetalBrain, Cortex02 > 0.1) %>% nrow, filter(nc_FetalBrain, Cortex03 > 0.1) %>% nrow, filter(nc_FetalBrain, Cortex04 > 0.1) %>% nrow, filter(nc_FetalBrain, GE01 > 0.1) %>% nrow, filter(nc_FetalBrain, GE02 > 0.1) %>% nrow, filter(nc_FetalBrain, GE03 > 0.1) %>% nrow, filter(nc_FetalBrain, GE04 > 0.1) %>% nrow), 
+                          N_1 = c(filter(nc_FetalBrain, Brain01 > 1) %>% nrow, filter(nc_FetalBrain, Brain02 > 1) %>% nrow, filter(nc_FetalBrain, Cortex01 > 1) %>% nrow, filter(nc_FetalBrain, Cortex02 > 1) %>% nrow, filter(nc_FetalBrain, Cortex03 > 1) %>% nrow, filter(nc_FetalBrain, Cortex04 > 1) %>% nrow, filter(nc_FetalBrain, GE01 > 1) %>% nrow, filter(nc_FetalBrain, GE02 > 1) %>% nrow, filter(nc_FetalBrain, GE03 > 1) %>% nrow, filter(nc_FetalBrain, GE04 > 1) %>% nrow), 
+                          N_10 = c(filter(nc_FetalBrain, Brain01 > 10) %>% nrow, filter(nc_FetalBrain, Brain02 > 10) %>% nrow, filter(nc_FetalBrain, Cortex01 > 10) %>% nrow, filter(nc_FetalBrain, Cortex02 > 10) %>% nrow, filter(nc_FetalBrain, Cortex03 > 10) %>% nrow, filter(nc_FetalBrain, Cortex04 > 10) %>% nrow, filter(nc_FetalBrain, GE01 > 10) %>% nrow, filter(nc_FetalBrain, GE02 > 10) %>% nrow, filter(nc_FetalBrain, GE03 > 10) %>% nrow, filter(nc_FetalBrain, GE04 > 10) %>% nrow), 
+                          N_100 = c(filter(nc_FetalBrain, Brain01 > 100) %>% nrow, filter(nc_FetalBrain, Brain02 > 100) %>% nrow, filter(nc_FetalBrain, Cortex01 > 100) %>% nrow, filter(nc_FetalBrain, Cortex02 > 100) %>% nrow, filter(nc_FetalBrain, Cortex03 > 100) %>% nrow, filter(nc_FetalBrain, Cortex04 > 100) %>% nrow, filter(nc_FetalBrain, GE01 > 100) %>% nrow, filter(nc_FetalBrain, GE02 > 100) %>% nrow, filter(nc_FetalBrain, GE03 > 100) %>% nrow, filter(nc_FetalBrain, GE04 > 100) %>% nrow))
+rownames(nc_summary) <- colnames(nc_FetalBrain)[-1]
+nc_summary_tall <- melt(nc_summary, id = "Sample")
+(nc_summary_figure <- ggplot(nc_summary_tall, aes(x = Sample, y = value, fill = variable)) + 
+   geom_bar(stat = "identity", position = "dodge") + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   scale_fill_discrete(labels=c("N > 0.1","N > 1","N > 10", "N > 100"), name = "") + 
+   theme_bw())
+```
+
+## Expression of epigenetic regulators
+
+```{r regulator_exp}
+regulators <- read.delim("/projects/epigenomics/users/lli/FetalBrain/epi_regulators.txt", as.is = T, strip = T)
+regulators <- cbind(regulators, pc_FetalBrain[regulators$Ensembl, 2:ncol(pc_FetalBrain)])
+rownames(regulators) <- regulators$gene
+regulators <- as.matrix(regulators[, 3:ncol(regulators)])
+(regulators_heatmap <- ggplot(melt(t(scale(t(regulators), center = T, scale = T))) %>% mutate(Gene = factor(Var1, levels = rev(rownames(regulators))), Sample = factor(Var2, levels = colnames(regulators))), aes(x=Sample, y=Gene, fill=value)) + 
+   geom_tile() + 
+   scale_fill_gradient(name = "Z-score") + 
+   xlab("") + 
+   ylab("") + 
+   theme_bw() + 
+   theme(axis.ticks.y = element_line(size = 0), panel.border = element_rect(size = 0), axis.text.x = element_text(angle = 90)))
 ```
 
 ## Differential gene expression 
