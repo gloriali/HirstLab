@@ -1,4 +1,4 @@
-enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG_PATHWAY", "PANTHER_PATHWAY", "REACTOME_PATHWAY", "INTERPRO"), height = 6, width = 9){
+enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG_PATHWAY", "PANTHER_PATHWAY", "REACTOME_PATHWAY", "INTERPRO", "SP_PIR_KEYWORDS"), height = 6, width = 9){
   library(ggplot2)
   DAVID <- read.delim(paste0(dirIn, name, "_DAVID.txt"), as.is=T)
   if(erminej){
@@ -41,7 +41,8 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
      geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
      ggtitle(paste0("Functional enrichment for ", name)) + 
-     scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue"))
+     xlab(paste0("-log10 ", p)) + 
+     scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
   ggsave(Enrich_plot, file = paste0(dirOut, name, "_enrich.pdf"), height = height, width = width)
   return(Enrich_plot)
 }
