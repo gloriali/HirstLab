@@ -41,7 +41,8 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
      geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
      ggtitle(paste0("Functional enrichment for ", name)) + 
-     xlab(paste0("-log10 ", p)) + 
+     xlab("") + 
+     ylab(paste0("-log10 ", p)) + 
      scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
   ggsave(Enrich_plot, file = paste0(dirOut, name, "_enrich.pdf"), height = height, width = width)
   return(Enrich_plot)
