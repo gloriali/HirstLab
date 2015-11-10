@@ -43,6 +43,7 @@ File paths on xhost
 * Fetal Brain:
     + Histone modification wig files: `/home/lli/FetalBrain/HisMod/wigs/`
     + WGBS fractional calls and coverage symlink files: `/projects/epigenomics/users/lli/FetalBrain/WGBS/`
+    + WGBS nonCpG methylation: `/projects/production_genomics/bs-seq/*/non_CpG*`        
     + MeDIP wig files: `/projects/mbilenky/REMC/brain/MeDIP/wigs/`  
     + MeDIP fractional calls: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/`
     + DMRs from MeDIP: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/`  
