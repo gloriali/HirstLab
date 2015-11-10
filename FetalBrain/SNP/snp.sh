@@ -19,9 +19,7 @@
 
 #####################
 # use RNA-seq
-genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
-SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+## run on apollo
 dirIn=/projects/epigenomics/users/lli/FetalBrain/RNAseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/SNP/
 
@@ -34,9 +32,7 @@ for cell in "Cortex" "GE"; do
             bam1=${files[i]}
             bam2=${files[j]}
             name=$(echo $bam1 | cut -d'.' -f2)_$(echo $bam2 | cut -d'.' -f2)
-            echo $name
-            $SAMTOOLS mpileup -C50 -uf $genome $dirIn/$bam1 $dirIn/$bam2 | $BCFTOOLS/bcftools view -bvcg - > $dirOut/$name.bcf
-            $BCFTOOLS/bcftools view $dirOut/$name.bcf | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+            qsub /home/lli/HirstLab/FetalBrain/SNP/snp_apollo.sh -i $dirIn -o $dirOut -b1 $bam1 -b2 $bam2 -n $name 
         done
     done
 done
