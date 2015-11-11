@@ -43,6 +43,6 @@ for file in Cortex*.vcf; do
     file2=$(echo $file | sed -e 's/Cortex/GE/g')
     name=$(echo $file | sed -e 's/Cortex/HuFNSC/g')
     echo -e $file1"\t"$file2"\t"$name
-    awk 'NR==FNR {if(!($1~/^#/)){h[$3]=$0; next}} {if($3 in h){print $0"\t"h[$3]}}' $file2 $file1 > $dirOut/$name
+    awk 'NR==FNR {if(!($1~/^#/)){id=$1":"$2; h[id]=$0; next}} {id=$1":"$2; if(id in h){print $0"\t"h[id]}}' $file2 $file1 > $dirOut/$name
 done
 
