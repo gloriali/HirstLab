@@ -189,7 +189,9 @@ phyper(length(intersect(DMR_DE_Brain01_Brain02_hyper$DMR_gene$id, DMR_DE_GE01_GE
 phyper(length(intersect(DMR_DE_Brain01_Brain02_hypo$DMR_gene$id, DMR_DE_GE01_GE02_hypo$DMR_gene$id)), DMR_proximal_MZ_summary["Brain01_Brain02_hypo", "unique.genes"], pcgene - DMR_proximal_MZ_summary["Brain01_Brain02_hypo", "unique.genes"], DMR_proximal_MZ_summary["GE01_GE02_hypo", "unique.genes"], lower.tail = F, log = T) 
 phyper(length(intersect(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene$id, DMR_DE_GE01_GE02_hyper$DMR_gene$id)), DMR_proximal_MZ_summary["Cortex01_Cortex02_hyper", "unique.genes"], pcgene - DMR_proximal_MZ_summary["Cortex01_Cortex02_hyper", "unique.genes"], DMR_proximal_MZ_summary["GE01_GE02_hyper", "unique.genes"], lower.tail = F, log = T) 
 phyper(length(intersect(DMR_DE_Cortex01_Cortex02_hypo$DMR_gene$id, DMR_DE_GE01_GE02_hypo$DMR_gene$id)), DMR_proximal_MZ_summary["Cortex01_Cortex02_hypo", "unique.genes"], pcgene - DMR_proximal_MZ_summary["Cortex01_Cortex02_hypo", "unique.genes"], DMR_proximal_MZ_summary["GE01_GE02_hypo", "unique.genes"], lower.tail = F, log = T) 
-#' DAVID functional enrichment showed neuron development, but none reached statistical significance.  
+#' DAVID functional enrichment for proximal DMR DE genes
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+(MZ_UMR_DE_DAVID <- enrich("MZ_UMR_DE", fdr = 0.02, p = "Benjamini", erminej = F, height = 6, width = 8))
  
 #' overlap with TFBSs
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/TF/")
@@ -216,7 +218,7 @@ save(Brain01_Brain02_DMR, Cortex01_Cortex02_DMR, GE01_GE02_DMR,
      GREAT_HuFNSC01.UMR.Brain, GREAT_HuFNSC02.UMR.Brain, GREAT_HuFNSC01.UMR.Cortex, GREAT_HuFNSC02.UMR.Cortex, GREAT_HuFNSC01.UMR.GE, GREAT_HuFNSC02.UMR.GE, 
      genomicBreak_MZ, genomicBreak_MZ_figure, DMR_proximal_MZ_summary, DMR_proximal_MZ_hyper, venn_DMR_proximal_MZ_hyper, DMR_proximal_MZ_hypo, venn_DMR_proximal_MZ_hypo, 
      DMR_DE_Brain01_Brain02_hyper, DMR_DE_Brain01_Brain02_hypo, DMR_DE_Cortex01_Cortex02_hyper, DMR_DE_Cortex01_Cortex02_hypo, DMR_DE_GE01_GE02_hyper, DMR_DE_GE01_GE02_hypo, 
-     DMR_MZ_TF, DMR_MZ_TF_figure, 
+     DMR_MZ_TF, DMR_MZ_TF_figure, MZ_UMR_DE_DAVID, 
      file = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_MZ.Rdata")
 
 #' Between Cortex and GE
