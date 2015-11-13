@@ -22,6 +22,16 @@
 ## run on apollo
 dirIn=/projects/epigenomics/users/lli/FetalBrain/RNAseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/SNP/
+ls $dirIn/*.bam > $dirIn/bamlist.txt
+mkdir -p $dirOut
+name=FetalBrain_RNAseq_SNP
+genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+
+$SAMTOOLS mpileup -C50 -uf $genome -b $dirIn/bamlist.txt | $BCFTOOLS/bcftools view -bvcg - > $dirOut/$name.bcf
+$BCFTOOLS/bcftools view $dirOut/$name.bcf | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+
 
 cd $dirIn
 for cell in "Cortex" "GE"; do
