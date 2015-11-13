@@ -82,12 +82,19 @@ grid.draw(MZ_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("No. of enriched\nbases(Mb)", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
-pdf("Figure2a.pdf", height = 10, width = 8)
+pdf("Figure2a.pdf", height = 7, width = 5.5)
 grid.draw(MZ_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("No. of enriched\nbases(Mb)", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
 dev.off()
+```
+
+### Figure 2b 
+
+```{r MZ_UMR_DE}
+(MZ_UMR_DE_DAVID)
+ggsave(MZ_UMR_DE_DAVID, file = "Figure2b.pdf", height = 5, width = 6)
 ```
 
 ## Figure S1
@@ -198,7 +205,7 @@ NPCs_scale <- data.frame(Donor = c(rep(c("HuFNSC02", "HuFNSC04", "HuFNSC02", "Hu
                                  value = c((filter(DMR_freq_WGBS_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = -mean(freq)))$m, UMR_enhancer_enrich[c(2,4), "enrich"], cortex_GE_DE_summary$UP, (filter(DMR_freq_WGBS_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, UMR_enhancer_enrich[c(1,3), "enrich"], cortex_GE_DE_summary$DN, cortex_GE_summary[, "isoform_genes"]))
 NPCs_scale[NPCs_scale$DM_DE == "GE", "value"] <- -NPCs_scale[NPCs_scale$DM_DE == "GE", "value"]
 NPCs_scale <- filter(NPCs_scale, Donor %in% c("HuFNSC02", "HuFNSC04"), as.character(Assay) != "Enhancer UMRs")
-NPCs_scale_figure <- ggplot(NPCs_scale, aes(x = Donor, y = value, fill = DM_DE)) + 
+NPCs_scale_figure <- ggplot(NPCs_scale, aes(x = GW, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.4) + 
    geom_hline(yintercept = 0) + 
    facet_grid(Assay ~ GW, scales = "free") + 
@@ -214,11 +221,11 @@ grid.draw(NPCs_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure3a.pdf", height = 10, width = 10)
+pdf("Figure3a.pdf", height = 7, width = 6)
 grid.draw(NPCs_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.04, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.23, "npc"), rot = 90, gp=gpar(fontsize=15))
 dev.off()
 ```
 
@@ -232,7 +239,7 @@ GOBP_GE02.UMR_WGBS <- read.delim("../WGBS/DMR/ALL_GREAT_GOBP_DMR.Cortex-HuFNSC02
 GOBP_Cortex02_GE02_WGBS <- rbind(select(mutate(filter(GOBP_Cortex02.UMR_WGBS, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "Cortex.UMR", FDR = -log10(V7), Term = V3), UMR, Term, FDR),
                                  select(mutate(filter(GOBP_GE02.UMR_WGBS, V8 >= 2 & V7 <= 0.05 & V16 <= 0.05), UMR = "GE.UMR", FDR = log10(V7), Term = V3), UMR, Term, FDR))
 Terms <- unique(c(arrange(filter(GOBP_Cortex02_GE02_WGBS, UMR == "Cortex.UMR"), desc(FDR))[1:20, "Term"], rev(arrange(filter(GOBP_Cortex02_GE02_WGBS, UMR == "GE.UMR"), FDR)[1:20, "Term"])))
-GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Terms), Term = factor(Term, levels = rev(Terms)))
+GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Terms), Term = factor(Term, levels = rev(Terms))) 
 (GOBP_Cortex02_GE02_WGBS_figure <- ggplot(data = GOBP_Cortex02_GE02_WGBS, aes(Term, FDR, fill = UMR)) +
   geom_bar(position = "identity", stat = "identity", width = .5) + 
   coord_flip() + 
@@ -241,7 +248,7 @@ GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Term
   scale_fill_manual(values = c("red", "blue"), name = "") + 
   theme_bw() + 
   theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15)))
-ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "Figure3b.pdf", height = 10, width = 10)
+ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "Figure3b.pdf", height = 10, width = 9)
 ```
 
 ### Figure 3c: GFAP and NFIX
@@ -346,11 +353,11 @@ grid.draw(GW_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("UMR Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure4a.pdf", height = 10, width = 8)
+pdf("Figure4a.pdf", height = 8, width = 6)
 grid.draw(GW_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("UMR Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
+grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("Fold Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
+grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
 dev.off()
 ```
 
@@ -358,12 +365,12 @@ dev.off()
 
 * Transcription factors exclusively statistically enriched (Benjamini corrected p-value < 0.01, and percent of enhancers with motif > 20%) in GW17 unique enhancers.     
 
-```{r GW_enhancer_TFBS, fig.height=4, fig.width=12}
+```{r GW_enhancer_TFBS, fig.height=6, fig.width=8}
 grid.newpage()
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
        list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:9)) 
-pdf("Figure4b.pdf", height = 7, width = 8)
-layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
+pdf("Figure4b.pdf", height = 6, width = 8)
+layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm"), axis.text.y = element_text(size = 15)), 1, 1:4),
        list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:9)) 
 dev.off()
 ```
@@ -371,15 +378,15 @@ dev.off()
 ### Figure 4c: TF-binding enhancers are hypomethylated
 
 ```{r GW_enhancer_TFBS_5mC}
-(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure)
-ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure, file = "Figure4c.pdf", height = 6, width = 5)
+(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + theme(axis.text.y = element_text(size = 15)))
+ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + theme(axis.text.y = element_text(size = 15)), file = "Figure4c.pdf", height = 6, width = 6)
 ```
 
 ### Figure 4d: TF-binding enhancer targets are up-regulated
 
 ```{r GW_enhancer_TFBS_RPKM}
-(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure)
-ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure, file = "Figure4d.pdf", height = 6, width = 5)
+(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + theme(axis.text.y = element_text(size = 15)))
+ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + theme(axis.text.y = element_text(size = 15)), file = "Figure4d.pdf", height = 6, width = 6)
 ```
 
 ## Figure S3
@@ -443,11 +450,11 @@ dev.off()
 
 ### Figure 5b: Heatmap of OLIG2 target genes   
 
-```{r GW_OLIG2_heatmap, fig.height = 8, fig.width = 6}
+```{r GW_OLIG2_heatmap, fig.height = 7, fig.width = 7}
 e <- 1e-4
-grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
-pdf("Figure5b.pdf", height = 10, width = 10)
-grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
+grid.arrange(GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 1, widths = c(0.33, 0.33, 0.34))
+pdf("Figure5b.pdf", height = 7, width = 7)
+grid.arrange(GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 1, widths = c(0.33, 0.33, 0.34))
 dev.off()
 ```
 
@@ -466,7 +473,7 @@ unique_enhancer_GW_Olig2_DE_DAVID <- unique_enhancer_GW_Olig2_DE_DAVID %>% mutat
   scale_y_continuous(breaks = c(-2, 0, 2, 4), labels = abs(c(-2, 0, 2, 4))) + 
   theme_bw() +
   theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15)))
-ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure5c.pdf", height = 10, width = 10)
+ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure5c.pdf", height = 7, width = 9)
 ```
 
 ### Figure 5d: Differential expressed OLIG2 target genes   
@@ -484,7 +491,7 @@ ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure5c.pdf", height =
 (GW_DE_summary_figure <- GW_DE_summary_figure + 
    scale_y_continuous(limits=c(-700, 700)) + 
    theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15), legend.title = element_text(size = 0)))
-ggsave(GW_DE_summary_figure, file = "Figure6a.pdf", height = 10, width = 12)
+ggsave(GW_DE_summary_figure, file = "Figure6a.pdf", height = 8, width = 10)
 ```
 
 ### Figure 6b: Shared by cortex and GE NPCs  
@@ -498,7 +505,7 @@ GW_DE_trend_figure$data$trend <- gsub("notDE", "ST", GW_DE_trend_figure$data$tre
    scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_figure, file = "Figure6b.pdf", height = 10, width = 12)
+ggsave(GW_DE_trend_figure, file = "Figure6b.pdf", height = 6, width = 8)
 ```
 
 ### Figure 6c: Cortex NPCs  
@@ -512,7 +519,7 @@ GW_DE_trend_cortex_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_c
    scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_cortex_figure, file = "Figure6c.pdf", height = 10, width = 12)
+ggsave(GW_DE_trend_cortex_figure, file = "Figure6c.pdf", height = 6, width = 8)
 ```
 
 ### Figure 6d: GE NPCs
@@ -526,7 +533,7 @@ GW_DE_trend_GE_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_GE_fi
    scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_GE_figure, file = "Figure6d.pdf", height = 10, width = 12)
+ggsave(GW_DE_trend_GE_figure, file = "Figure6d.pdf", height = 6, width = 8)
 ```
 
 ### Figure 6e: Heatmap of stage specific expressed genes  
@@ -580,6 +587,13 @@ gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %
   set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
   set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
+nc_FetalBrain <- read.delim("../Tables/rpkm_nc.txt", as.is = T, row.names = 1)
+nc_FetalBrain <- nc_FetalBrain[rowMeans(nc_FetalBrain) >= 0.1, ]
+nc_dend <- (1- (nc_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(nc_FetalBrain), TF_value = 2)
 exon_FetalBrain <- read.delim("../Tables/rpkm_exon.txt", as.is = T, row.names = 1)
 exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
   set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
@@ -594,25 +608,17 @@ miR_dend <- (1- (miR_FetalBrain[highExpr, -1] %>% as.matrix %>% cor(method = "sp
   set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(miR_FetalBrain[, -1]), TF_value = 2)
 op <- par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
-plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
-mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
-mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(gene_dend, main = "RNA-seq\nGene pc", horiz = TRUE)
+plot(exon_dend, main = "RNA-seq\nExon pc", horiz = TRUE)
+plot(nc_dend, main = "RNA-seq\nGene nc", horiz = TRUE)
 plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
-mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot.new()
-legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
 par(op)
 pdf("FigureS4a.pdf", height = 12, width = 12)
 par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
-plot(gene_dend, main = "RNA-seq\nGene", horiz = TRUE)
-mtext("A", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot(exon_dend, main = "RNA-seq\nExon", horiz = TRUE)
-mtext("B", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
+plot(gene_dend, main = "RNA-seq\nGene pc", horiz = TRUE)
+plot(exon_dend, main = "RNA-seq\nExon pc", horiz = TRUE)
+plot(nc_dend, main = "RNA-seq\nGene nc", horiz = TRUE)
 plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
-mtext("C", side = 3, line = 2.5, cex = 1.5, adj = 0, padj = 0)
-plot.new()
-legend("topleft", c("Brain", "Cortex", "GE"), col = c("green", "red", "blue"), lwd = 8)
 dev.off()
 ```
 

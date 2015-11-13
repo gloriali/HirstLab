@@ -595,7 +595,7 @@ homer_unique_enhancer_GW_GW17only <- homer_unique_enhancer_GW_GW17[!(homer_uniqu
 write.table(homer_unique_enhancer_GW_GW17only, file = "homer_unique_enhancer_GW_GW17only.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 homer_unique_enhancer_GW_GW17only_sig <- filter(homer_unique_enhancer_GW_GW17only, Percent.of.Target.Sequences.with.Motif >= 20) %>% arrange(-Log.P.value) %>% mutate(GW = "GW17", TF = factor(TF, levels = TF)) 
 homer_unique_enhancer_GW_GW17only_sig <- rbind(homer_unique_enhancer_GW_GW17only_sig %>% select(TF, Log.P.value, GW), 
-                                               read.delim("../GW.GW13/knownResults.txt", head = T, as.is = T) %>% mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), GW = "GW13") %>% filter(as.character(Motif.Name) %in% as.character(homer_unique_enhancer_GW_GW17only_sig$Motif.Name)) %>% select(TF, Log.P.value, GW)) %>% mutate(Category = "-Log P vale")
+                                               read.delim("../GW.GW13/knownResults.txt", head = T, as.is = T) %>% mutate(Motif.Name = gsub("/Homer", "", Motif.Name), Motif.Name = gsub(" ", "_", Motif.Name), TF = gsub("\\(.+\\)", "", split_on_last(Motif.Name, "/")[1,]), GW = "GW13") %>% filter(as.character(Motif.Name) %in% as.character(homer_unique_enhancer_GW_GW17only_sig$Motif.Name)) %>% select(TF, Log.P.value, GW)) %>% mutate(Category = "-Log P value")
 (homer_unique_enhancer_GW_GW17only_figure <- ggplot(data = homer_unique_enhancer_GW_GW17only_sig, aes(TF, -Log.P.value, fill = GW)) +
    geom_bar(stat = "identity", width = .5, position = position_dodge()) + 
    scale_fill_manual(values = c("GW13" = "red", "GW17" = "blue"), guide = "none") + 
@@ -715,33 +715,36 @@ clab_figure <- ggplot(clab, aes(GW, y, fill = GW)) +
   theme(plot.margin=unit(c(1,0,0,-0.8), "cm"), axis.text = element_text(size = 0), axis.ticks = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"))
 homer_unique_enhancer_GW_GW17only_Olig2 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% filter(group == "hypo_UP")
 GW17only_Olig2_UMR_K4me1 <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02_K4me1, GE04_K4me1)
-GW17only_Olig2_UMR_K4me1_tall <- melt(GW17only_Olig2_UMR_K4me1, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_K4me1", "", variable), levels = c("GE04", "GE02")), GW = gsub("GE01_5K4me1", "GW17", variable), GW = gsub("GE02_5K4me1", "GW17", GW), GW = gsub("GE04_5K4me1", "GW13", GW))
-GW17only_Olig2_UMR_K4me1_heatmap <- ggplot(GW17only_Olig2_UMR_K4me1_tall, aes(x = Sample, y = id, fill = value)) + 
+GW17only_Olig2_UMR_K4me1_tall <- melt(GW17only_Olig2_UMR_K4me1, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_K4me1", "", variable), levels = c("GE04", "GE02")), GW = Sample)
+levels(GW17only_Olig2_UMR_K4me1_tall$GW) <- c("GW13", "GW17")
+GW17only_Olig2_UMR_K4me1_heatmap <- ggplot(GW17only_Olig2_UMR_K4me1_tall, aes(x = GW, y = id, fill = value)) + 
    geom_tile() + 
    scale_fill_gradient(name = "H3K4me1\n  signal", low = "black") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(plot.margin = unit(c(-0.8,0,1,-0.5), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
+   theme(plot.margin=unit(c(1,0,1,-0.5), "cm"), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 GW17only_Olig2_UMR_mC <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02_5mC, GE04_5mC)
-GW17only_Olig2_UMR_mC_tall <- melt(GW17only_Olig2_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_5mC", "", variable), levels = c("GE04", "GE02")), GW = gsub("GE02_5mC", "GW17", variable), GW = gsub("GE04_5mC", "GW13", GW))
-GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = Sample, y = id, fill = value)) + 
+GW17only_Olig2_UMR_mC_tall <- melt(GW17only_Olig2_UMR_mC, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(gsub("*_5mC", "", variable), levels = c("GE04", "GE02")), GW = Sample)
+levels(GW17only_Olig2_UMR_mC_tall$GW) <- c("GW13", "GW17")
+GW17only_Olig2_UMR_mC_heatmap <- ggplot(GW17only_Olig2_UMR_mC_tall, aes(x = GW, y = id, fill = value)) + 
    geom_tile() + 
    scale_fill_gradient(name = " Fractional\nmethylation", low = "black", high = "darkred") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(plot.margin = unit(c(-0.8,0,1,-0.8), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
+   theme(plot.margin=unit(c(1,0,1,-0.8), "cm"), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 GW17only_Olig2_UMR_RPKM <- homer_unique_enhancer_GW_GW17only_Olig2 %>% select(Nearest.Ensembl, GE02, GE04)
 #GW17only_Olig2_UMR_RPKM_scale <- na.omit(data.frame(Nearest.Ensembl = GW17only_Olig2_UMR_RPKM$Nearest.Ensembl, t(scale(t(GW17only_Olig2_UMR_RPKM %>% select(-Nearest.Ensembl)), center = T, scale = T))))
-GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(factor(variable), levels = c("GE04", "GE02")), GW = gsub("(GE01)|(GE02)", "GW17", variable), GW = gsub("GE03", "GW15", GW), GW = gsub("GE04", "GW13", GW))
-GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = Sample, y = id, fill = log10(value + e))) + 
+GW17only_Olig2_UMR_RPKM_tall <- melt(GW17only_Olig2_UMR_RPKM, id = "Nearest.Ensembl") %>% mutate(id = factor(Nearest.Ensembl, levels = rev(homer_unique_enhancer_GW_GW17only_Olig2$Nearest.Ensembl)), Sample = factor(factor(variable), levels = c("GE04", "GE02")), GW = Sample)
+levels(GW17only_Olig2_UMR_RPKM_tall$GW) <- c("GW13", "GW17")
+GW17only_Olig2_UMR_RPKM_heatmap <- ggplot(GW17only_Olig2_UMR_RPKM_tall, aes(x = GW, y = id, fill = log10(value + e))) + 
    geom_tile() + 
    scale_fill_gradient(name = "log10(RPKM)", low = "black", high = "darkgreen") + 
    xlab("") + 
    ylab("") + 
    theme_bw() + 
-   theme(plot.margin = unit(c(-0.8,0,1,-0.8), "cm"), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
+   theme(plot.margin=unit(c(1,0,1,-0.5), "cm"), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom")
 grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
 pdf("GW17only_Olig2_UMR_heatmap.pdf", height = 8, width = 8)
 grid.arrange(clab_figure, clab_figure, clab_figure, GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 2, widths = c(0.33, 0.33, 0.34), heights = c(0.11, 0.89))
