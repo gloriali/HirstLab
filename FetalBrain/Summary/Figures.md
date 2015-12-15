@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Fri Oct 16 11:34:47 2015
+Updated: Tue Dec 15 10:50:14 2015
 
 
 
@@ -32,38 +32,18 @@ Updated: Fri Oct 16 11:34:47 2015
 ##   2
 ```
 
-## Figure S1
-### Figure S1a: Scale of UMRs and DE genes between MZ twins and NPCs 
+### Figure 2c
 
-* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
-* _Note the opposite direction of UMRs and unique enhancers, why?_      
-
-![](Figures_files/figure-html/MZ_scale_compare-1.png) 
+![](Figures_files/figure-html/MZ_UMR_DM_DE-1.png) 
 
 ```
 ## png 
 ##   2
 ```
 
-### Figure S1c: UMR genomic breakdown
-* Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins    
+### Figure 2d 
 
-![](Figures_files/figure-html/genomicBreak_MZ-1.png) 
-
-### Figure S1d: Venn Diagram of DE genes
-* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types     
-  
-![](Figures_files/figure-html/Venn_DE_MZ-1.png) 
-
-```
-## png 
-##   2
-```
-
-### Figure S1e: DAVID for DE genes
-* DAVID GO biological processes enriched for DE genes between MZ twins        
-
-![](Figures_files/figure-html/DE_DAVID_MZ-1.png) 
+![](Figures_files/figure-html/MZ_UMR_DE-1.png) 
 
 ## Figure 3. Epigenetic and transcriptomic comparisons between cortex and GE NPCs revealed key regulators in brain development.            
 ### Figure 3a: Scale of UMRs and DE genes between NPCs 
@@ -89,28 +69,6 @@ Updated: Fri Oct 16 11:34:47 2015
 
 ![](./Figures_files/figure-html/GFAP.png)     
 ![](./Figures_files/figure-html/NFIX.png)   
-
-## Figure S2
-### Figure S2a: Validate WGBS UMRs with MeDIP/MRE
-
-* (A). For each UMR between NPCs identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between cortex and GE NPCs. (C). GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP cortex UMRs (red), and GE UMRs (blue). 
-
-![](Figures_files/figure-html/WGBS_valid-1.png) 
-
-```
-## png 
-##   2
-```
-
-### Figure S2b: DAVID for DE genes
-* DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
-
-![](Figures_files/figure-html/DE_DAVID_NPC-1.png) 
-
-### Figure S2c: DAVID for isoform
-* DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs         
-
-![](Figures_files/figure-html/isoform_DAVID_NPC-1.png) 
 
 ## Figure 4: Differences between GW are asymmetric, with more GW17-specific UMRs and up-regulated genes    
 ### Figure 4a: UMRs and DE genes between GW 
@@ -142,18 +100,6 @@ Updated: Fri Oct 16 11:34:47 2015
 ### Figure 4d: TF-binding enhancer targets are up-regulated
 
 ![](Figures_files/figure-html/GW_enhancer_TFBS_RPKM-1.png) 
-
-## Figure S3
-### Figure S3a: GREAT enrichment for GW UMRs  
-
-* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
-
-![](Figures_files/figure-html/GREAT_GW-1.png) 
-
-```
-## png 
-##   2
-```
 
 ## Figure 5. OLIG2
 ### Figure 5a: OLIG2
@@ -218,8 +164,103 @@ Updated: Fri Oct 16 11:34:47 2015
 ##   2
 ```
 
+-----------------
+
+### Figure S1 SNP
+
+![](Figures_files/figure-html/SNP-1.png) 
+
+## Figure S2
+### Figure S2a: Scale of UMRs and DE genes between MZ twins and NPCs 
+
+* MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
+* _Note the opposite direction of UMRs and unique enhancers, why?_      
+
+![](Figures_files/figure-html/MZ_scale_compare-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Figure S2b: UMR GREAT
+
+### Figure S2c: UMR genomic breakdown
+* Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins    
+
+![](Figures_files/figure-html/genomicBreak_MZ-1.png) 
+
+### Figure S2d: Venn Diagram of DE genes
+* Venn diagrame of No. of differential expressed genes between MZ twins in different cell types     
+  
+![](Figures_files/figure-html/Venn_DE_MZ-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Figure S2e: RPKM - histone modifications
+
+![](Figures_files/figure-html/RPKM_his-1.png) 
+
+### Figure S2f: DM histone modification DAVID
+
+### Figure S2g: DAVID for DE genes
+* DAVID GO biological processes enriched for DE genes between MZ twins        
+
+![](Figures_files/figure-html/DE_DAVID_MZ-1.png) 
+
+## Figure S3
+### Figure S3a: Validate WGBS UMRs with MeDIP/MRE
+
+* (A). For each UMR between NPCs identified by WGBS we calculated the normalized MeDIP-seq (methylated, top panel) and MRE-seq (unmethylated, bottom panel) signal. From this we show boxplot of methylation asymmetry between MeDIP-seq and MRE-seq signals in cortex and GE cells defined as (signal(cortex)-signal(GE))/(signal(cortex)+signal(GE)). (B). UMR frequency (bp/MB) across all chromosomes for MeDIP UMRs between cortex and GE NPCs. (C). GREAT GO biological processes terms enriched (region-based binomial and hypergeometric FDR < 0.05) in MeDIP cortex UMRs (red), and GE UMRs (blue). 
+
+![](Figures_files/figure-html/WGBS_valid-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Figure S3b: 5hmC histogram
+
+![](Figures_files/figure-html/5hmC_histogram-1.png) 
+
+### Figure S3c: 5hmC GREAT
+
+### Figure S3d: core enhancer homer TFs
+
+### Figure S3e: DAVID for DE genes
+* DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
+
+![](Figures_files/figure-html/DE_DAVID_NPC-1.png) 
+
+### Figure S3f: DAVID for isoform
+* DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs         
+
+![](Figures_files/figure-html/isoform_DAVID_NPC-1.png) 
+
+### Figure S3g: UMR - DM his - DE
+
 ## Figure S4
-### Figure S4a: Transcriptional clustering
+### Figure S4a: GREAT enrichment for GW UMRs  
+
+* GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
+
+![](Figures_files/figure-html/GREAT_GW-1.png) 
+
+```
+## png 
+##   2
+```
+
+### Figure S4b: DM his DAVID
+
+### Figure S4c: DM his & DE DAVID
+
+## Figure S5
+### Figure S5a: Transcriptional clustering
 
 * Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
 
@@ -230,13 +271,15 @@ Updated: Fri Oct 16 11:34:47 2015
 ##   2
 ```
 
------------------
+### Figure S5b: nc patterns
 
+
+--------
 ## Candidates    
 ### Figure S1b: UMR asymmetry    
 * UMRs frequency (bp/MB) for each chromosome for MeDIP UMRs between MZ twins    
 
-![](Figures_files/figure-html/UMR_asymmetry_MZ-1.png) 
+![](Figures_files/figure-html/Candidates_UMR_asymmetry_MZ-1.png) 
 
 ### Figure S1c: UMR locations
 * Locations of UMRs along each chromosome for MeDIP UMRs between MZ twins                  
