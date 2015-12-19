@@ -66,6 +66,7 @@ for file in HuFNSC*dbSNP.vcf; do
     echo $name
     less $file | awk '{if(!(match($0, "0/1") || match($0, "1/0"))){print $0}}' > $name.homo.vcf
 done
-
+# summary 
+wc -l Hu* | awk '{sample=gensub(".main.+", "", "g", $2); sample=gensub("HuFNSC0", "Subject", "g", sample); if($2 ~ /homo/){homo=$1; value=$1; cat="homozygotic"} else{value=$1-homo; cat="heterozygotic"} print sample"\t"cat"\t"value}' | awk '$1 ~ /Subject/ {print $0}' > SNP.summary
 
 
