@@ -9,6 +9,7 @@ do
     /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
 done
 
+############################################
 > /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FindER.summary
 # FindER for H3K4me1
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
@@ -221,6 +222,7 @@ do
     echo -e "$name\t$Npeak" >> $dirER/Input.combine.summary
 done
 
+############################################
 # intersect
 ## H3K4me3 with promoter
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me3/
@@ -268,6 +270,7 @@ do
     /gsc/software/linux-x86_64-centos5/bedtools-2.17.0/bin/closestBed -a $file -b /home/lli/hg19/hg19v65_genes.bed -d -io | awk '$7 ~ /protein_coding/ {gsub("_protein_coding", "", $7); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$7"\t"$8}' > $dirOut/closest_gene/$name.closest.gene.pc.io
 done 
 
+############################################
 # core enhancers: overlapping all NPC enhancers
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
 cd $dirOut
@@ -388,77 +391,108 @@ do
     mkdir -p $dirOut
     /home/acarles/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
 done
+
+############################################
+# distance between closest peaks in pairwise comparisons
+dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/
+dirOut=$dirIn/dis/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
+mkdir -p $dirOut
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_Brain01_Brain02.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_Brain01_Brain02.overlap
+cat $dirOut/H3K4me1_Brain01_Brain02.closest $dirOut/H3K4me1_Brain01_Brain02.overlap > $dirOut/H3K4me1_Brain01_Brain02.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_Cortex01_Cortex02.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_Cortex01_Cortex02.overlap
+cat $dirOut/H3K4me1_Cortex01_Cortex02.closest $dirOut/H3K4me1_Cortex01_Cortex02.overlap > $dirOut/H3K4me1_Cortex01_Cortex02.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_GE01_GE02.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_GE01_GE02.overlap
+cat $dirOut/H3K4me1_GE01_GE02.closest $dirOut/H3K4me1_GE01_GE02.overlap > $dirOut/H3K4me1_GE01_GE02.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_Cortex01_GE01.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_Cortex01_GE01.overlap
+cat $dirOut/H3K4me1_Cortex01_GE01.closest $dirOut/H3K4me1_Cortex01_GE01.overlap > $dirOut/H3K4me1_Cortex01_GE01.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_Cortex02_GE02.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_Cortex02_GE02.overlap
+cat $dirOut/H3K4me1_Cortex02_GE02.closest $dirOut/H3K4me1_Cortex02_GE02.overlap > $dirOut/H3K4me1_Cortex02_GE02.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_GE01_GE04.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_GE01_GE04.overlap
+cat $dirOut/H3K4me1_GE01_GE04.closest $dirOut/H3K4me1_GE01_GE04.overlap > $dirOut/H3K4me1_GE01_GE04.dis
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -d | awk '{if($7!=0)print $0}' > $dirOut/H3K4me1_GE02_GE04.closest
+$BEDTOOLS/closestBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -d | awk '{if($7==0)print $1"\t"$2"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -wo | awk '{dis=-$7; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"dis}' > $dirOut/H3K4me1_GE02_GE04.overlap
+cat $dirOut/H3K4me1_GE02_GE04.closest $dirOut/H3K4me1_GE02_GE04.overlap > $dirOut/H3K4me1_GE02_GE04.dis
+
+############################################
 # Unique enhancers
 dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/'
 dirOut=$dirIn/unique/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
 mkdir -p $dirOut
 cd $dirIn
-echo -e "Comparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_enhancer.summary
+echo -e "Mark\tComparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_enhancer.summary
 ## Between MZ twins
 ### Brain
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -b $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain02.bed
-s1=`wc -l $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.MZ.Brain01.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.MZ.Brain02.bed | cut -d' ' -f 1`
-echo -e "MZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -b $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed -b $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Brain02.bed
+s1=`less $dirIn/FindER_scan.A03485.H3K4me1.Brain01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03493.H3K4me1.Brain02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.MZ.Brain01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.MZ.Brain02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tMZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### Cortex
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex02.bed
-s1=`wc -l $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.MZ.Cortex01.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.MZ.Cortex02.bed | cut -d' ' -f 1`
-echo -e "MZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.Cortex02.bed
+s1=`less $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.MZ.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.MZ.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tMZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### GE
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE02.bed
-s1=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.MZ.GE01.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.MZ.GE02.bed | cut -d' ' -f 1`
-echo -e "MZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.GE02.bed
+s1=`less $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.MZ.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.MZ.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tMZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### Intersect
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex01.bed -b $dirOut/unique_enhancer.MZ.GE01.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.HuFNSC01.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.MZ.Cortex02.bed -b $dirOut/unique_enhancer.MZ.GE02.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.MZ.HuFNSC02.bed
 ## Between neurospheres
 ### HuFNSC01
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE01.bed
-s1=`wc -l $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.Cortex01.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.GE01.bed | cut -d' ' -f 1`
-echo -e "Neurospheres\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE01.bed
+s1=`less $dirIn/FindER_scan.A03269.H3K4me1.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.Neurospheres.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.Neurospheres.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tNPCs\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### HuFNSC02
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE02.bed
-s1=`wc -l $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.Cortex02.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.Neurospheres.GE02.bed | cut -d' ' -f 1`
-echo -e "Neurospheres\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.Cortex02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.Neurospheres.GE02.bed
+s1=`less $dirIn/FindER_scan.A03281.H3K4me1.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.Neurospheres.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.Neurospheres.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tNPCs\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### intersect
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.Cortex01.bed -b $dirOut/unique_enhancer.Neurospheres.Cortex02.bed > $dirOut/unique_enhancer.Neurospheres.Cortex.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.Neurospheres.GE01.bed -b $dirOut/unique_enhancer.Neurospheres.GE02.bed > $dirOut/unique_enhancer.Neurospheres.GE.bed
 ## Between GW
 ### GE01 vs GE04
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_01.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_01.bed
-s1=`wc -l $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.GW.GW17_01.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.GW.GW13_01.bed | cut -d' ' -f 1`
-echo -e "GW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_01.bed
+s1=`less $dirIn/FindER_scan.A03275.H3K4me1.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.GW.GW17_01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.GW.GW13_01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tGW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### GE02 vs GE04
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_02.bed
-/projects/epigenomics/software/bedtools-2.23.0/bin/subtractBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -A | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_02.bed
-s1=`wc -l $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | cut -d' ' -f 1`
-s2=`wc -l $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | cut -d' ' -f 1`
-s1_unique=`wc -l $dirOut/unique_enhancer.GW.GW17_02.bed | cut -d' ' -f 1`
-s2_unique=`wc -l $dirOut/unique_enhancer.GW.GW13_02.bed | cut -d' ' -f 1`
-echo -e "GW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -b $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW17_02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed -b $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_enhancer.GW.GW13_02.bed
+s1=`less $dirIn/FindER_scan.A03477.H3K4me1.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19303.H3K4me1.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_enhancer.GW.GW17_02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_enhancer.GW.GW13_02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me1\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_enhancer.summary
 ### intersect
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW13_01.bed -b $dirOut/unique_enhancer.GW.GW13_02.bed > $dirOut/unique_enhancer.GW.GW13.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_enhancer.GW.GW17_01.bed -b $dirOut/unique_enhancer.GW.GW17_02.bed > $dirOut/unique_enhancer.GW.GW17.bed
@@ -566,4 +600,277 @@ wig=/home/lli/FetalBrain/HisMod/wigs/A19303.q5.F1028.SET_194.wig.gz
 /gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $wig -r $reg -o $out -s hg19 -n $name > $out$name.coverage.log
 # normaliazed to No. of mapped reads (GE04 as reference)
 paste unique_enhancer.GW.GW17.bed.GE01.K4me1.coverage unique_enhancer.GW.GW17.bed.GE02.K4me1.coverage unique_enhancer.GW.GW17.bed.GE04.K4me1.coverage | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5*30778793/96165980"\t"$11*30778793/38955337"\t"$17}' > unique_enhancer.GW.GW17.bed.K4me1.coverage
+
+############################################
+# Unique H3K4me3
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me3/'
+dirOut=$dirIn/unique/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Mark\tComparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_H3K4me3.summary
+## Between MZ twins
+### Brain
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03486.H3K4me3.Brain01.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A03494.H3K4me3.Brain02.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.MZ.Brain01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03494.H3K4me3.Brain02.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A03486.H3K4me3.Brain01.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.MZ.Brain02.bed
+s1=`less $dirIn/FindER_scan.A03486.H3K4me3.Brain01.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03494.H3K4me3.Brain02.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K4me3.MZ.Brain01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K4me3.MZ.Brain02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me3\tMZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K4me3.summary
+## Between neurospheres
+### HuFNSC02
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03282.H3K4me3.Cortex02.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.Neurospheres.Cortex02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A03282.H3K4me3.Cortex02.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.Neurospheres.GE02.bed
+s1=`less $dirIn/FindER_scan.A03282.H3K4me3.Cortex02.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K4me3.Neurospheres.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K4me3.Neurospheres.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me3\tNPCs\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K4me3.summary
+## Between GW
+### GE02 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A19304.H3K4me3.GE04.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.GW.GW17_02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19304.H3K4me3.GE04.minER_300.FDR_0.05.bed -b $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K4me3.GW.GW13_02.bed
+s1=`less $dirIn/FindER_scan.A03478.H3K4me3.GE02.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19304.H3K4me3.GE04.minER_300.FDR_0.05.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K4me3.GW.GW17_02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K4me3.GW.GW13_02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K4me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K4me3.summary
+
+###################################
+# Unique H3K9me3
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K9me3/'
+dirOut=$dirIn/unique/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Mark\tComparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_H3K9me3.summary
+## Between MZ twins
+### Brain
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03487.H3K9me3.Brain01.multi.bed -b $dirIn/FindER_scan.A03495.H3K9me3.Brain02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.Brain01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03495.H3K9me3.Brain02.multi.bed -b $dirIn/FindER_scan.A03487.H3K9me3.Brain01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.Brain02.bed
+s1=`less $dirIn/FindER_scan.A03487.H3K9me3.Brain01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03495.H3K9me3.Brain02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.MZ.Brain01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.MZ.Brain02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tMZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### Cortex
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.Cortex02.bed
+s1=`less $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.MZ.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.MZ.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tMZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### GE
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -b $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.GE01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -b $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.GE02.bed
+s1=`less $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.MZ.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.MZ.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tMZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### Intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.MZ.Cortex01.bed -b $dirOut/unique_H3K9me3.MZ.GE01.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.HuFNSC01.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.MZ.Cortex02.bed -b $dirOut/unique_H3K9me3.MZ.GE02.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.MZ.HuFNSC02.bed
+## Between neurospheres
+### HuFNSC01
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.Neurospheres.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -b $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.Neurospheres.GE01.bed
+s1=`less $dirIn/FindER_scan.A03271.H3K9me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.Neurospheres.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.Neurospheres.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tNPCs\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### HuFNSC02
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.Neurospheres.Cortex02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -b $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.Neurospheres.GE02.bed
+s1=`less $dirIn/FindER_scan.A03283.H3K9me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.Neurospheres.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.Neurospheres.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tNPCs\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.Neurospheres.Cortex01.bed -b $dirOut/unique_H3K9me3.Neurospheres.Cortex02.bed > $dirOut/unique_H3K9me3.Neurospheres.Cortex.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.Neurospheres.GE01.bed -b $dirOut/unique_H3K9me3.Neurospheres.GE02.bed > $dirOut/unique_H3K9me3.Neurospheres.GE.bed
+## Between GW
+### GE01 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -b $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.GW.GW17_01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed -b $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.GW.GW13_01.bed
+s1=`less $dirIn/FindER_scan.A03277.H3K9me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.GW.GW17_01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.GW.GW13_01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tGW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### GE02 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -b $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.GW.GW17_02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed -b $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K9me3.GW.GW13_02.bed
+s1=`less $dirIn/FindER_scan.A03479.H3K9me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19305.H3K9me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K9me3.GW.GW17_02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K9me3.GW.GW13_02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K9me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K9me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.GW.GW13_01.bed -b $dirOut/unique_H3K9me3.GW.GW13_02.bed > $dirOut/unique_H3K9me3.GW.GW13.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K9me3.GW.GW17_01.bed -b $dirOut/unique_H3K9me3.GW.GW17_02.bed > $dirOut/unique_H3K9me3.GW.GW17.bed
+
+###################################
+# Unique H3K27me3
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K27me3/'
+dirOut=$dirIn/unique/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Mark\tComparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_H3K27me3.summary
+## Between MZ twins
+### Brain
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03488.H3K27me3.Brain01.multi.bed -b $dirIn/FindER_scan.A03496.H3K27me3.Brain02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.Brain01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03496.H3K27me3.Brain02.multi.bed -b $dirIn/FindER_scan.A03488.H3K27me3.Brain01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.Brain02.bed
+s1=`less $dirIn/FindER_scan.A03488.H3K27me3.Brain01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03496.H3K27me3.Brain02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.MZ.Brain01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.MZ.Brain02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tMZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### Cortex
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.Cortex02.bed
+s1=`less $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.MZ.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.MZ.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tMZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### GE
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -b $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.GE01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -b $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.GE02.bed
+s1=`less $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.MZ.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.MZ.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tMZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### Intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.MZ.Cortex01.bed -b $dirOut/unique_H3K27me3.MZ.GE01.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.HuFNSC01.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.MZ.Cortex02.bed -b $dirOut/unique_H3K27me3.MZ.GE02.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.MZ.HuFNSC02.bed
+## Between neurospheres
+### HuFNSC01
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.Neurospheres.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -b $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.Neurospheres.GE01.bed
+s1=`less $dirIn/FindER_scan.A03272.H3K27me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.Neurospheres.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.Neurospheres.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tNPCs\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### HuFNSC02
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.Neurospheres.Cortex02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -b $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.Neurospheres.GE02.bed
+s1=`less $dirIn/FindER_scan.A03284.H3K27me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.Neurospheres.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.Neurospheres.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tNPCs\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.Neurospheres.Cortex01.bed -b $dirOut/unique_H3K27me3.Neurospheres.Cortex02.bed > $dirOut/unique_H3K27me3.Neurospheres.Cortex.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.Neurospheres.GE01.bed -b $dirOut/unique_H3K27me3.Neurospheres.GE02.bed > $dirOut/unique_H3K27me3.Neurospheres.GE.bed
+## Between GW
+### GE01 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -b $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.GW.GW17_01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed -b $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.GW.GW13_01.bed
+s1=`less $dirIn/FindER_scan.A03278.H3K27me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.GW.GW17_01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.GW.GW13_01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tGW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### GE02 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -b $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.GW.GW17_02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed -b $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K27me3.GW.GW13_02.bed
+s1=`less $dirIn/FindER_scan.A03480.H3K27me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19306.H3K27me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K27me3.GW.GW17_02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K27me3.GW.GW13_02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K27me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K27me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.GW.GW13_01.bed -b $dirOut/unique_H3K27me3.GW.GW13_02.bed > $dirOut/unique_H3K27me3.GW.GW13.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K27me3.GW.GW17_01.bed -b $dirOut/unique_H3K27me3.GW.GW17_02.bed > $dirOut/unique_H3K27me3.GW.GW17.bed
+
+###################################
+# Unique H3K36me3
+dirIn='/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K36me3/'
+dirOut=$dirIn/unique/
+BEDTOOLS=/projects/epigenomics/software/bedtools-2.23.0/bin/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Mark\tComparison\tSamples\tSample1\tSample2\tSample1_unique\tSample2_unique" > $dirOut/unique_H3K36me3.summary
+## Between MZ twins
+### Brain
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03489.H3K36me3.Brain01.multi.bed -b $dirIn/FindER_scan.A03497.H3K36me3.Brain02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.Brain01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03497.H3K36me3.Brain02.multi.bed -b $dirIn/FindER_scan.A03489.H3K36me3.Brain01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.Brain02.bed
+s1=`less $dirIn/FindER_scan.A03489.H3K36me3.Brain01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03497.H3K36me3.Brain02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.MZ.Brain01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.MZ.Brain02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tMZ\tBrain01_Brain02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### Cortex
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.Cortex02.bed
+s1=`less $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.MZ.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.MZ.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tMZ\tCortex01_Cortex02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### GE
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -b $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.GE01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -b $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.GE02.bed
+s1=`less $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.MZ.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.MZ.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tMZ\tGE01_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### Intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.MZ.Cortex01.bed -b $dirOut/unique_H3K36me3.MZ.GE01.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.HuFNSC01.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.MZ.Cortex02.bed -b $dirOut/unique_H3K36me3.MZ.GE02.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.MZ.HuFNSC02.bed
+## Between neurospheres
+### HuFNSC01
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed -b $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.Neurospheres.Cortex01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -b $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.Neurospheres.GE01.bed
+s1=`less $dirIn/FindER_scan.A03273.H3K36me3.Cortex01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.Neurospheres.Cortex01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.Neurospheres.GE01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tNPCs\tCortex01_GE01\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### HuFNSC02
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed -b $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.Neurospheres.Cortex02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -b $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.Neurospheres.GE02.bed
+s1=`less $dirIn/FindER_scan.A03285.H3K36me3.Cortex02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.Neurospheres.Cortex02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.Neurospheres.GE02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tNPCs\tCortex02_GE02\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.Neurospheres.Cortex01.bed -b $dirOut/unique_H3K36me3.Neurospheres.Cortex02.bed > $dirOut/unique_H3K36me3.Neurospheres.Cortex.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.Neurospheres.GE01.bed -b $dirOut/unique_H3K36me3.Neurospheres.GE02.bed > $dirOut/unique_H3K36me3.Neurospheres.GE.bed
+## Between GW
+### GE01 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -b $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.GW.GW17_01.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed -b $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.GW.GW13_01.bed
+s1=`less $dirIn/FindER_scan.A03279.H3K36me3.GE01.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.GW.GW17_01.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.GW.GW13_01.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tGW\tGE01_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### GE02 vs GE04
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -b $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.GW.GW17_02.bed
+$BEDTOOLS/intersectBed -a $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed -b $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed -v | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/unique_H3K36me3.GW.GW13_02.bed
+s1=`less $dirIn/FindER_scan.A03481.H3K36me3.GE02.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s2=`less $dirIn/FindER_scan.A19307.H3K36me3.GE04.multi.bed | awk '{s=s+$3-$2} END{print s}'`
+s1_unique=`less $dirOut/unique_H3K36me3.GW.GW17_02.bed | awk '{s=s+$3-$2} END{print s}'`
+s2_unique=`less $dirOut/unique_H3K36me3.GW.GW13_02.bed | awk '{s=s+$3-$2} END{print s}'`
+echo -e "H3K36me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $dirOut/unique_H3K36me3.summary
+### intersect
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.GW.GW13_01.bed -b $dirOut/unique_H3K36me3.GW.GW13_02.bed > $dirOut/unique_H3K36me3.GW.GW13.bed
+/projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.GW.GW17_01.bed -b $dirOut/unique_H3K36me3.GW.GW17_02.bed > $dirOut/unique_H3K36me3.GW.GW17.bed
+
+
+
+
+
+
 
