@@ -10,3 +10,5 @@ REMC Fetal Brain Project
 * [HisMod](./HisMod/HisMod.md): Histone modifications analysis, _will add ChromHMM_.
 * [SNP](./SNP): Validate monozygotic twins with SNPs.
 * [bamstats.sh](./bamstats.sh): Script to generate bamstats for all Fetal Brain libraries.
+* [tables.sh](./tables.sh): Script to generate Supplemental tables for all Fetal Brain manuscript.
+
