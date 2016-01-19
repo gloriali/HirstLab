@@ -139,6 +139,29 @@ dev.off()
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
 pdf("Figure2c.pdf", height = 3, width = 8)
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+### Figure 2b: UMR GREAT
+
+```{r MZ_UMR_GREAT}
+GREAT_HuFNSC01.UMR.Brain <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/enrich/", file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hypo", name = "Brain-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Brain-Subject1 UMR")
+GREAT_HuFNSC02.UMR.Brain <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/enrich/", file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hyper", name = "Brain-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Brain-Subject2 UMR")
+GREAT_HuFNSC01.UMR.Cortex <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hypo", name = "Cortex-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Cortex-Subject1 UMR")
+GREAT_HuFNSC02.UMR.Cortex <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hyper", name = "Cortex-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Cortex-Subject2 UMR")
+GREAT_HuFNSC01.UMR.GE <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hypo", name = "GE-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("GE-Subject1 UMR")
+GREAT_HuFNSC02.UMR.GE <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hyper", name = "GE-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("GE-Subject2 UMR")
+grid.newpage()
+layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1), 
+       list(GREAT_HuFNSC02.UMR.Brain, 2, 1), 
+       list(GREAT_HuFNSC01.UMR.Cortex, 1, 2),
+       list(GREAT_HuFNSC02.UMR.Cortex, 2, 2),
+       list(GREAT_HuFNSC01.UMR.GE, 1, 3),
+       list(GREAT_HuFNSC02.UMR.GE, 2, 3))
+pdf("Figure2b.pdf", height = 4, width = 12)
+layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1), 
+       list(GREAT_HuFNSC02.UMR.Brain, 2, 1), 
+       list(GREAT_HuFNSC01.UMR.Cortex, 1, 2),
+       list(GREAT_HuFNSC02.UMR.Cortex, 2, 2),
+       list(GREAT_HuFNSC01.UMR.GE, 1, 3),
+       list(GREAT_HuFNSC02.UMR.GE, 2, 3))
 dev.off()
 ```
 
