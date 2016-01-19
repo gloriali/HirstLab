@@ -709,6 +709,13 @@ dev.off()
 ```
 
 ### Figure S3e: DAVID for DE genes
+## Figure S4
+### Figure S4a: core enhancer homer TFs
+
+```{r core_enhancer_homer}
+(homer_core_enhancer_figure)
+ggsave(homer_core_enhancer_figure, file = "FigureS4a.pdf", height = 5, width = 7)
+```
 * DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
 
 ```{r DE_DAVID_NPC}
