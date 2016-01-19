@@ -878,6 +878,14 @@ dev.off()
 
 ### Figure S5b: nc patterns
 
+## Tables
+
+* Table S1. Summary of molecular libraries and accessions.        
+* Table S2. List of UMRs between MZ twins, NPCs and across developmental stages.    
+* Table S3. Histone modification enriched regions from FindER.    
+* Table S4. List of gene promoters differentially marked by H3K4me3 and H3K27me3 between MZ twins, NPCs and across developmental stages.      
+* Table S5. Differentially expressed genes between MZ twins, NPCs and across developmental stages.      
+* Table S6. GWAS sites overlapped with NPC core enhancers.      
 
 --------
 ## Candidates    
