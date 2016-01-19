@@ -33,6 +33,8 @@ load("./RNAseq/FetalBrain_isoform.Rdata")
 load("./RNAseq/FetalBrain_isoform_valid.Rdata")
 load("./RNAseq/exonProfile_Rmd.Rdata")
 load("./WGBS_MeDIP/hydroxy.Rdata")
+source('~/HirstLab/Pipeline/R/enrich.R')
+source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 rownames(geneRPKM) <- geneRPKM$id
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 10, fig.width = 10) 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics/users/lli/FetalBrain/Figures/")
@@ -57,7 +59,7 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics/users/lli/FetalBrain/Figu
 * MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins. HuFNSC01-specific UMRs and genes upregulated in HuFNSC01 are shown in red, and HuFNSC02-specific UMRs and genes upregulated in HuFNSC02 are shown in blue.        
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
-```{r MZ_scale, fig.height = 10, fig.width = 8}
+```{r MZ_scale}
 FindER_enrichedBases <- FindER_summary %>% filter(Mark == "H3K4me1")
 rownames(FindER_enrichedBases) <- FindER_enrichedBases$Sample
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
@@ -91,7 +93,6 @@ grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot =
 dev.off()
 ```
 
-### Figure 2c
 ```{r MZ_scale2, eval=FALSE}
 dirIn <- "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/"
 MZ_scale_his <- rbind(read.delim(paste0(dirIn, "H3K4me1/unique/unique_enhancer.summary"), as.is = T), 
@@ -135,10 +136,6 @@ layOut(list(MZ_scale_UMR_figure, 1, 1:3), list(MZ_scale_his_figure, 1, 4:9), lis
 dev.off()
 ```
 
-```{r MZ_UMR_DM_DE, height=3}
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
-pdf("Figure2c.pdf", height = 3, width = 8)
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
 ### Figure 2b: UMR GREAT
 
 ```{r MZ_UMR_GREAT}
@@ -170,6 +167,15 @@ dev.off()
 ```{r MZ_UMR_DE}
 (MZ_UMR_DE_DAVID)
 ggsave(MZ_UMR_DE_DAVID, file = "Figure2d.pdf", height = 5, width = 6)
+```
+
+### Figure 2d
+
+```{r MZ_UMR_DM_DE, height=3, eval=FALSE}
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+pdf("Figure2d.pdf", height = 3, width = 8)
+grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+dev.off()
 ```
 
 ## Figure 3. Epigenetic and transcriptomic comparisons between cortex and GE NPCs revealed key regulators in brain development.            
@@ -536,7 +542,7 @@ SNP <- read.delim("/projects/epigenomics/users/lli/FetalBrain/SNP/SNP.summary", 
    ylab("No. of discordant SNPs") + 
    theme_bw() + 
    theme(axis.text.x = element_text(angle = 90)))
-ggsave(SNP_figure, file = "FigureS1.pdf")
+ggsave(SNP_figure, file = "FigureS1a.pdf")
 ```
 
 ## Figure S2
@@ -545,7 +551,7 @@ ggsave(SNP_figure, file = "FigureS1.pdf")
 * MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
-```{r MZ_scale_compare, fig.height = 10, fig.width = 12}
+```{r MZ_scale_compare, eval = F, fig.height = 10, fig.width = 12}
 FindER_enrichedBases <- FindER_summary %>% filter(Mark == "H3K4me1")
 rownames(FindER_enrichedBases) <- FindER_enrichedBases$Sample
 MZ_scale <- data.frame(Sample = rep(c(DMR_MZ_summary$Sample, DMR_neurospheres_summary$Sample), 7), 
@@ -581,13 +587,11 @@ grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.17, "npc"),
 dev.off()
 ```
 
-### Figure S2b: UMR GREAT
-
-### Figure S2c: UMR genomic breakdown
+### Figure S2a: UMR genomic breakdown
 * Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins    
 
 ```{r genomicBreak_MZ}
-genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "HuFNSC02 UMRs", "hypo" = "HuFNSC01 UMRs")))
+genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(factor(DM), c("hyper" = "Subject2 UMRs", "hypo" = "Subject1 UMRs")))
 (genomicBreak_MZ_figure <- ggplot(genomicBreak_MZ_tall, aes(x = Region, y = log2(FC), fill = Sample)) + 
   geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
   xlab("") + 
@@ -597,7 +601,9 @@ genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(fact
   coord_flip() + 
   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
   theme_bw())
-ggsave(genomicBreak_MZ_figure, file = "FigureS2c.pdf", height = 7, width = 6)
+ggsave(genomicBreak_MZ_figure, file = "FigureS2a.pdf", height = 4, width = 5)
+```
+
 ### Figure S2b: RPKM - histone modifications
 
 ```{r RPKM_his}
@@ -605,30 +611,21 @@ ggsave(genomicBreak_MZ_figure, file = "FigureS2c.pdf", height = 7, width = 6)
 ggsave(HisMod_RPKM_figure, file = "FigureS2b.pdf", height = 4, width = 7)
 ```
 
-### Figure S2d: Venn Diagram of DE genes
+### Figure S2c: Venn Diagram of DE genes
 * Venn diagrame of No. of differential expressed genes between MZ twins in different cell types     
   
 ```{r Venn_DE_MZ}
 MZ_UP <- list(Brain = as.character(filter(brain01_brain02DE, DE == "UP")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "UP")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "UP")[, "V1"]))
-venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE UP")
+venn_MZ_UP <- venn.diagram(MZ_UP, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE UP in Subject1")
 MZ_DN <- list(Brain = as.character(filter(brain01_brain02DE, DE == "DN")[, "V1"]), Cortex = as.character(filter(cortex01_cortex02DE, DE == "DN")[, "V1"]), GE = as.character(filter(GE01_GE02DE, DE == "DN")[, "V1"]))
-venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE DN")
+venn_MZ_DN <- venn.diagram(MZ_DN, filename = NULL, fill = c("green", "red", "blue"), main = "MZ DE UP in Subject2")
 grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
-pdf("FigureS2d.pdf", height = 6, width = 12)
+pdf("FigureS2c.pdf", height = 4, width = 8)
 grid.arrange(gTree(children = venn_MZ_UP), gTree(children = venn_MZ_DN), nrow = 1)
 dev.off()
 ```
 
-### Figure S2e: RPKM - histone modifications
-
-```{r RPKM_his}
-(HisMod_RPKM_figure)
-ggsave(HisMod_RPKM_figure, file = "FigureS2e.pdf", height = 5, width = 8)
-```
-
-### Figure S2f: DM histone modification DAVID
-
-### Figure S2g: DAVID for DE genes
+### Figure S2d: DAVID for DE genes
 * DAVID GO biological processes enriched for DE genes between MZ twins        
 
 ```{r DE_DAVID_MZ}
@@ -647,7 +644,7 @@ DAVID_MZ$Term <- factor(DAVID_MZ$Term, levels = rev(unique(DAVID_MZ[order(DAVID_
    ylab("-log10(FDR)") + 
    ggtitle("MZ twins") + 
    theme_bw())
-ggsave(DAVID_MZ_figure, file = "FigureS2g.pdf", height = 6, width = 6)
+ggsave(DAVID_MZ_figure, file = "FigureS2d.pdf", height = 3, width = 6)
 ```
 
 ## Figure S3
@@ -669,20 +666,15 @@ GOBP_Cortex02_GE02_MeDIP_figure <- ggplot(data = GOBP_Cortex02_GE02_MeDIP, aes(T
   ylab("-log10(FDR)") + 
   scale_fill_manual(values = c("blue", "red"), name = "") + 
   theme_bw()
+DMR_freq_neurospheres_figure$data <- DMR_freq_neurospheres_figure$data %>% mutate(donor = revalue(factor(donor), c("HuFNSC01" = "Subject1", "HuFNSC02" = "Subject2")))
 grid.newpage()
 layOut(list(valid_boxplot, 1, 1:2), 
        list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
        list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS3a.pdf", height = 12, width = 12)
-layOut(list(valid_boxplot, 1, 1:2), 
-       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1, 3:4), 
-       list(GOBP_Cortex02_GE02_MeDIP_figure, 2, 1:3))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS3a.pdf", height = 8, width = 10)
+layOut(list(valid_boxplot, 1:2, 1:3), 
+       list(DMR_freq_neurospheres_figure + scale_fill_manual(values = c("blue", "red"), labels = c("GE UMRs", "Cortex UMRs"), name = ""), 1:2, 4:6), 
+       list(GOBP_Cortex02_GE02_MeDIP_figure, 3:5, 1:4))
 dev.off()
 ```
 
@@ -695,7 +687,6 @@ ggsave(WGBS_MeDIP_diff_summary_figure, file = "FigureS3b.pdf", height = 4, width
 
 ### Figure S3c: 5hmC GREAT
 
-### Figure S3d: core enhancer homer TFs
 ```{r 5hmC_GREAT}
 GREAT_Cortex02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("5hmC Cortex")
 GREAT_GE02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_GE02", name = "GE02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("5hmC GE")
@@ -708,7 +699,6 @@ layOut(list(GREAT_Cortex02.hydroxy, 1, 1),
 dev.off()
 ```
 
-### Figure S3e: DAVID for DE genes
 ## Figure S4
 ### Figure S4a: core enhancer homer TFs
 
@@ -716,6 +706,8 @@ dev.off()
 (homer_core_enhancer_figure)
 ggsave(homer_core_enhancer_figure, file = "FigureS4a.pdf", height = 5, width = 7)
 ```
+
+### Figure S4b: DAVID for DE genes
 * DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
 
 ```{r DE_DAVID_NPC}
@@ -735,15 +727,15 @@ DAVID_NPCs$Term <- factor(DAVID_NPCs$Term, levels = rev(unique(DAVID_NPCs[order(
    ylab("-log10(FDR)") + 
    ggtitle("NPCs") + 
    theme_bw())
-ggsave(DAVID_NPCs_figure, file = "FigureS3e.pdf", height = 8, width = 6)
+ggsave(DAVID_NPCs_figure, file = "FigureS4b.pdf", height = 7, width = 6)
 ```
 
-### Figure S3f: DAVID for isoform
+### Figure S4c: DAVID for isoform
 * DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs         
 
 ```{r isoform_DAVID_NPC}
-(isoform_NPCs_DAVID <- isoform_cortex_GE_enrich$figure + xlab("") + theme(plot.margin=unit(c(1,1.35,1,1), "cm")))
-ggsave(isoform_NPCs_DAVID, file = "FigureS3f.pdf", height = 8, width = 6)
+(isoform_NPCs_DAVID <- isoform_cortex_GE_enrich$figure + xlab("") + theme(plot.margin=unit(c(1,1.35,1,1), "cm")) + ggtitle("NPC isoforms"))
+ggsave(isoform_NPCs_DAVID, file = "FigureS4c.pdf", height = 7, width = 8)
 ```
 
 ### Figure S4d: UMR - DM his - DE
@@ -753,8 +745,9 @@ ggsave(isoform_NPCs_DAVID, file = "FigureS3f.pdf", height = 8, width = 6)
 ggsave(Cortex02_GE02DE_epi_figure, file = "FigureS4d.pdf", height = 3, width = 8)
 ```
 
-## Figure S4
-### Figure S4a: GREAT enrichment for GW UMRs  
+
+## Figure S5
+### Figure S5a: GREAT enrichment for GW UMRs  
 
 * GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
 
@@ -792,16 +785,13 @@ grid.newpage()
 layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
        list(GREAT_GW_GE_figure, 1:3, 5:9), 
        list(GREAT_GW_shared_figure, 3:4, 1:4))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
-pdf("FigureS4a.pdf", height = 12, width = 12)
-layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4), 
-       list(GREAT_GW_GE_figure, 1:3, 5:9), 
-       list(GREAT_GW_shared_figure, 3:4, 1:4))
-grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
-grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+pdf("FigureS5a.pdf", height = 10, width = 13)
+layOut(list(GREAT_GW_Cortex_figure, 1:3, 1:4), 
+       list(GREAT_GW_GE_figure, 1:4, 5:9), 
+       list(GREAT_GW_shared_figure, 4:6, 1:4))
+dev.off()
+```
+
 ### Figure S5b: DM his DAVID
 
 ```{r DMhis_DAVID_GW}
@@ -829,37 +819,40 @@ dev.off()
 ggsave(DM_H3K27me3_DE_GW_GE_DAVID, file = "FigureS5c.pdf", height = 4, width = 7)
 ```
 
-## Figure S5
-### Figure S5a: Transcriptional clustering
+## Figure S6
+### Figure S6a: Transcriptional clustering
 
 * Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
 
 ```{r cluster}
 gene_FetalBrain <- read.delim("../Tables/rpkm_pc.txt", as.is = T, row.names = 1)
+colnames(gene_FetalBrain) <- gsub("HuFNSC0", "Subject", colnames(gene_FetalBrain))
 gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Brain.Subject1", "Brain.Subject2"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.Subject1", "Cortex.Subject2", "Cortex.Subject3", "Cortex.Subject4"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.Subject1", "GE.Subject2", "GE.Subject3", "GE.Subject4"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
 nc_FetalBrain <- read.delim("../Tables/rpkm_nc.txt", as.is = T, row.names = 1)
 nc_FetalBrain <- nc_FetalBrain[rowMeans(nc_FetalBrain) >= 0.1, ]
+colnames(nc_FetalBrain) <- gsub("HuFNSC0", "Subject", colnames(nc_FetalBrain))
 nc_dend <- (1- (nc_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Brain.Subject1", "Brain.Subject2"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.Subject1", "Cortex.Subject2", "Cortex.Subject3", "Cortex.Subject4"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.Subject1", "GE.Subject2", "GE.Subject3", "GE.Subject4"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(nc_FetalBrain), TF_value = 2)
 exon_FetalBrain <- read.delim("../Tables/rpkm_exon.txt", as.is = T, row.names = 1)
+colnames(exon_FetalBrain) <- gsub("HuFNSC0", "Subject", colnames(exon_FetalBrain))
 exon_dend <- (1- (exon_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Brain.Subject1", "Brain.Subject2"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.Subject1", "Cortex.Subject2", "Cortex.Subject3", "Cortex.Subject4"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.Subject1", "GE.Subject2", "GE.Subject3", "GE.Subject4"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(exon_FetalBrain), TF_value = 2)
-colnames(miR_FetalBrain) <- gsub("(\\d+)", "\\.HuFNSC\\1", colnames(miR_FetalBrain))
+colnames(miR_FetalBrain) <- gsub("0(\\d)", "\\.Subject\\1", colnames(miR_FetalBrain))
 highExpr <- as.character(miR_FetalBrain[rowSums(miR_FetalBrain[, 2:11] > 100) > 0, "Gene"])
 miR_dend <- (1- (miR_FetalBrain[highExpr, -1] %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
-  set("by_labels_branches_col", value = c("Brain.HuFNSC01", "Brain.HuFNSC02"), TF_value = "green", type = "all") %>% 
-  set("by_labels_branches_col", value = c("Cortex.HuFNSC01", "Cortex.HuFNSC02", "Cortex.HuFNSC03", "Cortex.HuFNSC04"), TF_value = "red", type = "all") %>% 
-  set("by_labels_branches_col", value = c("GE.HuFNSC01", "GE.HuFNSC02", "GE.HuFNSC03", "GE.HuFNSC04"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Brain.Subject1", "Brain.Subject2"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.Subject1", "Cortex.Subject2", "Cortex.Subject3", "Cortex.Subject4"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.Subject1", "GE.Subject2", "GE.Subject3", "GE.Subject4"), TF_value = "blue", type = "all") %>% 
   set("by_labels_branches_lwd", value = colnames(miR_FetalBrain[, -1]), TF_value = 2)
 op <- par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
 plot(gene_dend, main = "RNA-seq\nGene pc", horiz = TRUE)
@@ -867,7 +860,7 @@ plot(exon_dend, main = "RNA-seq\nExon pc", horiz = TRUE)
 plot(nc_dend, main = "RNA-seq\nGene nc", horiz = TRUE)
 plot(miR_dend, main = "miRNA-seq\n(RPM > 100)", horiz = TRUE)
 par(op)
-pdf("FigureS5a.pdf", height = 12, width = 12)
+pdf("FigureS6a.pdf", height = 12, width = 12)
 par(mar = c(5, 4, 4, 8), mfrow = c(2,2))
 plot(gene_dend, main = "RNA-seq\nGene pc", horiz = TRUE)
 plot(exon_dend, main = "RNA-seq\nExon pc", horiz = TRUE)
