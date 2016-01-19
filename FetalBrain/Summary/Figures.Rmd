@@ -598,6 +598,11 @@ genomicBreak_MZ_tall <- genomicBreak_MZ_figure$data %>% mutate(DM = revalue(fact
   scale_fill_manual(values = c("green", "red", "blue"), labels = c("Brain", "Cortex", "GE"), name = "") + 
   theme_bw())
 ggsave(genomicBreak_MZ_figure, file = "FigureS2c.pdf", height = 7, width = 6)
+### Figure S2b: RPKM - histone modifications
+
+```{r RPKM_his}
+(HisMod_RPKM_figure)
+ggsave(HisMod_RPKM_figure, file = "FigureS2b.pdf", height = 4, width = 7)
 ```
 
 ### Figure S2d: Venn Diagram of DE genes
