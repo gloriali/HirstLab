@@ -746,7 +746,12 @@ ggsave(DAVID_NPCs_figure, file = "FigureS3e.pdf", height = 8, width = 6)
 ggsave(isoform_NPCs_DAVID, file = "FigureS3f.pdf", height = 8, width = 6)
 ```
 
-### Figure S3g: UMR - DM his - DE
+### Figure S4d: UMR - DM his - DE
+
+```{r UMR_DM_DE_NPC}
+(Cortex02_GE02DE_epi_figure)
+ggsave(Cortex02_GE02DE_epi_figure, file = "FigureS4d.pdf", height = 3, width = 8)
+```
 
 ## Figure S4
 ### Figure S4a: GREAT enrichment for GW UMRs  
