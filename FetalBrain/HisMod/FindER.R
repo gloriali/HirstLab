@@ -176,6 +176,7 @@ H3K4me3_H3K27me3_promoter_drank_MZ <- rbind(H3K4me3_promoter %>% filter(abs(Brai
                                             H3K27me3_promoter %>% filter(abs(GE01_GE02) >= rank_cut, pmax(GE01rank, GE02rank) >= max_rank) %>% mutate(Subject1 = GE01, Subject2 = GE02, Rank1 = GE01rank, Rank2 = GE02rank, drank = GE01_GE02, Marked = ifelse(GE01_GE02 > 0, "Subject1", "Subject2"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
 H3K4me3_H3K27me3_promoter_drank_MZ <- H3K4me3_H3K27me3_promoter_drank_MZ %>% mutate(RPKM1 = ifelse(Cell == "Brain", geneRPKM[Ensembl, "Brain01"], ifelse(Cell == "Cortex", geneRPKM[Ensembl, "Cortex01"], geneRPKM[Ensembl, "GE01"])), 
                                                                                     RPKM2 = ifelse(Cell == "Brain", geneRPKM[Ensembl, "Brain02"], ifelse(Cell == "Cortex", geneRPKM[Ensembl, "Cortex02"], geneRPKM[Ensembl, "GE02"])), FC = (RPKM1+e)/(RPKM2+e))
+write.table(H3K4me3_H3K27me3_promoter_drank_MZ %>% select(-RPKM1,-RPKM2,-FC), file = "/projects/epigenomics/users/lli/FetalBrain/Tables/TableS4_MZ.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 H3K4me3_H3K27me3_promoter_drank_MZ_summary <- H3K4me3_H3K27me3_promoter_drank_MZ %>% filter(RPKM1+RPKM2 >= RPKM_cut) %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Subject1", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_MZ_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_MZ_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
@@ -231,6 +232,7 @@ H3K4me3_H3K27me3_promoter_drank_NPC <- rbind(H3K4me3_promoter %>% filter(abs(Cor
                                              H3K27me3_promoter %>% filter(abs(Cortex02_GE02) >= rank_cut) %>% mutate(NPC1 = Cortex02, NPC2 = GE02, Rank1 = Cortex02rank, Rank2 = GE02rank, drank = Cortex02_GE02, Marked = ifelse(Cortex02_GE02 > 0, "Cortex", "GE"), Subject = "Subject2", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
 H3K4me3_H3K27me3_promoter_drank_NPC <- H3K4me3_H3K27me3_promoter_drank_NPC %>% mutate(RPKM1 = ifelse(Subject == "Subject1", geneRPKM[Ensembl, "Cortex01"], geneRPKM[Ensembl, "Cortex02"]), 
                                                                                       RPKM2 = ifelse(Subject == "Subject1", geneRPKM[Ensembl, "GE01"], geneRPKM[Ensembl, "GE02"]), FC = (RPKM1+e)/(RPKM2+e))
+write.table(H3K4me3_H3K27me3_promoter_drank_NPC %>% select(-RPKM1,-RPKM2,-FC), file = "/projects/epigenomics/users/lli/FetalBrain/Tables/TableS4_NPC.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 H3K4me3_H3K27me3_promoter_drank_NPC_summary <- H3K4me3_H3K27me3_promoter_drank_NPC %>% group_by(Mark, Subject, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "Cortex", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_NPC_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_NPC_summary, aes(x = Subject, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
@@ -272,6 +274,7 @@ DM_H3K27me3_NPC_Subject2_GE_DAVID <- enrich("DM_H3K27me3_NPC_Subject2_GE.pc", er
 H3K4me3_H3K27me3_promoter_drank_GW <- rbind(H3K4me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K4me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")), 
                                             H3K27me3_promoter %>% filter(abs(GE02_GE04) >= rank_cut) %>% mutate(GW1 = GE02, GW2 = GE04, Rank1 = GE02rank, Rank2 = GE04rank, drank = GE02_GE04, Marked = ifelse(GE02_GE04 > 0, "GW17", "GW13"), Cell = "GE", Mark = "H3K27me3") %>% select(-contains("Brain"), -contains("Cortex"), -contains("GE")))
 H3K4me3_H3K27me3_promoter_drank_GW <- H3K4me3_H3K27me3_promoter_drank_GW %>% mutate(RPKM1 = geneRPKM[Ensembl, "GE04"], RPKM2 = geneRPKM[Ensembl, "GE02"], FC = (RPKM1+e)/(RPKM2+e))
+write.table(H3K4me3_H3K27me3_promoter_drank_GW %>% select(-RPKM1,-RPKM2,-FC), file = "/projects/epigenomics/users/lli/FetalBrain/Tables/TableS4_GW.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 H3K4me3_H3K27me3_promoter_drank_GW_summary <- H3K4me3_H3K27me3_promoter_drank_GW %>% group_by(Mark, Cell, Category, Marked) %>% summarize(Ngenes = n()) %>% mutate(Ngenes = ifelse(Marked == "GW13", Ngenes, -Ngenes))
 (H3K4me3_H3K27me3_promoter_drank_GW_figure <- ggplot(H3K4me3_H3K27me3_promoter_drank_GW_summary, aes(x = Cell, y = Ngenes, fill = Marked)) + 
    geom_bar(stat = "identity", position = "identity", width = 0.5) + 
