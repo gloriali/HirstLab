@@ -92,6 +92,48 @@ dev.off()
 ```
 
 ### Figure 2c
+```{r MZ_scale2, eval=FALSE}
+dirIn <- "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/"
+MZ_scale_his <- rbind(read.delim(paste0(dirIn, "H3K4me1/unique/unique_enhancer.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K4me3/unique/unique_H3K4me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K9me3/unique/unique_H3K9me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K27me3/unique/unique_H3K27me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K36me3/unique/unique_H3K36me3.summary"), as.is = T)) %>% filter(Comparison == "MZ") %>% mutate(cell = gsub("\\d.*", "", Samples)) %>% select(Mark, cell, Sample1_unique, Sample2_unique) %>% melt(id = c("Mark", "cell")) %>% mutate(Category = "Histone Modifications", sample = ifelse(variable == "Sample1_unique", "Unique in Subject1", "Unique in Subject2"), Mark = factor(Mark, levels = c("H3K4me1", "H3K4me3", "H3K9me3", "H3K27me3", "H3K36me3"))) %>% select(-variable)
+MZ_scale_his_figure <- ggplot(MZ_scale_his, aes(x = sample, y = value/1e6, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   xlab("") + 
+   ylab("Total length (Mb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+MZ_scale_UMR <- DMR_freq_MZ_figure$data %>% group_by(DM, cell) %>% summarize(value = abs(sum(DMRlen))) %>% mutate(sample = ifelse(DM == 1, "UMR in Subject1", "UMR in Subject2"), Mark = "DNAme", Category = "DNAme") 
+MZ_scale_UMR$DM <- NULL
+MZ_scale_UMR_figure <- ggplot(MZ_scale_UMR, aes(x = sample, y = value/1e3, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   scale_fill_manual(values = "orange") + 
+   xlab("") + 
+   ylab("Total length (Kb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), legend.key.size = unit(0.5, "cm"))
+MZ_scale_DE <- rbind(data.frame(cell = rep(c("Brain", "Cortex", "GE"), 2), variable = rep(c("UP", "DN"), each = 3)) %>% mutate(Mark = "nc genes", value = mapply(function(x, y) as.numeric(system(paste0("wc -l ", "/projects/epigenomics/users/lli/FetalBrain/RNAseq/DEfine/nc/", x, ".", y, "-HuFNSC01_", y, "-HuFNSC02.FDR_0.01.rmin_0.005.Nmin_25 | cut -d' ' -f 1"), intern = T)), variable, cell)), individual_DE_summary[1:3,] %>% mutate(cell = gsub("\\d.+", "", rownames(individual_DE_summary[1:3,])), DE = NULL) %>% melt(id = "cell") %>% mutate(Mark = "pc genes")) %>% mutate(Category = "Transcriptome", sample = ifelse(variable == "UP", "UP in Subject1", "UP in Subject2"), variable = NULL, cell = gsub("brain", "Brain", cell), cell = gsub("cortex", "Cortex", cell))
+MZ_scale_DE_figure <- ggplot(MZ_scale_DE, aes(x = sample, y = value, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   scale_fill_manual(values = c("blue", "red")) + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+grid.newpage()
+layOut(list(MZ_scale_UMR_figure, 1, 1:3), list(MZ_scale_his_figure, 1, 4:9), list(MZ_scale_DE_figure, 1, 10:13)) 
+pdf("Figure2a.pdf", height = 8, width = 7)
+layOut(list(MZ_scale_UMR_figure, 1, 1:3), list(MZ_scale_his_figure, 1, 4:9), list(MZ_scale_DE_figure, 1, 10:13)) 
+dev.off()
+```
 
 ```{r MZ_UMR_DM_DE, height=3}
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
@@ -141,6 +183,50 @@ grid.draw(NPCs_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.04, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
 grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.23, "npc"), rot = 90, gp=gpar(fontsize=15))
+dev.off()
+```
+
+```{r NPCs_scale2}
+dirIn <- "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/"
+NPCs_scale_his <- rbind(read.delim(paste0(dirIn, "H3K4me1/unique/unique_enhancer.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K4me3/unique/unique_H3K4me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K9me3/unique/unique_H3K9me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K27me3/unique/unique_H3K27me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K36me3/unique/unique_H3K36me3.summary"), as.is = T)) %>% filter(Comparison == "NPCs") %>% mutate(subject = gsub("_.*", "", Samples), subject = paste0("Subject", gsub("Cortex0", "", subject))) %>% select(Mark, subject, Sample1_unique, Sample2_unique) %>% melt(id = c("Mark", "subject")) %>% mutate(Category = "Histone Modifications", sample = ifelse(variable == "Sample1_unique", "Unique in Cortex", "Unique in GE"), Mark = factor(Mark, levels = c("H3K4me1", "H3K4me3", "H3K9me3", "H3K27me3", "H3K36me3"))) %>% select(-variable)
+NPCs_scale_his_figure <- ggplot(NPCs_scale_his, aes(x = sample, y = value/1e6, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(subject ~ Category) + 
+   xlab("") + 
+   ylab("Total length (Mb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+NPCs_scale_UMR <- DMR_freq_WGBS_figure$data %>% group_by(DM, donor) %>% summarize(value = abs(sum(DMRlen))) %>% mutate(sample = ifelse(DM == 1, "UMR in GE", "UMR in Cortex"), Mark = "DNAme", Category = "DNAme", subject = factor(gsub("HuFNSC0", "Subject", donor), levels = c("Subject4", "Subject2"))) 
+NPCs_scale_UMR$DM <- NULL
+NPCs_scale_UMR$donor <- NULL
+NPCs_scale_UMR_figure <- ggplot(NPCs_scale_UMR, aes(x = sample, y = value/1e3, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(subject ~ Category) + 
+   scale_fill_manual(values = "orange") + 
+   xlab("") + 
+   ylab("Total length (Kb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), legend.key.size = unit(0.5, "cm"))
+NPCs_scale_DE <- rbind(data.frame(subject = rep(c("HuFNSC02", "HuFNSC04"), 2), variable = rep(c("UP", "DN"), each = 2)) %>% mutate(Mark = "nc genes", value = mapply(function(x, y) as.numeric(system(paste0("wc -l ", "/projects/epigenomics/users/lli/FetalBrain/RNAseq/DEfine/nc/", x, ".Cortex-", y, "_GE-", y, ".FDR_0.01.rmin_0.005.Nmin_25 | cut -d' ' -f 1"), intern = T)), variable, subject)), cortex_GE_DE_summary[c("HuFNSC02", "HuFNSC04"),] %>% mutate(subject = rownames(cortex_GE_DE_summary[c("HuFNSC02", "HuFNSC04"),]), DE = NULL) %>% melt(id = "subject") %>% mutate(Mark = "pc genes")) %>% mutate(Category = "Transcriptome", sample = ifelse(variable == "UP", "UP in Cortex", "UP in GE"), variable = NULL, subject = factor(gsub("HuFNSC0", "Subject", subject), levels = c("Subject4", "Subject2")))
+NPCs_scale_DE_figure <- ggplot(NPCs_scale_DE, aes(x = sample, y = value, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(subject ~ Category) + 
+   scale_fill_manual(values = c("blue", "red")) + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+grid.newpage()
+layOut(list(NPCs_scale_UMR_figure, 1, 1:3), list(NPCs_scale_his_figure, 1, 4:9), list(NPCs_scale_DE_figure, 1, 10:13)) 
+pdf("Figure3a.pdf", height = 8, width = 7)
+layOut(list(NPCs_scale_UMR_figure, 1, 1:3), list(NPCs_scale_his_figure, 1, 4:9), list(NPCs_scale_DE_figure, 1, 10:13)) 
 dev.off()
 ```
 
@@ -206,6 +292,49 @@ grid.draw(GW_scale_figure_gt)
 grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("Fold Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
 grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
+dev.off()
+```
+
+```{r GW_scale2}
+dirIn <- "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/"
+GW_scale_his <- rbind(read.delim(paste0(dirIn, "H3K4me1/unique/unique_enhancer.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K4me3/unique/unique_H3K4me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K9me3/unique/unique_H3K9me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K27me3/unique/unique_H3K27me3.summary"), as.is = T), 
+                      read.delim(paste0(dirIn, "H3K36me3/unique/unique_H3K36me3.summary"), as.is = T)) %>% filter(Samples == "GE02_GE04") %>% mutate(cell = gsub("\\d.*", "", Samples)) %>% select(Mark, cell, Sample1_unique, Sample2_unique) %>% melt(id = c("Mark", "cell")) %>% mutate(Category = "Histone Modifications", sample = ifelse(variable == "Sample1_unique", "Unique in GW17", "Unique in GW13"), Mark = factor(Mark, levels = c("H3K4me1", "H3K4me3", "H3K9me3", "H3K27me3", "H3K36me3"))) %>% select(-variable)
+GW_scale_his_figure <- ggplot(GW_scale_his, aes(x = sample, y = value/1e6, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   xlab("") + 
+   ylab("Total length (Mb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+GW_scale_UMR <- DMR_freq_GW_figure$data %>% group_by(DM, cell) %>% summarize(value = abs(sum(DMRlen))) %>% mutate(sample = ifelse(DM == 1, "UMR in GW13", "UMR in GW17"), Mark = "DNAme", Category = "DNAme", cell = factor(cell, levels = c("GE", "Cortex"))) 
+GW_scale_UMR$DM <- NULL
+GW_scale_UMR_figure <- ggplot(GW_scale_UMR, aes(x = sample, y = value/1e3, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   scale_fill_manual(values = "orange") + 
+   xlab("") + 
+   ylab("Total length (Kb)") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), legend.key.size = unit(0.5, "cm"))
+GW_scale_DE <- rbind(data.frame(cell = rep(c("Cortex", "GE"), 2), variable = rep(c("UP", "DN"), each = 2)) %>% mutate(Mark = "nc genes", value = mapply(function(x, y) as.numeric(system(paste0("wc -l ", "/projects/epigenomics/users/lli/FetalBrain/RNAseq/DEfine/nc/", x, ".", y, "-HuFNSC02_", y, "-HuFNSC04.FDR_0.01.rmin_0.005.Nmin_25 | cut -d' ' -f 1"), intern = T)), variable, cell)), GW_DE_summary %>% filter(Sample %in% c("GW17-GW13.2_cortex", "GW17-GW13.2_GE")) %>% mutate(cell = type) %>% select(UP, DN, cell) %>% melt(id = "cell") %>% mutate(Mark = "pc genes")) %>% mutate(Category = "Transcriptome", sample = ifelse(variable == "UP", "UP in GW17", "UP in GW13"), variable = NULL, cell = factor(gsub("cortex", "Cortex", cell), levels = c("GE", "Cortex")))
+GW_scale_DE_figure <- ggplot(GW_scale_DE, aes(x = sample, y = value, fill = Mark)) + 
+   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
+   facet_grid(cell ~ Category) + 
+   scale_fill_manual(values = c("blue", "red")) + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   theme_bw() + 
+   guides(fill = guide_legend(title = "", nrow = 2)) + 
+   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
+grid.newpage()
+layOut(list(GW_scale_UMR_figure, 1:3, 1:3), list(GW_scale_his_figure, 1:2, 4:9), list(GW_scale_DE_figure, 1:3, 10:13)) 
+pdf("Figure4a.pdf", height = 8, width = 7)
+layOut(list(GW_scale_UMR_figure, 1:3, 1:3), list(GW_scale_his_figure, 1:2, 4:9), list(GW_scale_DE_figure, 1:3, 10:13)) 
 dev.off()
 ```
 
