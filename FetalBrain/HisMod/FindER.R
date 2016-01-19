@@ -314,19 +314,47 @@ load("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR_neurospheres.Rdata")
 load("/projects/epigenomics/users/lli/FetalBrain/GW/GW.Rdata")
 ### MZ twins
 Brain01_Brain02DE_epi <- brain01_brain02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
-                                                      K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain"))$Ensembl), T, F), 
-                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain"))$Ensembl), T, F), 
-                                                      DMR = ifelse((V1 %in% c(DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[,"id"], DMR_DE_Brain01_Brain02_hypo$DMR_gene_DE[,"id"])), T, F))
+                                                      K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Marked == "Subject1"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K4me3", Cell == "Brain", Marked == "Subject2"))$Ensembl), "hypo", "FALSE")), 
+                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain", Marked == "Subject1"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Brain", Marked == "Subject2"))$Ensembl), "hypo", "FALSE")), 
+                                                      DMR = ifelse((V1 %in% DMR_DE_Brain01_Brain02_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((V1 %in% DMR_DE_Brain01_Brain02_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+Brain01_Brain02DE_epi_summary <- rbind((Brain01_Brain02DE_epi %>% filter(K4 != "FALSE") %>% group_by(DE, K4) %>% summarize(N = n(), Ntotal = nrow(Brain01_Brain02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K4me3", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(K4 == "hyper", "Gain in Subject1", "Gain in Subject2")) %>% select(DEG, DM, fraction, Mark)),
+                                       (Brain01_Brain02DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(Brain01_Brain02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(K27 == "hyper", "Gain in Subject1", "Gain in Subject2")) %>% select(DEG, DM, fraction, Mark)),
+                                       (Brain01_Brain02DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(Brain01_Brain02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(DMR == "hyper", "UMR in Subject2", "UMR in Subject1")) %>% select(DEG, DM, fraction, Mark)))
+(Brain01_Brain02DE_epi_figure <- ggplot(Brain01_Brain02DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
 Brain01_Brain02DE_epi_list <- list(H3K4me3 = as.character(filter(Brain01_Brain02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Brain01_Brain02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Brain01_Brain02DE_epi, DMR == T)[, "V1"]))
 venn_Brain01_Brain02DE_epi <- venn.diagram(Brain01_Brain02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Brain01 vs Brain02")
 Cortex01_Cortex02DE_epi <- cortex01_cortex02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
-                                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex"))$Ensembl), T, F), 
-                                                          DMR = ifelse((V1 %in% c(DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex01_Cortex02_hypo$DMR_gene_DE[,"id"])), T, F))
+                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex", Marked == "Subject1"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "Cortex", Marked == "Subject2"))$Ensembl), "hypo", "FALSE")), 
+                                                      DMR = ifelse((V1 %in% DMR_DE_Cortex01_Cortex02_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((V1 %in% DMR_DE_Cortex01_Cortex02_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+Cortex01_Cortex02DE_epi_summary <- rbind((Cortex01_Cortex02DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(Cortex01_Cortex02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(K27 == "hyper", "Gain in Subject1", "Gain in Subject2")) %>% select(DEG, DM, fraction, Mark)),
+                                       (Cortex01_Cortex02DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(Cortex01_Cortex02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(DMR == "hyper", "UMR in Subject2", "UMR in Subject1")) %>% select(DEG, DM, fraction, Mark)))
+(Cortex01_Cortex02DE_epi_figure <- ggplot(Cortex01_Cortex02DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
 Cortex01_Cortex02DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_Cortex02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_Cortex02DE_epi, DMR == T)[, "V1"]))
 venn_Cortex01_Cortex02DE_epi <- venn.diagram(Cortex01_Cortex02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs Cortex02")
 GE01_GE02DE_epi <- GE01_GE02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
-                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE"))$Ensembl), T, F), 
-                                          DMR = ifelse((V1 %in% c(DMR_DE_GE01_GE02_hyper$DMR_gene_DE[,"id"], DMR_DE_GE01_GE02_hypo$DMR_gene_DE[,"id"])), T, F))
+                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE", Marked == "Subject1"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_MZ%>%filter(Mark == "H3K27me3", Cell == "GE", Marked == "Subject2"))$Ensembl), "hypo", "FALSE")), 
+                                                      DMR = ifelse((V1 %in% DMR_DE_GE01_GE02_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((V1 %in% DMR_DE_GE01_GE02_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+GE01_GE02DE_epi_summary <- rbind((GE01_GE02DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(GE01_GE02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(K27 == "hyper", "Gain in Subject1", "Gain in Subject2")) %>% select(DEG, DM, fraction, Mark)),
+                                       (GE01_GE02DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(GE01_GE02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in Subject1", "UP in Subject2"), DM = ifelse(DMR == "hyper", "UMR in Subject2", "UMR in Subject1")) %>% select(DEG, DM, fraction, Mark)))
+(GE01_GE02DE_epi_figure <- ggplot(GE01_GE02DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
 GE01_GE02DE_epi_list <- list(H3K27me3 = as.character(filter(GE01_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(GE01_GE02DE_epi, DMR == T)[, "V1"]))
 venn_GE01_GE02DE_epi <- venn.diagram(GE01_GE02DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "GE01 vs GE02")
 grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
@@ -344,14 +372,33 @@ Cortex01_Cortex02DE_epi_DMR_H3K27me3 <- Cortex01_Cortex02DE_epi %>% filter(DMR==
 GE01_GE02DE_epi_DMR_H3K27me3 <- GE01_GE02DE_epi %>% filter(DMR==T, K27==T)
 ### NPC
 Cortex01_GE01DE_epi <- cortex01_GE01DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
-                                                          K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject1"))$Ensembl), T, F), 
-                                                          DMR = ifelse((V1 %in% c(DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE[,"id"])), T, F))
+                                                  K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Marked == "Cortex"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Marked == "GE"))$Ensembl), "hypo", "FALSE")), 
+                                                  DMR = ifelse((V1 %in% DMR_DE_Cortex01_GE01_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((V1 %in% DMR_DE_Cortex01_GE01_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+Cortex01_GE01DE_epi_summary <- rbind((Cortex01_GE01DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(Cortex01_GE01DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in Cortex", "UP in GE"), DM = ifelse(K27 == "hyper", "Gain in Cortex", "Gain in GE")) %>% select(DEG, DM, fraction, Mark, N)),
+                                     (Cortex01_GE01DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(Cortex01_GE01DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in Cortex", "UP in GE"), DM = ifelse(DMR == "hyper", "UMR in GE", "UMR in Cortex")) %>% select(DEG, DM, fraction, Mark, N)))
+(Cortex01_GE01DE_epi_figure <- ggplot(Cortex01_GE01DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
 Cortex01_GE01DE_epi_list <- list(H3K27me3 = as.character(filter(Cortex01_GE01DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex01_GE01DE_epi, DMR == T)[, "V1"]))
 venn_Cortex01_GE01DE_epi <- venn.diagram(Cortex01_GE01DE_epi_list, filename = NULL, fill = c("red", "blue"), main = "Cortex01 vs GE01")
 Cortex02_GE02DE_epi <- cortex02_GE02DE %>% mutate(name = ensembl[V1, "name"], description = ensembl[V1, "description"], 
-                                                  K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2"))$Ensembl), T, F), 
-                                                  K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2"))$Ensembl), T, F), 
-                                                  DMR = ifelse((V1 %in% c(DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE[,"id"], DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE[,"id"])), T, F))
+                                                      K4 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Marked == "Cortex"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K4me3", Subject == "Subject2", Marked == "GE"))$Ensembl), "hypo", "FALSE")), 
+                                                      K27 = ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Marked == "Cortex"))$Ensembl), "hyper", ifelse((V1 %in% (H3K4me3_H3K27me3_promoter_drank_NPC%>%filter(Mark == "H3K27me3", Subject == "Subject2", Marked == "GE"))$Ensembl), "hypo", "FALSE")), 
+                                                      DMR = ifelse((V1 %in% DMR_DE_Cortex02_GE02_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((V1 %in% DMR_DE_Cortex02_GE02_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+Cortex02_GE02DE_epi_summary <- rbind((Cortex02_GE02DE_epi %>% filter(K4 != "FALSE") %>% group_by(DE, K4) %>% summarize(N = n(), Ntotal = nrow(Cortex02_GE02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K4me3", DEG = ifelse(DE == "UP", "UP in Cortex", "UP in GE"), DM = ifelse(K4 == "hyper", "Gain in Cortex", "Gain in GE")) %>% select(DEG, DM, fraction, Mark, N)),
+                                       (Cortex02_GE02DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(Cortex02_GE02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in Cortex", "UP in GE"), DM = ifelse(K27 == "hyper", "Gain in Cortex", "Gain in GE")) %>% select(DEG, DM, fraction, Mark, N)),
+                                       (Cortex02_GE02DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(Cortex02_GE02DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in Cortex", "UP in GE"), DM = ifelse(DMR == "hyper", "UMR in GE", "UMR in Cortex")) %>% select(DEG, DM, fraction, Mark, N)))
+(Cortex02_GE02DE_epi_figure <- ggplot(Cortex02_GE02DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
 Cortex02_GE02DE_epi_list <- list(H3K4me3 = as.character(filter(Cortex02_GE02DE_epi, K4 == T)[, "V1"]), H3K27me3 = as.character(filter(Cortex02_GE02DE_epi, K27 == T)[, "V1"]), DMR = as.character(filter(Cortex02_GE02DE_epi, DMR == T)[, "V1"]))
 venn_Cortex02_GE02DE_epi <- venn.diagram(Cortex02_GE02DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "Cortex02 vs GE02")
 grid.arrange(gTree(children = venn_Cortex01_GE01DE_epi), gTree(children = venn_Cortex02_GE02DE_epi), nrow = 1)
@@ -365,10 +412,20 @@ Cortex01_GE01DE_epi_DMR_H3K27me3 <- Cortex01_GE01DE_epi %>% filter(DMR==T, K27==
 Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3 <- Cortex02_GE02DE_epi %>% filter(DMR==T, K4==T, K27==T)
 ### GW
 GE02_GE04DE_epi <- GE02_GE04DE %>% mutate(name = ensembl[ID, "name"], description = ensembl[ID, "description"], 
-                                          K4 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Cell == "GE"))$Ensembl), T, F), 
-                                          K27 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Cell == "GE"))$Ensembl), T, F), 
-                                          DMR = ifelse((ID %in% c(DMR_DE_GE02_GE04_hyper$DMR_gene_DE[,"id"], DMR_DE_GE02_GE04_hypo$DMR_gene_DE[,"id"])), T, F))
-GE02_GE04DE_epi_list <- list(H3K4me3 = as.character(filter(GE02_GE04DE_epi, K4 == T)[, "ID"]), H3K27me3 = as.character(filter(GE02_GE04DE_epi, K27 == T)[, "ID"]), DMR = as.character(filter(GE02_GE04DE_epi, DMR == T)[, "ID"]))
+                                                      K4 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Marked == "GW17"))$Ensembl), "hyper", ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K4me3", Marked == "GW13"))$Ensembl), "hypo", "FALSE")), 
+                                                      K27 = ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Marked == "GW17"))$Ensembl), "hyper", ifelse((ID %in% (H3K4me3_H3K27me3_promoter_drank_GW%>%filter(Mark == "H3K27me3", Marked == "GW13"))$Ensembl), "hypo", "FALSE")), 
+                                                      DMR = ifelse((ID %in% DMR_DE_GE02_GE04_hyper$DMR_gene_DE[,"id"]), "hyper", ifelse((ID %in% DMR_DE_GE02_GE04_hypo$DMR_gene_DE[,"id"]), "hypo", "FALSE")))
+GE02_GE04DE_epi_summary <- rbind((GE02_GE04DE_epi %>% filter(K4 != "FALSE") %>% group_by(DE, K4) %>% summarize(N = n(), Ntotal = nrow(GE02_GE04DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K4me3", DEG = ifelse(DE == "UP", "UP in GW17", "UP in GW13"), DM = ifelse(K4 == "hyper", "Gain in GW17", "Gain in GW13")) %>% select(DEG, DM, fraction, Mark, N)),
+                                       (GE02_GE04DE_epi %>% filter(K27 != "FALSE") %>% group_by(DE, K27) %>% summarize(N = n(), Ntotal = nrow(GE02_GE04DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "H3K27me3", DEG = ifelse(DE == "UP", "UP in GW17", "UP in GW13"), DM = ifelse(K27 == "hyper", "Gain in GW17", "Gain in GW13")) %>% select(DEG, DM, fraction, Mark, N)),
+                                       (GE02_GE04DE_epi %>% filter(DMR != "FALSE") %>% group_by(DE, DMR) %>% summarize(N = n(), Ntotal = nrow(GE02_GE04DE_epi), fraction = N/Ntotal) %>% mutate(Mark = "UMR", DEG = ifelse(DE == "UP", "UP in GW17", "UP in GW13"), DM = ifelse(DMR == "hyper", "UMR in GW13", "UMR in GW17")) %>% select(DEG, DM, fraction, Mark, N)))
+(GE02_GE04DE_epi_figure <- ggplot(GE02_GE04DE_epi_summary, aes(DM, fraction, fill = DEG)) + 
+   geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+   facet_grid(. ~ Mark, scales = "free_x") + 
+   scale_fill_manual(values = c("red", "blue"), name = "") + 
+   xlab("") + 
+   ylab("Fraction of DE genes") + 
+   theme_bw())
+GE02_GE04DE_epi_list <- list(H3K4me3 = as.character(filter(GE02_GE04DE_epi, K4 != "FALSE")[, "ID"]), H3K27me3 = as.character(filter(GE02_GE04DE_epi, K27 != "FALSE")[, "ID"]), DMR = as.character(filter(GE02_GE04DE_epi, DMR != "FALSE")[, "ID"]))
 venn_GE02_GE04DE_epi <- venn.diagram(GE02_GE04DE_epi_list, filename = NULL, fill = c("green", "red", "blue"), main = "GE02 vs GE04")
 grid.draw(venn_GE02_GE04DE_epi)
 write.table(GE02_GE04DE_epi%>%filter(K4==T), file = "DM_H3K4me3_DE_GW_GE.pc.txt", sep = "\t", col.names = T, row.names = F, quote = F)
@@ -987,4 +1044,5 @@ save(FindER_summary, FindER_summary_figure, HisMod_RPKM, HisMod_RPKM_figure,
      Cortex01_GE01DE_epi, venn_Cortex01_GE01DE_epi, venn_Cortex02_GE02DE_epi, DM_H3K27me3_DE_NPC_Subject1_DAVID, DM_H3K4me3_DE_NPC_Subject2_DAVID, DM_H3K27me3_DE_NPC_Subject2_DAVID, Cortex01_GE01DE_epi_DMR_H3K27me3, Cortex02_GE02DE_epi_DMR_H3K4me3_H3K27me3, 
      GE02_GE04DE_epi, venn_GE02_GE04DE_epi, DM_H3K4me3_DE_GW_GE_DAVID, DM_H3K27me3_DE_GW_GE_DAVID, GE02_GE04DE_epi_DMR_H3K4me3_H3K27me3, 
      H3K4me3_H3K27me3_promoter_drank_MZ_RPKM_figure, H3K4me3_H3K27me3_promoter_drank_NPC_RPKM_figure, H3K4me3_H3K27me3_promoter_drank_GW_RPKM_figure, 
+     Brain01_Brain02DE_epi_figure, Cortex02_GE02DE_epi_figure, GE02_GE04DE_epi_figure, 
      file = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/FetalBrain_FindER.Rdata")
