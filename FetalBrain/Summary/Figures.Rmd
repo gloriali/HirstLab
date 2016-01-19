@@ -696,6 +696,17 @@ ggsave(WGBS_MeDIP_diff_summary_figure, file = "FigureS3b.pdf", height = 4, width
 ### Figure S3c: 5hmC GREAT
 
 ### Figure S3d: core enhancer homer TFs
+```{r 5hmC_GREAT}
+GREAT_Cortex02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("5hmC Cortex")
+GREAT_GE02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_GE02", name = "GE02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("5hmC GE")
+grid.newpage()
+layOut(list(GREAT_Cortex02.hydroxy, 1, 1), 
+       list(GREAT_GE02.hydroxy, 1, 2)) 
+pdf("FigureS3c.pdf", height = 6, width = 12)
+layOut(list(GREAT_Cortex02.hydroxy, 1, 1), 
+       list(GREAT_GE02.hydroxy, 1, 2)) 
+dev.off()
+```
 
 ### Figure S3e: DAVID for DE genes
 * DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
