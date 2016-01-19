@@ -133,6 +133,26 @@ HisMod_RPKM_stat$ymax <- with(HisMod_RPKM_stat, apply(cbind(max, upper + 1.5*(up
    theme(axis.text.x = element_text(angle = 90)))
 ggsave(HisMod_RPKM_figure, file = "HisMod_RPKM_figure.pdf", height = 8, width = 10)
 
+## =========== Distance between nearset peaks ===========
+### H3K4me1
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/dis/")
+H3K4me1_Brain01_Brain02_dis <- read.delim("H3K4me1_Brain01_Brain02.dis", head = F, as.is = T)
+H3K4me1_Cortex01_Cortex02_dis <- read.delim("H3K4me1_Cortex01_Cortex02.dis", head = F, as.is = T)
+H3K4me1_GE01_GE02_dis <- read.delim("H3K4me1_GE01_GE02.dis", head = F, as.is = T)
+H3K4me1_Cortex01_GE01_dis <- read.delim("H3K4me1_Cortex01_GE01.dis", head = F, as.is = T)
+H3K4me1_Cortex02_GE02_dis <- read.delim("H3K4me1_Cortex02_GE02.dis", head = F, as.is = T)
+H3K4me1_GE01_GE04_dis <- read.delim("H3K4me1_GE01_GE04.dis", head = F, as.is = T)
+H3K4me1_GE02_GE04_dis <- read.delim("H3K4me1_GE02_GE04.dis", head = F, as.is = T)
+plot(x = c(-1e4, 1e4), y = c(0,1), type = "n", main = "H3K4me1")
+lines(ecdf(H3K4me1_Brain01_Brain02_dis$V7))
+lines(ecdf(H3K4me1_Cortex01_Cortex02_dis$V7))
+lines(ecdf(H3K4me1_GE01_GE02_dis$V7))
+lines(ecdf(H3K4me1_Cortex01_GE01_dis$V7))
+lines(ecdf(H3K4me1_Cortex02_GE02_dis$V7))
+lines(ecdf(H3K4me1_GE01_GE04_dis$V7))
+lines(ecdf(H3K4me1_GE02_GE04_dis$V7))
+abline(v = -1000)
+
 ## =========== Differential marked genes ================
 setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
 geneRPKM <- rbind(read.delim("/projects/epigenomics/users/lli/FetalBrain/Tables/rpkm_pc.txt", as.is = T) %>% mutate(Category = "pc"), 
