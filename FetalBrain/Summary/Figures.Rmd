@@ -802,12 +802,32 @@ layOut(list(GREAT_GW_Cortex_figure, 1:2, 1:4),
 grid.text("A", x = unit(0.015, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("B", x = unit(0.515, "npc"), y = unit(0.98, "npc"), gp=gpar(fontsize = 20))
 grid.text("C", x = unit(0.015, "npc"), y = unit(0.48, "npc"), gp=gpar(fontsize = 20))
+### Figure S5b: DM his DAVID
+
+```{r DMhis_DAVID_GW}
+DM_H3K4me3_GW_GE_GW13_DAVID <- enrich("DM_H3K4me3_GW_GE_GW13.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K4me3 GW13")
+DM_H3K4me3_GW_GE_GW17_DAVID <- enrich("DM_H3K4me3_GW_GE_GW17.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K4me3 GW17")
+DM_H3K27me3_GW_GE_GW13_DAVID <- enrich("DM_H3K27me3_GW_GE_GW13.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K27me3 GW13")
+DM_H3K27me3_GW_GE_GW17_DAVID <- enrich("DM_H3K27me3_GW_GE_GW17.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K27me3 GW17")
+grid.newpage()
+layOut(list(DM_H3K4me3_GW_GE_GW13_DAVID, 1:3, 1), 
+       list(DM_H3K4me3_GW_GE_GW17_DAVID, 4:5, 1), 
+       list(DM_H3K27me3_GW_GE_GW13_DAVID, 1:3, 2),
+       list(DM_H3K27me3_GW_GE_GW17_DAVID, 4:5, 2)) 
+pdf("FigureS5b.pdf", height = 4, width = 12)
+layOut(list(DM_H3K4me3_GW_GE_GW13_DAVID, 1:3, 1), 
+       list(DM_H3K4me3_GW_GE_GW17_DAVID, 4:5, 1), 
+       list(DM_H3K27me3_GW_GE_GW13_DAVID, 1:3, 2),
+       list(DM_H3K27me3_GW_GE_GW17_DAVID, 4:5, 2)) 
 dev.off()
 ```
 
-### Figure S4b: DM his DAVID
+### Figure S5c: DM his & DE DAVID
 
-### Figure S4c: DM his & DE DAVID
+```{r DMhis_DE_DAVID}
+(DM_H3K27me3_DE_GW_GE_DAVID <- DM_H3K27me3_DE_GW_GE_DAVID + xlab("") + ggtitle("DM H3K27me3 DE"))
+ggsave(DM_H3K27me3_DE_GW_GE_DAVID, file = "FigureS5c.pdf", height = 4, width = 7)
+```
 
 ## Figure S5
 ### Figure S5a: Transcriptional clustering
