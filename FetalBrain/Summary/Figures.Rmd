@@ -139,12 +139,13 @@ dev.off()
 ### Figure 2b: UMR GREAT
 
 ```{r MZ_UMR_GREAT}
-GREAT_HuFNSC01.UMR.Brain <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/enrich/", file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hypo", name = "Brain-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Brain-Subject1 UMR")
-GREAT_HuFNSC02.UMR.Brain <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/enrich/", file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hyper", name = "Brain-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Brain-Subject2 UMR")
-GREAT_HuFNSC01.UMR.Cortex <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hypo", name = "Cortex-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Cortex-Subject1 UMR")
-GREAT_HuFNSC02.UMR.Cortex <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hyper", name = "Cortex-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Cortex-Subject2 UMR")
-GREAT_HuFNSC01.UMR.GE <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hypo", name = "GE-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("GE-Subject1 UMR")
-GREAT_HuFNSC02.UMR.GE <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/", file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hyper", name = "GE-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("GE-Subject2 UMR")
+setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
+GREAT_HuFNSC01.UMR.Brain <- enrich_GREAT(file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hypo", name = "Brain-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Brain-Subject1 UMR")
+GREAT_HuFNSC02.UMR.Brain <- enrich_GREAT(file = "DMR.Brain-HuFNSC01_Brain-HuFNSC02.hyper", name = "Brain-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Brain-Subject2 UMR")
+GREAT_HuFNSC01.UMR.Cortex <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hypo", name = "Cortex-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("Cortex-Subject1 UMR")
+GREAT_HuFNSC02.UMR.Cortex <- enrich_GREAT(file = "DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.hyper", name = "Cortex-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("Cortex-Subject2 UMR")
+GREAT_HuFNSC01.UMR.GE <- enrich_GREAT(file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hypo", name = "GE-HuFNSC01.UMRs", categories = "InterPro") + scale_fill_manual(values = "red", guide = "none") + ggtitle("GE-Subject1 UMR")
+GREAT_HuFNSC02.UMR.GE <- enrich_GREAT(file = "DMR.GE-HuFNSC01_GE-HuFNSC02.hyper", name = "GE-HuFNSC02.UMRs", categories = "InterPro") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("GE-Subject2 UMR")
 grid.newpage()
 layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1), 
        list(GREAT_HuFNSC02.UMR.Brain, 2, 1), 
@@ -152,7 +153,7 @@ layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1),
        list(GREAT_HuFNSC02.UMR.Cortex, 2, 2),
        list(GREAT_HuFNSC01.UMR.GE, 1, 3),
        list(GREAT_HuFNSC02.UMR.GE, 2, 3))
-pdf("Figure2b.pdf", height = 4, width = 12)
+pdf("/projects/epigenomics/users/lli/FetalBrain/Figures/Figure2b.pdf", height = 4, width = 12)
 layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1), 
        list(GREAT_HuFNSC02.UMR.Brain, 2, 1), 
        list(GREAT_HuFNSC01.UMR.Cortex, 1, 2),
@@ -688,12 +689,13 @@ ggsave(WGBS_MeDIP_diff_summary_figure, file = "FigureS3b.pdf", height = 4, width
 ### Figure S3c: 5hmC GREAT
 
 ```{r 5hmC_GREAT}
-GREAT_Cortex02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("5hmC Cortex")
-GREAT_GE02.hydroxy <- enrich_GREAT(dirIn = "/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/enrich/", file = "hydroxy_GE02", name = "GE02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("5hmC GE")
+setwd("/projects/epigenomics/users/lli/FetalBrain/WGBS_MeDIP/")
+GREAT_Cortex02.hydroxy <- enrich_GREAT(file = "hydroxy_Cortex02", name = "Cortex02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("5hmC Cortex")
+GREAT_GE02.hydroxy <- enrich_GREAT(file = "hydroxy_GE02", name = "GE02.hydroxy", categories = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("5hmC GE")
 grid.newpage()
 layOut(list(GREAT_Cortex02.hydroxy, 1, 1), 
        list(GREAT_GE02.hydroxy, 1, 2)) 
-pdf("FigureS3c.pdf", height = 6, width = 12)
+pdf("/projects/epigenomics/users/lli/FetalBrain/Figures/FigureS3c.pdf", height = 6, width = 12)
 layOut(list(GREAT_Cortex02.hydroxy, 1, 1), 
        list(GREAT_GE02.hydroxy, 1, 2)) 
 dev.off()
@@ -795,16 +797,17 @@ dev.off()
 ### Figure S5b: DM his DAVID
 
 ```{r DMhis_DAVID_GW}
-DM_H3K4me3_GW_GE_GW13_DAVID <- enrich("DM_H3K4me3_GW_GE_GW13.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K4me3 GW13")
-DM_H3K4me3_GW_GE_GW17_DAVID <- enrich("DM_H3K4me3_GW_GE_GW17.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K4me3 GW17")
-DM_H3K27me3_GW_GE_GW13_DAVID <- enrich("DM_H3K27me3_GW_GE_GW13.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K27me3 GW13")
-DM_H3K27me3_GW_GE_GW17_DAVID <- enrich("DM_H3K27me3_GW_GE_GW17.pc", dirIn = "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/enrich/", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K27me3 GW17")
+setwd("/projects/epigenomics/users/lli/FetalBrain/ChIPseq/signal/")
+DM_H3K4me3_GW_GE_GW13_DAVID <- enrich("DM_H3K4me3_GW_GE_GW13.pc", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K4me3 GW13")
+DM_H3K4me3_GW_GE_GW17_DAVID <- enrich("DM_H3K4me3_GW_GE_GW17.pc", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K4me3 GW17")
+DM_H3K27me3_GW_GE_GW13_DAVID <- enrich("DM_H3K27me3_GW_GE_GW13.pc", erminej = F, category = "GOBP") + scale_fill_manual(values = "red", guide = "none") + ggtitle("H3K27me3 GW13")
+DM_H3K27me3_GW_GE_GW17_DAVID <- enrich("DM_H3K27me3_GW_GE_GW17.pc", erminej = F, category = "GOBP") + scale_fill_manual(values = "blue", guide = "none") + ggtitle("H3K27me3 GW17")
 grid.newpage()
 layOut(list(DM_H3K4me3_GW_GE_GW13_DAVID, 1:3, 1), 
        list(DM_H3K4me3_GW_GE_GW17_DAVID, 4:5, 1), 
        list(DM_H3K27me3_GW_GE_GW13_DAVID, 1:3, 2),
        list(DM_H3K27me3_GW_GE_GW17_DAVID, 4:5, 2)) 
-pdf("FigureS5b.pdf", height = 4, width = 12)
+pdf("/projects/epigenomics/users/lli/FetalBrain/Figures/FigureS5b.pdf", height = 4, width = 12)
 layOut(list(DM_H3K4me3_GW_GE_GW13_DAVID, 1:3, 1), 
        list(DM_H3K4me3_GW_GE_GW17_DAVID, 4:5, 1), 
        list(DM_H3K27me3_GW_GE_GW13_DAVID, 1:3, 2),

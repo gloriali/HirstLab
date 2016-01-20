@@ -2,7 +2,7 @@
 Gloria Li  
 November 4, 2014  
 
-Updated: Tue Dec 15 10:50:14 2015
+Updated: Tue Jan 19 17:22:10 2016
 
 
 
@@ -32,9 +32,11 @@ Updated: Tue Dec 15 10:50:14 2015
 ##   2
 ```
 
-### Figure 2c
 
-![](Figures_files/figure-html/MZ_UMR_DM_DE-1.png) 
+
+### Figure 2b: UMR GREAT
+
+![](Figures_files/figure-html/MZ_UMR_GREAT-1.png) 
 
 ```
 ## png 
@@ -45,12 +47,23 @@ Updated: Tue Dec 15 10:50:14 2015
 
 ![](Figures_files/figure-html/MZ_UMR_DE-1.png) 
 
+### Figure 2d
+
+
+
 ## Figure 3. Epigenetic and transcriptomic comparisons between cortex and GE NPCs revealed key regulators in brain development.            
 ### Figure 3a: Scale of UMRs and DE genes between NPCs 
 
 * WGBS UMR frequency (top panel, bp/Mb), fold enrichment of UMRs in enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between cortex and GE NPCs in GW13 (left panel), and GW17 (right panel). Cortex-specific UMRs and genes upregulated in cortex are shown in red, and GE-specific UMRs and genes upregulated in GE are shown in blue.        
 
 ![](Figures_files/figure-html/NPCs_scale-1.png) 
+
+```
+## png 
+##   2
+```
+
+![](Figures_files/figure-html/NPCs_scale2-1.png) 
 
 ```
 ## png 
@@ -76,6 +89,13 @@ Updated: Tue Dec 15 10:50:14 2015
 * WGBS UMR frequency (top panel, bp/Mb), fold enrichment of UMRs in enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between GW13 and GW17 in NPCs cortex (left panel), and GE (right panel). GW13-specific UMRs and genes upregulated in GW13 are shown in red, and GW17-specific UMRs and genes upregulated in GW17 are shown in blue.        
 
 ![](Figures_files/figure-html/GW_scale-1.png) 
+
+```
+## png 
+##   2
+```
+
+![](Figures_files/figure-html/GW_scale2-1.png) 
 
 ```
 ## png 
@@ -176,21 +196,18 @@ Updated: Tue Dec 15 10:50:14 2015
 * MeDIP UMR frequency (top panel, bp/Mb), No. of unique enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between MZ twins (left panel), and between two NPC cell types (right panel). HuFNSC01-specific/cortex-specific UMRs and genes upregulated in HuFNSC01/cortex are shown in red, and HuFNSC02-specific/GE-specific UMRs and genes upregulated in HuFNSC02/GE are shown in blue.        
 * _Note the opposite direction of UMRs and unique enhancers, why?_      
 
-![](Figures_files/figure-html/MZ_scale_compare-1.png) 
 
-```
-## png 
-##   2
-```
 
-### Figure S2b: UMR GREAT
-
-### Figure S2c: UMR genomic breakdown
+### Figure S2a: UMR genomic breakdown
 * Fold enrichment on log2 scale for overlapping genomic regions with MeDIP UMRs between MZ twins    
 
 ![](Figures_files/figure-html/genomicBreak_MZ-1.png) 
 
-### Figure S2d: Venn Diagram of DE genes
+### Figure S2b: RPKM - histone modifications
+
+![](Figures_files/figure-html/RPKM_his-1.png) 
+
+### Figure S2c: Venn Diagram of DE genes
 * Venn diagrame of No. of differential expressed genes between MZ twins in different cell types     
   
 ![](Figures_files/figure-html/Venn_DE_MZ-1.png) 
@@ -200,13 +217,7 @@ Updated: Tue Dec 15 10:50:14 2015
 ##   2
 ```
 
-### Figure S2e: RPKM - histone modifications
-
-![](Figures_files/figure-html/RPKM_his-1.png) 
-
-### Figure S2f: DM histone modification DAVID
-
-### Figure S2g: DAVID for DE genes
+### Figure S2d: DAVID for DE genes
 * DAVID GO biological processes enriched for DE genes between MZ twins        
 
 ![](Figures_files/figure-html/DE_DAVID_MZ-1.png) 
@@ -229,22 +240,35 @@ Updated: Tue Dec 15 10:50:14 2015
 
 ### Figure S3c: 5hmC GREAT
 
-### Figure S3d: core enhancer homer TFs
+![](Figures_files/figure-html/5hmC_GREAT-1.png) 
 
-### Figure S3e: DAVID for DE genes
+```
+## png 
+##   2
+```
+
+## Figure S4
+### Figure S4a: core enhancer homer TFs
+
+![](Figures_files/figure-html/core_enhancer_homer-1.png) 
+
+### Figure S4b: DAVID for DE genes
 * DAVID GO biological processes enriched for DE genes between MZ twins (A), between cortex and GE NPCs (B), and between gestational weeks (C).    
 
 ![](Figures_files/figure-html/DE_DAVID_NPC-1.png) 
 
-### Figure S3f: DAVID for isoform
+### Figure S4c: DAVID for isoform
 * DAVID enriched terms (FDR < 0.01) for isoforms between cortex and GE NPCs         
 
 ![](Figures_files/figure-html/isoform_DAVID_NPC-1.png) 
 
-### Figure S3g: UMR - DM his - DE
+### Figure S4d: UMR - DM his - DE
 
-## Figure S4
-### Figure S4a: GREAT enrichment for GW UMRs  
+![](Figures_files/figure-html/UMR_DM_DE_NPC-1.png) 
+
+
+## Figure S5
+### Figure S5a: GREAT enrichment for GW UMRs  
 
 * GREAT GO biological processes enriched terms for UMRs between gestational weeks in cortex (A), GE (B), and shared by two cell types (C). GW13 UMRs are shown in red, and GW17 UMRs in blue.       
 
@@ -255,12 +279,21 @@ Updated: Tue Dec 15 10:50:14 2015
 ##   2
 ```
 
-### Figure S4b: DM his DAVID
+### Figure S5b: DM his DAVID
 
-### Figure S4c: DM his & DE DAVID
+![](Figures_files/figure-html/DMhis_DAVID_GW-1.png) 
 
-## Figure S5
-### Figure S5a: Transcriptional clustering
+```
+## png 
+##   2
+```
+
+### Figure S5c: DM his & DE DAVID
+
+![](Figures_files/figure-html/DMhis_DE_DAVID-1.png) 
+
+## Figure S6
+### Figure S6a: Transcriptional clustering
 
 * Unsupervised clustering on gene-level (A), exon-level (B), and miRNA (C) reveals fetal brain cell type relationships.         
 
@@ -273,6 +306,14 @@ Updated: Tue Dec 15 10:50:14 2015
 
 ### Figure S5b: nc patterns
 
+## Tables
+
+* Table S1. Summary of molecular libraries and accessions.        
+* Table S2. List of UMRs between MZ twins, NPCs and across developmental stages.    
+* Table S3. Histone modification enriched regions from FindER.    
+* Table S4. List of gene promoters differentially marked by H3K4me3 and H3K27me3 between MZ twins, NPCs and across developmental stages.      
+* Table S5. Differentially expressed genes between MZ twins, NPCs and across developmental stages.      
+* Table S6. GWAS sites overlapped with NPC core enhancers.      
 
 --------
 ## Candidates    
