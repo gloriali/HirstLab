@@ -350,57 +350,49 @@ GW_scale_DE_figure <- ggplot(GW_scale_DE, aes(x = sample, y = value, fill = Mark
    theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
 grid.newpage()
 layOut(list(GW_scale_UMR_figure, 1:3, 1:3), list(GW_scale_his_figure, 1:2, 4:9), list(GW_scale_DE_figure, 1:3, 10:13)) 
-pdf("Figure4a.pdf", height = 8, width = 7)
-layOut(list(GW_scale_UMR_figure, 1:3, 1:3), list(GW_scale_his_figure, 1:2, 4:9), list(GW_scale_DE_figure, 1:3, 10:13)) 
-dev.off()
 ```
 
-### Figure 4b: GW unique enhancer TFBSs
+### Figure 5c: GW unique enhancer TFBSs
 
 * Transcription factors exclusively statistically enriched (Benjamini corrected p-value < 0.01, and percent of enhancers with motif > 20%) in GW17 unique enhancers.     
 
 ```{r GW_enhancer_TFBS, fig.height=6, fig.width=8}
+homer_unique_enhancer_GW_GW17only_figure$data <- homer_unique_enhancer_GW_GW17only_figure$data %>% mutate(TF = factor(gsub("AR-halfsite", "AR", TF), levels = c("AR", "PR", "Foxo1", "Ptf1a", "Olig2")))
 grid.newpage()
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm")), 1, 1:4),
        list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:9)) 
-pdf("Figure4b.pdf", height = 6, width = 8)
+pdf("Figure5c.pdf", height = 5, width = 7)
 layOut(list(homer_unique_enhancer_GW_GW17only_figure + theme(plot.margin=unit(c(1,0,1,1), "cm"), axis.text.y = element_text(size = 15)), 1, 1:4),
        list(homer_unique_enhancer_GW_GW17only_RPKM_figure, 1, 5:9)) 
 dev.off()
 ```
 
-### Figure 4c: TF-binding enhancers are hypomethylated
+### Figure 5d: TF-binding enhancers are hypomethylated, targets are up-regulated
 
-```{r GW_enhancer_TFBS_5mC}
-(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + theme(axis.text.y = element_text(size = 15)))
-ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + theme(axis.text.y = element_text(size = 15)), file = "Figure4c.pdf", height = 6, width = 6)
+```{r GW_enhancer_TFBS_5mC_RPKM, fig.height=4, fig.width=6}
+homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure$data <- homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure$data %>% filter(TF %in% c("Olig2", "Foxo1", "AR-halfsite")) %>% mutate(TF = gsub("AR-halfsite", "AR", TF), Category = gsub("delta_5mC", "Enhancer_delta_5mC", Category))
+homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure$data <- homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure$data %>% filter(TF %in% c("Olig2", "Foxo1", "AR-halfsite"), Category == "Target_RPKM_GE_FC") %>% mutate(TF = gsub("AR-halfsite", "AR", TF), Category = gsub("Target_RPKM_GE_FC", "Target_RPKM_FC", Category))
+grid.newpage()
+layOut(list(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + facet_wrap(~ Category) + theme(plot.margin=unit(c(1,-0.8,1,1), "cm"), plot.background = element_rect(fill = "transparent"), axis.text.y = element_text(size = 15)), 1, 1),
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + facet_wrap(~ Category) + theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "transparent"), plot.margin=unit(c(1,1,1,0.1), "cm"), plot.background = element_rect(fill = "transparent"), axis.text.y = element_text(size = 15)), 1, 2)) 
+pdf("Figure5d.pdf", height = 4, width = 8)
+layOut(list(homer_unique_enhancer_GW_GW17only_targets_TF_5mCdelta_figure + facet_wrap(~ Category) + theme(plot.margin=unit(c(1,-0.8,1,1), "cm"), plot.background = element_rect(fill = "transparent"), axis.text.y = element_text(size = 15)), 1, 1),
+       list(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + facet_wrap(~ Category) + theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "transparent"), plot.margin=unit(c(1,1,1,0.1), "cm"), plot.background = element_rect(fill = "transparent"), axis.text.y = element_text(size = 15)), 1, 2)) 
+dev.off()
 ```
 
-### Figure 4d: TF-binding enhancer targets are up-regulated
-
-```{r GW_enhancer_TFBS_RPKM}
-(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + theme(axis.text.y = element_text(size = 15)))
-ggsave(homer_unique_enhancer_GW_GW17only_targets_TF_RPKM_FC_figure + theme(axis.text.y = element_text(size = 15)), file = "Figure4d.pdf", height = 6, width = 6)
-```
-
-## Figure 5. OLIG2
-### Figure 5a: OLIG2
-
-* UCSC genome browser shot of Oligodendrocyte Lineage Transcription Factor 2 (OLIG2) hypomethylated in promoter region and upregulated in GW17.     
-
-![](./Figures_files/figure-html/OLIG2.png)     
-
-### Figure 5b: Heatmap of OLIG2 target genes   
+## Figure 6. OLIG2
+### Figure 6b: Heatmap of OLIG2 target genes   
 
 ```{r GW_OLIG2_heatmap, fig.height = 7, fig.width = 7}
 e <- 1e-4
 grid.arrange(GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 1, widths = c(0.33, 0.33, 0.34))
-pdf("Figure5b.pdf", height = 7, width = 7)
+pdf("Figure6b.pdf", height = 7, width = 7)
 grid.arrange(GW17only_Olig2_UMR_K4me1_heatmap, GW17only_Olig2_UMR_mC_heatmap, GW17only_Olig2_UMR_RPKM_heatmap, nrow = 1, widths = c(0.33, 0.33, 0.34))
 dev.off()
 ```
 
-### Figure 5c: DAVID for OLIG2 target genes
+### Figure 6c: DAVID for OLIG2 target genes
 * Gene Ontology biological processes enriched in OLIG2 downstream target genes in cortex NPCs (red), and GE NPCs (blue).    
 
 ```{r GW_OLIG2_DAVID, fig.height = 7, fig.width = 8}
