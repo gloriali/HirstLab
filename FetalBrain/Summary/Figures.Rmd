@@ -394,8 +394,8 @@ unique_enhancer_GW_Olig2_DE_DAVID <- unique_enhancer_GW_Olig2_DE_DAVID %>% mutat
   scale_fill_manual(values = c("red", "blue"), name = "") + 
   scale_y_continuous(breaks = c(-2, 0, 2, 4), labels = abs(c(-2, 0, 2, 4))) + 
   theme_bw() +
-  theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15)))
-ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure6c.pdf", height = 7, width = 9)
+  theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15), plot.background = element_rect(fill = "transparent")))
+ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure6c.pdf", height = 6, width = 8)
 ```
 
 ## Figure 7: Transcriptional activation in neurospheres happens at different gestational stages, with major wave at GW13-GW15 in cortex, and at GW15-GW17 in GE     
