@@ -21,6 +21,7 @@ library(dendextend)
 library(reshape)
 library(wq)
 library(dplyr)
+library(RCircos)
 setwd("/projects/epigenomics/users/lli/FetalBrain/")
 load("./MeDIP/DMR_MZ.Rdata")
 load("./MeDIP/DMR_neurospheres.Rdata")
@@ -131,12 +132,35 @@ MZ_scale_DE_figure <- ggplot(MZ_scale_DE, aes(x = sample, y = value, fill = Mark
    theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
 grid.newpage()
 layOut(list(MZ_scale_UMR_figure, 1, 1:3), list(MZ_scale_his_figure, 1, 4:9), list(MZ_scale_DE_figure, 1, 10:13)) 
-pdf("Figure2a.pdf", height = 8, width = 7)
-layOut(list(MZ_scale_UMR_figure, 1, 1:3), list(MZ_scale_his_figure, 1, 4:9), list(MZ_scale_DE_figure, 1, 10:13)) 
-dev.off()
 ```
 
-### Figure 2b: UMR GREAT
+```{r MZ_RCircus}
+UMR_MZ_Brain_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c4.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "red") 
+UMR_MZ_Brain_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Brain-HuFNSC01_Brain-HuFNSC02.m0.75.d0.6.s300.c4.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "blue") 
+UMR_MZ_Cortex_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c4.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "red") 
+UMR_MZ_Cortex_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.Cortex-HuFNSC01_Cortex-HuFNSC02.m0.75.d0.6.s300.c4.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "blue") 
+UMR_MZ_GE_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c4.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "red") 
+UMR_MZ_GE_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/DMR.GE-HuFNSC01_GE-HuFNSC02.m0.75.d0.6.s300.c4.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(chromEnd = chromStart + 1, data = 1, PlotColors = "blue") 
+data(UCSC.HG19.Human.CytoBandIdeogram);
+cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
+chr.exclude <- "chrY";
+num.inside <- 15;
+num.outside <- 0;
+RCircos.Set.Core.Components(cyto.info, chr.exclude, num.inside, num.outside)
+params <- RCircos.Get.Plot.Parameters()
+params$hist.width <- 50
+RCircos.Reset.Plot.Parameters(params)
+RCircos.Set.Plot.Area()
+RCircos.Chromosome.Ideogram.Plot()
+RCircos.Histogram.Plot(UMR_MZ_Brain_hypo, data.col=5, track.num=1, side="in")
+RCircos.Histogram.Plot(UMR_MZ_Brain_hyper, data.col=5, track.num=2, side="in")
+RCircos.Histogram.Plot(UMR_MZ_Cortex_hypo, data.col=5, track.num=4, side="in")
+RCircos.Histogram.Plot(UMR_MZ_Cortex_hyper, data.col=5, track.num=5, side="in")
+RCircos.Histogram.Plot(UMR_MZ_GE_hypo, data.col=5, track.num=7, side="in")
+RCircos.Histogram.Plot(UMR_MZ_GE_hyper, data.col=5, track.num=8, side="in")
+```
+
+### Figure 3b: UMR GREAT
 
 ```{r MZ_UMR_GREAT}
 setwd("/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/")
@@ -153,7 +177,8 @@ layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1),
        list(GREAT_HuFNSC02.UMR.Cortex, 2, 2),
        list(GREAT_HuFNSC01.UMR.GE, 1, 3),
        list(GREAT_HuFNSC02.UMR.GE, 2, 3))
-pdf("/projects/epigenomics/users/lli/FetalBrain/Figures/Figure2b.pdf", height = 4, width = 12)
+setwd("/projects/epigenomics/users/lli/FetalBrain/Figures")
+pdf("Figure3b.pdf", height = 4, width = 12)
 layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1), 
        list(GREAT_HuFNSC02.UMR.Brain, 2, 1), 
        list(GREAT_HuFNSC01.UMR.Cortex, 1, 2),
@@ -163,104 +188,49 @@ layOut(list(GREAT_HuFNSC01.UMR.Brain, 1, 1),
 dev.off()
 ```
 
-### Figure 2d 
+### Figure 3d 
 
 ```{r MZ_UMR_DE}
 (MZ_UMR_DE_DAVID)
-ggsave(MZ_UMR_DE_DAVID, file = "Figure2d.pdf", height = 5, width = 6)
+ggsave(MZ_UMR_DE_DAVID, file = "Figure3d.pdf", height = 5, width = 6)
 ```
 
-### Figure 2d
+## Figure 4. Epigenetic and transcriptomic comparisons between cortex and GE NPCs revealed key regulators in brain development.            
+### Figure 4a. UMR Circos    
 
-```{r MZ_UMR_DM_DE, height=3, eval=FALSE}
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
-pdf("Figure2d.pdf", height = 3, width = 8)
-grid.arrange(gTree(children = venn_Brain01_Brain02DE_epi), gTree(children = venn_Cortex01_Cortex02DE_epi), gTree(children = venn_GE01_GE02DE_epi), nrow = 1)
+```{r NPCs_RCircus}
+UMR_NPC_GW13_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "red") 
+UMR_NPC_GW13_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "blue") 
+UMR_NPC_GW17_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "red") 
+UMR_NPC_GW17_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC02_GE-HuFNSC02.m0.75.p0.005.d0.5.s300.c3.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "blue") 
+data(UCSC.HG19.Human.CytoBandIdeogram);
+cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
+chr.exclude <- "chrY";
+num.inside <- 10;
+num.outside <- 0;
+RCircos.Set.Core.Components(cyto.info, chr.exclude, num.inside, num.outside)
+params <- RCircos.Get.Plot.Parameters()
+params$hist.width <- 100
+RCircos.Reset.Plot.Parameters(params)
+RCircos.Set.Plot.Area()
+RCircos.Chromosome.Ideogram.Plot()
+RCircos.Histogram.Plot(UMR_NPC_GW17_hypo, data.col=5, track.num=1, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW17_hyper, data.col=5, track.num=2, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW13_hypo, data.col=5, track.num=4, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW13_hyper, data.col=5, track.num=5, side="in")
+legend("bottomright", c("Cortex UMR", "GE UMR"), col = c("red", "blue"), lwd = 8, cex = 0.8)
+pdf(file="Figure4a.pdf", height=6, width=6, compress=TRUE)
+RCircos.Set.Plot.Area()
+RCircos.Chromosome.Ideogram.Plot()
+RCircos.Histogram.Plot(UMR_NPC_GW17_hypo, data.col=5, track.num=1, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW17_hyper, data.col=5, track.num=2, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW13_hypo, data.col=5, track.num=4, side="in")
+RCircos.Histogram.Plot(UMR_NPC_GW13_hyper, data.col=5, track.num=5, side="in")
+legend("bottomright", c("Cortex UMR", "GE UMR"), col = c("red", "blue"), lwd = 8, cex = 0.8)
 dev.off()
 ```
 
-## Figure 3. Epigenetic and transcriptomic comparisons between cortex and GE NPCs revealed key regulators in brain development.            
-### Figure 3a: Scale of UMRs and DE genes between NPCs 
-
-* WGBS UMR frequency (top panel, bp/Mb), fold enrichment of UMRs in enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between cortex and GE NPCs in GW13 (left panel), and GW17 (right panel). Cortex-specific UMRs and genes upregulated in cortex are shown in red, and GE-specific UMRs and genes upregulated in GE are shown in blue.        
-
-```{r NPCs_scale, fig.height = 10, fig.width = 12}
-NPCs_scale <- data.frame(Donor = c(rep(c("HuFNSC02", "HuFNSC04", "HuFNSC02", "HuFNSC04", "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 2), "HuFNSC01", "HuFNSC02", "HuFNSC03", "HuFNSC04"), 
-                                 GW = c(rep(c("GW17", "GW13", "GW17", "GW13", "GW17", "GW17", "GW13", "GW13"), 2), "GW17", "GW17", "GW13", "GW13"), 
-                                 Assay = factor(c(rep(c(rep("UMRs", 2), rep("Enhancer UMRs", 2), rep("DE genes", 4)), 2), rep("Isoforms", 4)), levels = c("UMRs", "Enhancer UMRs", "DE genes", "Isoforms")), 
-                                 DM_DE = c(rep(c("Cortex", "GE"), each = 8), rep("Isoform", 4)), 
-                                 value = c((filter(DMR_freq_WGBS_figure$data, DM == -1) %>% group_by(donor) %>% summarize(m = -mean(freq)))$m, UMR_enhancer_enrich[c(2,4), "enrich"], cortex_GE_DE_summary$UP, (filter(DMR_freq_WGBS_figure$data, DM == 1) %>% group_by(donor) %>% summarize(m = mean(freq)))$m, UMR_enhancer_enrich[c(1,3), "enrich"], cortex_GE_DE_summary$DN, cortex_GE_summary[, "isoform_genes"]))
-NPCs_scale[NPCs_scale$DM_DE == "GE", "value"] <- -NPCs_scale[NPCs_scale$DM_DE == "GE", "value"]
-NPCs_scale <- filter(NPCs_scale, Donor %in% c("HuFNSC02", "HuFNSC04"), as.character(Assay) != "Enhancer UMRs")
-NPCs_scale_figure <- ggplot(NPCs_scale, aes(x = GW, y = value, fill = DM_DE)) + 
-   geom_bar(stat="identity", position = "identity", width = 0.4) + 
-   geom_hline(yintercept = 0) + 
-   facet_grid(Assay ~ GW, scales = "free") + 
-   scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   scale_y_continuous(breaks = c(-500, -200, -50, -2, 2, 50, 200, 500, 1000, 2000), labels = abs(c(-500, -200, -50, -2, 2, 50, 200, 500, 1000, 2000))) + 
-   xlab("") + 
-   ylab("") + 
-   theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
-NPCs_scale_figure_gt <- ggplot_gtable(ggplot_build(NPCs_scale_figure))
-grid.newpage()
-grid.draw(NPCs_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure3a.pdf", height = 7, width = 6)
-grid.draw(NPCs_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.04, "npc"), y = unit(0.8, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.53, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of isoform genes", x = unit(0.015, "npc"), y = unit(0.23, "npc"), rot = 90, gp=gpar(fontsize=15))
-dev.off()
-```
-
-```{r NPCs_scale2}
-dirIn <- "/projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/"
-NPCs_scale_his <- rbind(read.delim(paste0(dirIn, "H3K4me1/unique/unique_enhancer.summary"), as.is = T), 
-                      read.delim(paste0(dirIn, "H3K4me3/unique/unique_H3K4me3.summary"), as.is = T), 
-                      read.delim(paste0(dirIn, "H3K9me3/unique/unique_H3K9me3.summary"), as.is = T), 
-                      read.delim(paste0(dirIn, "H3K27me3/unique/unique_H3K27me3.summary"), as.is = T), 
-                      read.delim(paste0(dirIn, "H3K36me3/unique/unique_H3K36me3.summary"), as.is = T)) %>% filter(Comparison == "NPCs") %>% mutate(subject = gsub("_.*", "", Samples), subject = paste0("Subject", gsub("Cortex0", "", subject))) %>% select(Mark, subject, Sample1_unique, Sample2_unique) %>% melt(id = c("Mark", "subject")) %>% mutate(Category = "Histone Modifications", sample = ifelse(variable == "Sample1_unique", "Unique in Cortex", "Unique in GE"), Mark = factor(Mark, levels = c("H3K4me1", "H3K4me3", "H3K9me3", "H3K27me3", "H3K36me3"))) %>% select(-variable)
-NPCs_scale_his_figure <- ggplot(NPCs_scale_his, aes(x = sample, y = value/1e6, fill = Mark)) + 
-   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
-   facet_grid(subject ~ Category) + 
-   xlab("") + 
-   ylab("Total length (Mb)") + 
-   theme_bw() + 
-   guides(fill = guide_legend(title = "", nrow = 2)) + 
-   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
-NPCs_scale_UMR <- DMR_freq_WGBS_figure$data %>% group_by(DM, donor) %>% summarize(value = abs(sum(DMRlen))) %>% mutate(sample = ifelse(DM == 1, "UMR in GE", "UMR in Cortex"), Mark = "DNAme", Category = "DNAme", subject = factor(gsub("HuFNSC0", "Subject", donor), levels = c("Subject4", "Subject2"))) 
-NPCs_scale_UMR$DM <- NULL
-NPCs_scale_UMR$donor <- NULL
-NPCs_scale_UMR_figure <- ggplot(NPCs_scale_UMR, aes(x = sample, y = value/1e3, fill = Mark)) + 
-   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
-   facet_grid(subject ~ Category) + 
-   scale_fill_manual(values = "orange") + 
-   xlab("") + 
-   ylab("Total length (Kb)") + 
-   theme_bw() + 
-   guides(fill = guide_legend(title = "", nrow = 2)) + 
-   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), legend.key.size = unit(0.5, "cm"))
-NPCs_scale_DE <- rbind(data.frame(subject = rep(c("HuFNSC02", "HuFNSC04"), 2), variable = rep(c("UP", "DN"), each = 2)) %>% mutate(Mark = "nc genes", value = mapply(function(x, y) as.numeric(system(paste0("wc -l ", "/projects/epigenomics/users/lli/FetalBrain/RNAseq/DEfine/nc/", x, ".Cortex-", y, "_GE-", y, ".FDR_0.01.rmin_0.005.Nmin_25 | cut -d' ' -f 1"), intern = T)), variable, subject)), cortex_GE_DE_summary[c("HuFNSC02", "HuFNSC04"),] %>% mutate(subject = rownames(cortex_GE_DE_summary[c("HuFNSC02", "HuFNSC04"),]), DE = NULL) %>% melt(id = "subject") %>% mutate(Mark = "pc genes")) %>% mutate(Category = "Transcriptome", sample = ifelse(variable == "UP", "UP in Cortex", "UP in GE"), variable = NULL, subject = factor(gsub("HuFNSC0", "Subject", subject), levels = c("Subject4", "Subject2")))
-NPCs_scale_DE_figure <- ggplot(NPCs_scale_DE, aes(x = sample, y = value, fill = Mark)) + 
-   geom_bar(stat="identity", wdith = 0.5, position="dodge") + 
-   facet_grid(subject ~ Category) + 
-   scale_fill_manual(values = c("blue", "red")) + 
-   xlab("") + 
-   ylab("No. of genes") + 
-   theme_bw() + 
-   guides(fill = guide_legend(title = "", nrow = 2)) + 
-   theme(axis.text.x = element_text(angle = 90), legend.position = "top", legend.direction = "horizontal", plot.background = element_rect(fill = "transparent"), plot.margin = unit(c(0.5, 0.5, 0.5, 0), "cm"), legend.key.size = unit(0.5, "cm"))
-grid.newpage()
-layOut(list(NPCs_scale_UMR_figure, 1, 1:3), list(NPCs_scale_his_figure, 1, 4:9), list(NPCs_scale_DE_figure, 1, 10:13)) 
-pdf("Figure3a.pdf", height = 8, width = 7)
-layOut(list(NPCs_scale_UMR_figure, 1, 1:3), list(NPCs_scale_his_figure, 1, 4:9), list(NPCs_scale_DE_figure, 1, 10:13)) 
-dev.off()
-```
-
-### Figure 3b: GREAT enrichment for NPCs UMRs
+### Figure 4b: GREAT enrichment for NPCs UMRs
 
 * GREAT GO biological processes terms statistically enriched (region-based binomial and hypergeometric FDR < 0.05) in cortex UMRs (red), and GE UMRs (blue).     
 
@@ -276,21 +246,47 @@ GOBP_Cortex02_GE02_WGBS <- mutate(filter(GOBP_Cortex02_GE02_WGBS, Term %in% Term
   coord_flip() + 
   xlab("") + 
   ylab("-log10(FDR)") + 
-  scale_fill_manual(values = c("red", "blue"), name = "") + 
+  scale_fill_manual(values = c("red", "blue"), name = "", guide = "none") + 
   theme_bw() + 
   theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15)))
-ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "Figure3b.pdf", height = 10, width = 9)
+ggsave(GOBP_Cortex02_GE02_WGBS_figure, file = "Figure4b.pdf", height = 9, width = 8)
 ```
 
-### Figure 3c: GFAP and NFIX
+## Figure 5: Differences between GW are asymmetric, with more GW17-specific UMRs and up-regulated genes    
+### Figure 5a: UMR Circos 
+```{r GW_RCircus}
+UMR_GW_cortex_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "red") 
+UMR_GW_cortex_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/DMR.Cortex-HuFNSC02_Cortex-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "blue") 
+UMR_GW_GE_hypo <- read.delim("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "red") 
+UMR_GW_GE_hyper <- read.delim("/projects/epigenomics/users/lli/FetalBrain/GW/DMR/DMR.GE-HuFNSC02_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed", head = F, col.names = c("Chromosome", "chromStart", "chromEnd", "ID")) %>% mutate(data = 1, PlotColors = "blue")
+data(UCSC.HG19.Human.CytoBandIdeogram);
+cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
+chr.exclude <- "chrY";
+num.inside <- 10;
+num.outside <- 0;
+RCircos.Set.Core.Components(cyto.info, chr.exclude, num.inside, num.outside)
+params <- RCircos.Get.Plot.Parameters()
+params$hist.width <- 100
+RCircos.Reset.Plot.Parameters(params)
+RCircos.Set.Plot.Area()
+RCircos.Chromosome.Ideogram.Plot()
+RCircos.Histogram.Plot(UMR_GW_cortex_hypo, data.col=5, track.num=1, side="in")
+RCircos.Histogram.Plot(UMR_GW_cortex_hyper, data.col=5, track.num=2, side="in")
+RCircos.Histogram.Plot(UMR_GW_GE_hypo, data.col=5, track.num=4, side="in")
+RCircos.Histogram.Plot(UMR_GW_GE_hyper, data.col=5, track.num=5, side="in")
+legend("bottomright", c("GW13 UMR", "GW17 UMR"), col = c("red", "blue"), lwd = 8, cex = 0.8)
+pdf(file="Figure5a.pdf", height=6, width=6, compress=TRUE)
+RCircos.Set.Plot.Area()
+RCircos.Chromosome.Ideogram.Plot()
+RCircos.Histogram.Plot(UMR_GW_cortex_hypo, data.col=5, track.num=1, side="in")
+RCircos.Histogram.Plot(UMR_GW_cortex_hyper, data.col=5, track.num=2, side="in")
+RCircos.Histogram.Plot(UMR_GW_GE_hypo, data.col=5, track.num=4, side="in")
+RCircos.Histogram.Plot(UMR_GW_GE_hyper, data.col=5, track.num=5, side="in")
+legend("bottomright", c("GW13 UMR", "GW17 UMR"), col = c("red", "blue"), lwd = 8, cex = 0.8)
+dev.off()
+```
 
-* UCSC genome browser shot of examples of cortex UMR activated genes, top panel: Glial Fibrillary Acidic Protein (GFAP), bottom panel: Nuclear Factor I/X (CCAAT-Binding Transcription Factor, NFIX).     
-
-![](./Figures_files/figure-html/GFAP.png)     
-![](./Figures_files/figure-html/NFIX.png)   
-
-## Figure 4: Differences between GW are asymmetric, with more GW17-specific UMRs and up-regulated genes    
-### Figure 4a: UMRs and DE genes between GW 
+### Figure 5b: UMRs enrichment in enhancers
 
 * WGBS UMR frequency (top panel, bp/Mb), fold enrichment of UMRs in enhancers (second panel), No. of differential expressed genes (third panel), and No. of isoform genes (bottom panel) between GW13 and GW17 in NPCs cortex (left panel), and GE (right panel). GW13-specific UMRs and genes upregulated in GW13 are shown in red, and GW17-specific UMRs and genes upregulated in GW17 are shown in blue.        
 
@@ -301,28 +297,19 @@ GW_scale <- data.frame(Cell = rep(c("Cortex", "GE"), 7),
                        value = c((filter(DMR_freq_GW_figure$data, DM == -1) %>% group_by(cell) %>% summarize(m = -mean(freq)))$m, UMR_enhancer_enrich[c(6, 8), "enrich"], GW_DE_summary[GW_DE_summary$Sample %in% c("GW17-GW13.2_cortex", "GW17-GW13.2_GE"), ]$UP, (filter(DMR_freq_GW_figure$data, DM == 1) %>% group_by(cell) %>% summarize(m = mean(freq)))$m, UMR_enhancer_enrich[c(5, 7), "enrich"], GW_DE_summary[GW_DE_summary$Sample %in% c("GW17-GW13.2_cortex", "GW17-GW13.2_GE"), ]$DN, as.numeric(as.vector(GW_isoform_summary[GW_isoform_summary$Sample %in% c("Cortex-HuFNSC02_Cortex-HuFNSC04", "GE-HuFNSC02_GE-HuFNSC04"), "isoform_genes"])))) %>%
   filter(as.character(DM_DE) != "Isoform")
 GW_scale[GW_scale$DM_DE == "GW13", "value"] <- -GW_scale[GW_scale$DM_DE == "GW13", "value"]
-GW_scale_figure <- ggplot(GW_scale, aes(x = Cell, y = value, fill = DM_DE)) + 
+GW_scale <- GW_scale %>% filter(Assay == "Enhancer UMRs")
+(GW_scale_figure <- ggplot(GW_scale, aes(x = Cell, y = value, fill = DM_DE)) + 
    geom_bar(stat="identity", position = "identity", width = 0.4) + 
    geom_hline(yintercept = 0) + 
-   facet_grid(Assay ~ Cell, scales = "free") + 
-   scale_fill_manual(values = c("red", "blue", "black"), name = "") + 
-   scale_y_continuous(breaks = c(-100, -1, 1, 100, 250, 500, 2000), labels = abs(c(-100, -1, 1, 100, 250, 500, 2000))) + 
+   # facet_grid(Assay ~ Cell, scales = "free") + 
+   scale_fill_manual(values = c("red", "blue"), name = "", labels = c("GW13 UMR", "GW17 UMR")) + 
+   scale_y_continuous(breaks = c(-1, -2, 1, 2, 3), labels = abs(c(-1, -2, 1, 2, 3))) + 
    xlab("") + 
-   ylab("") + 
+   ylab("Fold enrichment") + 
+   ggtitle("UMR enrichment in enhancers") +
    theme_bw() + 
-   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15))
-GW_scale_figure_gt <- ggplot_gtable(ggplot_build(GW_scale_figure))
-grid.newpage()
-grid.draw(GW_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("UMR Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=15))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=15))
-pdf("Figure4a.pdf", height = 8, width = 6)
-grid.draw(GW_scale_figure_gt)
-grid.text("UMR frequency\n(bp/Mb)", x = unit(0.03, "npc"), y = unit(0.83, "npc"), rot = 90, gp=gpar(fontsize=12))
-grid.text("Fold Enrichment\nin Enhancers", x = unit(0.03, "npc"), y = unit(0.5, "npc"), rot = 90, gp=gpar(fontsize=12))
-grid.text("No. of DE genes", x = unit(0.015, "npc"), y = unit(0.2, "npc"), rot = 90, gp=gpar(fontsize=12))
-dev.off()
+   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 12), title = element_text(size = 15)))
+ggsave(GW_scale_figure, file = "Figure5b.pdf", height = 6, width = 5)
 ```
 
 ```{r GW_scale2}
