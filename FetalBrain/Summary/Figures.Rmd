@@ -415,44 +415,64 @@ unique_enhancer_GW_Olig2_DE_DAVID <- unique_enhancer_GW_Olig2_DE_DAVID %>% mutat
   scale_y_continuous(breaks = c(-2, 0, 2, 4), labels = abs(c(-2, 0, 2, 4))) + 
   theme_bw() +
   theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15), legend.text = element_text(size = 15)))
-ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure5c.pdf", height = 7, width = 9)
+ggsave(unique_enhancer_GW_Olig2_DE_DAVID_figure, file = "Figure6c.pdf", height = 7, width = 9)
 ```
 
-### Figure 5d: Differential expressed OLIG2 target genes   
+## Figure 7: Transcriptional activation in neurospheres happens at different gestational stages, with major wave at GW13-GW15 in cortex, and at GW15-GW17 in GE     
+### Figure 7a: cluster of pc gene 
+```{r cluster_pc}
+gene_FetalBrain <- read.delim("../Tables/rpkm_pc.txt", as.is = T, row.names = 1)
+colnames(gene_FetalBrain) <- gsub("HuFNSC0", "Subject", colnames(gene_FetalBrain))
+gene_dend <- (1- (gene_FetalBrain %>% as.matrix %>% cor(method = "spearman"))) %>% as.dist %>% hclust %>% as.dendrogram %>% 
+  set("by_labels_branches_col", value = c("Brain.Subject1", "Brain.Subject2"), TF_value = "green", type = "all") %>% 
+  set("by_labels_branches_col", value = c("Cortex.Subject1", "Cortex.Subject2", "Cortex.Subject3", "Cortex.Subject4"), TF_value = "red", type = "all") %>% 
+  set("by_labels_branches_col", value = c("GE.Subject1", "GE.Subject2", "GE.Subject3", "GE.Subject4"), TF_value = "blue", type = "all") %>% 
+  set("by_labels_branches_lwd", value = colnames(gene_FetalBrain), TF_value = 2)
+op <- par(mar = c(5, 4, 4, 8))
+plot(gene_dend, main = "Protein-coding genes", horiz = TRUE)
+par(op)
+pdf("Figure7a.pdf", height = 5, width = 5)
+par(mar = c(5, 4, 4, 8))
+plot(gene_dend, main = "Protein-coding genes", horiz = TRUE)
+dev.off()
+```
 
-* Cytoscape network of OLIG2 target genes that are differential expressed.       
-
-![](./Figures_files/figure-html/homer_unique_enhancer_GW_GW17only_Olig2_DE_network.png)     
-
-## Figure 6: Transcriptional activation in neurospheres happens at different gestational stages, with major wave at GW13-GW15 in cortex, and at GW15-GW17 in GE     
-### Figure 6a: summary  
+### Figure 7b: summary DE 
 
 * No. of differential expressed genes between different gestational weeks (left panel: GW17 vs GW13, middle panel: GW17 vs GW15, right panel: GW15 vs GW13) in NPCs cortex (red), GE (blue), and shared by two cell types (purple). Bars pointing up shows upregulation in later stages, and bars pointing down shows upregulation in earlier stages.    
 
 ```{r GW_DE_summary}
-(GW_DE_summary_figure <- GW_DE_summary_figure + 
-   scale_y_continuous(limits=c(-700, 700)) + 
-   theme(strip.text = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 12), legend.text = element_text(size = 15), legend.title = element_text(size = 0)))
-ggsave(GW_DE_summary_figure, file = "Figure6a.pdf", height = 8, width = 10)
+GW_DE_summary_tall <- GW_DE_summary_figure$data %>% mutate(GW = revalue(GW, c("GW15-GW13" = "GW13-GW15", "GW17-GW13" = "GW13-GW17", "GW17-GW15" = "GW15-GW17")), Sample = gsub("_.*", "", Sample), Sample = revalue(Sample, c("GW15-GW13" = "Subject3\nvs\nSubject4", "GW17-GW13.1" = "Subject1\nvs\nSubject4", "GW17-GW13.2" = "Subject2\nvs\nSubject4", "GW17-GW15.1" = "Subject1\nvs\nSubject3", "GW17-GW15.2" = "Subject2\nvs\nSubject3")))
+(GW_DE_summary_figure <- ggplot(GW_DE_summary_tall, aes(Sample, value, fill = type)) + 
+   geom_bar(stat = "identity", width = 0.5, position = position_dodge()) + 
+   geom_hline(aes(yintercept = 0)) + 
+   facet_grid(. ~ GW, scales = "free_x", space = "free_x") +
+   scale_fill_manual(values = c("red", "blue", "purple"), name = "") + 
+   scale_y_continuous(limits=c(-700, 700), breaks = c(-600, -400, -200, 0, 200, 400, 600), labels = c(600, 400, 200, 0, 200, 400, 600)) + 
+   xlab("") + 
+   ylab("No. of genes") + 
+   theme_bw() + 
+   theme(axis.text = element_text(size = 12), legend.text = element_text(size = 15), legend.title = element_text(size = 0)))
+ggsave(GW_DE_summary_figure, file = "Figure7b.pdf", height = 6, width = 8)
 ```
 
-### Figure 6b: Shared by cortex and GE NPCs  
+### Figure 7c: Expression patterns  
 
 * Patterns of expression for genes differentially expressed between gestational weeks shared by cortex and GE NPCs. Genes are divided into eight expression profile groups, represented by eight different colours. The thickness of the line represents relative No. of genes in the category, and dashed line means no genes are in the category.                
 
 ```{r GW_DE_trend}
+GW_DE_trend_figure$data <- rbind(GW_DE_trend_figure$data %>% mutate(cell = "Shared"), GW_DE_trend_cortex_figure$data %>% mutate(type = F, cell = "Cortex"), GW_DE_trend_GE_figure$data %>% mutate(type = F, cell = "GE")) 
 GW_DE_trend_figure$data$trend <- gsub("notDE", "ST", GW_DE_trend_figure$data$trend)
 (GW_DE_trend_figure <- GW_DE_trend_figure + 
-   scale_size_continuous(name = "No. of genes", limits = c(0, 500), breaks = c(50, 100, 200, 300, 400, 500), range = c(1, 10)) + 
-   scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
+   scale_size_continuous(name = "No. of genes", limits = c(0, 500), breaks = c(50, 100, 200, 300, 400, 500), range = c(1, 8)) + 
+   scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink"), guide = "none") + 
+   geom_text(data = GW_DE_trend_figure$data %>% filter(x == "GW15") %>% mutate(y = 1.9), aes(x = x, y = y, label = N), color = "black", size = 6) + 
+   facet_grid(cell ~ trend) + 
    ylab("Relative expression level") + 
-   theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_figure, file = "Figure6b.pdf", height = 6, width = 8)
+   ggtitle("") + 
+   theme(strip.text = element_text(size = 15), title = element_text(size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 15, angle = 90), legend.text = element_text(size = 15)))
+ggsave(GW_DE_trend_figure, file = "Figure7c.pdf", height = 6, width = 13)
 ```
-
-### Figure 6c: Cortex NPCs  
-
-* Patterns of expression for genes differentially expressed between gestational weeks in cortex NPCs.           
 
 ```{r GW_DE_trend_cortex}
 GW_DE_trend_cortex_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_cortex_figure$data$trend), levels = c("UP-UP", "DN-DN" , "UP-DN", "DN-UP", "ST-UP", "DN-ST", "ST-DN", "UP-ST"))
@@ -461,12 +481,7 @@ GW_DE_trend_cortex_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_c
    scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_cortex_figure, file = "Figure6c.pdf", height = 6, width = 8)
 ```
-
-### Figure 6d: GE NPCs
-
-* Patterns of expression for genes differentially expressed between gestational weeks in GE NPCs.       
 
 ```{r GW_DE_trend_GE}
 GW_DE_trend_GE_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_GE_figure$data$trend), levels = c("UP-UP", "DN-DN" , "UP-DN", "DN-UP", "DN-ST", "ST-DN", "UP-ST", "ST-UP"))
@@ -475,10 +490,9 @@ GW_DE_trend_GE_figure$data$trend <- factor(gsub("notDE", "ST", GW_DE_trend_GE_fi
    scale_color_manual(name = "", values = c("UP-UP" = "purple", "DN-DN" = "green2", "UP-DN" = "orange", "DN-UP" = "gold", "UP-ST" = "red", "ST-UP" = "blue", "DN-ST" = "chocolate", "ST-DN" = "pink")) + 
    ylab("Relative expression level") + 
    theme(strip.text = element_text(size = 18), title = element_text(size = 18), axis.title = element_text(size = 18), axis.text = element_text(size = 15), legend.text = element_text(size = 18)))
-ggsave(GW_DE_trend_GE_figure, file = "Figure6d.pdf", height = 6, width = 8)
 ```
 
-### Figure 6e: Heatmap of stage specific expressed genes  
+### Figure 7d: Heatmap of stage specific expressed genes  
 
 * Heatmap for RPKM of stage-specific differential expressed genes in Figure 3c and 3d.         
 
@@ -512,7 +526,7 @@ GW_DE_heatmap_GE <- ggplot(GW_DE_rpkm_GE_tall, aes(x = Sample, y = miR, fill = v
    theme_bw() + 
    theme(axis.text.y = element_text(size = 0), axis.ticks.y = element_line(color = "white"), panel.border = element_rect(color = "white"), axis.text.x = element_text(angle = 90), plot.margin=unit(c(-0.3,1,1,1), "cm"), panel.background = element_rect(fill = "white"), panel.grid = element_line(color = "white"), legend.position = "bottom", axis.text = element_text(size = 15), legend.title = element_text(size = 18), legend.text = element_text(size = 15, angle = 90))
 grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.09, 0.41, 0.09, 0.41))
-pdf("Figure6e.pdf", height = 20, width = 8)
+pdf("Figure7d.pdf", height = 20, width = 8)
 grid.arrange(clab_figure + ggtitle("Cortex"), GW_DE_heatmap_cortex, clab_figure + ggtitle("GE"), GW_DE_heatmap_GE, nrow = 4, heights = c(0.09, 0.41, 0.09, 0.41))
 dev.off()
 ```
@@ -522,15 +536,14 @@ dev.off()
 ### Figure S1 SNP
 
 ```{r SNP}
-SNP <- read.delim("/projects/epigenomics/users/lli/FetalBrain/SNP/SNP.summary", head = F, col.names = c("Sample", "Type", "count")) %>% mutate(Sample = factor(Sample, levels = c("Subject1_Subject2", "Subject1_Subject3", "Subject2_Subject3", "Subject1_Subject4", "Subject2_Subject4", "Subject3_Subject4")))
+SNP <- read.delim("/projects/epigenomics/users/lli/FetalBrain/SNP/SNP.summary", head = F, col.names = c("Sample", "Type", "count")) %>% mutate(Sample = factor(gsub("_", "\nvs\n",  Sample), levels = c("Subject1\nvs\nSubject2", "Subject1\nvs\nSubject3", "Subject2\nvs\nSubject3", "Subject1\nvs\nSubject4", "Subject2\nvs\nSubject4", "Subject3\nvs\nSubject4")))
 (SNP_figure <- ggplot(SNP, aes(x = Sample, y = count, fill = Type)) + 
    geom_bar(stat = "identity", width = 0.5) + 
    scale_fill_manual(values = c("homozygotic" = "red", "heterozygotic" = "blue"), name = "") + 
    xlab("") + 
    ylab("No. of discordant SNPs") + 
-   theme_bw() + 
-   theme(axis.text.x = element_text(angle = 90)))
-ggsave(SNP_figure, file = "FigureS1a.pdf")
+   theme_bw()) 
+ggsave(SNP_figure, file = "FigureS1b.pdf", height = 5, width = 8)
 ```
 
 ## Figure S2
