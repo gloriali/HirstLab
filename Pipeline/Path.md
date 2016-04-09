@@ -55,4 +55,8 @@ File paths on xhost
     + Histone modifications: `/projects/mbilenky/REMC/H1/UCSF_UBC/wigs_175/`   
     + RNA-seq: `/projects/epigenomics/ep50/external/jqc.1.7.6/`   
 * ESC:
-    + RNA-seq: `/projects/epigenomics/ep50/external/jqc.1.7.6/`   
+    + RNA-seq: `/projects/epigenomics/ep50/external/jqc.1.7.6/`
+
+## CEMT project
+* Project folder: `/projects/edcc_new/reference_epigenomes/`     
+* WGBS fractional methylation calls: `/projects/edcc_prj2/bs-seq/*/*5mC.CpG`    
