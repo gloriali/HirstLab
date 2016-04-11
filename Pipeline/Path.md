@@ -59,4 +59,5 @@ File paths on xhost
 
 ## CEMT project
 * Project folder: `/projects/edcc_new/reference_epigenomes/`     
-* WGBS fractional methylation calls: `/projects/edcc_prj2/bs-seq/*/*5mC.CpG`    
+* WGBS fractional methylation calls: `/projects/edcc_prj2/bs-seq/<libraryID>/*5mC.CpG`    
+* WGS SNPs: `/projects/edcc_new/reference_epigenomes/<libraryID>/bams/WGS/*COSM*vcf`      
