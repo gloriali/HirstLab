@@ -1,12 +1,15 @@
 library(ggplot2)
 library(ggbio)
 library(GenomicRanges)
+source("/projects/epigenomics/users/smcconnell/glioma/WGBS/comparisons/DMR/DMR.figures.R")
+source("/home/lli/HirstLab/Pipeline/R/enrich_GREAT.R")
 
 # Take input directory and filename pattern, produce dataframes of all that match.
 # Assumes that the files will contain a DMR.[...]-[...].methyl pattern
 # Be careful when entering patterns that you're only including files that you want
 
 list.DMR <- function(pattern, path = "") {
+  # Given a pattern describing 1 or more filenames, produce a list of bedgraphs
   
   files = list.files("DMR/")[grep(pattern, list.files("DMR/"))]
   tables = list()
@@ -35,6 +38,13 @@ DMR.len.plot <- function(y) {
   lapply(seq_along(y), len.plot)
 }
 
+DMR.avg.len <- function(dmrs) {
+  avg.len = function(dmrName) {
+    mean(dmrs[[dmrName]][,7])
+  }
+  lapply(seq_along(dmrs), avg.len)
+}
+
 DMR.cpg.plot <- function(y) {
   cpg.plot = function(x) {
     titlename = paste0(names(y)[x], "\nNo. of CpGs per DMR by Chromosome")
@@ -46,14 +56,58 @@ DMR.cpg.plot <- function(y) {
   lapply(seq_along(y), cpg.plot)
 }
 
-data(hg19IdeogramCyto, package = "biovizBase")   # Mixed chr order
-hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
-DMR_pos_WGBS_gr <- keepSeqlevels(as(DMRs[[1]], "GRanges"), paste0("chr", c(1:22, "X", "Y")))
-ggplot(hg19) + 
-  layout_karyogram(cytoband = TRUE) +
-#  layout_karyogram(data = DMR_pos_WGBS_gr, geom = "point", aes(y = y, x = pos, color = factor(`Hypo/Hyper`, levels = c("1", "-1"))), position = position_jitter(height = 2), size = 1.5, alpha = 0.5) +
-  xlab("Position of DMRs on the chromosome") + 
-  coord_cartesian(ylim = c(-15, 25)) #+
-#  facet_grid(seqnames ~ donor)   Need to read up on facets
+DMR.freq.plot <- function(y) {
+  freq.plot <- function(x) {
+    DMR_figures(DMR = y[[x]],
+                sample1 = strsplit(names(y)[x], split = " ")[[1]][1],
+                sample2 = strsplit(names(y)[x], split = " ")[[1]][3],
+                figures = "frequency")
+  }
+  lapply(seq_along(y), freq.plot)
+}
 
+DMR.GREAT.plot <- function(path, filename) {
   
+  great.list = list.files(path, filename)
+  great.sub = function(files) {
+    subbed = sub(x = files, pattern = "^GREAT.*_", replacement = "")
+    subbed = sub(x = subbed, pattern = "\\.tsv$", replacement = "")
+  }
+  great.list = unique(unlist(lapply(great.list, great.sub)))
+  
+  enrich.simple = function(greatfile) {
+    enrich_GREAT(file = greatfile, 
+                 name = greatfile,
+                 dirIn = paste0(getwd(), "/great/Hyper-Hypo_Split/"),
+                 dirOut = paste0(getwd(), "/great/Hyper-Hypo_Split/"))
+  }
+  lapply(great.list, enrich.simple)
+}
+
+DMR.stats <- function(hypo, hyper) {
+  # Given two equal length lists of hypo and hyper DMRs, produce dataframes of their summary statistics
+  
+  if (length(hypo) != length(hyper)) {
+    return("Error: hypo and hyper are not of equal length")
+  }
+  if (!all(names(hyperDMRs) == names(hypoDMRs))) {
+    return("Error: Elements of the same index in both hypo and hyper must have the same sample name")
+  }
+  findStats <- function(num) {
+    hypoDMR  = hypo[[num]]
+    hyperDMR = hyper[[num]]
+    lengths = c(length(hypoDMR[,7]), length(hyperDMR[,7]))
+    sums = c(sum(hypoDMR[,7]), sum(hyperDMR[,7]))
+    df = data.frame(`Number of UMRs` = lengths, `Avg UMR Length` = sums)
+    names(df) <- gsub(x = names(df),
+                      pattern = "\\.",
+                      replacement = " ")
+    row.names(df) <- c("Hypo", "Hyper")
+    df
+  }
+  result <- lapply(seq_along(hypo), findStats)
+  names(result) <- names(hypo)
+  result
+}
+
+
