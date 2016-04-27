@@ -38,7 +38,7 @@ done
 
 mkdir -p $dirOut
 
-awk 'NR==FNR {id=$1":"$2; if($4+$5 >= "'$cov'"+0){h[id]=$5"\t"$4}; next} {id=$1":"$2; if((id in h)&($4+$5 >= "'$cov'"+0)){print id"\t"$5"\t"$4"\t"h[id]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
+awk 'NR==FNR {id=$1":"$2; if($4+$5 >= "'$cov'"+0){h[id]=$5"\t"$4}; next} {id=$1":"$2; if((id in h)&&($4+$5 >= "'$cov'"+0)){print id"\t"$5"\t"$4"\t"h[id]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
 nC1=($(wc -l $dirIn/$file1)); nC2=($(wc -l $dirIn/$file2)); nC=($(wc -l $dirOut/$name.join));
 echo "No. of CpGs shared with enough coverage: "$nC
 
