@@ -43,7 +43,7 @@ nC1=($(wc -l $dirIn/$file1)); nC2=($(wc -l $dirIn/$file2)); nC=($(wc -l $dirOut/
 echo "No. of CpGs shared with enough coverage: "$nC
 
 echo "Running methyl_diff; output to "$dirOut/DM.$name.p$pth.d$delta.bed
-less $dirOut/$name.join | awk '{if($2+$3+$4+$5>100000){print "0\t0\t0\t0"} else{print $2"\t"$3"\t"$4"\t"$5}}' > $dirOut/$name.input
+less $dirOut/$name.join | awk '{print $2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.input
 less $dirOut/$name.input | /home/mbilenky/methyl_diff-methyl_diff/methyl_diff > $dirOut/$name.output
 paste $dirOut/$name.join $dirOut/$name.output | awk '{cov1=$2+$3; cov2=$4+$5; m1=$2/cov1; m2=$4/cov2; print $1"\t"cov1"\t"m1"\t"cov2"\t"m2"\t"$6}' > $dirOut/$name.diff
 less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0; m="'$m'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); start=gensub(".*:", "", "g", $1); end=start+1; if(1-$6<pth && d>delta && $3>m){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta && $5>m){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.p$pth.d$delta.bed
