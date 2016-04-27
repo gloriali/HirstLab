@@ -2,21 +2,23 @@
 
 if [ "$1" == "-h" ] ; then
     echo -e "Identify DM CpGs from WGBS coverage with methyl_diff
-Usage: `basename $0` -i <dirIn> -o <dirOut> -f1 <file1> -f2 <file2> -n <name> -p <p-value> -d <delta> -m <methylation>
+Usage: `basename $0` -i <dirIn> -o <dirOut> -f1 <file1> -f2 <file2> -n <name> -p <p-value> -d <delta> -m <methylation> -c <coverage>
     <dirIn>: input directory
     <dirOut>: ourput directory
-    <file1>: input for sample1, format ID\tunconverted\tconverted\tfractional
-    <file2>: input for sample2, format ID\tunconverted\tconverted\tfractional
+    <file1>: input for sample1, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output)
+    <file2>: input for sample2, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output)
     <name>: output file name
     <p-value>: p-value cutoff for methyl_diff, default to 0.0005
     <delta>: min difference in fractional methylation, default to 0.6
-    <methylation>: min fractional methylation for the hyper, default to 0.75"
+    <methylation>: min fractional methylation for the hyper, default to 0.75
+    <coverage>: min coverage for the CpG, default to 3"
     exit 0
 fi
 
 pth=0.0005
 delta=0.6
 m=0.75
+cov=3
 dirIn=''
 while [ $# -gt 0 ]
 do
@@ -29,23 +31,22 @@ do
         -p) pth="$2"; shift;;
         -d) delta="$2"; shift;;
         -m) m="$2"; shift;;
+        -c) cov="$2"; shift;;
     esac
     shift
 done
 
 mkdir -p $dirOut
 
-awk 'NR==FNR {h[$1]=$2"\t"$3; next} {if($1 in h){print $1"\t"$2"\t"$3"\t"h[$1]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
+awk 'NR==FNR {id=$1":"$2; if($4+$5 >= "'$cov'"+0){h[id]=$5"\t"$4}; next} {id=$1":"$2; if((id in h)&($4+$5 >= "'$cov'"+0)){print id"\t"$5"\t"$4"\t"h[id]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
 nC1=($(wc -l $dirIn/$file1)); nC2=($(wc -l $dirIn/$file2)); nC=($(wc -l $dirOut/$name.join));
-echo "No. of CpGs in "$file1": "$nC1
-echo "No. of CpGs in "$file2": "$nC2
-echo "No. of CpGs shared: "$nC
+echo "No. of CpGs shared with enough coverage: "$nC
 
 echo "Running methyl_diff; output to "$dirOut/DM.$name.p$pth.d$delta.bed
 less $dirOut/$name.join | awk '{if($2+$3+$4+$5>100000){print "0\t0\t0\t0"} else{print $2"\t"$3"\t"$4"\t"$5}}' > $dirOut/$name.input
 less $dirOut/$name.input | /home/mbilenky/methyl_diff-methyl_diff/methyl_diff > $dirOut/$name.output
 paste $dirOut/$name.join $dirOut/$name.output | awk '{cov1=$2+$3; cov2=$4+$5; m1=$2/cov1; m2=$4/cov2; print $1"\t"cov1"\t"m1"\t"cov2"\t"m2"\t"$6}' > $dirOut/$name.diff
-less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0; m="'$m'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); end=gensub(".*-", "", "g", $1); start=end-2; if(1-$6<pth && d>delta && $3>m){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta && $5>m){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.p$pth.d$delta.bed
+less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0; m="'$m'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); start=gensub(".*:", "", "g", $1); end=start+1; if(1-$6<pth && d>delta && $3>m){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta && $5>m){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.p$pth.d$delta.bed
 dm=($(wc -l $dirOut/DM.$name.m$m.p$pth.d$delta.bed)); hyper=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}')); hypo=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$pth"\t"$delta"\t"$m"\t"$dm"\t"$hyper"\t"$hypo >> $dirOut/DM.summary.stats
 rm $dirOut/$name.input $dirOut/$name.output 
