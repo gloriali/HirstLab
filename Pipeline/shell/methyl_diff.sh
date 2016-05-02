@@ -5,8 +5,8 @@ if [ "$1" == "-h" ] ; then
 Usage: `basename $0` -i <dirIn> -o <dirOut> -f1 <file1> -f2 <file2> -n <name> -p <p-value> -d <delta> -m <methylation> -c <coverage>
     <dirIn>: input directory
     <dirOut>: ourput directory
-    <file1>: input for sample1, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output)
-    <file2>: input for sample2, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output)
+    <file1>: input for sample1, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output .5mC.CpG file)
+    <file2>: input for sample2, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output .5mC.CpG file)
     <name>: output file name
     <p-value>: p-value cutoff for methyl_diff, default to 0.0005
     <delta>: min difference in fractional methylation, default to 0.6
