@@ -55,4 +55,4 @@ paste $dirOut/$name.join $dirOut/$name.output | awk '{cov1=$2+$3; cov2=$4+$5; m1
 less $dirOut/$name.diff | awk 'BEGIN{pth="'$pth'"+0; delta="'$delta'"+0; m="'$m'"+0} {d=$3-$5; chr=gensub(":.*", "", "g", $1); start=gensub(".*:", "", "g", $1); end=start+1; if(1-$6<pth && d>delta && $3>m){print chr"\t"start"\t"end"\t1\t"$3"\t"$5} else if($6<pth && d<-delta && $5>m){print chr"\t"start"\t"end"\t-1\t"$3"\t"$5}}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.p$pth.d$delta.bed
 dm=($(wc -l $dirOut/DM.$name.m$m.p$pth.d$delta.bed)); hyper=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}')); hypo=($(less $dirOut/DM.$name.m$m.p$pth.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
 echo -e $name"\t"$pth"\t"$delta"\t"$m"\t"$dm"\t"$hyper"\t"$hypo >> $dirOut/DM.summary.stats
-rm $dirOut/$name.input $dirOut/$name.output 
+rm $dirOut/$name.join $dirOut/$name.input $dirOut/$name.output $dirOut/$name.diff
