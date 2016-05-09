@@ -3,7 +3,7 @@
 # DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs and intersect
 BEDTOOLS='/projects/epigenomics/software/bedtools-2.23.0/bin/'
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
-dirOut=$dirIn/DMR/
+dirOut='/home/lli/glioma/WGBS/DMR/'
 mkdir -p $dirOut/intermediate/
 cd $dirIn
 > $dirOut/intermediate/DM.summary.stats
@@ -17,12 +17,13 @@ size=500
 cut=3     
 for file1 in CEMT*.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g')
-    echo $lib1
+    echo -e "\n\n"$lib1
     for file2 in NPC*.5mC.CpG; do
         lib2=$(echo $file2 | sed -e 's/.5mC.CpG//g')
-        echo $lib2
-        /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $lib1'_'$lib2 -p $pth -d $delta -m $m -c $cov
-        /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirOut/intermediate/ -f DM.$name.*.bed -n $lib1_$lib2 -s $size -c $cut
+        name=$lib1'_'$lib2
+        echo -e "\n"$name
+        /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
+        /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/intermediate/ -o $dirOut/intermediate/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
         less $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper.bed 
         less $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo.bed 
     done
