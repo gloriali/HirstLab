@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs and intersect
+# DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs 
 BEDTOOLS='/projects/epigenomics/software/bedtools-2.23.0/bin/'
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 dirOut='/home/lli/glioma/WGBS/DMR/'
@@ -27,6 +27,14 @@ for file1 in CEMT*.5mC.CpG; do
         less $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper.bed 
         less $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo.bed 
     done
+done
+
+# For each glioma sample, take the intersect of DMRs compared to all 4 NPCs
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirOut='/home/lli/glioma/WGBS/DMR/'
+for file1 in CEMT*.5mC.CpG; do
+    lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g')
+    echo -e "\n\n"$lib1
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hyper.bed | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hyper.bed | awk '{print $0"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.hyper.GE.bed | awk '{print $0"\t"$1":"$2"-"$3"\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hyper
