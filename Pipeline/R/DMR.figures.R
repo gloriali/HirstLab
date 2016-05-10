@@ -1,9 +1,10 @@
-DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, height = 7, figures = c("length", "count", "adjacentDis", "frequency", "position"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1)){
+DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, height = 8, figures = c("length", "count", "adjacentDis", "frequency", "position", "circos"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1), hist_width = 100){
   library(ggplot2)
   library(dplyr)
   library(ggbio)
   library(GenomicRanges)
-  DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_position_figure <- NULL;
+	library(RCircos)
+	DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_pos_figure <- NULL; 
   chrlength <- chrlength[chrlength$chr %in% chrs, ]
   chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
   colnames(DMR) <- colname
@@ -11,10 +12,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
   DMR$chr <- factor(DMR$chr, levels = chrs)
   DMR <- DMR[order(DMR$chr, DMR$start, decreasing = F), ]
   DMR$pos <- (DMR$start + DMR$end)/2
-  DMR$dis <- c(-100000, DMR[2:nrow(DMR), ]$pos - DMR[1:nrow(DMR)-1,]$pos)
-  DMR[DMR$dis < 0, ]$dis <- -100000
   if("length" %in% figures){
-    DMR_length_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(length, 0.25), middle = median(length), upper = quantile(length, 0.75), min = min(length), max = max(length)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
+    DMR_length_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(length, 0.25), middle = as.numeric(median(length)), upper = quantile(length, 0.75), min = min(length), max = max(length)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
     DMR_length_figure <- ggplot(DMR_length_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -22,7 +21,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
       ggtitle(paste("DMR length -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
       facet_wrap(~ DM) + 
-      theme_bw()
+      theme_bw() + 
+    	theme(axis.text.x = element_text(angle = 90))
     ggsave(DMR_length_figure, file = paste0(dirOut, "/DMRlength_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("count" %in% figures){
@@ -38,7 +38,9 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
     ggsave(DMR_count_figure, file = paste0(dirOut, "/CpGcount_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("adjacentDis" %in% figures){
-    DMR_dis_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(dis, 0.25), middle = median(dis), upper = quantile(dis, 0.75), min = min(dis), max = max(dis)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
+  	DMR$dis <- c(-100000, DMR[2:nrow(DMR), ]$pos - DMR[1:nrow(DMR)-1,]$pos)
+  	DMR[DMR$dis < 0, ]$dis <- -100000
+  	DMR_dis_stat <- mutate(summarise(group_by(DMR, chr, DM), lower = quantile(dis, 0.25), middle = median(dis), upper = quantile(dis, 0.75), min = min(dis), max = max(dis)), ymin = max(min, lower - 1.5*(upper-lower)), ymax = min(max, upper + 1.5*(upper-lower)))
     DMR_dis_figure <- ggplot(DMR_dis_stat, aes(x = chr, fill = chr)) + 
       geom_boxplot(aes(lower = lower, middle = middle, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.8) + 
       xlab("") + 
@@ -82,7 +84,29 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
        theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.y = element_line(color = "transparent"), panel.grid.minor.y = element_line(color = "transparent"))
     ggsave(DMR_pos_figure@ggplot, file = paste0(dirOut, "/DMRpos_", sample1, "_", sample2, ".pdf"), width = width, height = height)    
   }
-  return(list(length = DMR_length_figure, count = DMR_count_figure, dis = DMR_dis_figure, freq = DMR_freq_figure, pos = DMR_pos_figure@ggplot))
+  if("circos" %in% figures){
+  	DMR_hyper <- DMR %>% filter(DM == 1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "red")
+  	colnames(DMR_hyper) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
+  	DMR_hypo <- DMR %>% filter(DM == -1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "blue")
+  	colnames(DMR_hypo) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
+  	data(UCSC.HG19.Human.CytoBandIdeogram);
+  	cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
+  	chr.exclude <- "chrY";
+  	num.inside <- 10;
+  	num.outside <- 0;
+  	pdf(paste0(dirOut, "/DMRcircos_", sample1, "_", sample2, ".pdf"), width = width, height = height)
+  	RCircos.Set.Core.Components(cyto.info, chr.exclude, num.inside, num.outside)
+  	params <- RCircos.Get.Plot.Parameters()
+  	params$hist.width <- hist_width
+  	RCircos.Reset.Plot.Parameters(params)
+  	RCircos.Set.Plot.Area()
+  	RCircos.Chromosome.Ideogram.Plot()
+  	RCircos.Histogram.Plot(DMR_hyper, data.col=5, track.num=1, side="in")
+  	RCircos.Histogram.Plot(DMR_hypo, data.col=5, track.num=2, side="in")
+  	legend("bottomright", c("hyper", "hypo"), col = c("red", "blue"), lwd = 8, cex = 0.8)
+  	dev.off()
+  }
+  return(list(length = DMR_length_figure, count = DMR_count_figure, dis = DMR_dis_figure, freq = DMR_freq_figure, pos = DMR_pos_figure))
 }
 # DMR analysis and visualization  
 # Required input: 
@@ -95,6 +119,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
 #   [figures]: figures to analysis and output, default to all, `length: DMR length boxplot; count: No. of CpGs per DMR; adjacentDis: distance between adjacent DMRs; frequency: DMR frequency (bp/MB); position: position of DMRs on the chromosomes` 
 #   [chrs]: chromosomes to use, default to `chr1-22, chrX`
 #   [colname]: colnames of input DMR data frame, default to `c("chr", "start", "end", "ID", "DM", "count", "length")`
+#   [hist_width]: histogram width for R circos plot, default to 100. 
 # Output:
 #   pdf figures in `dirOut/<figure>_<sample1>_<sample2>.pdf`   
 #   return list of ggplot2 objects: unprocessed ones return `NULL`
@@ -102,4 +127,5 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 9, heig
 #     $count: No. of CpGs per DMR; 
 #     $dis: distance between adjacent DMRs; 
 #     $freq: DMR frequency (bp/MB); 
-#     $pos: position of DMRs on the chromosomes.   
+#     $pos: position of DMRs on the chromosomes, DMR_pos_figure@ggplot 
+#		R circos plot: pdf file only. 
