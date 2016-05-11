@@ -13,6 +13,7 @@ File paths on xhost
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * Homer: `/home/acarles/homer/bin/`
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
+* SnpEff: `/gsc/software/linux-x86_64-centos5/snpEff-3.2/snpEff/`    
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
