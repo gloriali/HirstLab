@@ -38,12 +38,12 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
   Enrich_plot <- ggplot(data = enrich, aes(Term, -log10(FDR), fill = Category)) +
      geom_bar(stat = "identity", width = .5) + 
      coord_flip() + 
-     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
+#     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
      ggtitle(paste0("Functional enrichment for ", name)) + 
      xlab("") + 
      ylab(paste0("-log10 ", p)) + 
-     scale_fill_manual(values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
+     scale_fill_manual(name = "", values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
   ggsave(Enrich_plot, file = paste0(dirOut, name, "_enrich.pdf"), height = height, width = width)
   return(Enrich_plot)
 }

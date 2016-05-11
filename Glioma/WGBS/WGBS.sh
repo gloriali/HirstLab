@@ -41,13 +41,12 @@ for file1 in CEMT*.5mC.CpG; do
     echo -e $lib1
     $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hyper.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed
     $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hyper.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed
-    $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hyper
-    less $dirOut/DMR.$lib1'_'NPC.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$lib1'_'NPC.hyper.bed
+    $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hyper
+    less $dirOut/DMR.$lib1'_'NPC.hyper | awk '$1 !~ /GL/ {print "chr"$1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$lib1'_'NPC.hyper.bed
     $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hypo.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hypo.bed
     $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hypo.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hypo.bed
-    $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hypo.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t-1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hypo
-    less $dirOut/DMR.$lib1'_'NPC.hypo | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$lib1'_'NPC.hypo.bed
-    cat $dirOut/DMR.$lib1'_'NPC.hyper $dirOut/DMR.$lib1'_'NPC.hypo > $dirOut/DMR.$lib1'_'NPC
+    $BEDTOOLS/intersectBed -a $dirIn/intermediate/DMR.$lib1'_'NPC.Cortex.hypo.bed -b $dirIn/intermediate/DMR.$lib1'_'NPC.GE.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hypo
+    less $dirOut/DMR.$lib1'_'NPC.hypo | awk '$1 !~ /GL/ {print "chr"$1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$lib1'_'NPC.hypo.bed
     hyper=($(wc -l $dirOut/DMR.$lib1'_'NPC.hyper))
     hypo=($(wc -l $dirOut/DMR.$lib1'_'NPC.hypo))
     length_hyper=($(less $dirOut/DMR.$lib1'_'NPC.hyper | awk '{len=len+$6}END{print len}'))
