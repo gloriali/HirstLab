@@ -104,6 +104,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
   	RCircos.Histogram.Plot(DMR_hyper, data.col=5, track.num=1, side="in")
   	RCircos.Histogram.Plot(DMR_hypo, data.col=5, track.num=2, side="in")
   	legend("bottomright", c("hyper", "hypo"), col = c("red", "blue"), lwd = 8, cex = 0.8)
+  	grid.text(paste0(sample1, "_", sample2), x = unit(0.5, "npc"), y = unit(0.95, "npc"), gp=gpar(fontsize=12))
   	dev.off()
   }
   return(list(length = DMR_length_figure, count = DMR_count_figure, dis = DMR_dis_figure, freq = DMR_freq_figure, pos = DMR_pos_figure))
