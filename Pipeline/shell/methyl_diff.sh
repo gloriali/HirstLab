@@ -5,8 +5,8 @@ if [ "$1" == "-h" ] ; then
 Usage: `basename $0` -i <dirIn> -o <dirOut> -f1 <file1> -f2 <file2> -n <name> -p <p-value> -d <delta> -m <methylation> -c <coverage>
     <dirIn>: input directory
     <dirOut>: ourput directory
-    <file1>: input for sample1, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output .5mC.CpG file)
-    <file2>: input for sample2, format: chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output .5mC.CpG file)
+    <file1>: input for sample1, format: chr\tposition\tstrand\tconverted\tunconverted (novoalign output .5mC.CpG file)
+    <file2>: input for sample2, format: chr\tposition\tstrand\tconverted\tunconverted (novoalign output .5mC.CpG file)
     <name>: output file name
     <p-value>: p-value cutoff for methyl_diff, default to 0.0005
     <delta>: min difference in fractional methylation, default to 0.6
@@ -38,7 +38,7 @@ done
 
 mkdir -p $dirOut
 
-awk 'NR==FNR {id=$1":"$2; if($4+$5 >= "'$cov'"+0){h[id]=$5"\t"$4}; next} {id=$1":"$2; if((id in h)&&($4+$5 >= "'$cov'"+0)){print id"\t"$5"\t"$4"\t"h[id]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
+awk 'NR==FNR {id=$1":"$2; if(($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){h[id]=$5"\t"$4}; next} {id=$1":"$2; if((id in h)&&($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){print id"\t"$5"\t"$4"\t"h[id]}}' $dirIn/$file2 $dirIn/$file1 > $dirOut/$name.join
 nC1=($(wc -l $dirIn/$file1)); nC2=($(wc -l $dirIn/$file2)); nC=($(wc -l $dirOut/$name.join));
 echo "No. of CpGs in file1: "$nC1
 echo "No. of CpGs in file2: "$nC2
