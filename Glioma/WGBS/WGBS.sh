@@ -21,6 +21,7 @@ for file1 in CEMT*.5mC.CpG; do
         lib2=$(echo $file2 | sed -e 's/.5mC.CpG//g')
         name=$lib1'_'$lib2
         echo -e "\n"$name
+        ulimit=1024000 # need to run on apollo, xhost only allow ulimit=102400
         /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
         /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/intermediate/ -o $dirOut/intermediate/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
         less $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper.bed 
