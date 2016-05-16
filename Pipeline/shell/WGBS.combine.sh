@@ -6,7 +6,7 @@ if [ "$1" == "-h" ] ; then
 Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand>
     <dirIn>: input directory
     <dirOut>: output directory
-    <file>: WGBS .sam.bedGraph input file, format chr\tstart\tend\tfractional_methylation\tcoverage      
+    <file>: input file, format chr\tposition\tstrand\tconverted\tunconverted\tcontext (novoalign output .5mC.CpG file)      
     <CG.strand>: mapping of stranded CpG IDs and combined CpG IDs, default genome hg19. "
     exit 0
 fi
@@ -26,8 +26,8 @@ done
 mkdir -p $dirOut
 
 echo "Combining strands for "$file" output to "$dirOut
-less $dirIn/$file | awk '{if($1~/chr/){print $1":"$2"\t"$4"\t"$5} else{print "chr"$1":"$2"\t"$4"\t"$5}}' > $dirOut/$file.tmp
+less $dirIn/$file | awk '{gsub(/chr/, ""); print $1":"$2"\t"$4"\t"$5}' > $dirOut/$file.tmp
 awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]}}' $strand $dirOut/$file.tmp > $dirOut/$file.tmp.join
-less $dirOut/$file.tmp.join | awk '{c[$4]=c[$4]+$2; t[$4]=t[$4]+$3; count[$4]=count[$4]+1} END{for(i in count){if(count[i]>2){print i"\t"c[i]"\t"t[i]"\t"count[i] >> "'$dirOut'""/ERROR.""'$file'"".error"}}; for(i in c){m=c[i]/(c[i]+t[i]); print i"\t"c[i]"\t"t[i]"\t"m}}' > $dirOut/$file.combine
+less $dirOut/$file.tmp.join | awk '{c[$4]=c[$4]+$3; t[$4]=t[$4]+$2; count[$4]=count[$4]+1} END{for(i in count){if(count[i]>2){print i"\t"c[i]"\t"t[i]"\t"count[i] >> "'$dirOut'""/ERROR.""'$file'"".error"}}; for(i in c){chr=gensub(":.+", "", "g", i); start=gensub(".+-", "", "g", i)-2; print chr"\t"start"\t.\t"t[i]"\t"c[i]"\t."}}' > $dirOut/$file.combine.5mC.CpG
 rm $dirOut/$file.tmp $dirOut/$file.tmp.join
 
