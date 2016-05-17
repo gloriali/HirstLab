@@ -27,16 +27,24 @@ for lib in 19 21 22 23; do
     less $dirOut/CEMT_$lib.vcf | awk '!/^#/ {print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"_"$9"_"$10}' > $dirOut/CEMT_$lib.vcf.bed
     $BEDTOOLS/intersectBed -a $dirOut/glioma_mutations.bed -b $dirOut/CEMT_$lib.vcf.bed -wa -wb > $dirOut/CEMT_$lib.vcf.glioma_mutations.txt
 done
-lib=47 # CEMT_47 was POG sample and stored in a different location and no COSMIC annotation
-ln -s /projects/edcc_new/reference_epigenomes/CEMT_47/bams/WGS/P00015.8_lanes_dupsFlagged.varFilter.eff.dbSNP_v137.annotations.vcf $dirOut/CEMT_$lib.vcf
+lib=47
+ln -s $dirVCF/CEMT_$lib/bams/WGS/P00015*dbSNP_v137.COSMIC_v64.annotations.vcf $dirOut/CEMT_$lib.vcf
 less $dirOut/CEMT_$lib.vcf | awk '!/^#/ {print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"_"$9"_"$10}' > $dirOut/CEMT_$lib.vcf.bed
 $BEDTOOLS/intersectBed -a $dirOut/glioma_mutations.bed -b $dirOut/CEMT_$lib.vcf.bed -wa -wb > $dirOut/CEMT_$lib.vcf.glioma_mutations.txt
-# intersecting with COSMIC annotation: CEMT_47 has no COSMIC annotation
+# intersecting with COSMIC annotation
 cd $dirOut
 for file in *.glioma_mutations.txt; do
     lib=$(echo $file | sed -e 's/.txt//g')
     less $file | awk '$8~/COSM/ {print $0}' > $dirOut/$lib.COSMIC.txt
 done
 
-
+# Somatic mutations in CEMT_47 (only one with matched blood sample)
+dirVCF='/projects/edcc_new/reference_epigenomes/'
+dirOut='/projects/epigenomics2/users/lli/glioma/WGS/VCF/'
+ln -s $dirVCF/CEMT_47/bams/WGS/P00017.4_lanes_dupsFlagged.varFilter.eff.dbSNP_v137.COSMIC_v64.annotations.vcf $dirOut/CB.CEMT_47.vcf
+less $dirOut/CB.CEMT_47.vcf | awk '!/^#/ {print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"_"$9"_"$10}' > $dirOut/CB.CEMT_$lib.vcf.bed
+cd /projects/epigenomics2/users/lli/glioma/WGS/VCF/
+awk 'NR==FNR {id=$1":"$2; h[id]=1} {i=$1":"$2; if(!(i in h)){print $0}}' CB.CEMT_47.vcf.bed CEMT_47.vcf.bed > CEMT_47.somatic.vcf.bed
+less CEMT_47.somatic.vcf.bed | awk '$0~/COSM/ {print $0}' > CEMT_47.somatic.COSMIC.vcf.bed
+less CEMT_47.somatic.COSMIC.vcf.bed | awk '$0~/NON_SYNONYMOUS_CODING/ {print $0}' > CEMT_47.somatic.COSMIC.non_synonymous.vcf.bed
 
