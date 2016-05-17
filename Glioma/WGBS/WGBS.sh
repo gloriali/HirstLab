@@ -1,13 +1,20 @@
 #!/bin/sh
 
+# check coverage profile
+dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+cd $dirIn
+for file in *.5mC.CpG; do
+    echo "Coverage profile for" $file
+    less $file | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $file.coverage.txt
+done
+
 # DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 mkdir -p $dirOut/intermediate/
-less /projects/edcc_prj2/bs-seq/a54762/A54762_3_lanes_dupsFlagged.q5.5mC.CpG | awk '{gsub(/chr/, ""); print $0}' > $dirIn/CEMT_47.5mC.CpG # CEMT_47 had a different format
 cd $dirIn
-> $dirOut/intermediate/DM.summary.stats
-> $dirOut/intermediate/DMR.summary.stats
+echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/intermediate/DM.summary.stats
+echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/intermediate/DMR.summary.stats
 pth=0.0005
 delta=0.6
 m=0.75
@@ -21,11 +28,19 @@ for file1 in CEMT*.5mC.CpG; do
         lib2=$(echo $file2 | sed -e 's/.5mC.CpG//g')
         name=$lib1'_'$lib2
         echo -e "\n"$name
-        ulimit=1024000 # need to run on apollo, xhost only allow ulimit=102400
         /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
         /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/intermediate/ -o $dirOut/intermediate/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
-        less $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hyper.bed 
-        less $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/intermediate/DMR.$name.s$size.c$cut.hypo.bed 
+    done
+done
+for file1 in CEMT*.combine; do
+    lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g')
+    echo -e "\n\n"$lib1
+    for file2 in NPC*.combine; do
+        lib2=$(echo $file2 | sed -e 's/.5mC.CpG//g')
+        name=$lib1'_'$lib2
+        echo -e "\n"$name
+        /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
+        /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/intermediate/ -o $dirOut/intermediate/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
     done
 done
 
@@ -34,7 +49,7 @@ BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 size=500  
 cut=3
-> $dirOut/DMR.summary.stats
+echo -e "sample\tsize\tcut\thyper\thypo\tlength_hyper\tlength_hypo" > $dirOut/DMR.summary.stats
 cd /projects/epigenomics2/users/lli/glioma/WGBS/
 for file1 in CEMT*.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g')
