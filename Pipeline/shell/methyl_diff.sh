@@ -49,7 +49,7 @@ less $dirOut/$name.join | awk '{print $2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.inp
 less $dirOut/$name.input | /home/mbilenky/methyl_diff-methyl_diff/methyl_diff > $dirOut/$name.output
 l1=($(wc -l $dirOut/$name.input)); l2=($(wc -l $dirOut/$name.output));
 if [ "$l1" != "$l2" ]; then
-    echo "methyl_diff input has" $l1 "lines, output has" $l2 "lines."; 
+    echo "ERROR: methyl_diff input has" $l1 "lines, output has" $l2 "lines."; 
     exit 1
 fi
 paste $dirOut/$name.join $dirOut/$name.output | awk '{cov1=$2+$3; cov2=$4+$5; m1=$2/cov1; m2=$4/cov2; print $1"\t"cov1"\t"m1"\t"cov2"\t"m2"\t"$6}' > $dirOut/$name.diff
