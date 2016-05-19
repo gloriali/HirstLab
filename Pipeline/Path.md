@@ -28,6 +28,8 @@ File paths on xhost
 * Ensembl v65: `/projects/epigenomics/resources/Ensembl/hg19v65/`
 * Genome hg19: `/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa`    
 * Chromosome sizes: `/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes`
+* CGI: `/home/lli/hg19/CGI.forProfiles.BED`        
+* CGI shores: `/home/lli//hg19/CGI.2000shores.BED`       
 * Encode TFBS: `/projects/mbilenky/REMC/breast/ENCODE/TFs/wgEncodeRegTfbsClusteredV3.bed.gz`    
 * GWAS: `/projects/epigenomics/resources/UCSC_hg19/GWAS/` (bed `/home/lli/hg19/gwasCatalog_July2014.bed`)
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
