@@ -7,6 +7,7 @@ Analysis pipeline
     * [isoform.md](./instructions/isoform.md): instructions for identifying isoform genes and cassette exons.  
     * [junction.md](./instructions/junction.md): instructions for validating isoforms with junction reads.  
     * [epiProfile.md](./instructions/epiProfile.md): instructions for calculating and plotting epigenetic profiles for isoform and intron retention.       
+    * [WGBS.DMR.md](./instructions/WGBS.DMR.md): instructions for DMR analysis from WGBS fractional methylation calls.
     * [MeDIP.DMR.md](./instructions/MeDIP.DMR.md): instructions for DMR analysis from MeDIP fractional methylation calls.
     * [DMR.analysis.md](./instructions/DMR.analysis.md): instructions for routine DMR analysis in R.       
     * [ChromHMM.md](./instructions/ChromHMM.md): instructions on running ChromHMM. _unfinished_.
