@@ -47,4 +47,10 @@ cd /projects/epigenomics2/users/lli/glioma/WGS/VCF/
 awk 'NR==FNR {id=$1":"$2; h[id]=1} {i=$1":"$2; if(!(i in h)){print $0}}' CB.CEMT_47.vcf.bed CEMT_47.vcf.bed > CEMT_47.somatic.vcf.bed
 less CEMT_47.somatic.vcf.bed | awk '$0~/COSM/ {print $0}' > CEMT_47.somatic.COSMIC.vcf.bed
 less CEMT_47.somatic.COSMIC.vcf.bed | awk '$0~/NON_SYNONYMOUS_CODING/ {print $0}' > CEMT_47.somatic.COSMIC.non_synonymous.vcf.bed
+## TET2?
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+$BEDTOOLS/intersectBed -a glioma_mutations.bed -b CEMT_47.somatic.vcf.bed -wa -wb | grep 'TET2' # frameshift INDEL @ 4:106190839-106190840
+/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 4:106190839-106190840 /projects/epigenomics2/users/lli/glioma/WGS/bam/P00015.CEMT_47.bam
+/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 4:106190839-106190840 /projects/epigenomics2/users/lli/glioma/WGS/bam/P00017.CEMT_47.bam
+
 
