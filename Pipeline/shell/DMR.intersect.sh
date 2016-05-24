@@ -42,7 +42,7 @@ do
     name=$(echo $dmr | sed -e s/'DMR.'//g)
     name=$(echo $name | sed -e s/'.bed'//g)
     echo "Processing $name" 
-    less $dmr | awk '{gsub("chr", ""), print $0}' > $dmr.tmp
+    less $dmr | awk '{gsub("chr", ""); print $0}' > $dmr.tmp
     $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b $dmr.tmp -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$8"_"$1":"$2"-"$3}' > $dirOut/DMR.$name.CpG.bed
     $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/hg19v69_genes.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CpG_gene.bed
     $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/hg19v69_exons_for_genes.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CpG_exon.bed
