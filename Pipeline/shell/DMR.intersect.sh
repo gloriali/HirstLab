@@ -28,7 +28,7 @@ $dirOut/DMR.<name>.CpG_gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
 $dirOut/DMR.<name>.CpG_promoter_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
 $dirOut/DMR.<name>.CpG_CGI.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
 $dirOut/DMR.<name>.CpG_CGI_shore.bed: chr\tstart\tend\tDMR_ID\tCGI_shore_ID
-$dirOut/genomic.breakdown.summary: Name\tTotal No. of CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\tCGI_shore\n"
+$dirOut/genomic.breakdown.summary (fold enrichment): Name\tTotal No. of CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\tCGI_shore\n"
 all_total=28217448 # wc -l /home/lli/hg19/CG.BED
 all_gene=18685044 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/hg19v69_genes.bed -wa -wb | wc -l
 all_exon=2834283 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/hg19v69_exons_for_genes.bed -wa -wb | wc -l
