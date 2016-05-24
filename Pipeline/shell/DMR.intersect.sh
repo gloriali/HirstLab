@@ -35,7 +35,7 @@ all_exon=2834283 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/
 all_promoter=4758353 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/hg19v69_genes_TSS_2000.bed -wa -wb | wc -l
 all_CGI=2089538 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | wc -l
 all_CGI_shore=2590276 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.2000shores.BED -wa -wb |wc -l
-echo -e "$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore" | awk '{print "ExpectedPercent\t"$1"\t"($1-$2)/$1"\t"($2-$3)/$1"\t"$3/$1"\t"$2/$1"\t"$4/$1"\t"$5/$1"\t"$6/$1}' 
+echo -e "$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore" | awk '{print "Total No. of CpGs: "$1"\nExpectedPercentage:\n-Intergenic: "($1-$2)/$1"\n-Intron: "($2-$3)/$1"\n-Exon: "$3/$1"\n-Gene: "$2/$1"\n-Promoter: "$4/$1"\n-CGI: "$5/$1"\n-CGI shore: "$6/$1}' 
 echo -e "Name\tNCpG\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\tCGI_shore" > $dirOut/genomic.breakdown.summary
 for dmr in DMR.*.bed
 do
