@@ -42,7 +42,8 @@ do
     name=$(echo $dmr | sed -e s/'DMR.'//g)
     name=$(echo $name | sed -e s/'.bed'//g)
     echo "Processing $name" 
-    $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b $dmr -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$8"_"$1":"$2"-"$3}' > $dirOut/DMR.$name.CpG.bed
+    less $dmr | awk '{gsub("chr", ""), print $0}' > $dmr.tmp
+    $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b $dmr.tmp -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$8"_"$1":"$2"-"$3}' > $dirOut/DMR.$name.CpG.bed
     $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/hg19v69_genes.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CpG_gene.bed
     $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/hg19v69_exons_for_genes.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CpG_exon.bed
     $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/hg19v69_genes_TSS_2000.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CpG_promoter.bed
@@ -56,5 +57,6 @@ do
     CGI=`wc -l $dirOut/DMR.$name.CpG_CGI.bed | cut -d' ' -f 1`
     CGI_shore=`wc -l $dirOut/DMR.$name.CpG_CGI_shore.bed | cut -d' ' -f 1`
     echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI\t$CGI_shore\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($8-$9)/$8)"\t"(($3-$4)/$2)/(($9-$10)/$8)"\t"($4/$2)/($10/$8)"\t"($3/$2)/($9/$8)"\t"($5/$2)/($11/$8)"\t"($6/$2)/($12/$8)"\t"($7/$2)/($13/$8)}' >> $dirOut/genomic.breakdown.summary
+    rm $dmr.tmp
 done
 
