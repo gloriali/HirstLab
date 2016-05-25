@@ -98,21 +98,24 @@ for(lib in libs){
 
 ### -------- Venn Diagram --------
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+DMR_intersect <- data.frame(sample1 = NA, sample2 = NA, hyper1 = NA, hyper2 = NA, hyper_intersect = NA, hyper_percent1 = NA, hyper_percent2 = NA, hypo1 = NA, hypo2 = NA, hypo_intersect = NA, hypo_percent1 = NA, hypo_percent2 = NA)
 for(i1 in 1:(length(libs)-1)){
 	for(i2 in (i1+1):length(libs)){
 		print(c(i1, i2, libs[i1], libs[i2]))
+		a1_hyper <- as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		a2_hyper <- as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		cross_hyper <- as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hyper.bed -b DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		assign(paste0("Venn_DMR_", libs[i1], ".", libs[i2], "_hyper"), 
-					 draw.pairwise.venn(as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hyper.bed -b DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
+					 draw.pairwise.venn(a1_hyper, a2_hyper, cross_hyper, category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
+		a1_hypo <- as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		a2_hypo <- as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		cross_hypo <- as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hypo.bed -b DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		assign(paste0("Venn_DMR_", libs[i1], ".", libs[i2], "_hypo"), 
-					 draw.pairwise.venn(as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hypo.bed -b DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T)), 
-					 									 category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
+					 draw.pairwise.venn(a1_hypo, a2_hypo, cross_hypo, category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
+		DMR_intersect <- rbind(DMR_intersect, data.frame(sample1 = libs[i1], sample2 = libs[i2], hyper1 = a1_hyper, hyper2 = a2_hyper, hyper_intersect = cross_hyper, hyper_percent1 = cross_hyper/a1_hyper, hyper_percent2 = cross_hyper/a2_hyper, hypo1 = a1_hypo, hypo2 = a2_hypo, hypo_intersect = cross_hypo, hypo_percent1 = cross_hypo/a1_hypo, hypo_percent2 = cross_hypo/a2_hypo))
 	}
 }
+DMR_intersect <- na.omit(DMR_intersect)
 pdf("Venn_DMR.pdf")
 for(i1 in 1:(length(libs)-1)){
 	for(i2 in (i1+1):length(libs)){
@@ -124,7 +127,7 @@ for(i1 in 1:(length(libs)-1)){
 dev.off()
 
 
-save(list = c("quantile_5mC_figure", "DMR_summary_figure", "genomic_breakdown_figure", 
+save(list = c("quantile_5mC_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", 
 							ls(pattern = "DMR_CEMT_\\d+_figure"), ls(pattern = "DMR_CEMT_\\d+_CGI_dis_figure"), 
 							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*")),
 		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")

@@ -23,6 +23,7 @@ library(reshape)
 library(wq)
 library(dplyr)
 library(RCircos)
+library(knitr)
 load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 7) 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGBS/DMR/")
@@ -59,7 +60,8 @@ for(lib in libs){
 ```
 
 ### DMR frequency distribution 
-* Mostly evenly distributed across different chromosomes.   
+* Mostly evenly distributed across different chromosomes.  
+* Frequencies in CEMT21 and CEMT23 vs NPCs were comparable to observed between NPCs.        
 * chrX has least amount of DMRs, almost none hypo ones in IDH mutant samples: _smaller number of hypo DMRs?_
 
 ```{r DMR_freq, fig.width=8}
@@ -119,4 +121,9 @@ for(lib in libs){
 (GREAT_DMR_CEMT_23_hypo)
 ```
 
+### DMR intersect 
+
+```{r DMR_intersect, results='asis'}
+kable(DMR_intersect %>% select(sample1, sample2, hyper_percent1, hyper_percent2, hypo_percent1, hypo_percent2), digits = 4, format = "html", align = "c", row.names = F)
+```
 
