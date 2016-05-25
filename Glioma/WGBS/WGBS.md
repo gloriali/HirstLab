@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Wed May 25 11:17:20 2016
+Updated: Wed May 25 13:32:12 2016
 
 
 
@@ -68,8 +68,11 @@ Updated: Wed May 25 11:17:20 2016
 ![](WGBS_files/figure-html/DMR_GREAT_hypo2-1.png)
 
 ### DMR intersect 
+* Jaccard similarity: intersect (bp) / union (bp).      
+* DMRs between IDH mut vs NPCs were more similar.      
+* CEMT21 and CEMT_23 (wt) were not similar to IDH mut samples, nor were they similar to each other.       
 
-<table>
+![](WGBS_files/figure-html/DMR_intersect-1.png)![](WGBS_files/figure-html/DMR_intersect-2.png)<table>
  <thead>
   <tr>
    <th style="text-align:center;"> sample1 </th>

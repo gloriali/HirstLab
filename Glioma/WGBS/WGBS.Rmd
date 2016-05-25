@@ -122,8 +122,13 @@ for(lib in libs){
 ```
 
 ### DMR intersect 
+* Jaccard similarity: intersect (bp) / union (bp).      
+* DMRs between IDH mut vs NPCs were more similar.      
+* CEMT21 and CEMT_23 (wt) were not similar to IDH mut samples, nor were they similar to each other.       
 
 ```{r DMR_intersect, results='asis'}
+(DMR_jaccard_hyper_figure)
+(DMR_jaccard_hypo_figure)
 kable(DMR_intersect %>% select(sample1, sample2, hyper_percent1, hyper_percent2, hypo_percent1, hypo_percent2), digits = 4, format = "html", align = "c", row.names = F)
 ```
 

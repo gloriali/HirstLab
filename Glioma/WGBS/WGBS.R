@@ -6,10 +6,11 @@ library(VennDiagram)
 library(gridExtra)
 library(gplots)
 library(dendextend)
-library(reshape)
+library(reshape2)
 library(wq)
 library(dplyr)
 library(RCircos)
+library(stringr)
 source('~/HirstLab/Pipeline/R/DMR.figures.R')
 source('~/HirstLab/Pipeline/R/enrich.R')
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
@@ -96,26 +97,44 @@ for(lib in libs){
 (GREAT_DMR_CEMT_47_hyper <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
 (GREAT_DMR_CEMT_47_hypo <- enrich_GREAT("CEMT_47_hypo", "CEMT_47_hypo", categories = c("MSigPerturbation"), height = 2, width = 7))
 
-### -------- Venn Diagram --------
+### -------- Intersect --------
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-DMR_intersect <- data.frame(sample1 = NA, sample2 = NA, hyper1 = NA, hyper2 = NA, hyper_intersect = NA, hyper_percent1 = NA, hyper_percent2 = NA, hypo1 = NA, hypo2 = NA, hypo_intersect = NA, hypo_percent1 = NA, hypo_percent2 = NA)
+DMR_intersect <- data.frame(sample1 = NA, sample2 = NA, hyper1 = NA, hyper2 = NA, hyper_intersect = NA, hyper_percent1 = NA, hyper_percent2 = NA, hyper_jaccard = NA, hypo1 = NA, hypo2 = NA, hypo_intersect = NA, hypo_percent1 = NA, hypo_percent2 = NA, hypo_jaccard = NA)
 for(i1 in 1:(length(libs)-1)){
 	for(i2 in (i1+1):length(libs)){
 		print(c(i1, i2, libs[i1], libs[i2]))
 		a1_hyper <- as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		a2_hyper <- as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		cross_hyper <- as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hyper.bed -b DMR.", libs[i2], "_NPC.hyper.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		jaccard_hyper <- as.numeric(str_split_fixed(system(paste0(BEDTOOLS, "bedtools jaccard -a DMR.", libs[i1], "_NPC.hyper.bed -b DMR.", libs[i2], "_NPC.hyper.bed"), intern = T)[2], pattern = "\\t", n = 4)[1,3])
 		assign(paste0("Venn_DMR_", libs[i1], ".", libs[i2], "_hyper"), 
 					 draw.pairwise.venn(a1_hyper, a2_hyper, cross_hyper, category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
 		a1_hypo <- as.numeric(system(paste0("less DMR.", libs[i1], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		a2_hypo <- as.numeric(system(paste0("less DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
 		cross_hypo <- as.numeric(system(paste0(BEDTOOLS, "/intersectBed -a  DMR.", libs[i1], "_NPC.hypo.bed -b DMR.", libs[i2], "_NPC.hypo.bed | awk '{s=s+$3-$2}END{print s}'"), intern = T))
+		jaccard_hypo <- as.numeric(str_split_fixed(system(paste0(BEDTOOLS, "bedtools jaccard -a DMR.", libs[i1], "_NPC.hypo.bed -b DMR.", libs[i2], "_NPC.hypo.bed"), intern = T)[2], pattern = "\\t", n = 4)[1,3])
 		assign(paste0("Venn_DMR_", libs[i1], ".", libs[i2], "_hypo"), 
 					 draw.pairwise.venn(a1_hypo, a2_hypo, cross_hypo, category = c(libs[i1], libs[i2]), cat.pos = 0, ext.pos = 180))
-		DMR_intersect <- rbind(DMR_intersect, data.frame(sample1 = libs[i1], sample2 = libs[i2], hyper1 = a1_hyper, hyper2 = a2_hyper, hyper_intersect = cross_hyper, hyper_percent1 = cross_hyper/a1_hyper, hyper_percent2 = cross_hyper/a2_hyper, hypo1 = a1_hypo, hypo2 = a2_hypo, hypo_intersect = cross_hypo, hypo_percent1 = cross_hypo/a1_hypo, hypo_percent2 = cross_hypo/a2_hypo))
+		DMR_intersect <- rbind(DMR_intersect, data.frame(sample1 = libs[i1], sample2 = libs[i2], hyper1 = a1_hyper, hyper2 = a2_hyper, hyper_intersect = cross_hyper, hyper_percent1 = cross_hyper/a1_hyper, hyper_percent2 = cross_hyper/a2_hyper, hyper_jaccard = jaccard_hyper, hypo1 = a1_hypo, hypo2 = a2_hypo, hypo_intersect = cross_hypo, hypo_percent1 = cross_hypo/a1_hypo, hypo_percent2 = cross_hypo/a2_hypo, hypo_jaccard = jaccard_hypo))
 	}
 }
 DMR_intersect <- na.omit(DMR_intersect)
+DMR_jaccard_hyper <- data.frame(sample1 = c(DMR_intersect$sample1, DMR_intersect$sample2, libs), sample2 = c(DMR_intersect$sample2, DMR_intersect$sample1, libs), jaccard = c(rep(DMR_intersect$hyper_jaccard, 2), rep(1, length(libs)))) 
+DMR_jaccard_hyper_figure <- ggplot(DMR_jaccard_hyper, aes(sample1, sample2, fill = jaccard)) + 
+	geom_tile() + 
+	xlab("") + 
+	ylab("") + 
+	ggtitle("Jaccard similarity - hyper DMRs") + 
+	theme_bw()
+ggsave(DMR_jaccard_hyper_figure, file = "DMR_jaccard_hyper_figure.pdf", height = 5, width = 6)
+DMR_jaccard_hypo <- data.frame(sample1 = c(DMR_intersect$sample1, DMR_intersect$sample2, libs), sample2 = c(DMR_intersect$sample2, DMR_intersect$sample1, libs), jaccard = c(rep(DMR_intersect$hypo_jaccard, 2), rep(1, length(libs)))) 
+DMR_jaccard_hypo_figure <- ggplot(DMR_jaccard_hypo, aes(sample1, sample2, fill = jaccard)) + 
+	geom_tile() + 
+	xlab("") + 
+	ylab("") + 
+	ggtitle("Jaccard similarity - hypo DMRs") + 
+	theme_bw()
+ggsave(DMR_jaccard_hypo_figure, file = "DMR_jaccard_hypo_figure.pdf", height = 5, width = 6)
 pdf("Venn_DMR.pdf")
 for(i1 in 1:(length(libs)-1)){
 	for(i2 in (i1+1):length(libs)){
@@ -127,7 +146,7 @@ for(i1 in 1:(length(libs)-1)){
 dev.off()
 
 
-save(list = c("quantile_5mC_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", 
+save(list = c("quantile_5mC_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", "DMR_jaccard_hyper_figure", "DMR_jaccard_hypo_figure", 
 							ls(pattern = "DMR_CEMT_\\d+_figure"), ls(pattern = "DMR_CEMT_\\d+_CGI_dis_figure"), 
 							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*")),
 		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
