@@ -58,6 +58,7 @@ genomic_breakdown_tall <- melt(genomic_breakdown, id = c("sample", "DM")) %>%
 	mutate(value = ifelse(DM == "hyper", value, -value))
 genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, fill = DM)) + 
 	geom_bar(position = "identity", stat = "identity", width = 0.5) + 
+	geom_hline(yintercept = c(-2, 2)) + 
 	facet_wrap(~sample) + 
 	xlab("") + 
 	ylab("Fold enrichment") + 
@@ -84,15 +85,15 @@ for(lib in libs){
 }
 
 ### -------- GREAT --------
-(GREAT_DMR_CEMT_19_hyper <- enrich_GREAT("CEMT_19_hyper", "CEMT_19_hyper", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
+(GREAT_DMR_CEMT_19_hyper <- enrich_GREAT("CEMT_19_hyper", "CEMT_19_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
 (GREAT_DMR_CEMT_19_hypo <- enrich_GREAT("CEMT_19_hypo", "CEMT_19_hypo", categories = c("GOBP"), height = 3, width = 7))
-(GREAT_DMR_CEMT_21_hyper <- enrich_GREAT("CEMT_21_hyper", "CEMT_21_hyper", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
+(GREAT_DMR_CEMT_21_hyper <- enrich_GREAT("CEMT_21_hyper", "CEMT_21_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
 (GREAT_DMR_CEMT_21_hypo <- enrich_GREAT("CEMT_21_hypo", "CEMT_21_hypo", categories = c("MSigPerturbation"), height = 4, width = 7))
-(GREAT_DMR_CEMT_22_hyper <- enrich_GREAT("CEMT_22_hyper", "CEMT_22_hyper", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
+(GREAT_DMR_CEMT_22_hyper <- enrich_GREAT("CEMT_22_hyper", "CEMT_22_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
 # GREAT_DMR_CEMT_22_hypo : no enrichment
-(GREAT_DMR_CEMT_23_hyper <- enrich_GREAT("CEMT_23_hyper", "CEMT_23_hyper", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 9, width = 7))
+(GREAT_DMR_CEMT_23_hyper <- enrich_GREAT("CEMT_23_hyper", "CEMT_23_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
 (GREAT_DMR_CEMT_23_hypo <- enrich_GREAT("CEMT_23_hypo", "CEMT_23_hypo", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
-(GREAT_DMR_CEMT_47_hyper <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 9, width = 7))
+(GREAT_DMR_CEMT_47_hyper <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
 (GREAT_DMR_CEMT_47_hypo <- enrich_GREAT("CEMT_47_hypo", "CEMT_47_hypo", categories = c("MSigPerturbation"), height = 2, width = 7))
 
 ### -------- Venn Diagram --------
