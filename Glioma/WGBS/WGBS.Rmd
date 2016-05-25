@@ -1,0 +1,122 @@
+---
+title: "Glioma - DNA methylation"
+author: "Gloria Li"
+date: "May 24, 2016"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 7) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGBS/DMR/")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+```
+
+## Global hypermethylation in IDH mut glioma
+* Genome-wide and CGI hypermethylation in IDH mutant glioma samples: CEMT19, CEMT22, and CEMT_47.      
+* CEMT_21 (10% IDH mutation frequency) showed methylation levels closer to IDH wildtype samples.    
+* Whiskers of the box plot represent 10% and 90% quantile.     
+
+```{r global_5mC}
+(quantile_5mC_figure)
+```
+
+## DMRs between gliomas and NPCs  
+### Total DMR length
+* Hypermethylation in IDH mut samples.    
+* Hypomethylation in IDH wt glioma: CEMT_23 (GBM).     
+* CEMT_21 had the least amount of DMRs and no bias towards hyper or hypo.      
+* Results against different NPCs were reasonably similar (intersect statistically significant).      
+
+```{r DMR_summary}
+(DMR_summary_figure)
+```
+
+### DMR length distribution (QC) 
+* Mostly evenly distributed with median ~ 300bp.      
+
+```{r DMR_length}
+for(lib in libs){
+	print(get(paste0("DMR_", lib, "_figure"))$length)
+}
+```
+
+### DMR frequency distribution 
+* Mostly evenly distributed across different chromosomes.   
+* chrX has least amount of DMRs, almost none hypo ones in IDH mutant samples: _smaller number of hypo DMRs?_
+
+```{r DMR_freq, fig.width=8}
+for(lib in libs){
+	print(get(paste0("DMR_", lib, "_figure"))$freq)
+}
+```
+
+### DMR enrichment in genomic regions 
+* Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
+* Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
+
+```{r DMR_genomicBreak}
+(genomic_breakdown_figure)
+```
+
+### DMR distance to CGIs
+* Distance between mid-point of DMRs and mid-point of closest CGI, normalized against length of the CGI (0: CGI mid-point; +/-1: CGI boundaries).      
+* Hypomethylated regions were enriched at CGI shores.    
+* IDH wt (CEMT23) hypermethylated regions were enriched at CGI centres.      
+* IDH mut samples hypermethylated regions were enriched towards the edge of CGI, except CEMT19 and CEMT47 were also enriched at CGI centres.        
+
+```{r DMR_CGIdis}
+for(lib in libs){
+	print(get(paste0("DMR_", lib, "_CGI_dis_figure")))
+}
+```
+
+### DMR GREAT analysis
+* DMR - gene association
+	+ Proximal: 5kb upstream, 1kb downstream.     
+	+ Distal: up to 20kb.         
+
+#### Hypermethylated DMRs
+* IDH mut and wt samples showed different terms, and CEMT_21 showed similar terms as wt.      
+	+ Disease Ontology: mut showed CNS/brain disease.     
+	+ GOBP: mut showed neurogenesis/brain development, wt showed regulation of biosynthetic process.   
+	+ GOCC: wt showed transcription factor complex, mut also showed membranes and neurons.         
+
+```{r DMR_GREAT_hyper, fig.height=9}
+(GREAT_DMR_CEMT_19_hyper)
+(GREAT_DMR_CEMT_22_hyper)
+(GREAT_DMR_CEMT_47_hyper)
+(GREAT_DMR_CEMT_21_hyper)
+(GREAT_DMR_CEMT_23_hyper)
+```
+
+#### Hypomethylated DMRs
+* IDH mut had few significant term (CEMT22 had none), wt had cancer related terms, and CEMT21 showed similar terms to mut.   
+
+```{r DMR_GREAT_hypo1, fig.height=4}
+(GREAT_DMR_CEMT_19_hypo)
+(GREAT_DMR_CEMT_21_hypo)
+(GREAT_DMR_CEMT_47_hypo)
+```
+```{r DMR_GREAT_hypo2, fig.height=8}
+(GREAT_DMR_CEMT_23_hypo)
+```
+
+
