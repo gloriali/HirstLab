@@ -53,4 +53,17 @@ $BEDTOOLS/intersectBed -a glioma_mutations.bed -b CEMT_47.somatic.vcf.bed -wa -w
 /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 4:106190839-106190840 /projects/epigenomics2/users/lli/glioma/WGS/bam/P00015.CEMT_47.bam
 /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 4:106190839-106190840 /projects/epigenomics2/users/lli/glioma/WGS/bam/P00017.CEMT_47.bam
 
+# CNVs
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn='/projects/epigenomics2/users/lli/glioma/WGS/CNV/'
+mkdir -p $dirIn
+cd $dirIn
+for file in *.CNV; do
+    echo $file
+    less $file | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$4"\t"$5}' > $file.bed
+    $BEDTOOLS/intersectBed -a $file.bed -b /home/lli/hg19/cytoBand.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$10}' > $file.cytoband
+    $BEDTOOLS/intersectBed -a $file.bed -b /home/lli/hg19/hg19v69_genes.bed -wa -wb | awk '{gsub("_", "\t"); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$10"\t"$11}' > $file.gene.tmp
+    awk 'NR==FNR {name[$1]=$2; next} {print $0"\t"name[$7]}' /projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.EnsID_sorted.HUGO $file.gene.tmp > $file.gene
+    rm $file.gene.tmp
+done
 
