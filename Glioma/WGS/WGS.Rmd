@@ -1,0 +1,45 @@
+---
+title: "Glioma - DNA methylation"
+author: "Gloria Li"
+date: "May 26, 2016"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggbio)
+library(GenomicRanges)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics2/users/lli/glioma/WGS/WGS.Rdata")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGS/")
+```
+
+## Confirm common mutations in glioma
+* Confirmed IDH mutation and 1p19q co-deletion in CEMT19, CEMT22, and CEMT47.     
+* IDH mutation frequency in CEMT21 was much lower than expected, and 1p19q deletion was not detected, suggesting tumour content in this sample may be low, estmated 18.5% according to IDH mutattion frequency.   
+* Apart from IDH1 mutations and CIC mutation in CEMT47, all other variations in the table were not associated with glioma according to COSMIC. And in the case of CEMT47, those variations were also found in matched blood sample, suggesting they may be germline in other samples as well.    
+
+```{r mutation, results='asis'}
+kable(glioma_mutations, format = "html", align = "r", row.names = F)
+kable(IDH, format = "html", align = "r", row.names = F, caption = "IDH mutation frequency")
+```
+
+## Copy number variations
+
+```{r CNV, fig.height=8}
+for(lib in libs){
+	print(get(paste0("CNV_", lib, "_figure"))@ggplot)
+}
+```
+
