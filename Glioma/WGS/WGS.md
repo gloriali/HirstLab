@@ -1,8 +1,8 @@
-# Glioma - DNA methylation
+# Glioma - genetic variations
 Gloria Li  
 May 26, 2016  
 
-Updated: Thu May 26 18:02:24 2016
+Updated: Thu May 26 18:12:26 2016
 
 
 

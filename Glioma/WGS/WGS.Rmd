@@ -1,5 +1,5 @@
 ---
-title: "Glioma - DNA methylation"
+title: "Glioma - genetic variations"
 author: "Gloria Li"
 date: "May 26, 2016"
 output: 
