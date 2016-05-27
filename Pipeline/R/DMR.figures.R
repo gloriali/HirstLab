@@ -3,8 +3,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
   library(dplyr)
   library(ggbio)
   library(GenomicRanges)
-	library(RCircos)
-	DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_pos_figure <- NULL; 
+  library(RCircos)
+  DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_pos_figure <- NULL; 
   chrlength <- chrlength[chrlength$chr %in% chrs, ]
   chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
   colnames(DMR) <- colname
