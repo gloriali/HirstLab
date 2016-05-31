@@ -40,13 +40,13 @@ i=$3;
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
-    echo "ERROR: more than one bamstats file found:" $lib
+    echo -e "ERROR: more than one bamstats file found:\t" $lib"\t"$i
     exit
 fi
 
 if [ ! -f $i ]
 then
-    echo "ERROR: bamstats file not found:" $lib
+    echo -e "ERROR: bamstats file not found:\t" $lib"\t"$i
     exit
 fi
 
