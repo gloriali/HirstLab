@@ -868,9 +868,18 @@ echo -e "H3K36me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $di
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.GW.GW13_01.bed -b $dirOut/unique_H3K36me3.GW.GW13_02.bed > $dirOut/unique_H3K36me3.GW.GW13.bed
 /projects/epigenomics/software/bedtools-2.23.0/bin/intersectBed -a $dirOut/unique_H3K36me3.GW.GW17_01.bed -b $dirOut/unique_H3K36me3.GW.GW17_02.bed > $dirOut/unique_H3K36me3.GW.GW17.bed
 
-
-
-
+# FindER 1.0.0b GE04 to compare to gliomas
+JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+mkdir -p $dirOut
+cd $dirIn
+for file in *.H*.GE04.bam; do
+    mark=$(echo $file | sed -e 's/.GE04.bam//g' | sed -e 's/A1930..//g')
+    echo $mark
+    mkdir -p $dirOut/$mark
+    $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/$file -inputBam $dirIn/A19309.Input.GE04.bam -out $dirOut/$mark -SE > $dirOut/$mark/$file.log
+done
 
 
 
