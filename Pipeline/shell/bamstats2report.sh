@@ -9,34 +9,34 @@
 #This script fetches QC metrics in the bamstats file
 #
 #Input = libID, path to bamstats file 
-#Output= report at /projects/epigenomics/users/acarles/qc (text file that has one line per QC metric)
+#Output= report text file that has one line per QC metric
 #Example Of Command: 
-
+#bamstats2report.sh <output directory> <library ID> <path to bamstats file>
 
 #############################
-# Annaick Carles
-# Last update: November 2014
+# adapted from Annaick Carles
 ##############################
 
 
 #Output directory - permissions are open so that other users from the group can run this shell script - 
-outDir="/projects/epigenomics/users/acarles/qc"
+# First argument is output directory
+outDir=$1
 if [ ! -d $outDir ]; then
   mkdir $outDir
 fi
 ### Copy report template
-if [ ! -f $outDir/qcReport.template ];
+if [ ! -f /projects/epigenomics/users/acarles/qc/qcReport.template ];
 then
 echo "Report template file does not exist"
 exit
 else 
-cp $outDir/qcReport.template $outDir/report.temp0
+cp /projects/epigenomics/users/acarles/qc/qcReport.template $outDir/report.temp0
 fi
 
-# First argument is library ID
-lib=$1;
-# Automatic path to bamstats file from library ID 
-i="/projects/analysis6/$lib/merge_bwa/hg19a/*.bamstats";
+# Second argument is library ID
+lib=$2;
+# Third argument is path to bamstats file 
+i=$3;
 
 if [ `ls -l $i | wc -l` -gt 1 ]
 then
@@ -57,7 +57,7 @@ echo "---> Processing Lib $lib";
 # Output file
 outFileTemp=$outDir/report.temp1
 outFile=$outDir/report_$lib.$(date +%Y%m%d)
-echo "Output will be at: /projects/epigenomics/users/acarles/qc/report_<lib>.<date>"
+echo "Output will be at: "$outDir"/report_<lib>.<date>"
 
 
 ### 1/ Name
