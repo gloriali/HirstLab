@@ -12,5 +12,5 @@ less $dirOut/bamstas2report.log | grep 'ERROR' > $dirOut/bamstas2report.error
 less $dirOut/bamstas2report.error | awk '{print $6; gsub("bamstats", "bam"); cmd="/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py -g 2864785220 -q 10 -b " $7 " > ""'$dirOut'" $6 ".bamstats"; system(cmd); cmd2="/home/lli/HirstLab/Pipeline/shell/bamstats2report.sh ""'$dirOut'"" "$6" ""'$dirOut'" $6 ".bamstats"; system(cmd2)}'
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
 # add metadata info
-awk 'NR==FNR {donor[$3]=$1; assay[$3]=$2; next} {print $0"\t"donor[$1]"\t"assay[$1]}' /projects/epigenomics2/users/lli/glioma/glioma_libraries.tsv $dirOut/summary.txt > $dirOut/summary.tsv
+awk 'NR==FNR {donor[$3]=$1; assay[$3]=$2; next} {print $1"\t"donor[$1]"\t"assay[$1]"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11}' /projects/epigenomics2/users/lli/glioma/glioma_libraries.tsv $dirOut/summary.txt > $dirOut/summary.tsv
 
