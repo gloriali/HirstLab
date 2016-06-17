@@ -43,13 +43,18 @@ $BEDTOOLS/shuffleBed -i $region -g $chr -excl $excl | awk '{print $1"\t"$2"\t"$3
 $JAVA -jar -Xmx15G $RegCov -w $wig -r $dirOut/$name.background.bed -o $dirOut -c $chr -n $name.background >> $dirOut/$name.log
 
 ## plot and cutoff: 90% quantile of coverage for background regions
+less $excl | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.ER.bed
+$JAVA -jar -Xmx15G $RegCov -w $wig -r $dirOut/$name.ER.bed -o $dirOut -c $chr -n $name.ER > $dirOut/$name.log
 echo "signal <- read.delim(\"$(ls $dirOut/*.$name.signal.coverage)\", as.is = T, head = F, col.names = c(\"chr\", \"start\", \"end\", \"ID\", \"cov\", \"max\"))
 background <- read.delim(\"$(ls $dirOut/*.$name.background.coverage)\", as.is = T, head = F, col.names = c(\"chr\", \"start\", \"end\", \"ID\", \"cov\", \"max\"))
+ER <- read.delim(\"$(ls $dirOut/*.$name.ER.coverage)\", as.is = T, head = F, col.names = c(\"chr\", \"start\", \"end\", \"ID\", \"cov\", \"max\"))
 pdf(\"$dirOut/$name.pdf\")
 plot(c(0, 20), c(0, 1), type = \"n\", main = \"$name\", xlab = \"average coverage\", ylab = \"ecdf\")
+lines(ecdf(ER\$cov), col = \"black\")
 lines(ecdf(signal\$cov), col = \"red\")
 lines(ecdf(background\$cov), col = \"blue\")
 abline(v = quantile(background\$cov, 0.9), col = \"blue\")
+legend(\"bottomright\", c(\"Sample1 ER\", \"Sample2 ER\", \"Sample2 background\"), col = c(\"red\", \"black\", \"blue\"), lwd = 5, lty = 1, cex = 0.8)
 dev.off()
 " > $dirOut/$name.R
 $R CMD BATCH $dirOut/$name.R
@@ -58,5 +63,5 @@ echo "Coverage cutoff: $cutoff"
 
 ## output
 less $dirOut/*.$name.signal.coverage | awk '{if($5 <= '"$cutoff"'){print $0}}' > $dirOut/$name.unique
-rm $dirOut/*$name.signal* $dirOut/*$name.background* $dirOut/$name.R
+rm $dirOut/*$name.ER* $dirOut/*$name.signal* $dirOut/*$name.background* $dirOut/$name.R
 
