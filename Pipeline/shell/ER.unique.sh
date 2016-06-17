@@ -32,7 +32,8 @@ BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
 
 ## calculate region signal from wig
-$JAVA -jar -Xmx15G $RegCov -w $wig -r <(less $region | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}') -o $dirOut -c $chr -n $name.signal > $dirOut/$name.log
+less $region | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.signal.bed
+$JAVA -jar -Xmx15G $RegCov -w $wig -r $dirOut/$name.signal.bed -o $dirOut -c $chr -n $name.signal > $dirOut/$name.log
 
 ## generate background regions
 $BEDTOOLS/shuffleBed -i $region -g $chr -excl $excl | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.background.bed
