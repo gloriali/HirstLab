@@ -47,5 +47,5 @@ echo "Coverage cutoff: $cutoff"
 
 ## output
 less $dirOut/*.$name.signal.coverage | awk '{if($5 <= '"$cutoff"'){print $0}}' > $dirOut/$name.unique
-rm *$name.signal* *$name.background*
+rm $dirOut/*$name.signal* $dirOut/*$name.background*
 
