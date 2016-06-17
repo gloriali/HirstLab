@@ -3,16 +3,18 @@
 # ChIP-seq check if regions are enriched from signal files
 if [ "$1" == "-h" ] ; then
     echo -e "ChIP-seq unique enriched regions in pairwise comparisons 
-Usage: `basename $0` -r <region> -w <wig> -o <dirOut> -n <name> -excl <excl>
+Usage: `basename $0` -r <region> -w <wig> -o <dirOut> -n <name> -excl <excl> -q <quant>
     <region>: enriched regions in sample1, format: chr\tstart\tend\t<additional columns>
     <wig>: wig signalling file for sample2
     <dirOut>: output directory
     <name>: output name
     <excl>: enriched regions in sample2, format: chr\tstart\tend\t<additional columns>
+    <quant>: quantile of background signal to use as cutoff, default to 0.9
 Output: $dirOut/$name.unique, format: chr\tstart\tend\tID\taverage coverage\tmax coverage"
     exit 0
 fi
 
+quant=0.9
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -21,6 +23,7 @@ do
         -o) dirOut="$2"; shift;;
         -n) name="$2"; shift;;
         -excl) excl="$2"; shift;;
+        -q) quant="$2"; shift;;
     esac
     shift
 done
@@ -58,7 +61,7 @@ legend(\"bottomright\", c(\"Sample1 ER\", \"Sample2 ER\", \"Sample2 background\"
 dev.off()
 " > $dirOut/$name.R
 $R CMD BATCH $dirOut/$name.R
-cutoff=$(less $dirOut/*.$name.background.coverage | awk '{print $5}' | sort -k1,1n | awk '{c[NR]=$1} END{print c[NR-int(NR/10)]}')
+cutoff=$(less $dirOut/*.$name.background.coverage | awk '{print $5}' | sort -k1,1n | awk '{c[NR]=$1} END{print c[int(NR*'"$quant"')]}')
 echo "Coverage cutoff: $cutoff"
 
 ## output
