@@ -98,5 +98,72 @@ for i in {1..50}; do
     done
 done
 
+# Differentially marked regions
+## signal files
+dirIn=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/
+for lib in 19 21 22 23 47; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
+        echo $lib $mark
+        mkdir -p $dirOut/$mark/
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*.wig.gz $dirOut/$mark/CEMT_$lib.wig.gz   
+    done
+done
+dirIn=/home/lli/FetalBrain/HisMod/wigs/
+ln -s $dirIn/A19303.*.wig.gz $dirOut/H3K4me1/NPC_GE04.wig.gz
+ln -s $dirIn/A19304.*.wig.gz $dirOut/H3K4me3/NPC_GE04.wig.gz
+ln -s $dirIn/A19305.*.wig.gz $dirOut/H3K9me3/NPC_GE04.wig.gz
+ln -s $dirIn/A19306.*.wig.gz $dirOut/H3K27me3/NPC_GE04.wig.gz
+ln -s $dirIn/A19307.*.wig.gz $dirOut/H3K36me3/NPC_GE04.wig.gz
+ln -s $dirIn/A19308.*.wig.gz $dirOut/H3K27ac/NPC_GE04.wig.gz
+ln -s $dirIn/A19309.*.wig.gz $dirOut/Input/NPC_GE04.wig.gz
+
+## differentially marked regions from FindER peaks and wig singal files
+### test: how to set the background coverage cutoff? 
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+dirOut=$dirIn/unique/test/
+mkdir -p $dirOut
+lib=19
+mark=H3K27ac
+region=$dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz
+wig=$dirIn/wig/$mark/NPC_GE04.wig.gz
+excl=$dirIn/FindER/$mark/A19308.H3K27ac.GE04.vs.A19309.Input.GE04.FDR_0.05.FindER.bed.gz
+name=CEMT_$lib.vs.NPC_GE04.CEMT_$lib
+JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+#### calculate region signal from wig
+$JAVA -jar -Xmx15G $RegCov -w $wig -r <(less $region | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}') -o $dirOut -c $chr -n $name.signal > $dirOut/$name.log
+for i in {1..10}; do
+    #### generate background regions
+    $BEDTOOLS/shuffleBed -i $region -g $chr -excl $excl | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"'"$i"'}' > $dirOut/$name.background.$i.bed
+    #### calculate coverage for background regions
+    $JAVA -jar -Xmx15G $RegCov -w $wig -r $dirOut/$name.background.$i.bed -o $dirOut -c $chr -n $name.background.$i >> $dirOut/$name.log
+done
+
+### glioma vs NPC
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique/ER.unique.summary
+for lib in 19 21 22 23 47; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+        echo "CEMT_"$lib $mark
+        echo -e "\n\nCEMT_"$lib $mark >> $dirIn/unique/ER.unique.log
+        dirOut=$dirIn/unique/$mark/
+        mkdir -p $dirOut/
+        ~/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/NPC_GE04.wig.gz -excl $(ls $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz) -o $dirOut/ -n CEMT_$lib.vs.NPC_GE04.CEMT_$lib >> $dirIn/unique/ER.unique.log
+        ~/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_$lib.wig.gz -r $(ls $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz) -o $dirOut/ -n CEMT_$lib.vs.NPC_GE04.NPC_GE04 >> $dirIn/unique/ER.unique.log
+        N_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | wc -l)
+        len_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_NPC=$(less $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz | wc -l)
+        len_NPC=$(less $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)
+        len_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | awk '{s=s+$3-$2}END{print s}')
+        N_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)
+        len_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e "$lib\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
+    done
+done
+less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
 
 
