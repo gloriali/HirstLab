@@ -56,7 +56,7 @@ plot(c(0, 20), c(0, 1), type = \"n\", main = \"$name\", xlab = \"average coverag
 lines(ecdf(ER\$cov), col = \"black\")
 lines(ecdf(signal\$cov), col = \"red\")
 lines(ecdf(background\$cov), col = \"blue\")
-abline(v = quantile(background\$cov, 0.9), col = \"blue\")
+abline(v = quantile(background\$cov, $quant), col = \"blue\")
 legend(\"bottomright\", c(\"Sample1 ER\", \"Sample2 ER\", \"Sample2 background\"), col = c(\"red\", \"black\", \"blue\"), lwd = 5, lty = 1, cex = 0.8)
 dev.off()
 " > $dirOut/$name.R
