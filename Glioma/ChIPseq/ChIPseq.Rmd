@@ -16,7 +16,6 @@ Updated: `r date()`
 library(ggplot2)
 library(plyr)
 library(VennDiagram)
-library(gridExtra)
 library(gplots)
 library(dendextend)
 library(reshape)
@@ -24,9 +23,12 @@ library(wq)
 library(dplyr)
 library(RCircos)
 library(knitr)
-load("/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
-knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 7, bitmapType='cairo') 
-knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/ChIPseq/")
+library(png)
+library(grid)
+library(gridExtra)
+load("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/ChIPseq/ChIPseq.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 7) 
+knitr::opts_knit$set(root.dir = "/Users/epigenomics_lab_02/百度云同步盘/Gliomas/ChIPseq/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
@@ -44,6 +46,7 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```{r ER_summary}
 (ER_summary_figure)
 ```
+
 ```{r ER_subsample, fig.width=4}
 for(i in 1:nrow(ER_adjust_summary)){
 	grid.arrange(gTree(children = get(paste0("Venn_adjust_N_region", rownames(ER_adjust_summary)[i]))), gTree(children = get(paste0("Venn_adjust_Total_length", rownames(ER_adjust_summary)[i]))), nrow = 2)
@@ -53,13 +56,18 @@ for(i in 1:nrow(ER_adjust_summary)){
 }
 ```
 
-## Chromatin states
-* ChromHMM for 6 core histone marks in glioma and GE04.    
-![](/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/emission.pdf)
+
+## Chromatin states       
+* ChromHMM for 6 core histone marks in glioma and GE04.     
 
 ```{r chromHMM}
+img <- readPNG("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/ChIPseq/ChromHMM/emission_name.png")
+grid.raster(img)
+```
+```{r chromHMM_summary}
 (chromHMM_summary_figure)
 ```
+
 
 ## Unique enriched regions 
 * Pairwise comparisons between glioma samples (S1) and NPC GE04 (S2).   
@@ -69,9 +77,12 @@ for(i in 1:nrow(ER_adjust_summary)){
 	+ Calculate S1 ER signal in S2 wig.    
 	+ Randomly generate a set of background regions (not overlapping with S2 ER) with same length as S1 ER.   
 	+ Calculate signal for these background regions in S2 wig, use 90% quantile as cutoff. 
-	+ S1 unique ER: S1 ER with signal < background cutoff in S2.   
-![](/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/CEMT_19.vs.NPC_GE04.CEMT_19.pdf)
+	+ S1 unique ER: S1 ER with signal < background cutoff in S2.     
 
+```{r unique_ER_method}
+img <- readPNG("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/ChIPseq/unqiue_ER.png")
+grid.raster(img)
+```
 ```{r unique_ER_summary}
 (ER_unique_summary_figure)
 ```
