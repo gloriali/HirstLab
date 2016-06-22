@@ -39,6 +39,13 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (quantile_5mC_figure)
 ```
 
+## DNA methylation changes around CGI edges
+* DNA methylation changes around CGI occurred across the entire region.     
+
+```{r 5mC_CGI}
+(CGI_edge_figure)
+```
+
 ## DMRs between gliomas and NPCs  
 ### Total DMR length
 * Hypermethylation in IDH mut samples.    

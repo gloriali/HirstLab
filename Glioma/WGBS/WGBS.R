@@ -30,6 +30,19 @@ quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, fill = category)) +
 	theme_bw()
 ggsave(quantile_5mC_figure, file = "../quantile_5mC_figure.pdf", height = 5, width = 6)
 
+## ------- changes at CGI edges
+CGI_edge <- read.delim("../CGI_edge/CGI.edge.all", head = F, col.names = c("chr", "start", "end", "ID", "mC", "CGI", "edge", "dis", "sample")) %>% 
+	mutate(edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime")))
+CGI_edge_CpG_ID <- CGI_edge %>% group_by(ID) %>% summarise(n = n()) %>% filter(n == 9)
+CGI_edge <- CGI_edge %>% filter(ID %in% CGI_edge_CpG_ID$ID)
+(CGI_edge_figure <- ggplot(CGI_edge, aes(-dis, mC, color = sample)) + 
+	geom_smooth() + 
+	facet_wrap(~ edge, scales = "free_x") + 
+	xlab("Distance to CGI edge (bp)") + 
+	ylab("Fractional methylation") + 
+	theme_bw())
+ggsave(CGI_edge_figure, file = "../CGI_edge/CGI_edge_figure.pdf", width = 8)
+
 ## ------- DMR glioma vs NPC -------
 ### -------- summary ---------
 DMR_summary <- read.delim("./intermediate/DMR.summary.stats", head = T, as.is = T)
