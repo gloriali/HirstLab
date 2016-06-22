@@ -158,8 +158,19 @@ for(i1 in 1:(length(libs)-1)){
 }
 dev.off()
 
+### -------- enrichment in chromatin states --------
+DMR_ChromHMM_summary <- read.delim("./CpG/DMR.chromHMM.enrich.summary", as.is = T) 
+(DMR_ChromHMM_summary_figure <- ggplot(DMR_ChromHMM_summary, aes(Name, Enrichment, fill = Sample)) + 
+	geom_bar(stat = "identity", position = position_dodge()) + 
+	facet_grid(. ~ DM) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("Fold enrichment") +
+	theme_bw())
+ggsave(DMR_ChromHMM_summary_figure, file = "DMR_ChromHMM_summary_figure.pdf")
 
-save(list = c("quantile_5mC_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", "DMR_jaccard_hyper_figure", "DMR_jaccard_hypo_figure", 
+save(list = c("quantile_5mC_figure", "CGI_edge_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", "DMR_jaccard_hyper_figure", "DMR_jaccard_hypo_figure", 
+							"DMR_ChromHMM_summary", "DMR_ChromHMM_summary_figure", 
 							ls(pattern = "DMR_CEMT_\\d+_figure"), ls(pattern = "DMR_CEMT_\\d+_CGI_dis_figure"), 
 							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*")),
 		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")

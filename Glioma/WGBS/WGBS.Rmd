@@ -85,6 +85,15 @@ for(lib in libs){
 (genomic_breakdown_figure)
 ```
 
+### DMR enrichment in chromatin states
+* Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
+* Hypomethylated regions were enriched in enhancer regions.    
+
+```{r DMR_ChromHMM}
+(DMR_ChromHMM_summary_figure)
+```
+
+
 ### DMR distance to CGIs
 * Distance between mid-point of DMRs and mid-point of closest CGI, normalized against length of the CGI (0: CGI mid-point; +/-1: CGI boundaries).      
 * Hypomethylated regions were enriched at CGI shores.    
