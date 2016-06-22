@@ -2,4 +2,5 @@ CEMT Glioma Project
 ========
 * [GliomaLibraries.tsv](./GliomaLibraries.tsv): Libraries and samples information for CEMT glioma samples.          
 * [WGS](./WGS/WGS.md): genetic variation analysis.      
-* [WGBS](./WGBS/WGBS.md): DNA methylation analysis.      
+* [WGBS](./WGBS/WGBS.md): DNA methylation analysis.  
+* [ChIP-seq](./ChIPseq/ChIPseq.md): Histone modifications ChIP-seq analysis.       

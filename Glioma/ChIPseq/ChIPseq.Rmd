@@ -1,0 +1,79 @@
+---
+title: "Glioma - Histone modifications ChIP-seq"
+author: "Gloria Li"
+date: "Jun, 19, 2016"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 7, bitmapType='cairo') 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/ChIPseq/")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+```
+
+## FindER enriched regions 
+* Some libraries were much more deeply sequenced than others, i.e. CEMT_47, might lead to increased enriched regions due to increased sequencing depth.     
+* Subsample bam files of deeply sequenced libraries to the average coverage of other libraries of the same mark (ran 50 times), and re-run FindER:   
+	+ CEMT_21 H3K4me1: 0.4
+	+ CEMT_47 H3K4me1: 0.4
+	+ CEMT_47 H3K9me3: 0.5
+	+ CEMT_47 H3K27me3: 0.4
+	+ CEMT_47 H3K27ac: 0.3
+* Subsampled libraries (panel 2 and 4) had less enriched regions, but were able to retain the majority of enriched regions.    
+* FindER v 1.0.0b      
+
+```{r ER_summary}
+(ER_summary_figure)
+```
+```{r ER_subsample, fig.width=4}
+for(i in 1:nrow(ER_adjust_summary)){
+	grid.arrange(gTree(children = get(paste0("Venn_adjust_N_region", rownames(ER_adjust_summary)[i]))), gTree(children = get(paste0("Venn_adjust_Total_length", rownames(ER_adjust_summary)[i]))), nrow = 2)
+	grid.text(paste0(rownames(ER_adjust_summary)[i], "\nfraction_", ER_adjust_summary[i, "frac"]), x = unit(0.8, "npc"), y = unit(0.95, "npc"))
+	grid.text("No. of regions", x = unit(0.2, "npc"), y = unit(0.98, "npc"))
+	grid.text("Total length", x = unit(0.2, "npc"), y = unit(0.48, "npc"))
+}
+```
+
+## Chromatin states
+* ChromHMM for 6 core histone marks in glioma and GE04.    
+![](/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/emission.pdf)
+
+```{r chromHMM}
+(chromHMM_summary_figure)
+```
+
+## Unique enriched regions 
+* Pairwise comparisons between glioma samples (S1) and NPC GE04 (S2).   
+* Challenge: S1 and S2 often have quite different sequencing depth, thus direct comparisons between ER are likely biased.     
+* Input: ER in S1, wig in S1, ER in S2, wig in S2.   
+* Method: 
+	+ Calculate S1 ER signal in S2 wig.    
+	+ Randomly generate a set of background regions (not overlapping with S2 ER) with same length as S1 ER.   
+	+ Calculate signal for these background regions in S2 wig, use 90% quantile as cutoff. 
+	+ S1 unique ER: S1 ER with signal < background cutoff in S2.   
+![](/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/CEMT_19.vs.NPC_GE04.CEMT_19.pdf)
+
+```{r unique_ER_summary}
+(ER_unique_summary_figure)
+```
+
+
