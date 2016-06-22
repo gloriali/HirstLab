@@ -125,3 +125,26 @@ for file in *.combine.5mC.CpG; do
     rm $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R 
 done
 cat $dirOut/*.CGI.edge > $dirOut/CGI.edge.all
+
+# DMR enrichment in chromatin states
+dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CpG/'
+dirState='/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/'
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+CG='/home/lli/hg19/CG.BED'
+cd $dirOut
+echo -e "Sample\tDM\tState\tTotal_CpG\tDMR_CpG\tState_CpG\tDMR_State_CpG\tEnrichment" > $dirOut/DMR.chromHMM.enrich
+for file in *.CpG.bed; do
+    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
+    dm=$(echo $file | sed -e 's/.*NPC.//g' | sed -e 's/.CpG.bed//g')
+    echo 'Processing' $lib $dm
+    less $dirState/$lib'_18_segments.bed' | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $CG -b stdin -wa -wb | awk '{c[$8]=c[$8]+1}END{for(i in c){print i"\t"c[i]}}' > $lib.state
+    total=$(less $lib.state | awk '{c=c+$2}END{print c}')
+    less $dirState/$lib'_18_segments.bed' | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{c[$8]=c[$8]+1}END{for(i in c){print i"\t"c[i]}}' > $lib.state.dmr
+    dmr=$(less $lib.state.dmr | awk '{c=c+$2}END{print c}')
+    awk 'NR==FNR {dmr[$1]=$2; next} {print $0"\t"dmr[$1]}' $lib.state.dmr $lib.state | sort -k1,1 | awk '{enrich=($3/$2)/("'$dmr'"/"'$total'"); print "'$lib'""\t""'$dm'""\t"$1"\t"'"$total"'"\t"'"$dmr"'"\t"$2"\t"$3"\t"enrich}' >> $dirOut/DMR.chromHMM.enrich
+    rm $lib.state $lib.state.dmr
+done
+awk 'NR==FNR {name[$1]=$2} {print $0"\t"name[$3]}' $dirState/chromatin.states.summary $dirOut/DMR.chromHMM.enrich > $dirOut/DMR.chromHMM.enrich.summary
+rm $dirOut/DMR.chromHMM.enrich
+
+
