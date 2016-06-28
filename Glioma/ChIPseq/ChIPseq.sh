@@ -143,6 +143,7 @@ for i in {1..10}; do
 done
 
 ### glioma vs NPC
+#### method1: ER and signal files
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
 echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique/ER.unique.summary
 for lib in 19 21 22 23 47; do
@@ -166,4 +167,28 @@ for lib in 19 21 22 23 47; do
 done
 less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
 
+#### method2: non-overlapping ER 
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique2/ER.unique.summary
+echo -e "Sample\tMark\tN_glioma_unique_method1\tN_glioma_unique_method2\tN_glioma_unique_intersect\tN_NPC_unique_method1\tN_NPC_unique_method2\tN_NPC_unique_intersect" > $dirIn/unique2/ER.unique.compare.methods
+for lib in 19 21 22 23 47; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+        echo "CEMT_"$lib $mark
+        dirOut=$dirIn/unique2/$mark/
+        mkdir -p $dirOut/
+        $BEDTOOLS/intersectBed -a $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -b $(ls $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz) -v > $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique
+        $BEDTOOLS/intersectBed -a $(ls $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz) -b $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -v > $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique
+        N_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | wc -l)
+        len_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_NPC=$(less $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz | wc -l)
+        len_NPC=$(less $dirIn/FindER/$mark/*$mark.GE04.*.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)
+        len_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | awk '{s=s+$3-$2}END{print s}')
+        N_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)
+        len_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e "$lib\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique2/ER.unique.summary
+        echo -e "$lib\t$mark\t$(less $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)\t$N_glioma_unique\t$($BEDTOOLS/intersectBed -a $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique -b $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)\t$(less $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)\t$N_NPC_unique\t$($BEDTOOLS/intersectBed -a $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique -b $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)" >> $dirIn/unique2/ER.unique.compare.methods
+    done
+done
 
