@@ -44,19 +44,18 @@ function bam2fq {
 export -f bam2fq
 cat BamList.txt | parallel --gnu bam2fq 
 cat <(ls *.fq) | parallel --gnu gzip
-# gzip *.fq
-# rm *.sorted.bam
-
+rm *.sorted.bam
 ## jaguar alignment
-dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_fq/
-dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
 ref=/home/pubseq/genomes/Homo_sapiens/hg19a/jaguar/1.7.5/ens69/bwa_ind/transcriptome/75/ref.fa
 ens=hg19_ens69
+dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_fq/
+dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_bam/
+mkdir -p $dirOut
 for f1 in *.1.fq.gz; do
     name=$(echo $f1 | sed -e 's/.1.fq.gz//g')
     f2=$name.2.fq.gz
     echo $f1 $f2 $name
-    /home/lli//home/lli/HirstLab/Pipeline/shell/jaguar.sh -i $dirIn -o $dirOut -f1 $f1 -f2 $f2 -n $name -r $ref -v $ens
+    /home/lli/HirstLab/Pipeline/shell/jaguar.sh -i $dirIn -o $dirOut -f1 $f1 -f2 $f2 -n $name -r $ref -v $ens
 done
 
 
