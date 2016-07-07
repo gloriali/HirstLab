@@ -147,4 +147,26 @@ done
 awk 'NR==FNR {name[$1]=$2} {print $0"\t"name[$3]}' $dirState/chromatin.states.summary $dirOut/DMR.chromHMM.enrich > $dirOut/DMR.chromHMM.enrich.summary
 rm $dirOut/DMR.chromHMM.enrich
 
+## DMR enrichemnt in unique histone modification ERs
+dirDMR=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/
+dirHM=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+cd $dirDMR
+echo -e "Sample\tDMR\tMark\tHM\tN_DMR\tN_HM\tN_intersect\tN_total\tFold\tp-value" > $dirDMR/DMR.uniqueHM.enrichment.summary
+for file in DMR.CEMT*.bed; do
+    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
+    dm=$(echo $file | sed -e 's/.bed//g' | sed -e 's/.*NPC.//g')
+    echo $lib $dm
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K27ac H3K36me3; do
+        for file2 in $dirHM/$mark/$lib*.unique; do
+            dhm=$(echo $file2 | sed -e 's/.*.vs.NPC_GE04.//g')
+            echo $mark $dhm 
+            fc=$(less $file2 | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a $dirDMR/$file -b stdin -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print a"\t"b"\t"i"\t"t"\t"(i/a)/(b/t)}')
+            p=$(less $file2 | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a $dirDMR/$file -b stdin -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+            echo -e "$lib\t$dm\t$mark\t$dhm\t$fc\t$p" >> $dirDMR/DMR.uniqueHM.enrichment.summary
+        done
+    done
+done
 
