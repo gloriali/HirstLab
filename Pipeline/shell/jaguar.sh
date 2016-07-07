@@ -46,6 +46,5 @@ AUTOMATION_HOME=/projects/wtsspipeline/programs/external_programs/Automation/
 # repositioning step using:
 #######################
 
-mkdir -p $dirOut/$name/;
 rm -rf $dirOut/$name/
 /home/mbilenky/bin/Solexa_Shell/RunJR.sh $dirOut/$name".sortedByName.bam" $dirOut/$name $ens &> $dirOut/run/$name.j.log
