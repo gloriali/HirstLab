@@ -94,3 +94,40 @@ name=A15299.GE04
 mkdir -p $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
 
+# DE between glioma and NPCs
+## generate matlab code for DEfine
+dirIn='/projects/epigenomics2/users/lli/glioma/RNAseq/';
+dirOut='/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/';
+mkdir -p $dirOut
+echo -e "%/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab
+addpath /home/mbilenky/matlab -end" > $dirOut/DEfine.glioma.m
+for name1 in CEMT_19 CEMT_21 CEMT_22 CEMT_23 CEMT_47; do
+    mkdir -p $dirOut/$name1/
+    for name2 in Cortex02 GE02 Cortex04 GE04; do
+        sample1=$name1
+        sample2=$(ls $dirIn/NPC_RPKM/*$name2/*.bam | sed -e 's/.*\///g' | sed -e 's/.bam//g')
+        echo $sample1 $sample2
+        if [ $name2 == 'Cortex02' ]; then
+            echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% $name1 %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+" >> $dirOut/DEfine.glioma.m
+        fi
+        echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%% $name1 vs $name2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all; close all;
+out=true; corr1=true; corr2=true; rpkm=true; figs=true; RPKMmin=0.005; Nmin=25; eps=0.0001; maxLim=3.5; fdr=0.01; 
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.pc.EnsID.GC','%s %f');
+dirIn='$dirIn';
+dirOut='$dirOut/$name1/';
+sample1='$sample1'; name1='$name1';
+sample2='$sample2'; name2='$name2';
+[idl,n1,r1,rmi,ra,rma]=textread(strcat(dirIn, 'RPKM/', sample1, '.G.A.rpkm.pc'),'%s %f %f %f %f %f');
+[id,n2,r2,rmi,ra,rma]=textread(strcat(dirIn, 'NPC_RPKM/', sample2,'/coverage/', sample2, '.G.A.rpkm.pc'),'%s %f %f %f %f %f');
+[C,ix,ixl]=intersect(id,idl);
+[cc,nfup,nfdn]=DEfine(idl(ixl), r1(ixl), r2(ix), n1(ixl), n2(ix), [gl(ixl), gc(ix)], dirOut, name1, name2, out, figs, fdr, corr1, corr2, rpkm, RPKMmin, Nmin, eps, maxLim);
+" >> $dirOut/DEfine.glioma.m
+    done
+done
