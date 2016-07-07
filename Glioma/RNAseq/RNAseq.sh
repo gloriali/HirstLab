@@ -57,5 +57,29 @@ for f1 in *.1.fq.gz; do
     echo $f1 $f2 $name
     /home/lli/HirstLab/Pipeline/shell/jaguar.sh -i $dirIn -o $dirOut -f1 $f1 -f2 $f2 -n $name -r $ref -v $ens
 done
-
+## QC and RPKM
+dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_bam/
+echo -e "A03473.Cortex01 R
+A03474.GE01 R
+A03475.Cortex02 R
+A03476.GE02 R
+A03484.Brain01 R
+A04599.Cortex03 R
+A07825.Brain02 S
+A15295.GE03 S
+A15298.Cortex04 S
+A15299.GE04 S" > $dirIn/strand.specificity
+function RNAseqQC {
+    samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
+    JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+    dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_bam/
+    dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
+    ens=hg19v69
+    name=$1
+    s=$2
+    mkdir -p $dirOut/$name/
+    /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens $s 0 "1,1,1,1,1" $JAVA $samtools > $dirOut/$name/qca.log
+}
+export -f RNAseqQC
+cat $dirIn/strand.specificity | parallel --gnu RNAseqQC 
 
