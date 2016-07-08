@@ -192,3 +192,34 @@ for lib in 19 21 22 23 47; do
     done
 done
 
+## intersect with DE genes
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dirDE=/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
+echo -e "Sample\tMark\tMarked\tDE\tN_DM_promoter\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirIn/DHM.DE.summary
+n_total=19865
+for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do 
+    cd $dirIn/$mark/
+    dirOut=$dirIn/$mark/DE/
+    mkdir -p $dirOut
+    for dmr in *.unique; do
+        lib=$(echo $dmr | sed -e 's/.vs.*//g')
+        dm=$(echo $dmr | cut -d'.' -f 4)
+        echo $mark $lib $dm
+        less $dmr | awk '{gsub("chr", ""); print}' | $BEDTOOLS/intersectBed -a stdin -b $promoter -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$10}' | sort -k5,5 > $dirOut/$lib.vs.NPC.$dm.unique.promoter.bed
+        for file in $dirDE/*$lib*.FDR_0.01.rmin_0.005.Nmin_25; do
+            de=$(basename $file | sed -e 's/.CEMT.*//g')
+            echo $de
+            join $dirOut/$lib.vs.NPC.$dm.unique.promoter.bed $file -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$lib.vs.NPC.$dm.unique.$de
+            n_dm=$(less $dirOut/$lib.vs.NPC.$dm.unique.promoter.bed | wc -l)
+            n_de=$(less $file | wc -l)
+            n_intersect=$(less $dirOut/$lib.vs.NPC.$dm.unique.$de | wc -l)
+            p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+            echo -e "$lib\t$mark\t$dm\t$de\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirIn/DHM.DE.summary
+        done
+    done
+done
+
+
