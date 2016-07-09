@@ -64,35 +64,35 @@ dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_bam/
 dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
 ens=hg19v69
 name=A03473.Cortex01
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A03474.GE01
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A03475.Cortex02
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A03476.GE02
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A03484.Brain01
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A04599.Cortex03
-mkdir -p $dirOut/$name/
+rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A07825.Brain02
-mkdir -p $dirOut/$name/
-/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
+rm -rf $dirOut/$name/
+/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A15295.GE03
-mkdir -p $dirOut/$name/
-/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
+rm -rf $dirOut/$name/
+/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A15298.Cortex04
-mkdir -p $dirOut/$name/
-/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
+rm -rf $dirOut/$name/
+/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 name=A15299.GE04
-mkdir -p $dirOut/$name/
-/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
+rm -rf $dirOut/$name/
+/home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
@@ -131,3 +131,19 @@ sample2='$sample2'; name2='$name2';
 " >> $dirOut/DEfine.glioma.m
     done
 done
+## intersect DE from NPCs
+dirOut='/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/';
+annotate='/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes';
+echo -e "Sample\tDE\tCortex02\tCortex04\tGE02\tGE04\tintersect" > $dirOut/DE.pc.summary
+for lib in CEMT_19 CEMT_21 CEMT_22 CEMT_23 CEMT_47; do
+    echo $lib
+    cat $dirOut/$lib/UP.$lib* | cut -f 1 | sort | uniq -c | awk '$1 ~ 4 {print $2}' | join - $annotate | sed 's/ /\t/g' > $dirOut/UP.$lib'_NPC.FDR_0.01.rmin_0.005.Nmin_25'
+    cat $dirOut/$lib/DN.$lib* | cut -f 1 | sort | uniq -c | awk '$1 ~ 4 {print $2}' | join - $annotate | sed 's/ /\t/g' > $dirOut/DN.$lib'_NPC.FDR_0.01.rmin_0.005.Nmin_25'
+    up=$(wc -l $dirOut/$lib/UP.$lib* | awk 'NR==1{s1=$1} NR==2{s2=$1} NR==3{s3=$1} NR==4{s4=$1} END{print s1"\t"s2"\t"s3"\t"s4}')
+    up_intersect=$(less $dirOut/UP.$lib'_NPC.FDR_0.01.rmin_0.005.Nmin_25' | wc -l)
+    echo -e "$lib\tUP\t$up\t$up_intersect" >> $dirOut/DE.pc.summary
+    dn=$(wc -l $dirOut/$lib/DN.$lib* | awk 'NR==1{s1=$1} NR==2{s2=$1} NR==3{s3=$1} NR==4{s4=$1} END{print s1"\t"s2"\t"s3"\t"s4}')
+    dn_intersect=$(less $dirOut/DN.$lib'_NPC.FDR_0.01.rmin_0.005.Nmin_25' | wc -l)
+    echo -e "$lib\tDN\t$dn\t$dn_intersect" >> $dirOut/DE.pc.summary
+done
+
