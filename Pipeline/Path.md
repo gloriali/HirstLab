@@ -11,6 +11,7 @@ File paths on xhost
 * BCFtools: `/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools`   
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
 * BWA: `/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa`      
+* Bamstats: `/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py`   
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * Homer: `/home/acarles/homer/bin/`
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
