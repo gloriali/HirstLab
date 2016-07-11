@@ -1,0 +1,63 @@
+---
+title: "Glioma - RNA-seq"
+author: "Gloria Li"
+date: "July, 10, 2016"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+library(png)
+library(grid)
+library(gridExtra)
+load("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/RNAseq/RNAseq.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 7) 
+knitr::opts_knit$set(root.dir = "/Users/epigenomics_lab_02/百度云同步盘/Gliomas/RNAseq/")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+```
+
+## DE glioma vs NPCs
+* DEfine of glioma vs four NPC samples (cortex02, GE02, cortex04, GE04), FDR = 0.01.      
+* Intersect of DE genes from all four NPC samples.  
+
+### Summary  
+* More UP genes than DN genes in all samples, but eps. in IDH-wt (CEMT_23).       
+
+```{r DE_summary}
+(DE_pc_summary_figure)
+```
+
+### DAVID functional enrichment 
+
+* IDH-mut samples        
+
+```{r DAVID_mut}
+for(lib in c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_47")){
+	print(get(paste0("DAVID_UP_", lib, "_figure")))
+	print(get(paste0("DAVID_DN_", lib, "_figure")))
+}
+```
+```{r DAVID_wt_UP, fig.height=12}
+(DAVID_UP_CEMT_23_figure)
+```
+```{r DAVID_wt_DN, fig.height=3}
+(DAVID_DN_CEMT_23_figure)
+```
+
+
