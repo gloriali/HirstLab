@@ -14,21 +14,11 @@ Updated: `r date()`
 
 ```{r setup, include = FALSE}
 library(ggplot2)
-library(plyr)
-library(VennDiagram)
-library(gplots)
-library(dendextend)
-library(reshape)
-library(wq)
 library(dplyr)
-library(RCircos)
 library(knitr)
-library(png)
-library(grid)
-library(gridExtra)
-load("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/RNAseq/RNAseq.Rdata")
+load("~/百度云同步盘/Gliomas/RNAseq/RNAseq.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 8, fig.width = 7) 
-knitr::opts_knit$set(root.dir = "/Users/epigenomics_lab_02/百度云同步盘/Gliomas/RNAseq/")
+knitr::opts_knit$set(root.dir = "~/百度云同步盘/Gliomas/RNAseq/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
