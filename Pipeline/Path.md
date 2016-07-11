@@ -10,6 +10,7 @@ File paths on xhost
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`    
 * BCFtools: `/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools`   
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
+* BWA: `/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa`      
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * Homer: `/home/acarles/homer/bin/`
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
