@@ -15,4 +15,6 @@ mkdir -p $dirOut/$name/
 name=B09_PC_JN27BS+4_RNAseq
 mkdir -p $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/PX0380_C9587ANXX_8_GCAAGG_withJunctionsOnGenome_dupsFlagged.bam $name $dirOut $ens S 0 "1,1,1,1,1" $JAVA $samtools 
+join $dirOut/B07_PC_AK1189_RNAseq/coverage/B07_PC_AK1189_RNAseq.G.A.rpkm.pc $dirOut/B08_PC_OPK69_RNAseq/coverage/B08_PC_OPK69_RNAseq.G.A.rpkm.pc | join - $dirOut/B09_PC_JN27BS+4_RNAseq/coverage/B09_PC_JN27BS+4_RNAseq.G.A.rpkm.pc | awk 'BEGIN {print "ID\tB07_PC_AK1189\tB08_PC_OPK69\tB09_PC_JN27BS+4"} {print $1"\t"$3"\t"$8"\t"$13}' > $dirOut/rpkm.pc
+join $dirOut/B07_PC_AK1189_RNAseq/coverage/B07_PC_AK1189_RNAseq.G.A.rpkm.nc $dirOut/B08_PC_OPK69_RNAseq/coverage/B08_PC_OPK69_RNAseq.G.A.rpkm.nc | join - $dirOut/B09_PC_JN27BS+4_RNAseq/coverage/B09_PC_JN27BS+4_RNAseq.G.A.rpkm.nc | awk 'BEGIN {print "ID\tB07_PC_AK1189\tB08_PC_OPK69\tB09_PC_JN27BS+4"} {print $1"\t"$3"\t"$8"\t"$13}' > $dirOut/rpkm.nc
 
