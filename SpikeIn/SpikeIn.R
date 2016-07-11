@@ -49,3 +49,31 @@ expression_all <- data.frame(ENSG = Expression_Memory$ENSG, Naive = Expression_N
 rownames(expression_all) <- expression_all$ENSG
 write.table(expression_all, file = "./mm10v71/Expression.normalized.matrix", sep = "\t", row.names = F, quote = F)
 
+## 2D plots
+expression_all <- read.delim("./mm10v71/Expression.normalized.matrix", as.is = T)
+(plot2D_Naive_Memory <- ggplot(expression_all, aes(log10(Memory), log10(Naive))) + 
+	geom_point(color = "black", alpha = 0.2, size = 1) + 
+	geom_abline(intercept = 0, slope = 1, color = "green") + 
+	theme_bw())
+ggsave(plot2D_Naive_Memory, file = "./mm10v71/plot2D_Naive_Memory.pdf", height = 5, width = 5)
+(plot2D_Primary_Memory <- ggplot(expression_all, aes(log10(Memory), log10(Primary))) + 
+	geom_point(color = "black", alpha = 0.2, size = 1) + 
+	geom_abline(intercept = 0, slope = 1, color = "green") + 
+	theme_bw())
+ggsave(plot2D_Primary_Memory, file = "./mm10v71/plot2D_Primary_Memory.pdf", height = 5, width = 5)
+(plot2D_Secondary_Memory <- ggplot(expression_all, aes(log10(Memory), log10(Secondary))) + 
+	geom_point(color = "black", alpha = 0.2, size = 1) + 
+	geom_abline(intercept = 0, slope = 1, color = "green") + 
+	theme_bw())
+ggsave(plot2D_Secondary_Memory, file = "./mm10v71/plot2D_Secondary_Memory.pdf", height = 5, width = 5)
+(plot2D_Primary_Secondary <- ggplot(expression_all, aes(log10(Secondary), log10(Primary))) + 
+	geom_point(color = "black", alpha = 0.2, size = 1) + 
+	geom_abline(intercept = 0, slope = 1, color = "green") + 
+	theme_bw())
+ggsave(plot2D_Primary_Secondary, file = "./mm10v71/plot2D_Primary_Secondary.pdf", height = 5, width = 5)
+(plot2D_Primary_Naive <- ggplot(expression_all, aes(log10(Naive), log10(Primary))) + 
+	geom_point(color = "black", alpha = 0.2, size = 1) + 
+	geom_abline(intercept = 0, slope = 1, color = "green") + 
+	theme_bw())
+ggsave(plot2D_Primary_Naive, file = "./mm10v71/plot2D_Primary_Naive.pdf", height = 5, width = 5)
+
