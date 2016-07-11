@@ -148,3 +148,9 @@ for(lib in libs){
 kable(DMR_intersect %>% select(sample1, sample2, hyper_percent1, hyper_percent2, hypo_percent1, hypo_percent2), digits = 4, format = "html", align = "c", row.names = F)
 ```
 
+### DMR intersect with differentially marked histone modifications  
+
+```{r DMR_DHM}
+(DMR_DHM_enrich_figure)
+```
+
