@@ -1,6 +1,18 @@
 #!/bin/sh
 
 ## QC and RPKM
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+dirIn=/projects/epigenomics2/Brain/NJabado/RNAseq/bam/
+dirOut=/projects/epigenomics2/Brain/NJabado/QC/
+mkdir -p $dirOut
+cd $dirIn
+for bam in *.bam; do
+    name=$(echo $bam | sed -e 's/_withJunctionsOnGenome_dupsFlagged.bam//g' | sed -e 's/C9587ANXX_8_//g')
+    echo $name
+    $bamstats -g 2864785220 -q 10 -b $dirIn/$bam  > $dirIn/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirIn/$name.bamstats
+done
+# /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
 samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 dirIn=/projects/epigenomics2/Brain/NJabado/RNAseq/bam/
