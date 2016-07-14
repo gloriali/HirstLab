@@ -24,9 +24,9 @@ library(wq)
 library(dplyr)
 library(RCircos)
 library(knitr)
-load("/Users/epigenomics_lab_02/百度云同步盘/Gliomas/WGBS/WGBS.Rdata")
+load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 7) 
-knitr::opts_knit$set(root.dir = "/Users/epigenomics_lab_02/百度云同步盘/Gliomas/WGBS/DMR/")
+knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGBS/DMR/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
@@ -146,5 +146,11 @@ for(lib in libs){
 (DMR_jaccard_hyper_figure)
 (DMR_jaccard_hypo_figure)
 kable(DMR_intersect %>% select(sample1, sample2, hyper_percent1, hyper_percent2, hypo_percent1, hypo_percent2), digits = 4, format = "html", align = "c", row.names = F)
+```
+
+### DMR intersect with differentially marked histone modifications  
+
+```{r DMR_DHM}
+(DMR_DHM_enrich_figure)
 ```
 

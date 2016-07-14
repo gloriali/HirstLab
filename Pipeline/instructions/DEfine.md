@@ -9,21 +9,19 @@
 ## DEfine on genes
 * Sample code        
 ```
-addpath /home/lli/bin/matlab -end
+addpath /home/mbilenky/matlab -end
 clear all; close all;
-fdr=0.015;    
-RPKMmin=0.005; Nmin=25; out=true; corr1=true; corr2=true; rpkm=true; figs=true; 
-[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.length','%s %f');
-[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_genes.pc.EnsID.GC','%s %f');
-dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
-dirOut='/home/lli/REMC/breast/gene/';
-% for each library
-lib1='A17918'; cell1='lum', donor1='RM084';
-lib2='A17919'; cell2='myo', donor2='RM084';
-[id,n1,r1,rmi,ra,rma]=textread(strcat(dirIn1,lib1,'/coverage/',lib1,'.G.A.rpkm.pc'),'%s %f %f %f %f %f');
-[id,n2,r2,rmi,ra,rma]=textread(strcat(dirIn2,lib2,'/coverage/',lib2,'.G.A.rpkm.pc'),'%s %f %f %f %f %f');
+out=true; corr1=true; corr2=true; rpkm=true; figs=true; RPKMmin=0.005; Nmin=25; eps=0.0001; maxLim=3.5; fdr=0.01; 
+[idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.pc.EnsID.length','%s %f');
+[id,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.pc.EnsID.GC','%s %f');
+dirIn='/projects/epigenomics2/users/lli/glioma/RNAseq/';
+dirOut='/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine//CEMT_19/';
+sample1='CEMT_19'; name1='CEMT_19';
+sample2='A03475.Cortex02'; name2='Cortex02';
+[idl,n1,r1,rmi,ra,rma]=textread(strcat(dirIn, 'RPKM/', sample1, '.G.A.rpkm.pc'),'%s %f %f %f %f %f');
+[id,n2,r2,rmi,ra,rma]=textread(strcat(dirIn, 'NPC_RPKM/', sample2,'/coverage/', sample2, '.G.A.rpkm.pc'),'%s %f %f %f %f %f');
 [C,ix,ixl]=intersect(id,idl);
-[cc,nfup,nfdn]=DEfine(idl, r1(ix), r2(ix), n1(ix), n2(ix), [gl,gc], dirOut, [cell1,'-',donor1], [cell2,'-',donor2], out,figs, fdr,corr1,corr2,rpkm,RPKMmin,Nmin);
+[cc,nfup,nfdn]=DEfine(idl(ixl), r1(ixl), r2(ix), n1(ixl), n2(ix), [gl(ixl), gc(ix)], dirOut, name1, name2, out, figs, fdr, corr1, corr2, rpkm, RPKMmin, Nmin, eps, maxLim);
 ```       
 
 ## DEfine on exons
@@ -32,7 +30,7 @@ lib2='A17919'; cell2='myo', donor2='RM084';
 addpath /home/lli/bin/matlab -end
 clear all; close all;
 fdr=0.015;    
-RPKMmin=0.005; Nmin=25; out=true; corr1=true; corr2=true; rpkm=true; figs=true; 
+RPKMmin=0.005; Nmin=25; out=true; corr1=true; corr2=true; rpkm=true; figs=true; eps=0.0001; maxLim=3.5; 
 [idl,gl]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_exons_for_genes.length','%s %f');
 [idgc,gc]=textread('/projects/epigenomics/resources/Ensembl/hg19v65/hg19v65_exons_for_genes.GC','%s %f');
 dirIn='/projects/epigenomics/ep50/internal/jqc.1.7.6/';
@@ -47,12 +45,12 @@ X=intersect(id,intersect(idgc,idl))
 [C,ix,i]=intersect(id,X);
 [C,ixl,i]=intersect(idl,X);
 [C,ixgc,i]=intersect(idgc,X);
-[cc,nfup,nfdn]=DEfine(idl(ixl), r1(ix), r2(ix), n1(ix), n2(ix), [gl(ixl),gc(ixgc)], dirOut, [cell1,'-',donor1], [cell2,'-',donor2], out,figs, fdr,corr1,corr2,rpkm,RPKMmin,Nmin);
+[cc,nfup,nfdn]=DEfine(idl(ixl), r1(ix), r2(ix), n1(ix), n2(ix), [gl(ixl),gc(ixgc)], dirOut, [cell1,'-',donor1], [cell2,'-',donor2], out,figs, fdr,corr1,corr2,rpkm,RPKMmin,Nmin,eps,maxLim);
 ```
 
 ## Output 
-* The UP/DN files format: `Gene id    rpkm1   rpkm2   p-value Multiple testing corrected p-value`          
-* RPKM.corrected file format: `Gene id    RPKM1corrected  N1 corrected    RPKM2 corrected N2 corrected    p-val1  p-valcorr1  p-val2    p-valcorr2`         
+* The UP/DN files format: `GeneId    rpkm1   rpkm2   p-value Multiple testing corrected p-value`          
+* RPKM.corrected file format: `GeneId    RPKM1corrected  N1corrected    RPKM2corrected N2corrected    p-val1  p-valcorr1  p-val2    p-valcorr2`         
 * Boxplot_GC: boxplot for GC bias correction        
 * Boxplot_L: boxplot for gene/exon length bias correction          
 * Plot2D: result summary 2D plot         

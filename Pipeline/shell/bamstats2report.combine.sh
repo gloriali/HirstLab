@@ -8,7 +8,7 @@
 dirIn=$1
 dirOut=$2
 
-cp /projects/epigenomics/users/acarles/qc/summaryTemplate.11 $dirOut/summary.xls
+cp /home/lli/hg19/qcReport.template $dirOut/summary.xls
 
 cd $dirIn
 for file in report*; do

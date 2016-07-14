@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Tue Jul 12 12:52:40 2016
+Updated: Thu Jul 14 12:09:33 2016
 
 
 
@@ -178,4 +178,8 @@ Updated: Tue Jul 12 12:52:40 2016
   </tr>
 </tbody>
 </table>
+
+### DMR intersect with differentially marked histone modifications  
+
+![](WGBS_files/figure-html/DMR_DHM-1.png)
 
