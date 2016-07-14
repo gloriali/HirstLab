@@ -25,12 +25,12 @@ if [ ! -d $outDir ]; then
   mkdir $outDir
 fi
 ### Copy report template
-if [ ! -f /projects/epigenomics/users/acarles/qc/qcReport.template ];
+if [ ! -f /home/lli/hg19/qcReport.template ];
 then
 echo "Report template file does not exist"
 exit
 else 
-cp /projects/epigenomics/users/acarles/qc/qcReport.template $outDir/report.temp0
+cp /home/lli/hg19/qcReport.template $outDir/report.temp0
 fi
 
 # Second argument is library ID
@@ -75,7 +75,7 @@ ntotal="$n $total";
 echo $ntotal >> "$outFileTemp"
 n=$((n+1))
 
-### 3/ Mapped reads and Mapping Efficiency
+### 3/ and 4/ Mapped reads and Mapping Efficiency
 al=(`less $i|grep "Number_Reads_Aligned"|cut -f2 -d ":" | sed 's/[\t| ]*//g'`);
 nal="$n $al";
 echo $nal >> "$outFileTemp"
@@ -88,7 +88,7 @@ nme="$n $me";
 echo $nme >> "$outFileTemp"
 n=$((n+1))
 
-### 4/ and 5/ dups and percentage of dups
+### 5/ and 6/ dups and percentage of dups
 dups=(`less $i |grep Duplicates |cut -f2 -d ":" | sed 's/[\t| ]*//g'`);
 ndups="$n $dups";
 echo $ndups >> "$outFileTemp"
@@ -99,7 +99,18 @@ npdups="$n $pdups"
 echo $npdups >> "$outFileTemp"
 n=$((n+1))
 
-### 6/ and 7/ Filtered reads and percentage of filtered reads
+### 7/ and 8/ paired and percentage of paired
+pair=(`less $i |grep Number_of_Paired_Alignments |cut -f2 -d ":" | sed 's/[\t| ]*//g'`);
+npair="$n $pair";
+echo $npair >> "$outFileTemp"
+n=$((n+1))
+# percent dups
+ppair=(`echo $pair $total | awk '{print $1/$2*100}'`)
+nppair="$n $ppair"
+echo $nppair >> "$outFileTemp"
+n=$((n+1))
+
+### 9/ and 10/ Filtered reads and percentage of filtered reads
 filt=(`less $i |grep without_Dups_and |cut -f2 -d ":" | sed 's/[\t| ]*//g'`);
 nfilt="$n $filt";
 echo $nfilt >> "$outFileTemp"
@@ -109,20 +120,20 @@ npfilt="$n $pfilt"
 echo $npfilt >> "$outFileTemp"
 n=$((n+1))
 
-### 8/ Read coverage
+### 11/ Read coverage
 cov=(`less $i |grep coverage |cut -f2 -d ":" | sed 's/[\t| ]*//g'`)
 rcov=(`printf "%0.2f\n" $cov`)
 ncov="$n $rcov";
 echo $ncov >> "$outFileTemp"
 n=$((n+1))
 
-### 11/ Read Length
+### 12/ Read Length
 len=(`less $i |grep length |cut -f2 -d ":" | sed 's/[\t| ]*//g'`)
 nlen="$n $len";
 echo $nlen >> "$outFileTemp"
 n=$((n+1))
 
-### 12/ Fragment size
+### 13/ Fragment size
 size=(`less $i |grep Size |cut -f2 -d ":" | sed 's/[\t| ]*//g'`)
 nsize="$n $size";
 echo $nsize >> "$outFileTemp"
