@@ -12,7 +12,6 @@ for bam in *.bam; do
     $bamstats -g 2864785220 -q 10 -b $dirIn/$bam  > $dirIn/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirIn/$name.bamstats
 done
-# /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
 samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 dirIn=/projects/epigenomics2/Brain/NJabado/RNAseq/bam/
