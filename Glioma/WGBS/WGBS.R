@@ -169,9 +169,34 @@ DMR_ChromHMM_summary <- read.delim("./CpG/DMR.chromHMM.enrich.summary", as.is = 
 	theme_bw())
 ggsave(DMR_ChromHMM_summary_figure, file = "DMR_ChromHMM_summary_figure.pdf")
 
+### -------- enrichment in differentially marked histone mods -------
+DMR_DHM_enrich <- read.delim("./DMR.uniqueHM.enrichment.summary", as.is = T) %>% 
+	mutate(HM = gsub("CEMT.*.unique", "Histone modification gain", HM), HM = gsub("NPC.*.unique", "Histone modification loss", HM), sig = ifelse(p.value <= 0.01, "p-value <= 0.01", "p-value > 0.01"))
+(DMR_DHM_enrich_figure <- ggplot(DMR_DHM_enrich, aes(Sample, log2(Fold), fill = Mark, color = sig)) + 
+	geom_bar(stat = "identity", position = position_dodge(), width = 0.8) + 
+	scale_color_manual(name = "", values = c("red", "transparent")) + 
+	facet_grid(HM ~ DMR) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("log2 Fold Enrichemnt") + 
+	theme_bw())
+ggsave(DMR_DHM_enrich_figure, file = "DMR_DHM_enrich_figure.pdf")
+
+### -------- associated with DE genes ----------
+DMR_DE <- read.delim("./DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.01)
+(DMR_DE_figure <- ggplot(DMR_DE, aes(DM, Percent_intersect, fill = DE, color = Significant)) + 
+	geom_bar(stat = "identity", position = position_dodge(), width = 0.6) + 
+	scale_fill_manual(name = "", values = c("blue", "red")) + 
+	scale_color_manual(values = c("transparent", "green")) + 
+	facet_wrap(~ Sample) + 
+	xlab("") + 
+	ylab("Fraction of DE genes") + 
+	theme_bw())
+ggsave(DMR_DE_figure, file = "DMR_DE_figure.pdf")
+
 save(list = c("quantile_5mC_figure", "CGI_edge_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", "DMR_jaccard_hyper_figure", "DMR_jaccard_hypo_figure", 
 							"DMR_ChromHMM_summary", "DMR_ChromHMM_summary_figure", 
 							ls(pattern = "DMR_CEMT_\\d+_figure"), ls(pattern = "DMR_CEMT_\\d+_CGI_dis_figure"), 
-							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*")),
+							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*"), "DMR_DHM_enrich_figure", "DMR_DE_figure"),
 		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 
