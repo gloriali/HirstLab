@@ -90,6 +90,18 @@ ER_unique_summary <- read.delim("./unique/ER.unique.summary", as.is = T) %>%
 	theme_bw())
 ggsave(ER_unique_summary_figure, file = "./unique/ER_unique_summary_figure.pdf", width = 8, height = 6)
 
+### associated with DE genes 
+DHM_DE <- read.delim("./unique/DHM.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.01, DHM = ifelse(Marked == "NPC_GE04", "Loss", "Gain"))
+(DHM_DE_figure <- ggplot(DHM_DE, aes(DHM, Percent_intersect, fill = DE, color = Significant)) + 
+	geom_bar(stat = "identity", position = position_dodge(), width = 0.6) + 
+	scale_fill_manual(name = "", values = c("blue", "red")) + 
+	scale_color_manual(values = c("transparent", "green")) + 
+	facet_grid(Mark ~ Sample) + 
+	xlab("") + 
+	ylab("Fraction of DE genes") + 
+	theme_bw())
+ggsave(DHM_DE_figure, file = "./unique/DHM_DE_figure.pdf")
+
 ## -------- Chromatin states ----------
 chromHMM_summary <- read.delim("./ChromHMM/chromatin.states.summary", as.is = T) 
 chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), variable.name = "Sample")
@@ -102,8 +114,8 @@ chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), va
 ggsave(chromHMM_summary_figure, file = "./ChromHMM/chromHMM_summary_figure.pdf")
 
 
-save(list = c("ER_summary", "ER_summary_figure", "ER_adjust", "chromHMM_summary", "chromHMM_summary_figure", "ER_unique_summary_figure", 
-							ls(pattern = "Venn_adjust_")), 
+save(list = c("ER_summary", "ER_summary_figure", "ER_adjust_summary", "chromHMM_summary", "chromHMM_summary_figure", "ER_unique_summary_figure", 
+							ls(pattern = "Venn_adjust_"), "DHM_DE_figure"), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
 
