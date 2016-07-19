@@ -40,7 +40,7 @@ less $dirIn/ChIPseq/ER/H3K4me1/unique/unique_enhancer.Neurospheres.GE.bed | awk 
 less $dirIn/ChIPseq/ER/H3K4me1/unique/unique_enhancer.GW.GW13.bed | awk '{print $0"\tGW\tGW13"}' >> $dirOut/TableS3_uniqueEnhancer.txt
 less $dirIn/ChIPseq/ER/H3K4me1/unique/unique_enhancer.GW.GW17.bed | awk '{print $0"\tGW\tGW17"}' >> $dirOut/TableS3_uniqueEnhancer.txt
 
-# Table S4. List of gene promoters differentially marked by H3K4me3 and H3K27me3 between MZ twins, NPCs and across developmental stages.
+# Table S6. List of gene promoters differentially marked by H3K4me3 and H3K27me3 between MZ twins, NPCs and across developmental stages.
 ## see FindER.R 
 
 # Table S5. Differentially expressed genes between MZ twins, NPCs and across developmental stages.
@@ -81,6 +81,6 @@ for file in *HuFNSC01*HuFNSC03* *HuFNSC02*HuFNSC03*; do
     less $file | awk '{if("'$DE'"=="UP"){de="UP.in.GW17"}else{de="UP.in.GW15"}; print $0"\t"de"\t""'$cell'"}' >> $dirOut/TableS5_GW.txt
 done
 
-# Table S6. GWAS sites overlapped with NPC core enhancers.      
-echo -e "enhancerChr\tenhancerStart\tenhancerEnd\tenhancerID\tgwasChr\tgwasStart\tgwasEnd\tgwasID\ttrait\tgenes" > $dirOut/TableS6.txt
-less /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/core_enhancers.GWAS.txt >> $dirOut/TableS6.txt
+# Table S4. GWAS sites overlapped with NPC core enhancers.      
+echo -e "enhancerChr\tenhancerStart\tenhancerEnd\tenhancerID\tgwasChr\tgwasStart\tgwasEnd\tgwasID\ttrait\tgenes" > $dirOut/TableS4.txt
+less /projects/epigenomics/users/lli/FetalBrain/ChIPseq/ER/H3K4me1/core/core_enhancers.GWAS.txt >> $dirOut/TableS4.txt
