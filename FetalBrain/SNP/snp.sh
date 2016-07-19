@@ -1,21 +1,25 @@
 #!/bin/sh
 
-# /home/lli/MeDIPMRE/
+# use MeDIP/MRE
+dirOut=/home/lli/FetalBrain/MeDIPMRE/SNP/
+cd $dirOut
 ## brain01 brain02
 /home/pubseq/BioSw/samtools/samtools-0.1.16/samtools mpileup -C50 -uf /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa HS2788.bam HS2790.bam | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view -bvcg - > ./SNP/HS2788_HS2790.bcf
 /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view HS2788_HS2790.bcf | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/vcfutils.pl varFilter -D100 > HS2788_HS2790.vcf
-
 ## cortex01 cortex02
 /home/pubseq/BioSw/samtools/samtools-0.1.16/samtools mpileup -C50 -uf /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa HS2775.bam HS2779.bam | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view -bvcg - > ./SNP/HS2775_HS2779.bcf
 /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view HS2775_HS2779.bcf | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/vcfutils.pl varFilter -D100 > HS2775_HS2779.vcf
-
 ## ge01 ge02
 /home/pubseq/BioSw/samtools/samtools-0.1.16/samtools mpileup -C50 -uf /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa HS2777.bam HS2781.bam | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view -bvcg - > ./SNP/HS2777_HS2781.bcf
 /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view HS2777_HS2781.bcf | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/vcfutils.pl varFilter -D100 > HS2777_HS2781.vcf
-
 ## myo35 myo70
 /home/pubseq/BioSw/samtools/samtools-0.1.16/samtools mpileup -C50 -uf /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa HS1394.bam HS2294.bam | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view -bvcg - > HS1394_HS2294.bcf
 /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools view HS1394_HS2294.bcf | /home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/vcfutils.pl varFilter -D100 > HS1394_HS2294.vcf
+
+## discordant SNPs in MeDIP
+less HS2775_HS2779.vcf | awk '$1 !~ "#" {gt1=gensub(":.*", "", "g", $10); gt2=gensub(":.*", "", "g", $11); gt3=gensub(":.*", "", "g", $12); gt4=gensub(":.*", "", "g", $13); if(gt1 == gt2 && gt3 == gt4 && gt1 != gt3){print $0}}' > MZ_discordant_SNP_cortex.vcf
+less HS2777_HS2781.vcf | awk '$1 !~ "#" {gt1=gensub(":.*", "", "g", $10); gt2=gensub(":.*", "", "g", $11); gt3=gensub(":.*", "", "g", $12); gt4=gensub(":.*", "", "g", $13); if(gt1 == gt2 && gt3 == gt4 && gt1 != gt3){print $0}}' > MZ_discordant_SNP_GE.vcf
+awk 'NR==FNR {id=$1":"$2; gt=gensub(":.*", "", "g", $10)"_"gensub(":.*", "", "g", $12); h[id]= gt; next} {id=$1":"$2; gt=gensub(":.*", "", "g", $10)"_"gensub(":.*", "", "g", $12); if(id in h && gt == h[id]){print $0}}' MZ_discordant_SNP_cortex.vcf MZ_discordant_SNP_GE.vcf > MZ_discordant_SNP.vcf
 
 #####################
 # use RNA-seq
@@ -68,5 +72,9 @@ for file in HuFNSC*dbSNP.vcf; do
 done
 # summary 
 wc -l Hu* | awk '{sample=gensub(".main.+", "", "g", $2); sample=gensub("HuFNSC0", "Subject", "g", sample); if($2 ~ /homo/){homo=$1; value=$1; cat="homozygotic"} else{value=$1-homo; cat="heterozygotic"} print sample"\t"cat"\t"value}' | awk '$1 ~ /Subject/ {print $0}' > SNP.summary
+
+# MZ RNA-seq compare to MeDIP
+cd /projects/epigenomics/users/lli/FetalBrain/SNP/
+awk 'NR==FNR {id=$1":"$2; gt=gensub(":.*", "", "g", $10)"_"gensub(":.*", "", "g", $12); h[id]= gt; next} {id=$2":"$3; gt=gensub(":.*", "", "g", $11)"_"gensub(":.*", "", "g", $12); if(id in h && gt == h[id]){print $0}}' /home/lli/FetalBrain/MeDIPMRE/SNP/MZ_discordant_SNP.vcf HuFNSC01_HuFNSC02.main.dbSNP.vcf > MZ_discordant_SNP_MeDIP_RNAseq.vcf
 
 
