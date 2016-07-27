@@ -57,3 +57,44 @@ for bam in *.bam; do
     echo -e "$lib\t$n" >> $dirOut/QC.target_regions.txt
 done
 
+# FindER
+JAVA='/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java'
+samtools='/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools'
+FindER='/home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar'
+dirIn='/projects/epigenomics2/Brain/NJabado/ChIPseq/bam/'
+dirOut='/projects/epigenomics2/Brain/NJabado/ChIPseq/FindER/'
+mkdir -p $dirOut
+echo -e "Sample\tMark\tN_region\tTotal_length" > $dirOut/ER.summary.stats
+## indexing
+function index {
+    bam=$1
+    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $bam
+}
+export -f index
+cd $dirIn
+ls *.bam > $dirIn/BamList.txt
+cat BamList.txt | parallel --gnu index
+## FindER 
+for bam in *.bam; do
+    lib=$(echo $bam | sed -e 's/_C9E81ANXX_[3-6]//g' | sed -e 's/.bam//g');
+    sample=$(less ../labels.samples | awk -F "\t" '$5 ~ "'$lib'" {print $1}')
+    mark=$(echo $sample | sed 's/PC.//g' | cut -d'_' -f 2 | sed 's/Input[12]/Input/g')
+    if [ "$mark" != "Input" ]; then
+        if [[ "$sample" =~ "Input1" ]]; then
+            bam2='PX0378_C9E81ANXX_5_CTATAC.bam'
+        elif [[ "$sample" =~ "Input2" ]]; then
+            bam2='PX0379_C9E81ANXX_6_ATACGG.bam'
+        elif [[ "$sample" =~ "AK1189" ]]; then
+            bam2='PX0376_C9E81ANXX_3_CCACGC.bam'
+        else
+            bam2='PX0377_C9E81ANXX_4_GCAAGG.bam'
+        fi
+        sample=$(echo $sample | sed 's/PC.//g' | sed 's/_.*//g')
+        echo $lib $sample $mark 
+        $JAVA -jar -Xmx12G $FindER -signalBam $bam -inputBam $bam2 -out $dirOut > $dirOut/$lib.out
+        n=$(less $dirOut/$(echo $bam | sed 's/.bam//g')*.FindER.bed.gz | wc -l)
+        len=$(less $dirOut/$(echo $bam | sed 's/.bam//g')*.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        echo -e $sample"\t"$mark"\t"$n"\t"$len >> $dirOut/ER.summary.stats 
+    fi
+done
+
