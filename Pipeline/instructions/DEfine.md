@@ -1,5 +1,5 @@
 ## Matlab path on xhost
-`/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`
+`/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab`
 * Note: need to login with `ssh -X ssh.bcgsc.ca -l <username>`         
 
 ## DEfine function
