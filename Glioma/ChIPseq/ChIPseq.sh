@@ -222,4 +222,28 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
     done
 done
 
+## Homer for TFBS motifs
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/'
+mkdir -p $dirIn/homer/
+cd $dirIn/
+for file in *.unique; do
+    name=$(echo $file | sed -e 's/.unique//g')
+    echo "Processing "$name
+    dirOut=$dirIn/homer/$name/
+    mkdir -p $dirOut
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+done
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K4me1/'
+mkdir -p $dirIn/homer/
+cd $dirIn/
+for file in *.unique; do
+    name=$(echo $file | sed -e 's/.unique//g')
+    echo "Processing "$name
+    dirOut=$dirIn/homer/$name/
+    mkdir -p $dirOut
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+done
+
 
