@@ -222,28 +222,92 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
     done
 done
 
-## Homer for TFBS motifs
+## K27me3 and K36me3
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+intergenic=/home/lli/hg19/hg19v69_intergenic.bed
+$BEDTOOLS/intersectBed -a $gene -b /home/lli/hg19/hg19.chrlen.autoXY.bed -v | $BEDTOOLS/intersectBed -a $promoter -b stdin -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
+echo -e "Sample\tMark\tMarked\tFC_genebody\tp_genebody\tFC_promoter\tp_promoter\tFC_intergenic\tp_intergenic" > $dirIn/DHM.enrich.summary
+for mark in H3K27me3 H3K36me3; do
+    cd $dirIn/$mark/
+    for file in *.unique; do
+        sample=$(echo $file | sed 's/.vs.*//g')
+        marked=$(echo $file | sed 's/.unique//g' | sed 's/.*.vs.NPC_GE04.//g')
+        echo $sample $mark $marked 
+        fc_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        fc_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        fc_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary        
+    done
+done    
+
+## unique enhancers
+### Homer for TFBS motifs
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
-dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/'
-mkdir -p $dirIn/homer/
-cd $dirIn/
-for file in *.unique; do
-    name=$(echo $file | sed -e 's/.unique//g')
-    echo "Processing "$name
-    dirOut=$dirIn/homer/$name/
-    mkdir -p $dirOut
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/'
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+for mark in H3K27ac H3K4me1; do
+    mkdir -p $dirIn/$mark/homer/
+    cd $dirIn/$mark/
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.CEMT_19.unique -b CEMT_22.vs.NPC_GE04.CEMT_22.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.CEMT_47.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.IDHmut.unique
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.NPC.unique
+    less CEMT_23.vs.NPC_GE04.CEMT_23.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC.IDHwt.unique
+    less CEMT_23.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC.NPC.unique
+    for file in *.unique; do
+        name=$(echo $file | sed -e 's/.unique//g')
+        echo "Processing "$mark $name
+        dirOut=$dirIn/$mark/homer/$name/
+        mkdir -p $dirOut
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+    done
 done
-dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K4me1/'
-mkdir -p $dirIn/homer/
-cd $dirIn/
-for file in *.unique; do
-    name=$(echo $file | sed -e 's/.unique//g')
-    echo "Processing "$name
-    dirOut=$dirIn/homer/$name/
+### intersect with hypomethylation
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/'
+dirDMR='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+for mark in H3K27ac H3K4me1; do
+    dirOut=$dirIn/$mark/UMR/
     mkdir -p $dirOut
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+    cd $dirIn/$mark/
+    for file in CEMT*.CEMT*.unique; do
+        name=$(echo $file | sed -e 's/.unique//g')
+        sample=$(echo $file | sed -e 's/.vs.*//g')
+        echo "Processing "$mark $sample $name
+        $BEDTOOLS/intersectBed -a $file -b $dirDMR/DMR.$sample'_NPC.hypo.bed' | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.unique.UMR.bed
+    done    
+    for file in CEMT*.vs.NPC_GE04.NPC_GE04.unique; do
+        name=$(echo $file | sed -e 's/.unique//g')
+        sample=$(echo $file | sed -e 's/.vs.*//g')
+        echo "Processing "$mark $sample $name
+        $BEDTOOLS/intersectBed -a $file -b $dirDMR/DMR.$sample'_NPC.hyper.bed' | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.unique.UMR.bed
+    done
+    cd $dirOut
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.CEMT_19.unique.UMR.bed -b CEMT_22.vs.NPC_GE04.CEMT_22.unique.UMR.bed > x
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.CEMT_19.unique.UMR.bed -b CEMT_47.vs.NPC_GE04.CEMT_47.unique.UMR.bed > y
+    $BEDTOOLS/intersectBed -a CEMT_22.vs.NPC_GE04.CEMT_22.unique.UMR.bed -b CEMT_47.vs.NPC_GE04.CEMT_47.unique.UMR.bed > z
+    cat x y z | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.IDHmut.unique.UMR.bed
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique.UMR.bed -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique.UMR.bed > x
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique.UMR.bed -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique.UMR.bed > y
+    $BEDTOOLS/intersectBed -a CEMT_22.vs.NPC_GE04.NPC_GE04.unique.UMR.bed -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique.UMR.bed > z
+    cat x y z | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.NPC.unique.UMR.bed
+    rm x y z
+    cp CEMT_23.vs.NPC_GE04.CEMT_23.unique.UMR.bed IDHwt_NPC.IDHwt.unique.UMR.bed
+    cp CEMT_23.vs.NPC_GE04.NPC_GE04.unique.UMR.bed IDHwt_NPC.NPC.unique.UMR.bed
+    cd $dirOut
+    for file in IDH*.unique.UMR.bed; do
+        name=$(echo $file | sed -e 's/.unique.UMR.bed//g')
+        echo "Processing homer for "$mark $name
+        mkdir -p $dirOut/homer/$name/
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
+    done    
 done
-
-
