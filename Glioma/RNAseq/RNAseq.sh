@@ -94,6 +94,30 @@ name=A15299.GE04
 rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 
+# RPKM matrix
+cd /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/
+echo "ENSG" > glioma.RPKM
+less CEMT_19.G.A.rpkm.pc | awk '{print $1}' >> glioma.RPKM
+for file in *.G.A.rpkm.pc; do
+    lib=$(echo $file | sed 's/.G.A.rpkm.pc//g')
+    echo -e "ENSG\t$lib" > x
+    less $file | awk '{print $1"\t"$3}' >> x
+    join glioma.RPKM x | sed 's/ /\t/g' >y
+    mv y glioma.RPKM
+done
+rm x
+cd /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
+echo "ENSG" > NPC.RPKM
+less A03473.Cortex01/coverage/A03473.Cortex01.G.A.rpkm.pc | awk '{print $1}' >> NPC.RPKM
+for file in */coverage/*.G.A.rpkm.pc; do
+    lib=$(echo $file | sed 's/\/.*//g' | sed 's/A[0-9]*.//g')
+    echo -e "ENSG\t$lib" > x
+    less $file | awk '{print $1"\t"$3}' >> x
+    join NPC.RPKM x | sed 's/ /\t/g' >y
+    mv y NPC.RPKM
+done
+rm x
+
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
 dirIn='/projects/epigenomics2/users/lli/glioma/RNAseq/';
@@ -146,4 +170,8 @@ for lib in CEMT_19 CEMT_21 CEMT_22 CEMT_23 CEMT_47; do
     dn_intersect=$(less $dirOut/DN.$lib'_NPC.FDR_0.01.rmin_0.005.Nmin_25' | wc -l)
     echo -e "$lib\tDN\t$dn\t$dn_intersect" >> $dirOut/DE.pc.summary
 done
+cd $dirOut
+cat UP.CEMT_19_NPC.FDR_0.01.rmin_0.005.Nmin_25 UP.CEMT_22_NPC.FDR_0.01.rmin_0.005.Nmin_25 UP.CEMT_47_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $1}' | sort | uniq -d > UP.IDHmut.NPC
+cat DN.CEMT_19_NPC.FDR_0.01.rmin_0.005.Nmin_25 DN.CEMT_22_NPC.FDR_0.01.rmin_0.005.Nmin_25 DN.CEMT_47_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $1}' | sort | uniq -d > DN.IDHmut.NPC
+
 
