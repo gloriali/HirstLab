@@ -269,6 +269,36 @@ for mark in H3K27ac H3K4me1; do
         /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
     done
 done
+dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
+for mark in H3K27ac H3K4me1; do
+    cd $dirIn/$mark/homer/
+    less IDHmut_NPC.IDHmut/knownResults.txt | awk '{if(NR==1){print}else{percent=gensub("%", "", "g", $7);if($5<=0.01&&percent>=20){print}}}' > IDHmut_NPC.IDHmut.tf
+    less IDHmut_NPC.NPC/knownResults.txt | awk '{if(NR==1){print}else{percent=gensub("%", "", "g", $7);if($5<=0.01&&percent>=20){print}}}' > IDHmut_NPC.NPC.tf
+    less IDHmut_NPC.IDHmut.tf | awk 'NR > 1 {print $1}' | sed 's/(.*//g' > IDHmut_NPC.IDHmut.tf.ID
+    less IDHmut_NPC.NPC.tf | awk 'NR > 1 {print $1}' | sed 's/(.*//g' > IDHmut_NPC.NPC.tf.ID
+done
+for mark in H3K27ac H3K4me1; do
+    cd $dirIn/$mark/homer/
+    less IDHmut_NPC.IDHmut.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.IDHmut.tf.RPKM
+    less IDHmut_NPC.NPC.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.NPC.tf.RPKM
+done
+#### Ascl1, Olig2 in H3K4me1
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K4me1/'
+dirDE='/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/'
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.IDHmut.unique hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.IDHmut/knownResults/known7.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.IDHmut.Ascl1.annotate
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.IDHmut.unique hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.IDHmut/knownResults/known11.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.IDHmut.Olig2.annotate
+cd $dirIn/homer/
+for file in *.annotate; do
+    tf=$(echo $file | sed 's/.annotate//g' | sed 's/IDHmut_NPC.IDHmut.//g')
+    echo $tf
+    less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -D b > $file.closest.gene
+    less $file.closest.gene | sort -k8,8 | join - $dirDE/UP.IDHmut.NPC -1 8 | sed 's/ /\t/g' > $file.closest.gene.UP
+    less $file.closest.gene | sort -k8,8 | join - $dirDE/DN.IDHmut.NPC -1 8 | sed 's/ /\t/g' > $file.closest.gene.DN
+done
+
 ### intersect with hypomethylation
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -311,3 +341,31 @@ for mark in H3K27ac H3K4me1; do
         /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
     done    
 done
+dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
+for mark in H3K27ac H3K4me1; do
+    cd $dirIn/$mark/UMR/homer/
+    less IDHmut_NPC.IDHmut/knownResults.txt | awk '{if(NR==1){print}else{percent=gensub("%", "", "g", $7);if($5<=0.01&&percent>=20){print}}}' > IDHmut_NPC.IDHmut.tf
+    less IDHmut_NPC.NPC/knownResults.txt | awk '{if(NR==1){print}else{percent=gensub("%", "", "g", $7);if($5<=0.01&&percent>=20){print}}}' > IDHmut_NPC.NPC.tf
+    less IDHmut_NPC.IDHmut.tf | awk 'NR > 1 {print $1}' | sed 's/(.*//g' > IDHmut_NPC.IDHmut.tf.ID
+    less IDHmut_NPC.NPC.tf | awk 'NR > 1 {print $1}' | sed 's/(.*//g' > IDHmut_NPC.NPC.tf.ID
+done
+for mark in H3K27ac H3K4me1; do
+    cd $dirIn/$mark/UMR/homer/
+    less IDHmut_NPC.IDHmut.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.IDHmut.tf.RPKM
+    less IDHmut_NPC.NPC.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.NPC.tf.RPKM
+done
+#### Ascl1, Olig2 and NeuroD1 in H3K4me1
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K4me1/UMR/'
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.IDHmut.unique.UMR.bed hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.IDHmut/knownResults/known6.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.IDHmut.Ascl1.annotate
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.IDHmut.unique.UMR.bed hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.IDHmut/knownResults/known14.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.IDHmut.Olig2.annotate
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.IDHmut.unique.UMR.bed hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.IDHmut/knownResults/known12.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.IDHmut.NeuroD1.annotate
+cd $dirIn/homer/
+for file in *.annotate; do
+    tf=$(echo $file | sed 's/.annotate//g' | sed 's/IDHmut_NPC.IDHmut.//g')
+    echo $tf
+    less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -D b > $file.closest.gene
+done
+
