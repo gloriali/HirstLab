@@ -197,4 +197,27 @@ for dmr in DMR.CEMT*.bed; do
         echo -e "$lib\t$dm\t$de\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$6/$5}' >> $dirOut/DMR.DE.summary
     done
 done
+cd $dirOut
+echo -e "Sample\tDE_DMR\tCGI_DE_DMR" > DMR.DE.CGI.summary
+for file in *CEMT*.UP *CEMT*.DN; do
+    lib=$(echo $file | sed -e 's/DMR.//g')
+    less $file | awk '{print $2"\t"$3"\t"$4"\t"$1}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb > $file.CGI
+    echo -e "$lib\t$(less $file | wc -l)\t$(less $file.CGI | wc -l)" >> DMR.DE.CGI.summary
+done
+dirHM=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
+echo -e "Sample\tMark\tDE_DMR\tHMgain_DE_DMR\tHMloss_DE_DMR" > DMR.DE.HM.summary
+for mark in H3K27ac H3K27me3; do
+    for file in *CEMT*.UP *CEMT*.DN; do
+        lib=$(echo $file | sed -e 's/DMR.//g' | sed 's/.NPC.*//g')
+        echo $mark $lib
+        less $file | awk '{print "chr"$2"\t"$3"\t"$4"\t"$1}' | $BEDTOOLS/intersectBed -a stdin -b $dirHM/$mark/$lib.vs.NPC_GE04.$lib.unique -wa -wb > $file.$mark.gain
+        less $file | awk '{print "chr"$2"\t"$3"\t"$4"\t"$1}' | $BEDTOOLS/intersectBed -a stdin -b $dirHM/$mark/$lib.vs.NPC_GE04.NPC_GE04.unique -wa -wb > $file.$mark.loss
+        echo -e "$file\t$mark\t$(less $file | wc -l)\t$(less $file.$mark.gain | wc -l)\t$(less $file.$mark.loss | wc -l)" >> DMR.DE.HM.summary
+    done
+done
+cat DMR.CEMT_19.NPC.hyper.UP DMR.CEMT_22.NPC.hyper.UP DMR.CEMT_47.NPC.hyper.UP | awk '{print $1"."$11"."$12}' | sort | uniq | sed -e 's/\./\t/g' > DMR.IDHmut.NPC.hyper.UP
+cat DMR.CEMT_19.NPC.hyper.UP.H3K27ac.gain DMR.CEMT_22.NPC.hyper.UP.H3K27ac.gain DMR.CEMT_47.NPC.hyper.UP.H3K27ac.gain | awk '{print $4}' | sort | uniq > DMR.IDHmut.NPC.hyper.UP.H3K27ac.gain 
+cat DMR.CEMT_19.NPC.hyper.UP.H3K27me3.loss DMR.CEMT_22.NPC.hyper.UP.H3K27me3.loss DMR.CEMT_47.NPC.hyper.UP.H3K27me3.loss | awk '{print $4}' | sort | uniq > DMR.IDHmut.NPC.hyper.UP.H3K27me3.loss
+cat DMR.CEMT_19.NPC.hyper.DN DMR.CEMT_22.NPC.hyper.DN DMR.CEMT_47.NPC.hyper.DN | awk '{print $1"."$11"."$12}' | sort | uniq | sed -e 's/\./\t/g' > DMR.IDHmut.NPC.hyper.DN
+cat DMR.CEMT_19.NPC.hypo.UP DMR.CEMT_22.NPC.hypo.UP DMR.CEMT_47.NPC.hypo.UP | awk '{print $1"."$11"."$12}' | sort | uniq | sed -e 's/\./\t/g' > DMR.IDHmut.NPC.hypo.UP
 
