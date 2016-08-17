@@ -223,6 +223,7 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
 done
 
 ## K27me3 and K36me3
+### enrichment in promoters genebody and intergenic regions
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
 genome=/home/lli/hg19/hg19.chrom.len
@@ -245,6 +246,24 @@ for mark in H3K27me3 H3K36me3; do
         fc_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
         p_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
         echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary        
+    done
+done    
+### genic/intergenic distribution
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+intergenic=/home/lli/hg19/hg19v69_intergenic.bed
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
+echo -e "Sample\tMark\tgenebody\tpromoter\tintergenic\tgenic_intergenic" > $dirIn/HM.distribution.summary
+for mark in H3K27me3 H3K36me3; do
+    cd $dirIn/$mark/
+    for bam in *.bam; do
+        sample=$(echo $bam | sed 's/.bam//g' | sed 's/A[0-9]*.//g')
+        echo $sample $mark 
+        n_gene=$($samtools view -q 5 -F 1028 -L $gene $bam | wc -l)
+        n_promoter=$($samtools view -q 5 -F 1028 -L $promoter $bam | wc -l)
+        n_intergenic=$($samtools view -q 5 -F 1028 -L $intergenic $bam | wc -l)
+        echo -e "$sample\t$mark\t$n_gene\t$n_promoter\t$n_intergenic" | awk '{print $0"\t"($3+$4)/$5}' >> $dirIn/HM.distribution.summary       
     done
 done    
 
@@ -334,7 +353,7 @@ for mark in H3K27ac H3K4me1; do
     cp CEMT_23.vs.NPC_GE04.CEMT_23.unique.UMR.bed IDHwt_NPC.IDHwt.unique.UMR.bed
     cp CEMT_23.vs.NPC_GE04.NPC_GE04.unique.UMR.bed IDHwt_NPC.NPC.unique.UMR.bed
     cd $dirOut
-    for file in IDH*.unique.UMR.bed; do
+    for file in *.unique.UMR.bed; do
         name=$(echo $file | sed -e 's/.unique.UMR.bed//g')
         echo "Processing homer for "$mark $name
         mkdir -p $dirOut/homer/$name/
