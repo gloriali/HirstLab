@@ -86,4 +86,85 @@ for bam in *_trimmed.bam; do
     rm $dirOut/$bam $dirOut/$name.sorted.bam
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
+dirIn=/projects/epigenomics2/users/mmingay/all_bam/hmedip/
+dirOut=/projects/epigenomics2/users/lli/glioma/Kongkham/Vitc_hMC/
+mkdir -p $dirOut
+cd $dirOut
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed -e 's/.bam//g' | sed 's/mutant/Vitc/g')
+    echo $name
+    $samtools sort $bam $dirOut/$name.sorted
+    $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirOut/$name.sorted.bam O=$dirOut/$name.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
+    $samtools flagstat $dirOut/$name.sorted.dupsFlagged.bam > $dirOut/$name.flagstat
+    $bamstats -g 2864785220 -q 10 -b $dirOut/$name.sorted.dupsFlagged.bam  > $dirOut/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirOut/$name.bamstats
+    rm $dirOut/$name.sorted.bam
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
 
+# mapping to repetitive regions
+samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/Kongkham/
+echo -e "Library\tNumber_Repetitive_Mapping" > $dirOut/QC_repetitive
+cd $dirIn
+for bam in *.bam /projects/epigenomics2/users/lli/glioma/Kongkham/Vitc_hMC/*.sorted.dupsFlagged.bam /projects/epigenomics/users/lli/FetalBrain/MeDIP/bam/*.bam; do
+    lib=$(basename $bam | sed 's/.bam//g'| sed 's/.sorted.dupsFlagged//g')
+    echo $lib
+    rep=$($samtools view $bam | awk '{if($5==0){n++}}END{print n}')
+    echo -e $lib"\t"$rep >> $dirOut/QC_repetitive
+done
+
+# CpG coverage
+samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/bam/
+dirNPC=/projects/epigenomics/users/lli/FetalBrain/MeDIP/bam/
+CG=/home/lli/hg19/CG.BED # 28217448
+cd $dirIn
+## MC
+echo "Coverage" > $dirIn/CG.coverage.MC
+for i in {0..50}; do
+    echo $i >> $dirIn/CG.coverage.MC
+done
+echo ">50" >> $dirIn/CG.coverage.MC
+for bam in *_MC_*_trimmed.sorted.dupsFlagged.bam; do
+    sample=$(echo $bam | sed 's/_MC_.*_trimmed.sorted.dupsFlagged.bam//g')
+    echo "Processing" $sample
+    echo $sample > x
+    less $CG | awk '{print "chr"$0}' | $BEDTOOLS/coverageBed -a stdin -b <($samtools view -q 5 -F 1028 -b $bam) -counts | awk 'BEGIN{for(i=0;i<=51;i++){s[i]=0}} {if($5>50){s[51]++} else {s[$5]++}} END{for(i=0;i<=51;i++){print s[i]}}' >>x
+    paste $dirIn/CG.coverage.MC x > y
+    mv y $dirIn/CG.coverage.MC
+done
+for bam in $dirNPC/*.bam; do
+    sample=$(basename $bam | sed 's/.bam//g')
+    echo "Processing" $sample
+    echo $sample > x
+    $BEDTOOLS/coverageBed -a $CG -b <($samtools view -q 5 -F 1028 -b $bam) -counts | awk 'BEGIN{for(i=0;i<=51;i++){s[i]=0}} {if($5>50){s[51]++} else {s[$5]++}} END{for(i=0;i<=51;i++){print s[i]}}' >>x
+    paste $dirIn/CG.coverage.MC x > y
+    mv y $dirIn/CG.coverage.MC
+done
+rm x
+## hMC
+echo "Coverage" > $dirIn/CG.coverage.hMC
+for i in {0..50}; do
+    echo $i >> $dirIn/CG.coverage.hMC
+done
+echo ">50" >> $dirIn/CG.coverage.hMC
+for bam in *_hMC_*_trimmed.sorted.dupsFlagged.bam; do
+    sample=$(echo $bam | sed 's/_hMC_.*_trimmed.sorted.dupsFlagged.bam//g')
+    echo "Processing" $sample
+    echo $sample > a
+    less $CG | awk '{print "chr"$0}' | $BEDTOOLS/coverageBed -a stdin -b <($samtools view -q 5 -F 1028 -b $bam) -counts | awk 'BEGIN{for(i=0;i<=51;i++){s[i]=0}} {if($5>50){s[51]++} else {s[$5]++}} END{for(i=0;i<=51;i++){print s[i]}}' >>a
+    paste $dirIn/CG.coverage.hMC a > b
+    mv b $dirIn/CG.coverage.hMC
+done
+for bam in /projects/epigenomics2/users/lli/glioma/Kongkham/Vitc_hMC/*.sorted.dupsFlagged.bam; do
+    sample=$(basename $bam | sed 's/.sorted.dupsFlagged.bam//g')
+    echo "Processing" $sample
+    echo $sample > a
+    $BEDTOOLS/coverageBed -a $CG -b <($samtools view -q 5 -F 1028 -b $bam) -counts | awk 'BEGIN{for(i=0;i<=51;i++){s[i]=0}} {if($5>50){s[51]++} else {s[$5]++}} END{for(i=0;i<=51;i++){print s[i]}}' >>a
+    paste $dirIn/CG.coverage.hMC a > b
+    mv b $dirIn/CG.coverage.hMC
+done
+rm a
