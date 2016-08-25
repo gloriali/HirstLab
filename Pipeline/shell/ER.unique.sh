@@ -29,7 +29,7 @@ do
 done
 
 echo "Test whether $region are enriched in $wig, output to $dirOut/$name"
-JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R
