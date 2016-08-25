@@ -3,7 +3,7 @@ File paths on xhost
 
 ## Programs
 * R: `/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R`  
-* Java: `/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java`
+* Java: `/home/mbilenky/jdk1.8.0_92/jre/bin/java`
 * Python: `/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python`    
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab`  
 * Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/`
