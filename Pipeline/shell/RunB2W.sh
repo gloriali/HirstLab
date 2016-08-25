@@ -6,7 +6,7 @@
 #$ -N RunB2W
 #$ -V
 
-JAVA=/gsc/software/linux-x86_64/jdk1.6.0_18/jre/bin/java
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 SAMTOOLS=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
 
 # -bamFile <bam file name (BAM file has to be coordinate sorted!)> -out <output folder> [parameters]
