@@ -389,3 +389,10 @@ for file in *.annotate; do
     less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -D b > $file.closest.gene
 done
 
+## H3K36me3 methyltransferases expression
+cd /projects/epigenomics2/users/lli/glioma/RNAseq/
+echo -e "Name\tENSG
+NSD1\tENSG00000165671
+NSD2\tENSG00000109685
+SETD2\tENSG00000181555" > H3K36me3.methyltransferases
+less H3K36me3.methyltransferases | sort -k2,2 | join - NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - RPKM/glioma.RPKM | sed 's/ /\t/g' > H3K36me3.methyltransferases.RPKM
