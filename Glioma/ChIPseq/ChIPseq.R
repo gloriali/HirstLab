@@ -64,6 +64,18 @@ for(i in 1:nrow(ER_adjust_summary)){
 }
 dev.off()
 
+### genic/intergenic distribution
+HM_distrbution <- read.delim("./bam/HM.distribution.summary", as.is = T) %>%
+	mutate(Type = rep(c("NPC", rep("glioma", 5)), 2))
+(HM_distrbution_figure <- ggplot(HM_distrbution, aes(Sample, genic_intergenic, fill = Type)) + 
+	geom_bar(stat = "identity", width = 0.5) + 
+	facet_wrap(~ Mark) + 
+	xlab("") + 
+	ylab("# gene-associated reads / # intergenic reads") + 
+	theme_bw() + 
+	theme(axis.text.x = element_text(angle = 90)))
+ggsave(HM_distrbution_figure, file = "HM_distrbution_figure.pdf", width = 8, height = 6)
+
 ## -------- Differentially marked regions --------
 ### test: how to set the background coverage cutoff? CEMT_19 vs GE04 H3K27ac
 signal <- read.delim("./unique/test/63.CEMT_19.vs.NPC_GE04.CEMT_19.signal.coverage", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "cov", "max")) 
