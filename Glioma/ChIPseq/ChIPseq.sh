@@ -374,6 +374,32 @@ for mark in H3K27ac H3K4me1; do
     less IDHmut_NPC.IDHmut.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.IDHmut.tf.RPKM
     less IDHmut_NPC.NPC.tf.ID | sort -k2,2 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > IDHmut_NPC.NPC.tf.RPKM
 done
+#### Sox3 in H3K27ac
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/'
+dirRPKM='/projects/epigenomics2/users/lli/glioma/RNAseq/'
+dir5mC='/projects/epigenomics2/users/lli/glioma/WGBS/'
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/IDHmut_NPC.NPC.unique hg19 $dirIn/homer/ -find $dirIn/homer/IDHmut_NPC.NPC/knownResults/known13.motif | awk 'NR>1 {print $1}' | uniq | sed 's/:/\t/g' | sed 's/-/\t/g'  | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/homer/IDHmut_NPC.NPC.Sox3.annotate
+cd $dirIn/homer/
+for file in *.annotate; do
+    tf=$(echo $file | sed 's/.annotate//g' | sed 's/IDHmut_NPC.NPC.//g')
+    echo $tf
+    echo -e "ID\tchr\tstart\tend" > x
+    less $file | sort -k4,4 | awk '{print $4"\t"$1"\t"$2"\t"$3}' >> x
+    for CpG in $dir5mC/*.5mC.CpG; do
+        sample=$(basename $CpG | sed 's/.5mC.CpG//g')
+        echo -e "ID\t$sample" > y
+        less $CpG | awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{t[$4]=t[$4]+$8; c[$4]=c[$4]+$9} END{for(i in t){if(c[i]+t[i]>0){print i"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 >> y
+        join x y | sed 's/ /\t/g' > z
+        mv z x
+    done
+    mv x $file.5mC
+    echo -e "chr\tstart\tend\tID\tgeneChr\tgeneStart\tgeneEnd\tENSG\tdis" > $file.closest.gene
+    less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -D b >> $file.closest.gene
+    less $file.closest.gene | sort -k8,8 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 8 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > $file.closest.gene.RPKM
+done
 #### Ascl1, Olig2 and NeuroD1 in H3K4me1
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 PATH=$PATH:/home/lli/bin/homer/.//bin/
