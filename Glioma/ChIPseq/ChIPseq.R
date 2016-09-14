@@ -125,9 +125,23 @@ chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), va
 	theme_bw())
 ggsave(chromHMM_summary_figure, file = "./ChromHMM/chromHMM_summary_figure.pdf")
 
+## H3K36me3 methyltransferases expression
+H3K36me3_methyltransferases_RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RNAseq/H3K36me3.methyltransferases.RPKM", as.is = T) %>%
+	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Name")) %>% 
+	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
+	group_by(ENSG, Type) %>% summarize(Name = Name[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd))
+(H3K36me3_methyltransferases_RPKM_figure <- ggplot(H3K36me3_methyltransferases_RPKM, aes(Name, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
+	geom_point(size = 3) + 
+	geom_errorbar(width = 0.2) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("RPKM") + 
+	theme_bw())
+ggsave(H3K36me3_methyltransferases_RPKM_figure, file = "H3K36me3_methyltransferases_RPKM_figure.pdf", height = 5, width = 6)
 
-save(list = c("ER_summary", "ER_summary_figure", "ER_adjust_summary", "chromHMM_summary", "chromHMM_summary_figure", "ER_unique_summary_figure", 
-							ls(pattern = "Venn_adjust_"), "DHM_DE_figure"), 
+
+save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", 
+							ls(pattern = "figure"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
 
