@@ -114,6 +114,83 @@ DHM_DE <- read.delim("./unique/DHM.DE.summary", as.is = T) %>% mutate(Significan
 	theme_bw())
 ggsave(DHM_DE_figure, file = "./unique/DHM_DE_figure.pdf")
 
+### unique enhancers homer
+#### H3K27ac
+homer_unique_K27ac_NPC_tf <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.tf", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K27ac_NPC_tf_figure <- ggplot(homer_unique_K27ac_NPC_tf, aes(TF, Percent_with_motif)) + 
+	geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("Percent of enhancers with motif") + 
+	theme_bw())
+ggsave(homer_unique_K27ac_NPC_tf_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_figure.pdf", height = 4, width = 6)
+homer_unique_K27ac_NPC_tf_RPKM <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.tf.RPKM", as.is = T) %>%
+	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
+	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
+	group_by(ENSG, Type) %>% summarize(Motif = Motif[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd), Motif = factor(Motif, levels = gsub("-halfsite", "", levels(homer_unique_K27ac_NPC_tf$TF))))
+(homer_unique_K27ac_NPC_tf_RPKM_figure <- ggplot(homer_unique_K27ac_NPC_tf_RPKM, aes(Motif, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
+	geom_point(size = 3) + 
+	geom_errorbar(width = 0.4) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("RPKM") + 
+	theme_bw())
+ggsave(homer_unique_K27ac_NPC_tf_RPKM_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_RPKM_figure.pdf", height = 4, width = 6)
+(homer_unique_K27ac_NPC_Sox3_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K27ac/homer/enrich/", dirOut = "./unique/H3K27ac/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 8) + ggtitle("NPC-unique H3K27ac Sox3 DN"))
+#### H3K4me1
+homer_unique_K4me1_IDHmut_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K4me1_IDHmut_tf_figure <- ggplot(homer_unique_K4me1_IDHmut_tf, aes(TF, Percent_with_motif)) + 
+	geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("Percent of enhancers with motif") + 
+	theme_bw())
+ggsave(homer_unique_K4me1_IDHmut_tf_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_IDHmut_tf_figure.pdf", height = 6, width = 6)
+homer_unique_K4me1_IDHmut_tf_RPKM <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf.RPKM", as.is = T) %>%
+	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
+	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
+	group_by(ENSG, Type) %>% summarize(Motif = Motif[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd), Motif = factor(Motif, levels = gsub("-halfsite", "", levels(homer_unique_K4me1_IDHmut_tf$TF))))
+(homer_unique_K4me1_IDHmut_tf_RPKM_figure <- ggplot(homer_unique_K4me1_IDHmut_tf_RPKM, aes(Motif, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
+	geom_point(size = 3) + 
+	geom_errorbar(width = 0.4) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("RPKM") + 
+	theme_bw())
+ggsave(homer_unique_K4me1_IDHmut_tf_RPKM_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_IDHmut_tf_RPKM_figure.pdf", height = 6, width = 6)
+(homer_unique_K4me1_IDHmut_Ascl1_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.Ascl1.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 4) + ggtitle("glioma-unique H3K4me1 Ascl1 UP"))
+(homer_unique_K4me1_IDHmut_Olig2_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.Olig2.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 4) + ggtitle("glioma-unique H3K4me1 Olig2 UP"))
+(homer_unique_K4me1_IDHmut_HEB_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.HEB.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F) + ggtitle("glioma-unique H3K4me1 HEB UP"))
+homer_unique_K4me1_NPC_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.NPC.tf", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K4me1_NPC_tf_figure <- ggplot(homer_unique_K4me1_NPC_tf, aes(TF, Percent_with_motif)) + 
+	geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("Percent of enhancers with motif") + 
+	theme_bw())
+ggsave(homer_unique_K4me1_NPC_tf_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_NPC_tf_figure.pdf", height = 6, width = 6)
+homer_unique_K4me1_NPC_tf_RPKM <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.NPC.tf.RPKM", as.is = T) %>%
+	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
+	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
+	group_by(ENSG, Type) %>% summarize(Motif = Motif[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd), Motif = factor(Motif, levels = gsub("-halfsite", "", levels(homer_unique_K4me1_NPC_tf$TF))))
+(homer_unique_K4me1_NPC_tf_RPKM_figure <- ggplot(homer_unique_K4me1_NPC_tf_RPKM, aes(Motif, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
+	geom_point(size = 3) + 
+	geom_errorbar(width = 0.4) + 
+	coord_flip() + 
+	xlab("") + 
+	ylab("RPKM") + 
+	theme_bw())
+ggsave(homer_unique_K4me1_NPC_tf_RPKM_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_NPC_tf_RPKM_figure.pdf", height = 6, width = 6)
+(homer_unique_K4me1_NPC_Sox3_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Sox3 DN"))
+(homer_unique_K4me1_NPC_Sox6_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox6.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Sox6 DN"))
+(homer_unique_K4me1_NPC_Lhx2_DN_DAVID <- enrich("IDHmut_NPC.NPC.Lhx2.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Lhx2 DN"))
+
 ## -------- Chromatin states ----------
 chromHMM_summary <- read.delim("./ChromHMM/chromatin.states.summary", as.is = T) 
 chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), variable.name = "Sample")
