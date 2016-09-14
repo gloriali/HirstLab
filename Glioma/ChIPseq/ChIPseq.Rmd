@@ -44,22 +44,6 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```{r ER_summary}
 (ER_summary_figure)
 ```
-```{r ER_subsample, fig.width=4}
-for(i in 1:nrow(ER_adjust_summary)){
-	grid.arrange(gTree(children = get(paste0("Venn_adjust_N_region", rownames(ER_adjust_summary)[i]))), gTree(children = get(paste0("Venn_adjust_Total_length", rownames(ER_adjust_summary)[i]))), nrow = 2)
-	grid.text(paste0(rownames(ER_adjust_summary)[i], "\nfraction_", ER_adjust_summary[i, "frac"]), x = unit(0.8, "npc"), y = unit(0.95, "npc"))
-	grid.text("No. of regions", x = unit(0.2, "npc"), y = unit(0.98, "npc"))
-	grid.text("Total length", x = unit(0.2, "npc"), y = unit(0.48, "npc"))
-}
-```
-
-## Chromatin states
-* ChromHMM for 6 core histone marks in glioma and GE04.    
-![](/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/emission.pdf)
-
-```{r chromHMM}
-(chromHMM_summary_figure)
-```
 
 ## Unique enriched regions 
 * Pairwise comparisons between glioma samples (S1) and NPC GE04 (S2).   
@@ -70,10 +54,69 @@ for(i in 1:nrow(ER_adjust_summary)){
 	+ Randomly generate a set of background regions (not overlapping with S2 ER) with same length as S1 ER.   
 	+ Calculate signal for these background regions in S2 wig, use 90% quantile as cutoff. 
 	+ S1 unique ER: S1 ER with signal < background cutoff in S2.   
-![](/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K27ac/CEMT_19.vs.NPC_GE04.CEMT_19.pdf)
-
-```{r unique_ER_summary}
+```{r unique_ER_summary, fig.height=5}
 (ER_unique_summary_figure)
 ```
 
+### Histone modification associated DE genes
+* As expected, active marks, i.e. H3K27ac and H3K4me3 were significantly associated with transcriptional activation, while H3K27me3 was associated with down regulation.    
+
+```{r unique_ER_DE}
+(DHM_DE_figure)
+```
+
+### Unique enhancers and transcription factor activities
+* Homer transcription factor binding enrichment analysis for unique enhancers.   
+	+ q-value < 0.01
+	+ Fraction of enhancers with motif > 20%
+
+#### H3K27ac
+* Four transcription factors enriched in NPC-specific H3K27ac, only Sox3 was expressed in NPCs.     
+	+ Sox3: function as a switch in neuronal development. Keeps neural cells undifferentiated by counteracting the activity of proneural proteins and suppresses neuronal differentiation.      
+
+```{r unique_H3K27ac_NPC, fig.height=4}
+(homer_unique_K27ac_NPC_tf_figure)
+(homer_unique_K27ac_NPC_tf_RPKM_figure)
+```
+```{r unique_H3K27ac_NPC_DAVID}
+(homer_unique_K27ac_NPC_Sox3_DN_DAVID)
+```
+
+* No significantly enriched transcription factor in glioma-specific H3K27ac.   
+
+#### H3K4me1
+* Three transcription factors were enirched and expressed in NPC-specific H3K4me1: Sox3, Sox6, Lhx2.     
+	+ Sox3: function as a switch in neuronal development. Keeps neural cells undifferentiated by counteracting the activity of proneural proteins and suppresses neuronal differentiation.      
+	+ Sox6: plays a key role in several developmental processes, including neurogenesis and skeleton formation.      
+	+ Lhx2: acts as a transcriptional activator. Transcriptional regulatory protein involved in the control of cell differentiation in developing lymphoid and neural cell types.        
+	
+```{r unique_H3K4me1_NPC}
+(homer_unique_K4me1_NPC_tf_figure)
+(homer_unique_K4me1_NPC_tf_RPKM_figure)
+```
+```{r unique_H3K4me1_NPC_DAVID, fig.height=2}
+(homer_unique_K4me1_NPC_Sox3_DN_DAVID)
+(homer_unique_K4me1_NPC_Sox6_DN_DAVID)
+(homer_unique_K4me1_NPC_Lhx2_DN_DAVID)
+```
+
+* Three transcription factors were enriched and expressed in glioma-specific H3K4me1: HEB (TCF12), Ascl1, Olig2.      
+	+ HEB: involved in the initiation of neuronal differentiation.     
+	+ Ascl1: plays a role in the neuronal commitment and differentiation and in the generation of olfactory and autonomic neurons.      
+	+ Olig2: is an essential regulator of ventral neuroectodermal progenitor cell fate. Required for oligodendrocyte and motor neuron specification in the spinal cord, as well as for the development of somatic motor neurons in the hindbrain.      
+```{r unique_H3K4me1_IDHmut}
+(homer_unique_K4me1_IDHmut_tf_figure)
+(homer_unique_K4me1_IDHmut_tf_RPKM_figure)
+(homer_unique_K4me1_IDHmut_Ascl1_UP_DAVID)
+(homer_unique_K4me1_IDHmut_Olig2_UP_DAVID)
+(homer_unique_K4me1_IDHmut_HEB_UP_DAVID)
+```
+
+## Chromatin states
+* ChromHMM for 6 core histone marks in glioma and GE04.    
+![](/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/emission.pdf)
+
+```{r chromHMM}
+(chromHMM_summary_figure)
+```
 
