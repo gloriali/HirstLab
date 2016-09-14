@@ -138,6 +138,19 @@ homer_unique_K27ac_NPC_tf_RPKM <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.
 	ylab("RPKM") + 
 	theme_bw())
 ggsave(homer_unique_K27ac_NPC_tf_RPKM_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_RPKM_figure.pdf", height = 4, width = 6)
+homer_unique_K27ac_NPC_Sox3_5mC <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.Sox3.annotate.5mC", as.is = T) %>% 
+	mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (NPC.Cortex02 + NPC.Cortex04 + NPC.GE02 + NPC.GE04)/4, delta = IDHmut - NPC) %>% 
+	filter(delta >= 0.2) %>% arrange(delta) %>% mutate(ID = factor(ID, levels = ID))
+homer_unique_K27ac_NPC_Sox3_5mC_tall <- homer_unique_K27ac_NPC_Sox3_5mC %>%	select(-(chr:end), -CEMT_21, -IDHmut, -NPC, -delta) %>% melt(id.var = "ID") %>% 
+	mutate(variable = ifelse(variable == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", variable), ifelse(grepl("CEMT", variable), gsub("CEMT", "IDHmut_CEMT", variable), as.character(variable))))
+(homer_unique_K27ac_NPC_Sox3_5mC_heatmap <- ggplot(homer_unique_K27ac_NPC_Sox3_5mC_tall, aes(x = variable, y = ID, fill = value)) + 
+	geom_tile() + 
+	scale_fill_gradient(name = " Fractional\nmethylation", low = "lightblue", high = "black") + 
+	xlab("") + 
+	ylab("") + 
+	theme_bw() + 
+	theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
+ggsave(homer_unique_K27ac_NPC_Sox3_5mC_heatmap, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_Sox3_5mC_heatmap.pdf")
 (homer_unique_K27ac_NPC_Sox3_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K27ac/homer/enrich/", dirOut = "./unique/H3K27ac/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 8) + ggtitle("NPC-unique H3K27ac Sox3 DN"))
 #### H3K4me1
 homer_unique_K4me1_IDHmut_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf", as.is = T) %>%
@@ -217,7 +230,7 @@ H3K36me3_methyltransferases_RPKM <- read.delim("/projects/epigenomics2/users/lli
 ggsave(H3K36me3_methyltransferases_RPKM_figure, file = "H3K36me3_methyltransferases_RPKM_figure.pdf", height = 5, width = 6)
 
 
-save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", 
+save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_5mC_heatmap", 
 							ls(pattern = "figure"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 

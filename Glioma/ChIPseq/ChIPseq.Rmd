@@ -79,6 +79,7 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (homer_unique_K27ac_NPC_tf_RPKM_figure)
 ```
 ```{r unique_H3K27ac_NPC_DAVID}
+(homer_unique_K27ac_NPC_Sox3_5mC_heatmap + ggtitle("Sox3 enhancer fractional methylation"))
 (homer_unique_K27ac_NPC_Sox3_DN_DAVID)
 ```
 

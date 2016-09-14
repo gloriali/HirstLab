@@ -2,7 +2,7 @@
 Gloria Li  
 Jun, 19, 2016  
 
-Updated: Wed Sep 14 00:45:45 2016
+Updated: Wed Sep 14 12:27:03 2016
 
 
 
@@ -45,7 +45,7 @@ Updated: Wed Sep 14 00:45:45 2016
 	+ Sox3: function as a switch in neuronal development. Keeps neural cells undifferentiated by counteracting the activity of proneural proteins and suppresses neuronal differentiation.      
 
 ![](ChIPseq_files/figure-html/unique_H3K27ac_NPC-1.png)![](ChIPseq_files/figure-html/unique_H3K27ac_NPC-2.png)
-![](ChIPseq_files/figure-html/unique_H3K27ac_NPC_DAVID-1.png)
+![](ChIPseq_files/figure-html/unique_H3K27ac_NPC_DAVID-1.png)![](ChIPseq_files/figure-html/unique_H3K27ac_NPC_DAVID-2.png)
 
 * No significantly enriched transcription factor in glioma-specific H3K27ac.   
 
