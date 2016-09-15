@@ -36,7 +36,7 @@ hyper=($(less $dirOut/DMR.$name.s$size.c$cut.hyper | awk '{s=s+$3-$2} END{print 
 hypo=($(less $dirOut/DMR.$name.s$size.c$cut.hypo | awk '{s=s+$3-$2} END{print s}'))
 length=($(less $dirOut/DMR.$name.s$size.c$cut | sort -k7,7n | awk '{len[NR]=$7} END{if(NR%2){print len[(NR+1)/2]} else{print (len[(NR/2)]+len[(NR/2)+1])/2}}'))
 count=($(less $dirOut/DMR.$name.s$size.c$cut | sort -k6,6n | awk '{count[NR]=$6} END{if(NR%2){print count[(NR+1)/2]} else{print (count[(NR/2)]+count[(NR/2)+1])/2}}')) 
-less $dirOut/DMR.$name.s$size.c$cut.hyper | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$name.s$size.c$cut.hyper.bed   
-less $dirOut/DMR.$name.s$size.c$cut.hypo | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $dirOut/DMR.$name.s$size.c$cut.hypo.bed   
+less $dirOut/DMR.$name.s$size.c$cut.hyper | awk '{if($1 ~ /chr/){print $1"\t"$2"\t"$3"\t"$4}else{print "chr"$1"\t"$2"\t"$3"\t"$4}}' > $dirOut/DMR.$name.s$size.c$cut.hyper.bed   
+less $dirOut/DMR.$name.s$size.c$cut.hypo | awk '{if($1 ~ /chr/){print $1"\t"$2"\t"$3"\t"$4}else{print "chr"$1"\t"$2"\t"$3"\t"$4}}' > $dirOut/DMR.$name.s$size.c$cut.hypo.bed   
 echo -e $name"\t"$size"\t"$cut"\t"$length"\t"$count"\t"$dmr"\t"$hyper"\t"$hypo >> $dirOut/DMR.summary.stats
 
