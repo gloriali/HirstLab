@@ -10,6 +10,8 @@
 * Example:
 
 ```
+dirIn=<input directory>
+file=<*.5mC.CpG>
 /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file
 # genome-wide 5mC distribution
 less $dirIn/$file.combine.5mC.CpG | awk '{if($4+$5 > 0){print $5/($4+$5)}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' 
@@ -30,6 +32,15 @@ less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+
 * Example:
 
 ```
+dirIn=<input directory>
+dirOut=<output directory>
+file1=<sample1.5mC.CpG>
+file2=<sample2.5mC.CpG>
+name=<output file name>
+pth=0.005
+delta=0.6
+m=0.75
+cov=3
 /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
 ```
 
@@ -44,6 +55,8 @@ less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+
 * Example:
 
 ```
-/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/intermediate/ -o $dirOut/intermediate/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+size=500
+cut=3
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
 ```
 
