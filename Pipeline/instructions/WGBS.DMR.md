@@ -34,8 +34,8 @@ less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+
 ```
 dirIn=<input directory>
 dirOut=<output directory>
-file1=<sample1.5mC.CpG>
-file2=<sample2.5mC.CpG>
+file1=<sample1.combine.5mC.CpG>
+file2=<sample2.combine.5mC.CpG>
 name=<output file name>
 pth=0.005
 delta=0.6
