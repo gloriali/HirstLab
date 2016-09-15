@@ -5,7 +5,7 @@
     + Combine coverage from both strand: greater statistical power
 * Input: novoalign output `.5mC.CpG` file
 * Output: `*.combine.5mC.CpG`; same format as novoalign output `chr  start   .   converted   unconverted`
-* Script: `~/HirstLab/Pipeline/shell/WGBS.combine.sh`    
+* Script: `/home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh`    
 * Suggested QC: genome-wide and CGI 5mC distribution    
 * Example:
 
@@ -26,7 +26,7 @@ less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+
     + min coverage `-c`: default to 3         
 * Input: `.5mC.CpG` file for two samples    
 * Output: `DM.*` file and summary statistics (DM.summary.stats)     
-* Script: `~/HirstLab/Pipeline/shell/methyl_diff.sh`
+* Script: `/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh`
 * Example:
 
 ```
@@ -40,7 +40,7 @@ less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+
     + min number of CpGs within each DMR `-c`: default to 3
 * Input: `DM.*` file
 * Ouput: `DMR.*` files (total, hyper, and hypo), hyper/hypo bed files, and summary statistics (DMR.summary.stats)
-* Script: `~/HirstLab/Pipeline/shell/DMR.dynamic.sh`
+* Script: `/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh`
 * Example:
 
 ```
