@@ -1,4 +1,4 @@
-DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, height = 8, figures = c("length", "count", "adjacentDis", "frequency", "position", "circos"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1), hist_width = 100){
+DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, height = 8, figures = c("length", "count", "adjacentDis", "frequency", "position", "circos"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("/home/lli/hg19/chrlen_hg19.csv", as.is = T, row.names = 1), hist_width = 100){
   library(ggplot2)
   library(dplyr)
   library(GenomicRanges)
