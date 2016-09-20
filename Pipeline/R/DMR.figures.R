@@ -1,9 +1,7 @@
 DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, height = 8, figures = c("length", "count", "adjacentDis", "frequency", "position", "circos"), chrs = c(paste0("chr", as.character(1:22)), "chrX"), colname = c("chr", "start", "end", "ID", "DM", "count", "length"), chrlength = read.csv("~/hg19/chrlen_hg19.csv", as.is = T, row.names = 1), hist_width = 100){
   library(ggplot2)
   library(dplyr)
-  library(ggbio)
   library(GenomicRanges)
-  library(RCircos)
   DMR_length_figure <- NULL; DMR_count_figure <- NULL; DMR_dis_figure <- NULL; DMR_freq_figure <- NULL; DMR_pos_figure <- NULL; 
   chrlength <- chrlength[chrlength$chr %in% chrs, ]
   chrlength$chr <- factor(chrlength$chr, levels = chrs[1:length(chrs)])
@@ -68,6 +66,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
     ggsave(DMR_freq_figure, file = paste0(dirOut, "/DMRfreq_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("position" %in% figures){
+    library(ggbio)
     DMR$y <- DMR$DM * 15 + 5
     DMR_gr <- keepSeqlevels(as(DMR, "GRanges"), paste0("chr", c(1:22, "X")))
     data(hg19IdeogramCyto, package = "biovizBase")
@@ -85,7 +84,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
     ggsave(DMR_pos_figure@ggplot, file = paste0(dirOut, "/DMRpos_", sample1, "_", sample2, ".pdf"), width = width, height = height)    
   }
   if("circos" %in% figures){
-  	DMR_hyper <- DMR %>% filter(DM == 1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "red")
+  	library(RCircos)
+    DMR_hyper <- DMR %>% filter(DM == 1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "red")
   	colnames(DMR_hyper) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
   	DMR_hypo <- DMR %>% filter(DM == -1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "blue")
   	colnames(DMR_hypo) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
