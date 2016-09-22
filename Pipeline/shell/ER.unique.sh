@@ -65,6 +65,6 @@ cutoff=$(less $dirOut/*.$name.background.coverage | awk '{print $5}' | sort -k1,
 echo "Coverage cutoff: $cutoff"
 
 ## output
-less $dirOut/*.$name.signal.coverage | awk '{if($5 <= '"$cutoff"'){print $0}}' > $dirOut/$name.unique
+less $dirOut/*.$name.signal.coverage | awk '{if(($5 <= '"$cutoff"') && !($4 in id)){print $0}; id[$4]=1}' > $dirOut/$name.unique
 rm $dirOut/*$name.ER* $dirOut/*$name.signal* $dirOut/*$name.background* $dirOut/$name.R
 
