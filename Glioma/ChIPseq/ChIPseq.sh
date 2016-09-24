@@ -434,6 +434,90 @@ for file in *.annotate; do
     join $file.closest.gene.RPKM $dirRPKM/DEfine/DN.IDHmut.NPC | sed 's/ /\t/g' > $file.closest.gene.RPKM.DN
 done
 
+### Loss of H3K36me3 
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+cd $dirIn
+$BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC_NPC.unique
+cat CEMT_23.vs.NPC_GE04.NPC_GE04.unique > IDHwt_NPC_NPC.unique
+$BEDTOOLS/intersectBed -a IDHmut_NPC_NPC.unique -b IDHwt_NPC_NPC.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDH_NPC_NPC.unique
+echo -e "File\tN_K36\tN_UP\tN_DN\tN_K36_UP\tN_K36_DN" > $dirIn/H3K36me3_loss_DE.summary
+for file in *.vs.NPC_GE04.NPC_GE04.unique; do
+    echo $file
+    echo -e "ID\tchr\tstart\tend" > x
+    less $file | awk '{print $4"\t"$1"\t"$2"\t"$3}' | sort -k1,1 >> x
+    for CpG in $dir5mC/*.5mC.CpG.combine.5mC.CpG; do
+        sample=$(basename $CpG | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+        echo -e "ID\t$sample" > y;
+        less $CpG | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{t[$4]=t[$4]+$10; c[$4]=c[$4]+$11} END{for(i in t){if(c[i]+t[i]>0){print i"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 >> y;
+        join x y | sed 's/ /\t/g' > z;
+        mv z x;
+    done
+    mv x $file.5mC
+    less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/intersectBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -wa -wb > $file.gene
+    less $file.gene | sort -k10,10 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 10 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > $file.gene.RPKM
+    join $file.gene.RPKM $dirRPKM/DEfine/UP.IDHmut.NPC | sed 's/ /\t/g' > $file.gene.RPKM.UP
+    join $file.gene.RPKM $dirRPKM/DEfine/DN.IDHmut.NPC | sed 's/ /\t/g' > $file.gene.RPKM.DN
+    N_K36=$(less $file.gene.RPKM | awk '{print $1}' | uniq | wc -l)
+    N_UP=$(less $dirRPKM/DEfine/UP.IDHmut.NPC | wc -l)
+    N_DN=$(less $dirRPKM/DEfine/DN.IDHmut.NPC | wc -l)
+    N_K36_UP=$(less $file.gene.RPKM.UP | awk '{print $1}' | uniq | wc -l)
+    N_K36_DN=$(less $file.gene.RPKM.DN | awk '{print $1}' | uniq | wc -l)
+    echo -e "$file\t$N_K36\t$N_UP\t$N_DN\t$N_K36_UP\t$N_K36_DN" >> $dirIn/H3K36me3_loss_DE.summary
+done
+for file in IDH*.unique; do
+    echo $file
+    echo -e "ID\tchr\tstart\tend" > x
+    less $file | awk '{print $4"\t"$1"\t"$2"\t"$3}' | sort -k1,1 >> x
+    for CpG in $dir5mC/*.5mC.CpG.combine.5mC.CpG; do
+        sample=$(basename $CpG | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+        echo -e "ID\t$sample" > y;
+        less $CpG | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{t[$4]=t[$4]+$8; c[$4]=c[$4]+$9} END{for(i in t){if(c[i]+t[i]>0){print i"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 >> y;
+        join x y | sed 's/ /\t/g' > z;
+        mv z x;
+    done
+    mv x $file.5mC
+    less /home/lli/hg19/hg19v69_genes.bed | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/intersectBed -a <(less $file | sort -k1,1 -k2,2n) -b stdin -wa -wb > $file.gene
+    less $file.gene | sort -k8,8 | join - $dirRPKM/NPC_RPKM/NPC.RPKM -1 8 -2 1 | join - $dirRPKM/RPKM/glioma.RPKM | sed 's/ /\t/g' > $file.gene.RPKM
+    join $file.gene.RPKM $dirRPKM/DEfine/UP.IDHmut.NPC | sed 's/ /\t/g' > $file.gene.RPKM.UP
+    join $file.gene.RPKM $dirRPKM/DEfine/DN.IDHmut.NPC | sed 's/ /\t/g' > $file.gene.RPKM.DN
+    N_K36=$(less $file.gene.RPKM | awk '{print $1}' | uniq | wc -l)
+    N_UP=$(less $dirRPKM/DEfine/UP.IDHmut.NPC | wc -l)
+    N_DN=$(less $dirRPKM/DEfine/DN.IDHmut.NPC | wc -l)
+    N_K36_UP=$(less $file.gene.RPKM.UP | awk '{print $1}' | uniq | wc -l)
+    N_K36_DN=$(less $file.gene.RPKM.DN | awk '{print $1}' | uniq | wc -l)
+    echo -e "$file\t$N_K36\t$N_UP\t$N_DN\t$N_K36_UP\t$N_K36_DN" >> $dirIn/H3K36me3_loss_DE.summary
+done
+dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
+dirWig=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+cd $dirIn
+for file in *.vs.NPC_GE04.NPC_GE04.unique; do
+    sample=$(echo $file | sed 's/.vs.NPC_GE04.NPC_GE04.unique//g')
+    echo $sample
+    echo -e "ID\tchr\tstart\tend" > a
+    less $file | awk '{print $4"\t"$1"\t"$2"\t"$3}' | sort -k1,1 >> a
+    cov_glioma=$(less /projects/epigenomics2/users/lli/glioma/ChIPseq/H3K27me3.depth | awk '{if($1=="'$sample'"){print $2}}')
+    cov_GE04=35922595
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/$sample.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.$sample.H3K27me3 > $dirIn/$file.H3K27me3.log
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/NPC_GE04.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K27me3 >> $dirIn/$file.H3K27me3.log
+    echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K27me3" > b
+    join *$file.$sample.H3K27me3.coverage *$file.NPC_GE04.H3K27me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
+    join a b | sed 's/ /\t/g' > $file.H3K27me3    
+    cov_glioma=$(less /projects/epigenomics2/users/lli/glioma/ChIPseq/H3K36me3.depth | awk '{if($1=="'$sample'"){print $2}}')
+    cov_GE04=53179871
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/$sample.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.$sample.H3K36me3 > $dirIn/$file.H3K36me3.log
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/NPC_GE04.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K36me3 >> $dirIn/$file.H3K36me3.log
+    echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K36me3" > b
+    join *$file.$sample.H3K36me3.coverage *$file.NPC_GE04.H3K36me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
+    join a b | sed 's/ /\t/g' > $file.H3K36me3
+    join $file.H3K27me3 $file.H3K36me3 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"$7"\t"$13}' > $file.H3K27me3.H3K36me3 
+    rm *$file.$sample.H3K*me3* *$file.NPC_GE04.H3K*me3* a b
+done
+
 ## Histone modifiers expression
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/
 less Histone.modifiers | sort -k2,2 | join - NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - RPKM/glioma.RPKM | sed 's/ /\t/g' > Histone.modifiers.RPKM
