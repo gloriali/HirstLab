@@ -440,7 +440,7 @@ dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 cd $dirIn
 $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC_NPC.unique
-cat CEMT_23.vs.NPC_GE04.NPC_GE04.unique > IDHwt_NPC_NPC.unique
+cat CEMT_23.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC_NPC.unique
 $BEDTOOLS/intersectBed -a IDHmut_NPC_NPC.unique -b IDHwt_NPC_NPC.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDH_NPC_NPC.unique
 echo -e "File\tN_K36\tN_UP\tN_DN\tN_K36_UP\tN_K36_DN" > $dirIn/H3K36me3_loss_DE.summary
 for file in *.vs.NPC_GE04.NPC_GE04.unique; do
