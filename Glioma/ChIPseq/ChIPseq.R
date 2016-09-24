@@ -17,6 +17,7 @@ source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 load("/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 setwd("/projects/epigenomics2/users/lli/glioma/ChIPseq/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47", "GE04")
+Ensembl <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.EnsID_sorted.HUGO", as.is = T, head = F, row.names = 1)
 
 ## -------- ER summary -----------
 ### adjust for differences in sequencing depth: subsampling deep sequenced bam file to the average sequence depth of all other samples
@@ -125,7 +126,7 @@ homer_unique_K27ac_NPC_tf <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.t
 	xlab("") + 
 	ylab("Percent of enhancers with motif") + 
 	theme_bw())
-ggsave(homer_unique_K27ac_NPC_tf_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_figure.pdf", height = 4, width = 6)
+ggsave(homer_unique_K27ac_NPC_tf_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_figure.pdf", height = 4, width = 3)
 homer_unique_K27ac_NPC_tf_RPKM <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.tf.RPKM", as.is = T) %>%
 	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
 	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
@@ -137,7 +138,7 @@ homer_unique_K27ac_NPC_tf_RPKM <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.
 	xlab("") + 
 	ylab("RPKM") + 
 	theme_bw())
-ggsave(homer_unique_K27ac_NPC_tf_RPKM_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_RPKM_figure.pdf", height = 4, width = 6)
+ggsave(homer_unique_K27ac_NPC_tf_RPKM_figure, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_tf_RPKM_figure.pdf", height = 4, width = 4)
 homer_unique_K27ac_NPC_Sox3_5mC <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.Sox3.annotate.5mC", as.is = T) %>% 
 	mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (NPC.Cortex02 + NPC.Cortex04 + NPC.GE02 + NPC.GE04)/4, delta = IDHmut - NPC) %>% 
 	filter(delta >= 0.2) %>% arrange(delta) %>% mutate(ID = factor(ID, levels = ID))
@@ -150,8 +151,12 @@ homer_unique_K27ac_NPC_Sox3_5mC_tall <- homer_unique_K27ac_NPC_Sox3_5mC %>%	sele
 	ylab("") + 
 	theme_bw() + 
 	theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
-ggsave(homer_unique_K27ac_NPC_Sox3_5mC_heatmap, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_Sox3_5mC_heatmap.pdf")
+ggsave(homer_unique_K27ac_NPC_Sox3_5mC_heatmap, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_Sox3_5mC_heatmap.pdf", height = 6, width = 6)
+homer_unique_K27ac_NPC_Sox3_DN <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", as.is = T) %>%
+	filter(ID %in% homer_unique_K27ac_NPC_Sox3_5mC$ID, abs(dis) <= 2000) %>% distinct(ENSG) %>% mutate(Name = Ensembl[ENSG, "V2"]) 
+write.table(homer_unique_K27ac_NPC_Sox3_DN, file = "./unique/H3K27ac/homer/homer_unique_K27ac_NPC_Sox3_DN.txt", row.names = F, quote = F, sep = "\t")
 (homer_unique_K27ac_NPC_Sox3_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K27ac/homer/enrich/", dirOut = "./unique/H3K27ac/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 8) + ggtitle("NPC-unique H3K27ac Sox3 DN"))
+
 #### H3K4me1
 homer_unique_K4me1_IDHmut_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
@@ -204,6 +209,21 @@ ggsave(homer_unique_K4me1_NPC_tf_RPKM_figure, file = "./unique/H3K4me1/homer/hom
 (homer_unique_K4me1_NPC_Sox6_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox6.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Sox6 DN"))
 (homer_unique_K4me1_NPC_Lhx2_DN_DAVID <- enrich("IDHmut_NPC.NPC.Lhx2.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Lhx2 DN"))
 
+### loss of H3K36me3 
+H3K36me3_unique_NPC_5mC <- read.delim("./unique/H3K36me3/IDH_NPC_NPC.unique.5mC", as.is = T) %>% 
+	mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (NPC.Cortex02 + NPC.Cortex04 + NPC.GE02 + NPC.GE04)/4, delta = IDHmut - NPC) %>% 
+	arrange(delta) %>% mutate(ID = factor(ID, levels = ID))
+H3K36me3_unique_NPC_5mC_tall <- H3K36me3_unique_NPC_5mC %>%	select(-(chr:end), -CEMT_21, -IDHmut, -NPC, -delta) %>% melt(id.var = "ID") %>% 
+	mutate(variable = ifelse(variable == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", variable), ifelse(grepl("CEMT", variable), gsub("CEMT", "IDHmut_CEMT", variable), as.character(variable))))
+(H3K36me3_unique_NPC_5mC_heatmap <- ggplot(H3K36me3_unique_NPC_5mC_tall, aes(x = variable, y = ID, fill = value)) + 
+	geom_tile() + 
+	scale_fill_gradient(name = " Fractional\nmethylation", low = "lightblue", high = "black") + 
+	xlab("") + 
+	ylab("") + 
+	theme_bw() + 
+	theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
+ggsave(H3K36me3_unique_NPC_5mC_heatmap, file = "./unique/H3K36me3/H3K36me3_unique_NPC_5mC_heatmap.pdf", height = 6, width = 6)
+
 ## -------- Chromatin states ----------
 chromHMM_summary <- read.delim("./ChromHMM/chromatin.states.summary", as.is = T) 
 chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), variable.name = "Sample")
@@ -216,21 +236,21 @@ chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), va
 ggsave(chromHMM_summary_figure, file = "./ChromHMM/chromHMM_summary_figure.pdf")
 
 ## H3K36me3 methyltransferases expression
-H3K36me3_methyltransferases_RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RNAseq/H3K36me3.methyltransferases.RPKM", as.is = T) %>%
+Histone_modifiers_RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RNAseq/Histone.modifiers.RPKM", as.is = T) %>%
 	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Name")) %>% 
 	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
 	group_by(ENSG, Type) %>% summarize(Name = Name[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd))
-(H3K36me3_methyltransferases_RPKM_figure <- ggplot(H3K36me3_methyltransferases_RPKM, aes(Name, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
+(Histone_modifiers_RPKM_figure <- ggplot(Histone_modifiers_RPKM, aes(Name, mean, ymax = mean + sd, ymin = mean - sd, color = Type)) + 
 	geom_point(size = 3) + 
 	geom_errorbar(width = 0.2) + 
 	coord_flip() + 
 	xlab("") + 
 	ylab("RPKM") + 
 	theme_bw())
-ggsave(H3K36me3_methyltransferases_RPKM_figure, file = "H3K36me3_methyltransferases_RPKM_figure.pdf", height = 5, width = 6)
+ggsave(Histone_modifiers_RPKM_figure, file = "Histone_modifiers_RPKM_figure.pdf", height = 5, width = 6)
 
 
-save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_5mC_heatmap", 
+save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_5mC_heatmap", "homer_unique_K27ac_NPC_Sox3_DN", 
 							ls(pattern = "figure"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
