@@ -47,6 +47,7 @@ ggsave(CGI_edge_figure, file = "../CGI_edge/CGI_edge_figure.pdf", width = 8)
 ### -------- summary ---------
 DMR_summary <- read.delim("./intermediate/DMR.summary.stats", head = T, as.is = T)
 DMR_summary_tall <- data.frame(glioma = rep(gsub("_NPC.*", "", DMR_summary$sample), 2), NPC = rep(gsub(".*_NPC\\.", "", DMR_summary$sample), 2), DM = rep(c("hyper", "hypo"), each = nrow(DMR_summary)), length = c(DMR_summary$hyper, -DMR_summary$hypo)/10^6)
+#DMR_summary_tall <- DMR_summary_tall %>% filter(glioma != "CEMT_21") %>% mutate(glioma = ifelse(glioma == "CEMT_23", paste0("IDHwt\n", glioma), paste0("IDHmut\n", glioma)))
 DMR_summary_figure <- ggplot(DMR_summary_tall, aes(x = glioma, y = length, color = DM, shape = NPC)) + 
 	geom_point(position = position_jitter(width = 0.1), size = 3) + 
 	geom_hline(yintercept = 0) + 
@@ -54,10 +55,11 @@ DMR_summary_figure <- ggplot(DMR_summary_tall, aes(x = glioma, y = length, color
 	ylab("Total DMR length (Mb)") + 
 	scale_color_manual(name = "", values = c("red", "blue")) + 
 	coord_flip() + 
-	theme_bw()
+	theme_bw() + 
+	theme(axis.text.y = element_text(size = 15), axis.title.x = element_text(size = 15))
 ggsave(DMR_summary_figure, file = "DMR_summary_figure.pdf", height = 5, width = 6)
 
-### ------- visualization -----
+### ------- visualization ----- 
 colname <- c("chr", "start", "end", "ID", "DM", "length")
 for(lib in libs){
 	print(lib)
@@ -181,6 +183,10 @@ DMR_DHM_enrich <- read.delim("./DMR.uniqueHM.enrichment.summary", as.is = T) %>%
 	ylab("log2 Fold Enrichemnt") + 
 	theme_bw())
 ggsave(DMR_DHM_enrich_figure, file = "DMR_DHM_enrich_figure.pdf")
+DMR_enhancer_enrich <- DMR_DHM_enrich %>% filter(Sample != "CEMT_21", Mark == "H3K27ac")
+pdf("DMR_enhancer_enrich_venn.pdf")
+DMR_enhancer_enrich_venn <- draw.pairwise.venn(area1 = 9128, area2 = 10940, cross.area = 826, category = c("Hypermethylation", "Loss of H3K27ac"), fill = c("orange", "blue"), cat.pos = c(200, 160), cat.cex = 1.5)
+dev.off()
 
 ### -------- associated with DE genes ----------
 DMR_DE <- read.delim("./DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.01)
