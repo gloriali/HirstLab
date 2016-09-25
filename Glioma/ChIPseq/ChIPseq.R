@@ -7,7 +7,6 @@ library(gridExtra)
 library(gplots)
 library(dendextend)
 library(reshape2)
-library(wq)
 library(dplyr)
 library(RCircos)
 library(stringr)
@@ -65,18 +64,6 @@ for(i in 1:nrow(ER_adjust_summary)){
 }
 dev.off()
 
-### genic/intergenic distribution
-HM_distrbution <- read.delim("./bam/HM.distribution.summary", as.is = T) %>%
-	mutate(Type = rep(c("NPC", rep("glioma", 5)), 2))
-(HM_distrbution_figure <- ggplot(HM_distrbution, aes(Sample, genic_intergenic, fill = Type)) + 
-	geom_bar(stat = "identity", width = 0.5) + 
-	facet_wrap(~ Mark) + 
-	xlab("") + 
-	ylab("# gene-associated reads / # intergenic reads") + 
-	theme_bw() + 
-	theme(axis.text.x = element_text(angle = 90)))
-ggsave(HM_distrbution_figure, file = "HM_distrbution_figure.pdf", width = 8, height = 6)
-
 ## -------- Differentially marked regions --------
 ### test: how to set the background coverage cutoff? CEMT_19 vs GE04 H3K27ac
 signal <- read.delim("./unique/test/63.CEMT_19.vs.NPC_GE04.CEMT_19.signal.coverage", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "cov", "max")) 
@@ -102,6 +89,28 @@ ER_unique_summary <- read.delim("./unique/ER.unique.summary", as.is = T) %>%
 	ylab("") + 
 	theme_bw())
 ggsave(ER_unique_summary_figure, file = "./unique/ER_unique_summary_figure.pdf", width = 8, height = 6)
+H3K36me3_unique_summary <- ER_unique_summary %>% filter(Mark == "H3K36me3", Sample != "CEMT_21", variable %in% c("len_glioma_unique", "len_NPC_unique")) %>%
+  mutate(Sample = ifelse(Sample == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", Sample), gsub("CEMT", "IDHmut_CEMT", Sample)), value = abs(value)/10^6, type = paste0(type, "-specific"))
+(H3K36me3_unique_summary_figure <- ggplot(H3K36me3_unique_summary, aes(Sample, value, fill = type)) + 
+  geom_bar(stat = "identity", width = 0.5, position = position_dodge()) + 
+  scale_fill_manual(values = c("red", "blue"), name = "", labels = c("Gain", "Loss")) + 
+  xlab("") + 
+  ylab("Total length (MB)") + 
+  ggtitle("H3K36me3") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90)))
+ggsave(H3K36me3_unique_summary_figure, file = "./unique/H3K36me3_unique_summary_figure.pdf", height = 5, width = 5)
+H3K27me3_unique_summary <- ER_unique_summary %>% filter(Mark == "H3K27me3", Sample != "CEMT_21", variable %in% c("len_glioma_unique", "len_NPC_unique")) %>%
+  mutate(Sample = ifelse(Sample == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", Sample), gsub("CEMT", "IDHmut_CEMT", Sample)), value = abs(value)/10^6, type = paste0(type, "-specific"))
+(H3K27me3_unique_summary_figure <- ggplot(H3K27me3_unique_summary, aes(Sample, value, fill = type)) + 
+  geom_bar(stat = "identity", width = 0.5, position = position_dodge()) + 
+  scale_fill_manual(values = c("red", "blue"), name = "", labels = c("Gain", "Loss")) + 
+  xlab("") + 
+  ylab("Total length (MB)") + 
+  ggtitle("H3K27me3") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90)))
+ggsave(H3K27me3_unique_summary_figure, file = "./unique/H3K27me3_unique_summary_figure.pdf", height = 5, width = 5)
 
 ### associated with DE genes 
 DHM_DE <- read.delim("./unique/DHM.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.01, DHM = ifelse(Marked == "NPC_GE04", "Loss", "Gain"))
@@ -210,19 +219,62 @@ ggsave(homer_unique_K4me1_NPC_tf_RPKM_figure, file = "./unique/H3K4me1/homer/hom
 (homer_unique_K4me1_NPC_Lhx2_DN_DAVID <- enrich("IDHmut_NPC.NPC.Lhx2.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 2) + ggtitle("NPC-unique H3K4me1 Lhx2 DN"))
 
 ### loss of H3K36me3 
+#### RPKM
+e <- 1e-6
+colname <- c("ENSG", "chr", "start", "end", "ID", "geneChr", "geneStart", "geneEnd", "NPC.Cortex01", "NPC.GE01", "NPC.Cortex02", "NPC.GE02", "Brain01", "NPC.Cortex03", "Brain02", "NPC.GE03", "NPC.Cortex04", "NPC.GE04", "CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+H3K36me3_unique_NPC_gene_RPKM <- read.delim("./unique/H3K36me3/IDH_NPC_NPC.unique.gene.RPKM", as.is = T, head = F, col.names = colname) %>% 
+  mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (Cortex02 + Cortex04 + GE02 + GE04)/4, logFC = log2((IDHmut + e)/(NPC + e))) %>% 
+  arrange(logFC) %>% mutate(ID = factor(ID, levels = ID))
+H3K36me3_unique_NPC_gene_RPKM_tall <- H3K36me3_unique_NPC_gene_RPKM %>%	distinct(ENSG) %>% select(ENSG, NPC.Cortex02, NPC.Cortex04, NPC.GE02, NPC.GE04, CEMT_19, CEMT_22, CEMT_23, CEMT_47) %>% melt(id.var = "ENSG") %>% 
+  mutate(variable = ifelse(variable == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", variable), ifelse(grepl("CEMT", variable), gsub("CEMT", "IDHmut_CEMT", variable), as.character(variable))))
+(H3K36me3_unique_NPC_gene_RPKM_heatmap <- ggplot(H3K36me3_unique_NPC_gene_RPKM_tall, aes(x = variable, y = ID, fill = value)) + 
+  geom_tile() + 
+  scale_fill_gradient(name = "RPKM", low = "lightgreen", high = "black") + 
+  xlab("") + 
+  ylab("") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
+ggsave(H3K36me3_unique_NPC_gene_RPKM_heatmap, file = "./unique/H3K36me3/H3K36me3_unique_NPC_gene_RPKM_heatmap.pdf", height = 6, width = 6)
+#### 5mC
 H3K36me3_unique_NPC_5mC <- read.delim("./unique/H3K36me3/IDH_NPC_NPC.unique.5mC", as.is = T) %>% 
-	mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (NPC.Cortex02 + NPC.Cortex04 + NPC.GE02 + NPC.GE04)/4, delta = IDHmut - NPC) %>% 
-	arrange(delta) %>% mutate(ID = factor(ID, levels = ID))
+  mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, NPC = (NPC.Cortex02 + NPC.Cortex04 + NPC.GE02 + NPC.GE04)/4, delta = IDHmut - NPC) %>% 
+  filter(ID %in% H3K36me3_unique_NPC_gene_RPKM$ID) %>% arrange(delta) %>% mutate(ID = factor(ID, levels = ID))
 H3K36me3_unique_NPC_5mC_tall <- H3K36me3_unique_NPC_5mC %>%	select(-(chr:end), -CEMT_21, -IDHmut, -NPC, -delta) %>% melt(id.var = "ID") %>% 
-	mutate(variable = ifelse(variable == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", variable), ifelse(grepl("CEMT", variable), gsub("CEMT", "IDHmut_CEMT", variable), as.character(variable))))
+  mutate(variable = ifelse(variable == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", variable), ifelse(grepl("CEMT", variable), gsub("CEMT", "IDHmut_CEMT", variable), as.character(variable))))
 (H3K36me3_unique_NPC_5mC_heatmap <- ggplot(H3K36me3_unique_NPC_5mC_tall, aes(x = variable, y = ID, fill = value)) + 
-	geom_tile() + 
-	scale_fill_gradient(name = " Fractional\nmethylation", low = "lightblue", high = "black") + 
-	xlab("") + 
-	ylab("") + 
-	theme_bw() + 
-	theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
+  geom_tile() + 
+  scale_fill_gradient(name = " Fractional\nmethylation", low = "lightblue", high = "black") + 
+  xlab("") + 
+  ylab("") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90), axis.text.y = element_text(size = 0), axis.ticks.y = element_line(size = 0)))	
 ggsave(H3K36me3_unique_NPC_5mC_heatmap, file = "./unique/H3K36me3/H3K36me3_unique_NPC_5mC_heatmap.pdf", height = 6, width = 6)
+#### H3K27me3
+for(lib in libs[1:5]){
+  print(lib)
+  assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib), read.delim(paste0("./unique/H3K36me3/", lib, ".vs.NPC_GE04.NPC_GE04.unique.H3K27me3.H3K36me3"), as.is = T))
+  assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure"), ggplot(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib)), aes(diff_H3K27me3, diff_H3K36me3)) + 
+           geom_point(alpha = 0.2, size = 0.5) + 
+           stat_density2d(aes(fill = ..level..), geom="polygon") + 
+           coord_cartesian(xlim = c(-25, 25), ylim = c(-30, 0)) + 
+           ggtitle(lib) + 
+           xlab("H3K27me3 normalized signal\nGlioma - NPC") + 
+           ylab("H3K36me3 normalized signal\nGlioma - NPC") + 
+           theme_bw())
+  print(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure")))
+  ggsave(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure")), file = paste0("./unique/H3K36me3/H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure.pdf"), height = 5, width = 6)
+}
+#### genic/intergenic distribution
+HM_distrbution <- read.delim("./bam/HM.distribution.summary", as.is = T) %>%
+  mutate(Type = rep(c("NPC", rep("glioma", 5)), 2))
+(HM_distrbution_figure <- ggplot(HM_distrbution, aes(Sample, genic_intergenic, fill = Type)) + 
+  geom_bar(stat = "identity", width = 0.5) + 
+  facet_wrap(~ Mark) + 
+  xlab("") + 
+  ylab("# gene-associated reads / # intergenic reads") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90)))
+ggsave(HM_distrbution_figure, file = "HM_distrbution_figure.pdf", width = 8, height = 6)
 
 ## -------- Chromatin states ----------
 chromHMM_summary <- read.delim("./ChromHMM/chromatin.states.summary", as.is = T) 
@@ -236,7 +288,7 @@ chromHMM_summary_tall <- melt(chromHMM_summary, id.vars = c("State", "Name"), va
 ggsave(chromHMM_summary_figure, file = "./ChromHMM/chromHMM_summary_figure.pdf")
 
 ## H3K36me3 methyltransferases expression
-Histone_modifiers_RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RNAseq/Histone.modifiers.RPKM", as.is = T) %>%
+Histone_modifiers_RPKM <- read.delim("../RNAseq/Histone.modifiers.RPKM", as.is = T) %>%
 	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Name")) %>% 
 	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
 	group_by(ENSG, Type) %>% summarize(Name = Name[1], mean = mean(value), sd = sd(value)) %>% mutate(sd = ifelse(is.na(sd), 0, sd))
@@ -250,8 +302,8 @@ Histone_modifiers_RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RN
 ggsave(Histone_modifiers_RPKM_figure, file = "Histone_modifiers_RPKM_figure.pdf", height = 5, width = 6)
 
 
-save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_5mC_heatmap", "homer_unique_K27ac_NPC_Sox3_DN", 
-							ls(pattern = "figure"), ls(pattern = "DAVID")), 
+save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_DN", 
+							ls(pattern = "figure"), ls(pattern = "heatmap"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
 
