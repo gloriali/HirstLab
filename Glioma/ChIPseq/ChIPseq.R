@@ -253,7 +253,7 @@ ggsave(H3K36me3_unique_NPC_5mC_heatmap, file = "./unique/H3K36me3/H3K36me3_uniqu
 for(lib in libs[1:5]){
   print(lib)
   assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib), read.delim(paste0("./unique/H3K36me3/", lib, ".vs.NPC_GE04.NPC_GE04.unique.H3K27me3.H3K36me3"), as.is = T))
-  assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure"), ggplot(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib)), aes(diff_H3K27me3, diff_H3K36me3)) + 
+  assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_density2d"), ggplot(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib)), aes(diff_H3K27me3, diff_H3K36me3)) + 
            geom_point(alpha = 0.2, size = 0.5) + 
            stat_density2d(aes(fill = ..level..), geom="polygon") + 
            coord_cartesian(xlim = c(-25, 25), ylim = c(-30, 0)) + 
@@ -261,8 +261,18 @@ for(lib in libs[1:5]){
            xlab("H3K27me3 normalized signal\nGlioma - NPC") + 
            ylab("H3K36me3 normalized signal\nGlioma - NPC") + 
            theme_bw())
-  print(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure")))
-  ggsave(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure")), file = paste0("./unique/H3K36me3/H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_figure.pdf"), height = 5, width = 6)
+  print(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_density2d")))
+  ggsave(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_density2d")), file = paste0("./unique/H3K36me3/H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_density2d.pdf"), height = 5, width = 6)
+  assign(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_hist"), ggplot(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib)), aes(diff_H3K27me3)) + 
+           geom_histogram(fill = "blue", binwidth = 0.1) + 
+           geom_vline(xintercept = 0) + 
+           coord_cartesian(xlim = c(-10, 10), ylim = c(0, 4000)) + 
+           ggtitle(lib) + 
+           xlab("H3K27me3 normalized signal\nGlioma - NPC") + 
+           ylab("No. of regions") + 
+           theme_bw())
+  print(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_hist")))
+  ggsave(get(paste0("H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_hist")), file = paste0("./unique/H3K36me3/H3K36me3_unique_NPC_K27me3_K36me3_", lib, "_hist.pdf"), height = 5, width = 6)
 }
 #### genic/intergenic distribution
 HM_distrbution <- read.delim("./bam/HM.distribution.summary", as.is = T) %>%
@@ -303,7 +313,7 @@ ggsave(Histone_modifiers_RPKM_figure, file = "Histone_modifiers_RPKM_figure.pdf"
 
 
 save(list = c("ER_summary", "ER_adjust_summary", "chromHMM_summary", "homer_unique_K27ac_NPC_Sox3_DN", 
-							ls(pattern = "figure"), ls(pattern = "heatmap"), ls(pattern = "DAVID")), 
+							ls(pattern = "figure"), ls(pattern = "heatmap"), ls(pattern = "density2d"), ls(pattern = "hist"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
 
