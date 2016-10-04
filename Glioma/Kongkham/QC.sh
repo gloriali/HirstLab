@@ -168,3 +168,46 @@ for bam in /projects/epigenomics2/users/lli/glioma/Kongkham/Vitc_hMC/*.sorted.du
     mv b $dirIn/CG.coverage.hMC
 done
 rm a
+
+# Merge bam files (IDH mut vs IDH wt)
+samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+java=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+picard=/home/pubseq/BioSw/picard/picard-tools-1.52/
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED # 28217448
+dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/bam/
+cd $dirIn
+for file in *.bam; do
+	sample=$(echo $file | sed 's/_.*//g');
+	name=$(echo $file | sed "s/$sample//g");
+	IDH=$(less ../Sample_info.txt | awk -F"\t" '{if($1=="'$sample'"){if($2=="positive"){print "_IDHmut"}else{print "_IDHwt"}}}');
+	new=$sample$IDH$name;
+	mv $file $new
+done
+$samtools merge IDHmut_MC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHmut_MC*trimmed.sorted.dupsFlagged.bam)
+$samtools merge IDHwt_MC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHwt_MC*trimmed.sorted.dupsFlagged.bam)
+$samtools merge IDHmut_hMC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHmut_hMC*trimmed.sorted.dupsFlagged.bam)
+$samtools merge IDHwt_hMC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHwt_hMC*trimmed.sorted.dupsFlagged.bam)
+for bam in *merge*.bam; do
+    name=$(echo $bam | sed -e 's/.bam//g')
+    echo $name
+    $samtools flagstat $dirIn/$name.bam > $dirIn/$name.flagstat
+    $bamstats -g 2864785220 -q 10 -b $dirIn/$name.bam  > $dirIn/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
+echo "Coverage" > $dirIn/CG.coverage.merge
+for i in {0..50}; do
+    echo $i >> $dirIn/CG.coverage.merge
+done
+echo ">50" >> $dirIn/CG.coverage.merge
+for bam in *merge*.bam; do
+    sample=$(echo $bam | sed 's/.trimmed.sorted.dupsFlagged.bam//g')
+    echo "Processing" $sample
+    echo $sample > x
+    less $CG | awk '{print "chr"$0}' | $BEDTOOLS/coverageBed -a stdin -b <($samtools view -q 5 -F 1028 -b $bam) -counts | awk 'BEGIN{for(i=0;i<=51;i++){s[i]=0}} {if($5>50){s[51]++} else {s[$5]++}} END{for(i=0;i<=51;i++){print s[i]}}' >>x
+    paste $dirIn/CG.coverage.merge x > y
+    mv y $dirIn/CG.coverage.merge
+done
+
