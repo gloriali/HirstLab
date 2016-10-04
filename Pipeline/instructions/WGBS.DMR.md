@@ -4,7 +4,7 @@
     + Reduce stochastic sampling bias
     + Combine coverage from both strand: greater statistical power
 * Input: novoalign output `.5mC.CpG` file
-* Output: `*.combine.5mC.CpG`; same format as novoalign output `chr  start   .   converted   unconverted`
+* Output: `*.combine.5mC.CpG`; format `chr  start   end   converted   unconverted   fraction_methylation`
 * Script: `/home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh`    
 * Suggested QC: genome-wide and CGI 5mC distribution    
 * Example:
