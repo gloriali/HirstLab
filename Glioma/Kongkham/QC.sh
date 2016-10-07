@@ -83,7 +83,9 @@ for bam in *_trimmed.bam; do
     $samtools flagstat $dirOut/$name.sorted.dupsFlagged.bam > $dirOut/$name.flagstat
     $bamstats -g 2864785220 -q 10 -b $dirOut/$name.sorted.dupsFlagged.bam  > $dirOut/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirOut/$name.bamstats
-    rm $dirOut/$bam $dirOut/$name.sorted.bam
+	if [ -s $name.sorted.dupsFlagged.bam ]; then
+		rm $dirOut/$bam $dirOut/$name.sorted.bam
+	fi
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
 dirIn=/projects/epigenomics2/users/mmingay/all_bam/hmedip/
@@ -189,6 +191,7 @@ $samtools merge IDHmut_MC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHmut_MC*t
 $samtools merge IDHwt_MC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHwt_MC*trimmed.sorted.dupsFlagged.bam)
 $samtools merge IDHmut_hMC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHmut_hMC*trimmed.sorted.dupsFlagged.bam)
 $samtools merge IDHwt_hMC_merge.trimmed.sorted.dupsFlagged.bam $(ls *IDHwt_hMC*trimmed.sorted.dupsFlagged.bam)
+## QC
 for bam in *merge*.bam; do
     name=$(echo $bam | sed -e 's/.bam//g')
     echo $name
@@ -210,4 +213,15 @@ for bam in *merge*.bam; do
     paste $dirIn/CG.coverage.merge x > y
     mv y $dirIn/CG.coverage.merge
 done
-
+## wig
+chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/Kongkham/wig/
+mkdir -p $dirOut
+for fl in 175 200 225; do
+	for bam in $dirIn/*merge*.bam; do
+		name=$(basename $bam | sed -e 's/.trimmed.sorted.dupsFlagged.bam//g')
+		echo $fl $name
+		/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirOut -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
+	done
+done
