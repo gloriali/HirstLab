@@ -9,7 +9,7 @@
     * `<chr>.<name>.cov` simplified file for Matlab input: `chr_start   normalized coverage`
 + Sample code:
 ```
-JAVA=/gsc/software/linux-x86_64/jre1.7.0_03/bin/java
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java
 csizes=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
 dirr=/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/
@@ -25,7 +25,7 @@ do
         chr="chr"$chr
         echo "$chr"
         mkdir -p $out/$chr
-        $JAVA -jar -Xmx15G $LIB/RegionsCoverageFromWigCalculator.jar -w $dirw/$name.wig.gz -r $dirr/$chr.gz -o $out/$chr -s $csizes -n $name
+        $JAVA -jar -Xmx15G $LIB/RegionsCoverageFromWigCalculator.jar -w $dirw/$name.wig.gz -r $dirr/$chr.gz -o $out/$chr -c $csizes -n $name
         less $out/$chr/*.coverage | awk '{gsub("chr", "", $1); print $1"_"$2"\t"$4}' > $out/$chr/$chr"."$name.cov
     done
 done
@@ -39,7 +39,7 @@ done
 + Output files:
     * CDF plot for fractional methylation calls per chr
     * Fractional methylation calls per chr: `<chr>.<name>.dip` file: `chr_start   fractional calls`
-+ Sample code: (Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2012b/bin/matlab`)
++ Sample code: (Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab`)
 ```
 addpath /home/mbilenky/matlab/dmr -end
 
