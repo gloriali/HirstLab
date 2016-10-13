@@ -215,13 +215,38 @@ for bam in *merge*.bam; do
 done
 ## wig
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/bam/
 dirOut=/projects/epigenomics2/users/lli/glioma/Kongkham/wig/
 mkdir -p $dirOut
-for fl in 175 200 225; do
-	for bam in $dirIn/*merge*.bam; do
-		name=$(basename $bam | sed -e 's/.trimmed.sorted.dupsFlagged.bam//g')
-		echo $fl $name
-		/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirOut -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
-	done
+fl=175
+for bam in $dirIn/*merge*.bam; do
+	name=$(basename $bam | sed -e 's/.trimmed.sorted.dupsFlagged.bam//g')
+	echo $fl $name
+	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirOut -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr
 done
+for file in $dirOut/*.wig.gz; do
+    name=$(basename $file | sed -e 's/.wig.gz//g')
+    echo "Processing" $name
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $file $chrsize /gsc/www/bcgsc.ca/downloads/mb/Kongkham/hg19/$name.bw
+done
+## generate 5mC calls
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+LIB=/home/mbilenky/bin/Solexa_Java
+csizes=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
+dirr=/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/
+dirw=/projects/epigenomics2/users/lli/glioma/Kongkham/wig/
+for file in $dirw/*.wig.gz; do
+    name=$(basename $file | sed -e 's/.wig.gz//g')
+    echo "$name"
+    out="/projects/epigenomics2/users/lli/glioma/Kongkham/CG_25_around_chr/"$name
+    mkdir -p $out
+    for chr in {1..22} "X" "Y"; do
+        chr="chr"$chr
+        echo "$chr"
+        mkdir -p $out/$chr
+        $JAVA -jar -Xmx15G $LIB/RegionsCoverageFromWigCalculator.jar -w $file -r $dirr/$chr.gz -o $out/$chr -c $csizes -n $name
+        less $out/$chr/*.coverage | awk '{gsub("chr", "", $1); print $1"_"$2"\t"$4}' > $out/$chr/$chr"."$name.cov
+    done
+done
+
