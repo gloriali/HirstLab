@@ -521,3 +521,29 @@ done
 ## Histone modifiers expression
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/
 less Histone.modifiers | sort -k2,2 | join - NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - RPKM/glioma.RPKM | sed 's/ /\t/g' > Histone.modifiers.RPKM
+
+## Global histone modification changes
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/global/
+mkdir -p $dirOut
+dirIn=/home/lli/FetalBrain/HisMod/wigs/
+libInfo=/projects/epigenomics/users/lli/FetalBrain/FetalBrainLibrariesDetail.tsv
+for wig in $dirIn/*.wig.gz; do
+	lib=$(basename $wig | cut -d'.' -f1)
+	name=$(less $libInfo | awk -F "\t" '$1~"'$lib'" {gsub("HuFNSC", "", $3); gsub("Primary Cell Culture Neurospheres, ", "", $4); gsub(" Derived", "", $4); gsub("Ganglionic Eminence", "GE", $4); print "NPC_"$4$3}')
+	mark=$(less $libInfo | awk '$1~"'$lib'" {print $2}')
+	echo $lib $mark $name
+	mkdir -p $dirOut/$mark/
+	$JAVA -jar -Xmx10G $RegCov -w $wig -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500
+done
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/
+for wig in $dirIn/*/*.wig.gz; do
+	name=$(basename $wig | cut -d'.' -f1)
+	mark=$(echo $wig | sed "s|$dirIn/||g" | sed "s/\\/.*//g")
+	mkdir -p $dirOut/$mark/
+	if [ $name != "NPC_GE04" ]; then
+		echo $mark $name
+		$JAVA -jar -Xmx10G $RegCov -w $wig -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500
+	fi
+done
