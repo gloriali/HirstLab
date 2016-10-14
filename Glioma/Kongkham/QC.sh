@@ -234,19 +234,26 @@ done
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java
 csizes=/projects/epigenomics/resources/UCSC_chr/hg19.chrom.sizes
-dirr=/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/
 dirw=/projects/epigenomics2/users/lli/glioma/Kongkham/wig/
-for file in $dirw/*.wig.gz; do
-    name=$(basename $file | sed -e 's/.wig.gz//g')
-    echo "$name"
-    out="/projects/epigenomics2/users/lli/glioma/Kongkham/CG_25_around_chr/"$name
-    mkdir -p $out
-    for chr in {1..22} "X" "Y"; do
-        chr="chr"$chr
-        echo "$chr"
-        mkdir -p $out/$chr
-        $JAVA -jar -Xmx15G $LIB/RegionsCoverageFromWigCalculator.jar -w $file -r $dirr/$chr.gz -o $out/$chr -c $csizes -n $name
-        less $out/$chr/*.coverage | awk '{gsub("chr", "", $1); print $1"_"$2"\t"$4}' > $out/$chr/$chr"."$name.cov
-    done
+for region in "CG_25_around_chr" "CG_empty_500_chr"; do
+	dirr=/projects/epigenomics/users/mbilenky/CpG/hg19/$region/
+	for file in $dirw/*.wig.gz; do
+		name=$(basename $file | sed -e 's/.wig.gz//g')
+		out=/projects/epigenomics2/users/lli/glioma/Kongkham/$region/$name
+		mkdir -p $out
+		for chr in {1..22} "X" "Y"; do
+			chr="chr"$chr
+			mkdir -p $out/$chr
+			echo $region $name $chr
+			$JAVA -jar -Xmx15G $LIB/RegionsCoverageFromWigCalculator.jar -w $file -r $dirr/$chr.gz -o $out/$chr -c $csizes -n $name
+			less $out/$chr/*.coverage | awk '{gsub("chr", "", $1); print $1"_"$2"\t"$4}' > $out/$chr/$chr"."$name.cov
+		done
+	done
+done
+dirIn=/projects/epigenomics2/users/lli/glioma/Kongkham/CG_25_around_chr/
+dirOut=/projects/epigenomics2/users/lli/glioma/Kongkham/
+for name in "IDHmut_hMC_merge.q5.F1028.SET_175" "IDHmut_MC_merge.q5.F1028.SET_175" "IDHwt_hMC_merge.q5.F1028.SET_175" "IDHwt_MC_merge.q5.F1028.SET_175"; do
+    echo $name
+    cat $dirIn/$name/*/*.dip > $dirOut/$name.dip
 done
 
