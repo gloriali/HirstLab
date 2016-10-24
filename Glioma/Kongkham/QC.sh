@@ -256,4 +256,11 @@ for name in "IDHmut_hMC_merge.q5.F1028.SET_175" "IDHmut_MC_merge.q5.F1028.SET_17
     echo $name
     cat $dirIn/$name/*/*.dip > $dirOut/$name.dip
 done
+cd $dirOut
+for file in *.dip; do
+	name=$(echo $file | sed 's/.dip//g')
+	echo $name
+	less $file | awk '{chr=gensub("_.*", "", "g", $1); start=gensub(".*_", "", "g", $1); print "chr"chr"\t"start+23"\t"start+25"\t"$2}' | sort -k1,1 -k2,2n -T /projects/epigenomics/temp/ > $dirOut/$name.bedGraph
+	/home/lli/HirstLab/Pipeline/UCSC/bedGraphToBigWig $dirOut/$name.bedGraph $csizes /gsc/www/bcgsc.ca/downloads/mb/Kongkham/hg19/$name.fractional.bw
+done
 
