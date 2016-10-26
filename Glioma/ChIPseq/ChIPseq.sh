@@ -230,7 +230,8 @@ genome=/home/lli/hg19/hg19.chrom.len
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
 gene=/home/lli/hg19/hg19v69_genes.bed
 intergenic=/home/lli/hg19/hg19v69_intergenic.bed
-$BEDTOOLS/intersectBed -a $gene -b /home/lli/hg19/hg19.chrlen.autoXY.bed -v | $BEDTOOLS/intersectBed -a $promoter -b stdin -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
+#$BEDTOOLS/intersectBed -a $gene -b /home/lli/hg19/hg19.chrlen.autoXY.bed -v | $BEDTOOLS/intersectBed -a $promoter -b stdin -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
+$BEDTOOLS/subtractBed -a /home/lli/hg19/hg19.chrlen.autoXY.bed -b $gene | $BEDTOOLS/subtractBed -a stdin -b $promoter | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
 echo -e "Sample\tMark\tMarked\tFC_genebody\tp_genebody\tFC_promoter\tp_promoter\tFC_intergenic\tp_intergenic" > $dirIn/DHM.enrich.summary
 for mark in H3K27me3 H3K36me3; do
