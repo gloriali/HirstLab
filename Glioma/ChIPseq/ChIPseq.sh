@@ -563,6 +563,17 @@ for bam in $dirIn/*.bam; do
 	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirIn/wigs/ -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr;
 	$JAVA -jar -Xmx10G $RegCov -w $(ls $dirIn/wigs/$name.*.wig.gz) -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500;
 done
+### Other CEMT
+for wig in /projects/edcc_new/reference_epigenomes/CEMT_*/bams/ChIP-Seq/*/wig/*.wig.gz; do
+	mark=$(echo $wig | cut -d'/' -f8);
+	lib=$(echo $wig | cut -d'/' -f5);
+	name="Other_"$lib; 
+	if [ $lib != "CEMT_19" ] && [ $lib != "CEMT_21" ] && [ $lib != "CEMT_22" ] && [ $lib != "CEMT_23" ] && [ $lib != "CEMT_47" ] && [ $lib != "CEMT_47_PB" ]; then
+		echo $mark $name;
+		echo $mark $name $(basename $wig) >> $dirOut/signal.log;
+		$JAVA -jar -Xmx10G $RegCov -w $wig -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500;
+	fi
+done
 ### compare
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/global/;
 for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
@@ -573,7 +584,7 @@ for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
 		less $file.sorted | awk '{if(NR<=400){print $0 >> "'$file'"".sorted.top"}else{print $0 >> "'$file'"".sorted.rest"}}';
 	done
 	for f1 in *CEMT*.coverage *NB141*.coverage; do
-		for f2 in *NPC*.coverage; do
+		for f2 in *NPC*.coverage *Other*.coverage; do
 			s1=$(basename $f1 | cut -d'.' -f4);
 			s2=$(basename $f2 | cut -d'.' -f4);
 			echo $mark $s1 $s2;
