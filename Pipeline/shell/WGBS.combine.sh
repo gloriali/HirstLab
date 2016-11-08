@@ -9,7 +9,7 @@ Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand> -c <cov> -f
     <file>: input file.      
     <CG.strand>: mapping of stranded CpG IDs and combined CpG IDs, default genome hg19
     <cov>: minimal coverage required, default to 3. 
-    <format>: input file format. novomethyl (default): chr\tposition\tQUAL\tcontext\tMQUAL\tfractional\tunconverted\tcoverage; novo5mC: chr\tposition\tstrand\tconverted\tunconverted; bismark: chr\tstart\tend\tfractional\tunconverted\tconverted."
+    <format>: input file format. novomethyl (default): chr\tposition\tQUAL\tcontext\tstrand\tMQUAL\tfractional\tunconverted\tcoverage; novo5mC: chr\tposition\tstrand\tconverted\tunconverted; bismark: chr\tstart\tend\tfractional\tunconverted\tconverted."
     exit 0
 fi
 
