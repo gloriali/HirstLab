@@ -578,18 +578,18 @@ done
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/global/;
 for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
 	cd $dirIn/$mark/;
-	echo -e "Samples\tMark\tType\tmin\tymin\tbottom\tmiddle\ttop\tymax\tmax" > $dirIn/$mark.glioma_NPC.quantile;
+	echo -e "S1\tS2\tMark\tType\tmin\tymin\tbottom\tmiddle\ttop\tymax\tmax" > $dirIn/$mark.glioma_NPC.quantile;
 	for file in *.coverage; do
-		less $file | awk '{if($4>0){print $1":"$2"-"$3"\t"$4}}' | sort -k2,2nr -T /projects/epigenomics/temp/ > $file.sorted;
+		less $file | awk '{if($4>0){print $1":"$2"-"$3"\t"$4}}' | sort -k2,2nr -T /genesis/scratch/epigenomics/lli/ > $file.sorted;
 		less $file.sorted | awk '{if(NR<=400){print $0 >> "'$file'"".sorted.top"}else{print $0 >> "'$file'"".sorted.rest"}}';
 	done
-	for f1 in *CEMT*.coverage *NB141*.coverage; do
+	for f1 in *CEMT_19*.coverage *CEMT_21*.coverage *CEMT_22*.coverage *CEMT_23*.coverage *CEMT_47*.coverage *NB141*.coverage; do
 		for f2 in *NPC*.coverage *Other*.coverage; do
 			s1=$(basename $f1 | cut -d'.' -f4);
 			s2=$(basename $f2 | cut -d'.' -f4);
 			echo $mark $s1 $s2;
-			join <(less $f1.sorted.top | sort -k1,1) <(less $f2.sorted.top | sort -k1,1) -t $'\t' | awk '{print $0"\t"$2/$3}' | sort -k4,4n | awk '{s[NR]=$4} END{print "'$s1'"".""'$s2'""\t""'$mark'""\ttop\t"s[1]"\t"s[int(NR/10)]"\t"s[int(NR/4)]"\t"s[int(NR/2)]"\t"s[NR-int(NR/4)]"\t"s[NR-int(NR/10)]"\t"s[NR]}' >> $dirIn/$mark.glioma_NPC.quantile;
-			join <(less $f1.sorted.rest | sort -k1,1 -T /projects/epigenomics/temp/) <(less $f2.sorted.rest | sort -k1,1 -T /projects/epigenomics/temp/) -t $'\t' | awk '{print $0"\t"$2/$3}' | sort -k4,4n -T /projects/epigenomics/temp/ | awk '{s[NR]=$4} END{print "'$s1'"".""'$s2'""\t""'$mark'""\trest\t"s[1]"\t"s[int(NR/10)]"\t"s[int(NR/4)]"\t"s[int(NR/2)]"\t"s[NR-int(NR/4)]"\t"s[NR-int(NR/10)]"\t"s[NR]}' >> $dirIn/$mark.glioma_NPC.quantile;
+			join <(less $f1.sorted.top | sort -k1,1) <(less $f2.sorted.top | sort -k1,1) -t $'\t' | awk '{print $0"\t"$2/$3}' | sort -k4,4n | awk '{s[NR]=$4} END{print "'$s1'""\t""'$s2'""\t""'$mark'""\ttop\t"s[1]"\t"s[int(NR/10)]"\t"s[int(NR/4)]"\t"s[int(NR/2)]"\t"s[NR-int(NR/4)]"\t"s[NR-int(NR/10)]"\t"s[NR]}' >> $dirIn/$mark.glioma_NPC.quantile;
+			join <(less $f1.sorted.rest | sort -k1,1 -T /genesis/scratch/epigenomics/lli/) <(less $f2.sorted.rest | sort -k1,1 -T /genesis/scratch/epigenomics/lli/) -t $'\t' | awk '{print $0"\t"$2/$3}' | sort -k4,4n -T /genesis/scratch/epigenomics/lli/ | awk '{s[NR]=$4} END{print "'$s1'""\t""'$s2'""\t""'$mark'""\tglobal\t"s[1]"\t"s[int(NR/10)]"\t"s[int(NR/4)]"\t"s[int(NR/2)]"\t"s[NR-int(NR/4)]"\t"s[NR-int(NR/10)]"\t"s[NR]}' >> $dirIn/$mark.glioma_NPC.quantile;
 		done
 	done
 done
