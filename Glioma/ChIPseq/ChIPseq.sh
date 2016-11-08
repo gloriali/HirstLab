@@ -522,6 +522,9 @@ done
 ## Histone modifiers expression
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/
 less Histone.modifiers | sort -k2,2 | join - NPC_RPKM/NPC.RPKM -1 2 -2 1 | join - RPKM/glioma.RPKM | sed 's/ /\t/g' > Histone.modifiers.RPKM
+## HOXA/B expression
+cd /projects/epigenomics2/users/lli/glioma/RNAseq/
+less /home/lli/hg19/HOXA.HOXB.txt | sort -k1,1 | join - NPC_RPKM/NPC.RPKM | join - RPKM/glioma.RPKM | sed 's/ /\t/g' > HOXA.HOXB.RPKM
 
 ## Global histone modification changes
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
