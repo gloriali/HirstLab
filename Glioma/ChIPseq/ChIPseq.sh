@@ -583,6 +583,7 @@ for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
 	cd $dirIn/$mark/;
 	echo -e "S1\tS2\tMark\tType\tmin\tymin\tbottom\tmiddle\ttop\tymax\tmax" > $dirIn/$mark.glioma_NPC.quantile;
 	for file in *.coverage; do
+		echo $mark $file
 		less $file | awk '{if($4>0){print $1":"$2"-"$3"\t"$4}}' | sort -k2,2nr -T /genesis/scratch/epigenomics/lli/ > $file.sorted;
 		less $file.sorted | awk '{if(NR<=400){print $0 >> "'$file'"".sorted.top"}else{print $0 >> "'$file'"".sorted.rest"}}';
 	done
