@@ -596,6 +596,9 @@ for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
 			join <(less $f1.sorted.rest | sort -k1,1 -T /genesis/scratch/epigenomics/lli/) <(less $f2.sorted.rest | sort -k1,1 -T /genesis/scratch/epigenomics/lli/) -t $'\t' | awk '{print $0"\t"$2/$3}' | sort -k4,4n -T /genesis/scratch/epigenomics/lli/ | awk '{s[NR]=$4} END{print "'$s1'""\t""'$s2'""\t""'$mark'""\tglobal\t"s[1]"\t"s[int(NR/10)]"\t"s[int(NR/4)]"\t"s[int(NR/2)]"\t"s[NR-int(NR/4)]"\t"s[NR-int(NR/10)]"\t"s[NR]}' >> $dirIn/$mark.glioma_NPC.quantile;
 		done
 	done
+        file1=genomeProfile.bin500.step500.CEMT_19.coverage
+        file2=genomeProfile.bin500.step500.NPC_GE04.coverage
+        join <(less $file1 | awk '{print $1":"$2"-"$3"\t"$4}') <(less $file1 | awk '{print $1":"$2"-"$3"\t"$4}') | awk '{if($2+$3>0){print $1"\t"$2"\t"$3}}' > CEMT_19.NPC_GE04.coverage
 done
 
 
