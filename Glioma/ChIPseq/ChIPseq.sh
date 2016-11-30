@@ -7,7 +7,7 @@ for lib in 19 21 22 23 47; do
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
         echo $lib $mark
         mkdir -p $dirOut/$mark/
-        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER.1.0.0b/*.FDR_0.05.FindER.bed.gz $dirOut/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz   
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER.1.0.0b/*.FDR_0.05.FindER.bed.gz $dirOut/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz
     done
 done
 
@@ -81,7 +81,7 @@ for i in {1..50}; do
     $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/H3K27me3/A37109.CEMT_47.bam -inputBam $dirIn/input/A37112.CEMT_47.bam -out $dirOut -fractionS 0.4 > $dirOut/H3K27me3_CEMT_47_f.4.out
     $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/H3K9me3/A37108.CEMT_47.bam -inputBam $dirIn/input/A37112.CEMT_47.bam -out $dirOut -fractionS 0.5 > $dirOut/H3K9me3_CEMT_47_f.5.out
     $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/H3K4me1/A33467.CEMT_21.bam -inputBam $dirIn/input/A33473.CEMT_21.bam -out $dirOut -fractionS 0.4 > $dirOut/H3K4me1_CEMT_21_f.4.out
-    
+
     for file in *.bed.gz; do
         name=$(echo $file | sed -e 's/\..*//g')
         mark=$(less $dirOut/library.adjust | awk '$3 ~ /'"$name"'/ {print $1}')
@@ -106,7 +106,7 @@ for lib in 19 21 22 23 47; do
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
         echo $lib $mark
         mkdir -p $dirOut/$mark/
-        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*.wig.gz $dirOut/$mark/CEMT_$lib.wig.gz   
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*.wig.gz $dirOut/$mark/CEMT_$lib.wig.gz
     done
 done
 dirIn=/home/lli/FetalBrain/HisMod/wigs/
@@ -119,7 +119,7 @@ ln -s $dirIn/A19308.*.wig.gz $dirOut/H3K27ac/NPC_GE04.wig.gz
 ln -s $dirIn/A19309.*.wig.gz $dirOut/Input/NPC_GE04.wig.gz
 
 ## differentially marked regions from FindER peaks and wig singal files
-### test: how to set the background coverage cutoff? 
+### test: how to set the background coverage cutoff?
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
 dirOut=$dirIn/unique/test/
 mkdir -p $dirOut
@@ -167,7 +167,7 @@ for lib in 19 21 22 23 47; do
 done
 less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
 
-#### method2: non-overlapping ER 
+#### method2: non-overlapping ER
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique2/ER.unique.summary
@@ -200,7 +200,7 @@ dirDE=/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
 echo -e "Sample\tMark\tMarked\tDE\tN_DM_promoter\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirIn/DHM.DE.summary
 n_total=19865
-for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do 
+for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
     cd $dirIn/$mark/
     dirOut=$dirIn/$mark/DE/
     mkdir -p $dirOut
@@ -239,16 +239,16 @@ for mark in H3K27me3 H3K36me3; do
     for file in *.unique; do
         sample=$(echo $file | sed 's/.vs.*//g')
         marked=$(echo $file | sed 's/.unique//g' | sed 's/.*.vs.NPC_GE04.//g')
-        echo $sample $mark $marked 
+        echo $sample $mark $marked
         fc_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
         p_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
         fc_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
         p_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
         fc_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
         p_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
-        echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary        
+        echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary
     done
-done    
+done
 ### genic/intergenic distribution
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
@@ -260,13 +260,13 @@ for mark in H3K27me3 H3K36me3; do
     cd $dirIn/$mark/
     for bam in *.bam; do
         sample=$(echo $bam | sed 's/.bam//g' | sed 's/A[0-9]*.//g')
-        echo $sample $mark 
+        echo $sample $mark
         n_gene=$($samtools view -q 5 -F 1028 -L $gene $bam | wc -l)
         n_promoter=$($samtools view -q 5 -F 1028 -L $promoter $bam | wc -l)
         n_intergenic=$($samtools view -q 5 -F 1028 -L $intergenic $bam | wc -l)
-        echo -e "$sample\t$mark\t$n_gene\t$n_promoter\t$n_intergenic" | awk '{print $0"\t"($3+$4)/$5}' >> $dirIn/HM.distribution.summary       
+        echo -e "$sample\t$mark\t$n_gene\t$n_promoter\t$n_intergenic" | awk '{print $0"\t"($3+$4)/$5}' >> $dirIn/HM.distribution.summary
     done
-done    
+done
 
 ## unique enhancers
 ### Homer for TFBS motifs
@@ -286,7 +286,7 @@ for mark in H3K27ac H3K4me1; do
         echo "Processing "$mark $name
         dirOut=$dirIn/$mark/homer/$name/
         mkdir -p $dirOut
-        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8 
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut -size 200 -len 8
     done
 done
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
@@ -335,7 +335,7 @@ for mark in H3K27ac H3K4me1; do
         sample=$(echo $file | sed -e 's/.vs.*//g')
         echo "Processing "$mark $sample $name
         $BEDTOOLS/intersectBed -a $file -b $dirDMR/DMR.$sample'_NPC.hypo.bed' | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$name.unique.UMR.bed
-    done    
+    done
     for file in CEMT*.vs.NPC_GE04.NPC_GE04.unique; do
         name=$(echo $file | sed -e 's/.unique//g')
         sample=$(echo $file | sed -e 's/.vs.*//g')
@@ -359,8 +359,8 @@ for mark in H3K27ac H3K4me1; do
         name=$(echo $file | sed -e 's/.unique.UMR.bed//g')
         echo "Processing homer for "$mark $name
         mkdir -p $dirOut/homer/$name/
-        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
-    done    
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8
+    done
 done
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
 for mark in H3K27ac H3K4me1; do
@@ -435,7 +435,7 @@ for file in *.annotate; do
     join $file.closest.gene.RPKM $dirRPKM/DEfine/DN.IDHmut.NPC | sed 's/ /\t/g' > $file.closest.gene.RPKM.DN
 done
 
-### Loss of H3K36me3 
+### Loss of H3K36me3
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
@@ -507,7 +507,7 @@ for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/NPC_GE04.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K27me3 >> $dirIn/$file.H3K27me3.log
     echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K27me3" > b
     join *$file.$sample.H3K27me3.coverage *$file.NPC_GE04.H3K27me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
-    join a b | sed 's/ /\t/g' > $file.H3K27me3    
+    join a b | sed 's/ /\t/g' > $file.H3K27me3
     cov_glioma=$(less /projects/epigenomics2/users/lli/glioma/ChIPseq/H3K36me3.depth | awk '{if($1=="'$sample'"){print $2}}')
     cov_GE04=53179871
     $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/$sample.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.$sample.H3K36me3 > $dirIn/$file.H3K36me3.log
@@ -515,7 +515,7 @@ for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K36me3" > b
     join *$file.$sample.H3K36me3.coverage *$file.NPC_GE04.H3K36me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
     join a b | sed 's/ /\t/g' > $file.H3K36me3
-    join $file.H3K27me3 $file.H3K36me3 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"$7"\t"$13}' > $file.H3K27me3.H3K36me3 
+    join $file.H3K27me3 $file.H3K36me3 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"$7"\t"$13}' > $file.H3K27me3.H3K36me3
     rm *$file.$sample.H3K*me3* *$file.NPC_GE04.H3K*me3* a b
 done
 
@@ -557,12 +557,12 @@ done
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/NB141/
 mkdir -p $dirIn/wigs/
-fl=$(echo 175 | awk '{print $1}'); 
+fl=$(echo 175 | awk '{print $1}');
 for bam in $dirIn/*.bam; do
 	name=$(basename $bam | sed -e 's/.bam//g');
 	mark=$(echo $name | sed 's/NB141.//g')
 	echo $mark $name;
-	mkdir -p $dirOut/$mark/; 
+	mkdir -p $dirOut/$mark/;
 	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirIn/wigs/ -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr;
 	$JAVA -jar -Xmx10G $RegCov -w $(ls $dirIn/wigs/$name.*.wig.gz) -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500;
 done
@@ -570,7 +570,7 @@ done
 for wig in /projects/edcc_new/reference_epigenomes/CEMT_*/bams/ChIP-Seq/*/wig/*.wig.gz; do
 	mark=$(echo $wig | cut -d'/' -f8);
 	lib=$(echo $wig | cut -d'/' -f5);
-	name="Other_"$lib; 
+	name="Other_"$lib;
 	if [ $lib != "CEMT_19" ] && [ $lib != "CEMT_21" ] && [ $lib != "CEMT_22" ] && [ $lib != "CEMT_23" ] && [ $lib != "CEMT_47" ] && [ $lib != "CEMT_47_PB" ]; then
 		echo $mark $name;
 		echo $mark $name $(basename $wig) >> $dirOut/signal.log;
