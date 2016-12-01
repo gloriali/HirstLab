@@ -32,7 +32,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
       ggtitle(paste("No. of CpGs per DMR -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
       facet_wrap(~ DM) + 
-      theme_bw()
+      theme_bw() + 
+    	theme(axis.text.x = element_text(angle = 90))
     ggsave(DMR_count_figure, file = paste0(dirOut, "/CpGcount_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("adjacentDis" %in% figures){
@@ -46,7 +47,8 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
       ggtitle(paste("Distance between DMRs -", sample1, "vs", sample2, "DMRs")) + 
       guides(fill = F) + 
       facet_wrap(~ DM) + 
-      theme_bw()
+      theme_bw() + 
+    	theme(axis.text.x = element_text(angle = 90))
     ggsave(DMR_dis_figure, file = paste0(dirOut, "/DMRdis_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   }
   if("frequency" %in% figures){
