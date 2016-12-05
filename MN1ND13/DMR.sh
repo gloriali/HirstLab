@@ -2,10 +2,10 @@
 
 ## global QC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics2/users/lli/MN1ND13/DMR/
+dirIn=/projects/epigenomics2/PING/DMR/
 mkdir -p $dirIn
-ln -s /projects/edcc_prj2/bs-seq/PX0409/PX0409_ACCCAG_4_lanes_dupsFlagged.ClipOverlap.Cmethyl.cons.bed.CpG.txt.gz /projects/epigenomics2/users/lli/MN1ND13/DMR/A04_MN1ND13_DP.bed.CpG.txt.gz
-ln -s /projects/edcc_prj2/bs-seq/PX0409/PX0409_AGCGCT_4_lanes_dupsFlagged.ClipOverlap.Cmethyl.cons.bed.CpG.txt.gz /projects/epigenomics2/users/lli/MN1ND13/DMR/A05_MN1ND13_DN.bed.CpG.txt.gz
+ln -s /projects/edcc_prj2/bs-seq/PX0409/PX0409_ACCCAG_4_lanes_dupsFlagged.ClipOverlap.Cmethyl.cons.bed.CpG.txt.gz /projects/epigenomics2/PING/DMR/A04_MN1ND13_DP.bed.CpG.txt.gz
+ln -s /projects/edcc_prj2/bs-seq/PX0409/PX0409_AGCGCT_4_lanes_dupsFlagged.ClipOverlap.Cmethyl.cons.bed.CpG.txt.gz /projects/epigenomics2/PING/DMR/A05_MN1ND13_DN.bed.CpG.txt.gz
 echo -e "sample\ttype\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc.5mC.quantile # QC: genome-wide and CGI methylation level summary; ymin: 10% quantile, ymax: 90% quantile
 cd $dirIn
 for file in *.bed.CpG.txt.gz; do
@@ -20,7 +20,7 @@ join <(less A04_MN1ND13_DP.bed.CpG.txt.gz.combine.5mC.CpG | awk '{print $1":"$2"
 
 ## DMRs
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics2/users/lli/MN1ND13/DMR/
+dirIn=/projects/epigenomics2/PING/DMR/
 file1=A04_MN1ND13_DP.bed.CpG.txt.gz.combine.5mC.CpG;
 file2=A05_MN1ND13_DN.bed.CpG.txt.gz.combine.5mC.CpG;
 name=DP_DN;
@@ -36,7 +36,7 @@ pth=0.005; delta=0.5; m=0.6; cov=3; size=500; cut=3;
 
 ## Compare to CD34+ cells
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics2/users/lli/MN1ND13/DMR/
+dirIn=/projects/epigenomics2/PING/DMR/
 ln -s /projects/edcc_prj2/bs-seq/a34042/A34042_3_lanes_dupsFlagged.q5.f0.5mC.CpG $dirIn/CEMT_32_CD34.5mC.CpG
 file=CEMT_32_CD34.5mC.CpG
 lib=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/CEMT_32_//g')
