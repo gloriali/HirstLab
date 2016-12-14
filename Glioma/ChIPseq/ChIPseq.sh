@@ -247,51 +247,7 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
     done
 done
 
-## K27me3 and K36me3
-### enrichment in promoters genebody and intergenic regions
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
-genome=/home/lli/hg19/hg19.chrom.len
-promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
-gene=/home/lli/hg19/hg19v69_genes.bed
-intergenic=/home/lli/hg19/hg19v69_intergenic.bed
-#$BEDTOOLS/intersectBed -a $gene -b /home/lli/hg19/hg19.chrlen.autoXY.bed -v | $BEDTOOLS/intersectBed -a $promoter -b stdin -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
-$BEDTOOLS/subtractBed -a /home/lli/hg19/hg19.chrlen.autoXY.bed -b $gene | $BEDTOOLS/subtractBed -a stdin -b $promoter | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
-echo -e "Sample\tMark\tMarked\tFC_genebody\tp_genebody\tFC_promoter\tp_promoter\tFC_intergenic\tp_intergenic" > $dirIn/DHM.enrich.summary
-for mark in H3K27me3 H3K36me3; do
-    cd $dirIn/$mark/
-    for file in *.unique; do
-        sample=$(echo $file | sed 's/.vs.*//g')
-        marked=$(echo $file | sed 's/.unique//g' | sed 's/.*.vs.NPC_GE04.//g')
-        echo $sample $mark $marked
-        fc_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
-        p_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
-        fc_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
-        p_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
-        fc_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
-        p_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
-        echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary
-    done
-done
-### genic/intergenic distribution
-samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
-promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
-gene=/home/lli/hg19/hg19v69_genes.bed
-intergenic=/home/lli/hg19/hg19v69_intergenic.bed
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
-echo -e "Sample\tMark\tgenebody\tpromoter\tintergenic\tgenic_intergenic" > $dirIn/HM.distribution.summary
-for mark in H3K27me3 H3K36me3; do
-    cd $dirIn/$mark/
-    for bam in *.bam; do
-        sample=$(echo $bam | sed 's/.bam//g' | sed 's/A[0-9]*.//g')
-        echo $sample $mark
-        n_gene=$($samtools view -q 5 -F 1028 -L $gene $bam | wc -l)
-        n_promoter=$($samtools view -q 5 -F 1028 -L $promoter $bam | wc -l)
-        n_intergenic=$($samtools view -q 5 -F 1028 -L $intergenic $bam | wc -l)
-        echo -e "$sample\t$mark\t$n_gene\t$n_promoter\t$n_intergenic" | awk '{print $0"\t"($3+$4)/$5}' >> $dirIn/HM.distribution.summary
-    done
-done
+########################################################
 
 ## unique enhancers
 ### Homer for TFBS motifs
@@ -460,6 +416,53 @@ for file in *.annotate; do
     join $file.closest.gene.RPKM $dirRPKM/DEfine/DN.IDHmut.NPC | sed 's/ /\t/g' > $file.closest.gene.RPKM.DN
 done
 
+########################################################
+
+## K27me3 and K36me3
+### enrichment in promoters genebody and intergenic regions
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+intergenic=/home/lli/hg19/hg19v69_intergenic.bed
+#$BEDTOOLS/intersectBed -a $gene -b /home/lli/hg19/hg19.chrlen.autoXY.bed -v | $BEDTOOLS/intersectBed -a $promoter -b stdin -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
+$BEDTOOLS/subtractBed -a /home/lli/hg19/hg19.chrlen.autoXY.bed -b $gene | $BEDTOOLS/subtractBed -a stdin -b $promoter | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $intergenic
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/
+echo -e "Sample\tMark\tMarked\tFC_genebody\tp_genebody\tFC_promoter\tp_promoter\tFC_intergenic\tp_intergenic" > $dirIn/DHM.enrich.summary
+for mark in H3K27me3 H3K36me3; do
+    cd $dirIn/$mark/
+    for file in *.unique; do
+        sample=$(echo $file | sed 's/.vs.*//g')
+        marked=$(echo $file | sed 's/.unique//g' | sed 's/.*.vs.NPC_GE04.//g')
+        echo $sample $mark $marked
+        fc_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_promoter=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $promoter | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        fc_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_gene=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $gene | awk '$1 !~ /GL|name/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        fc_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p_intergenic=$(less $file | sort -k1,1 -k2,2n | $BEDTOOLS/bedtools fisher -a stdin -b <(less $intergenic | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        echo -e "$sample\t$mark\t$marked\t$fc_gene\t$p_gene\t$fc_promoter\t$p_promoter\t$fc_intergenic\t$p_intergenic" >> $dirIn/DHM.enrich.summary
+    done
+done
+### genic/intergenic distribution
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+intergenic=/home/lli/hg19/hg19v69_intergenic.bed
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
+echo -e "Sample\tMark\tgenebody\tpromoter\tintergenic\tgenic_intergenic" > $dirIn/HM.distribution.summary
+for mark in H3K27me3 H3K36me3; do
+    cd $dirIn/$mark/
+    for bam in *.bam; do
+        sample=$(echo $bam | sed 's/.bam//g' | sed 's/A[0-9]*.//g')
+        echo $sample $mark
+        n_gene=$($samtools view -q 5 -F 1028 -L $gene $bam | wc -l)
+        n_promoter=$($samtools view -q 5 -F 1028 -L $promoter $bam | wc -l)
+        n_intergenic=$($samtools view -q 5 -F 1028 -L $intergenic $bam | wc -l)
+        echo -e "$sample\t$mark\t$n_gene\t$n_promoter\t$n_intergenic" | awk '{print $0"\t"($3+$4)/$5}' >> $dirIn/HM.distribution.summary
+    done
+done
 ### Loss of H3K36me3
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
@@ -468,6 +471,26 @@ cd $dirIn
 $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC_NPC.unique
 cat CEMT_23.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC_NPC.unique
 $BEDTOOLS/intersectBed -a IDHmut_NPC_NPC.unique -b IDHwt_NPC_NPC.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDH_NPC_NPC.unique
+#### significance of intersect
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/
+lib=( CEMT_19 CEMT_21 CEMT_22 CEMT_23 CEMT_47 )
+echo -e "Sample1\tSample2\tN1\tN2\tIntersect\tFC\tPvalue" > $dirOut/H3K36me3.loss.intersect.summary
+cd $dirOut; 
+for i in {0..3}; do
+    for ((j = i+1; j < 5; j++)); do
+        sample1=${lib[$i]}; sample2=${lib[$j]};
+        file1=$sample1.vs.NPC_GE04.NPC_GE04.unique; file2=$sample2.vs.NPC_GE04.NPC_GE04.unique;
+        echo $sample1 $sample2;
+        n1=$(less $file1 | wc -l); n2=$(less $file2 | wc -l);
+        intersect=$($BEDTOOLS/intersectBed -a $file1 -b $file2 | wc -l);
+        fc=$($BEDTOOLS/bedtools fisher -a <(less $file1 | sort -k1,1 -k2,2n) -b <(less $file2| sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+        p=$($BEDTOOLS/bedtools fisher -a <(less $file1 | sort -k1,1 -k2,2n) -b <(less $file2| sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+        echo -e "$sample1\t$sample2\t$n1\t$n2\t$intersect\t$fc\t$p" >> $dirOut/H3K36me3.loss.intersect.summary
+    done
+done
 #### associate with DE
 echo -e "File\tN_K36\tN_UP\tN_DN\tN_K36_UP\tN_K36_DN" > $dirIn/H3K36me3_loss_DE.summary
 for file in *.vs.NPC_GE04.NPC_GE04.unique; do
