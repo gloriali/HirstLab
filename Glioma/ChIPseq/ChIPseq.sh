@@ -569,6 +569,48 @@ for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     join $file.H3K27me3 $file.H3K36me3 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"$7"\t"$13}' > $file.H3K27me3.H3K36me3
     rm *$file.$sample.H3K*me3* *$file.NPC_GE04.H3K*me3* a b
 done
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+gene=/home/lli/hg19/hg19v69_genes.bed
+cutoff=2
+echo -e "Sample\tH3K27me3\tN_total\tN\tFC_gene\tP_gene" > $dirIn/H3K36me3.loss.H3K27me3.summary
+for file in *.H3K27me3.H3K36me3; do
+    lib=$(echo $file | sed 's/.vs.NPC_GE04.NPC_GE04.unique.H3K27me3.H3K36me3//g')
+    echo $lib
+    less $file | awk 'NR>1 {if($5>="'$cutoff'"){print $1"\t"$2"\t"$3"\t"$4}}' > $dirIn/$file.K27gain
+    less $file | awk 'NR>1 {if($5<=-"'$cutoff'"){print $1"\t"$2"\t"$3"\t"$4}}' > $dirIn/$file.K27loss
+    n_total=$(less $file | wc -l); n_gain=$(less $file.K27gain | wc -l); n_loss=$(less $file.K27loss | wc -l);
+    fc_gain=$($BEDTOOLS/bedtools fisher -a <(less $file.K27gain | sort -k1,1 -k2,2n) -b <(less $gene | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+    p_gain=$($BEDTOOLS/bedtools fisher -a <(less $file.K27gain | sort -k1,1 -k2,2n) -b <(less $gene | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+    fc_loss=$($BEDTOOLS/bedtools fisher -a <(less $file.K27loss | sort -k1,1 -k2,2n) -b <(less $gene | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+    p_loss=$($BEDTOOLS/bedtools fisher -a <(less $file.K27loss | sort -k1,1 -k2,2n) -b <(less $gene | awk '$1 !~ /GL/ {print "chr"$0}' | sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+    echo -e "$lib\tgain\t$n_total\t$n_gain\t$fc_gain\t$p_gain" >> $dirIn/H3K36me3.loss.H3K27me3.summary
+    echo -e "$lib\tloss\t$n_total\t$n_loss\t$fc_loss\t$p_loss" >> $dirIn/H3K36me3.loss.H3K27me3.summary
+done
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+genome=/home/lli/hg19/hg19.chrom.len
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/
+lib=( CEMT_19 CEMT_21 CEMT_22 CEMT_23 CEMT_47 )
+echo -e "Sample1\tSample2\tK27\tN1\tN2\tIntersect\tFC\tPvalue" > $dirOut/H3K36me3.loss.H3K27me3.intersect.summary
+cd $dirOut;
+for K27 in gain loss; do
+    for i in {0..3}; do
+        for ((j = i+1; j < 5; j++)); do
+            sample1=${lib[$i]}; sample2=${lib[$j]};
+            file1=$sample1'.vs.NPC_GE04.NPC_GE04.unique.H3K27me3.H3K36me3.K27'$K27; file2=$sample2'.vs.NPC_GE04.NPC_GE04.unique.H3K27me3.H3K36me3.K27'$K27;
+            echo $sample1 $sample2 $K27;
+            n1=$(less $file1 | wc -l); n2=$(less $file2 | wc -l);
+            intersect=$($BEDTOOLS/intersectBed -a $file1 -b $file2 | wc -l);
+            fc=$($BEDTOOLS/bedtools fisher -a <(less $file1 | sort -k1,1 -k2,2n) -b <(less $file2| sort -k1,1 -k2,2n) -g $genome | awk 'NR==1{gsub(".*: ", ""); a=$1} NR==2{gsub(".*: ", ""); b=$1} NR==3{gsub(".*: ", ""); i=$1} NR==4{gsub(".*: ", ""); t=$1} END{print (i/a)/(b/t)}')
+            p=$($BEDTOOLS/bedtools fisher -a <(less $file1 | sort -k1,1 -k2,2n) -b <(less $file2| sort -k1,1 -k2,2n) -g $genome | awk 'NR==5 {gsub("# ", ""); print}' | $R - | sed -e 's/\[1\] //g')
+            echo -e "$sample1\t$sample2\t$K27\t$n1\t$n2\t$intersect\t$fc\t$p" >> $dirOut/H3K36me3.loss.H3K27me3.intersect.summary
+        done
+    done
+done
+cat *.H3K27me3.H3K36me3.K27gain | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > IDH_NPC_NPC.unique.H3K27me3.H3K36me3.K27gain
+cat *.H3K27me3.H3K36me3.K27loss | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > IDH_NPC_NPC.unique.H3K27me3.H3K36me3.K27loss
 
 ## Histone modifiers expression
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/
