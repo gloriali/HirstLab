@@ -443,6 +443,7 @@ cd $dirIn
 $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC_NPC.unique
 cat CEMT_23.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC_NPC.unique
 $BEDTOOLS/intersectBed -a IDHmut_NPC_NPC.unique -b IDHwt_NPC_NPC.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDH_NPC_NPC.unique
+#### associate with DE
 echo -e "File\tN_K36\tN_UP\tN_DN\tN_K36_UP\tN_K36_DN" > $dirIn/H3K36me3_loss_DE.summary
 for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     echo $file
@@ -467,6 +468,7 @@ for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     N_K36_DN=$(less $file.gene.RPKM.DN | awk '{print $1}' | uniq | wc -l)
     echo -e "$file\t$N_K36\t$N_UP\t$N_DN\t$N_K36_UP\t$N_K36_DN" >> $dirIn/H3K36me3_loss_DE.summary
 done
+#### associate with RPKM and 5mC
 for file in IDH*.unique; do
     echo $file
     echo -e "ID\tchr\tstart\tend" > x
@@ -490,6 +492,7 @@ for file in IDH*.unique; do
     N_K36_DN=$(less $file.gene.RPKM.DN | awk '{print $1}' | uniq | wc -l)
     echo -e "$file\t$N_K36\t$N_UP\t$N_DN\t$N_K36_UP\t$N_K36_DN" >> $dirIn/H3K36me3_loss_DE.summary
 done
+#### assocaite with H3K27me3
 dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/H3K36me3/'
 dirWig=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
