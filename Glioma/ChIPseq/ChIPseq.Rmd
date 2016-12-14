@@ -8,6 +8,7 @@ output:
     toc: true
     toc_float: true
     toc_depth: 4
+    code_folding: hide
 ---
 
 Updated: `r date()`
@@ -30,15 +31,21 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/ChIPseq
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
+## Global comparison
+* Calculate an average signal of 500bp bins for both samples.           
+* Look into only bins that that have non zero signal in both.       
+* Find bins that are common in top 400 bins in both samples, likely blacklist regions, e.g. tandem repeats.       
+* Plot box plot for the ratio log2(signal2/signal1) in top bins.       
+* Compare it the same ratio for the rest of the bins.       
+* Results and conclusion: inconsistency in input samples suggest that this method is not accurate when comparing samples from different biological origins, maybe due to genetic differences in these blacklist regions, e.g. different number of copies of the repeats. Thus these top ranked regions cannot be used as normalization standard.   
+
+```{r global}
+(global_H3K36me3_figure)
+(global_H3K27me3_figure)
+(global_Input_figure)
+```
+
 ## FindER enriched regions 
-* Some libraries were much more deeply sequenced than others, i.e. CEMT_47, might lead to increased enriched regions due to increased sequencing depth.     
-* Subsample bam files of deeply sequenced libraries to the average coverage of other libraries of the same mark (ran 50 times), and re-run FindER:   
-	+ CEMT_21 H3K4me1: 0.4
-	+ CEMT_47 H3K4me1: 0.4
-	+ CEMT_47 H3K9me3: 0.5
-	+ CEMT_47 H3K27me3: 0.4
-	+ CEMT_47 H3K27ac: 0.3
-* Subsampled libraries (panel 2 and 4) had less enriched regions, but were able to retain the majority of enriched regions.    
 * FindER v 1.0.0b      
 
 ```{r ER_summary}
@@ -54,9 +61,63 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 	+ Randomly generate a set of background regions (not overlapping with S2 ER) with same length as S1 ER.   
 	+ Calculate signal for these background regions in S2 wig, use 90% quantile as cutoff. 
 	+ S1 unique ER: S1 ER with signal < background cutoff in S2.   
+	
 ```{r unique_ER_summary, fig.height=5}
 (ER_unique_summary_figure)
 ```
+
+### Loss of H3K36me3      
+* Global loss of H3K36me3 in both IDH mutant and wt gliomas.   
+* H3K36me3 loss regions are enriched in genebody but not intergenic regions, while H3K36me3 gain regions are also enriched in intergenic regions.      
+
+```{r K36_loss}
+(H3K36me3_unique_summary_figure)
+(H3K36me3_unique_enrich_summary_figure)
+```
+
+#### H3K36me3 loss regions are consistent in all glioma samples
+
+```{r K36_intersect, results='asis'}
+H3K36me3_loss_intersect_venn <- draw.pairwise.venn(area1 = H3K36me3_loss_intersect_summary[1, "N1"], area2 = H3K36me3_loss_intersect_summary[1, "N2"], cross.area = H3K36me3_loss_intersect_summary[1, "Intersect"], category = c(H3K36me3_loss_intersect_summary[1, "Sample1"], H3K36me3_loss_intersect_summary[1, "Sample2"]), fill = c("red", "blue"))
+(H3K36me3_loss_intersect_figure)
+kable(H3K36me3_loss_intersect_summary %>% select(-samples), digits = 4, format = "html", align = "c", row.names = F)
+```
+
+#### H3K36me3 loss regions are associated with cell cycle regulation
+
+```{r K36_loss_GREAT}
+(H3K36me3_unique_GREAT)
+(H3K36me3_loss_gene_DAVID)
+```
+
+#### H3K36me3 loss regions are associated with transcriptional downregulation
+
+```{r K36_loss_RPKM, results='asis'}
+(H3K36me3_unique_NPC_gene_RPKM_figure)
+kable(H3K36me3_loss_DE_summary, digits = 4, format = "html", align = "c", row.names = F)
+```
+
+#### Subtle gain of H3K27me3   
+* No significant correlation between H3K36me3 and H3K27me3 signals.    
+* The intersect of H3K27me3 gain/loss regions between different samples are still significant.     
+* Both H3K27me3 gain and loss regions are enriched in genebody.       
+* The functions of genes associated with H3K27me3 gain/loss regions are different.      
+
+```{r unique_ER_K36_K27, results='asis'}
+(H3K36me3_unique_NPC_K27me3_K36me3_CEMT_19_density2d)
+kable(H3K36me3_loss_H3K27me3_intersect_summary, digits = 4, format = "html", align = "c", row.names = F)
+(H3K36me3_loss_H3K27me3_summary_figure)
+(H3K36me3_loss_H3K27me3gain_GREAT)
+(H3K36me3_loss_H3K27me3loss_GREAT)
+```
+
+#### No redistribution of H3K27me3      
+
+```{r K27me3_redistribution}
+(HM_distrbution_figure)
+```
+
+* [Nada's results](http://science.sciencemag.org/content/352/6287/844.figures-only)   
 
 ### Histone modification associated DE genes
 * As expected, active marks, i.e. H3K27ac and H3K4me3 were significantly associated with transcriptional activation, while H3K27me3 was associated with down regulation.    
@@ -74,9 +135,10 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 * Four transcription factors enriched in NPC-specific H3K27ac, only Sox3 was expressed in NPCs.     
 	+ Sox3: function as a switch in neuronal development. Keeps neural cells undifferentiated by counteracting the activity of proneural proteins and suppresses neuronal differentiation.      
 
-```{r unique_H3K27ac_NPC, fig.height=4}
+```{r unique_H3K27ac_NPC, fig.height=4, results='asis'}
 (homer_unique_K27ac_NPC_tf_figure)
 (homer_unique_K27ac_NPC_tf_RPKM_figure)
+kable(homer_unique_K27ac_NPC_Sox3_DN %>% select(ENSG, Name), digits = 4, format = "html", align = "l", row.names = F)
 ```
 ```{r unique_H3K27ac_NPC_DAVID}
 (homer_unique_K27ac_NPC_Sox3_5mC_heatmap + ggtitle("Sox3 enhancer fractional methylation"))
