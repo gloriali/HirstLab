@@ -1,5 +1,37 @@
 #!/bin/sh
 
+# Upgrade GE04 to FindER 1.0.0b PET
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0816/AnalyzedData/IX0816-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_4_GATCAG_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K27ac/A19308.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0817/AnalyzedData/IX0817-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_5_CTTGTA_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K27me3/A19306.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0816/AnalyzedData/IX0816-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_4_ACTTGA_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K36me3/A19307.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0817/AnalyzedData/IX0817-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_5_GATCAG_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K4me1/A19303.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0817/AnalyzedData/IX0817-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_5_TAGCTT_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K4me3/A19304.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0817/AnalyzedData/IX0817-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_5_GGCTAC_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/H3K9me3/A19305.NPC_GE04.bam
+/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in /home/aldente/private/Projects/REMC/IX0816/AnalyzedData/IX0816-1./Solexa/Data/current/BaseCalls/BWA_2012-09-09/compressed_bams/s_4_TAGCTT_paired.dup.sorted.bam.spec --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirOut/input/A19309.NPC_GE04.bam
+JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+cd $dirIn
+for file in H*/*GE04.bam; do
+    mark=$(echo $file | sed 's/\/A.*GE04.bam//g')
+	file=$(basename $file)
+    echo $mark
+    mkdir -p $dirOut/$mark
+    $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/$mark/$file -inputBam $dirIn/input/A19309.Input.GE04.bam -out $dirOut/$mark > $dirOut/$mark/$file.log
+done
+
+# Convert pair-end to single-end
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam_se/
+samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac input; do
+	mkdir -p $dirOut/$mark/;
+	cd $dirIn/$mark/;
+	 
+done
+
 # FindER 1.0.0b results
 dirIn=/projects/edcc_new/reference_epigenomes/
 dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
