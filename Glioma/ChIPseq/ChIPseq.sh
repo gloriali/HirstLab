@@ -22,7 +22,7 @@ for bam in */*GE04*.bam; do
 	$samtools index $bam;
     $samtools flagstat $bam > $dirOut/$mark/$name.flagstat
     $bamstats -g 2864785220 -q 10 -b $bam  > $dirOut/$mark/$name.bamstats
-	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark/ -F:1028,-q:5,-n:$lib,-chr:$chr
+	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark/ -F:1028,-q:5,-n:$lib,-chr:$chr,-cp
 done
 JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
@@ -268,7 +268,7 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
     cd $dirIn/$mark/
     dirOut=$dirIn/$mark/DE/
     mkdir -p $dirOut
-    for dmr in *.unique; do
+    for dmr in CEMT*.unique; do
         lib=$(echo $dmr | sed -e 's/.vs.*//g')
         dm=$(echo $dmr | cut -d'.' -f 4)
         echo $mark $lib $dm
