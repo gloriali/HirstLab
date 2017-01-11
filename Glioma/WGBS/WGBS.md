@@ -114,7 +114,7 @@ Updated: Wed Jan 11 11:48:15 2017
 </tbody>
 </table>
 
-![DMR_CGI_K36](/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/hyperCGI_K36.1.png)        
+![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
 
 ### DMR enrichment in chromatin states
 * Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
