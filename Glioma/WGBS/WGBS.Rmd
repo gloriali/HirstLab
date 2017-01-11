@@ -40,13 +40,26 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
 ## DNA methylation changes around CGI edges
-* DNA methylation changes around CGI occurred across the entire region.     
+* CGIs are hypermethylated in IDH mutant gliomas.     
+* DNA methylation changes around CGI occur at the edge of CGIs.     
 
-```{r 5mC_CGI}
+```{r 5mC_CGI, fig.height = 8}
 (CGI_edge_figure)
+(CGI_edge_delta_figure)
 ```
 
 ## DMRs between gliomas and NPCs  
+### DMR identification 
+  * Identify DM CpGs     
+  	+ CpG coverage in both samples $\ge$ 3;        
+    + methyl_diff one-sided p-value $\le$ 0.0005;  
+    + delta fractional methylation $\ge$ 0.6;  
+    + fractional methylation of one sample $\ge$ 0.75.   
+  * Collapse DM CpGs into DMRs     
+    + adjacent DM CpGs have the same DM status;    
+    + distance between adjacent CpGs (size) $\le$ 500bp;   
+    + No. of CpGs within each DMR $\ge$ 3.   
+    
 ### Total DMR length
 * Hypermethylation in IDH mut samples.    
 * Hypomethylation in IDH wt glioma: CEMT_23 (GBM).     
@@ -57,26 +70,6 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (DMR_summary_figure)
 ```
 
-### DMR length distribution (QC) 
-* Mostly evenly distributed with median ~ 300bp.      
-
-```{r DMR_length}
-for(lib in libs){
-	print(get(paste0("DMR_", lib, "_figure"))$length)
-}
-```
-
-### DMR frequency distribution 
-* Mostly evenly distributed across different chromosomes.  
-* Frequencies in CEMT21 and CEMT23 vs NPCs were comparable to observed between NPCs.        
-* chrX has least amount of DMRs, almost none hypo ones in IDH mutant samples: _smaller number of hypo DMRs?_
-
-```{r DMR_freq, fig.width=8}
-for(lib in libs){
-	print(get(paste0("DMR_", lib, "_figure"))$freq)
-}
-```
-
 ### DMR enrichment in genomic regions 
 * Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
 * Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
@@ -84,6 +77,22 @@ for(lib in libs){
 ```{r DMR_genomicBreak}
 (genomic_breakdown_figure)
 ```
+
+### DMR associated with DE genes
+* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
+
+```{r DMR_DE}
+(DMR_DE_figure)
+```
+
+### Hypermethylated CGIs associated with transcription   
+* There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
+
+```{r DMR_CGI}
+kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
+```
+
+![DMR_CGI_K36](/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/hyperCGI_K36.1.png)        
 
 ### DMR enrichment in chromatin states
 * Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
@@ -93,17 +102,10 @@ for(lib in libs){
 (DMR_ChromHMM_summary_figure)
 ```
 
+### DMR intersect with differentially marked histone modifications  
 
-### DMR distance to CGIs
-* Distance between mid-point of DMRs and mid-point of closest CGI, normalized against length of the CGI (0: CGI mid-point; +/-1: CGI boundaries).      
-* Hypomethylated regions were enriched at CGI shores.    
-* IDH wt (CEMT23) hypermethylated regions were enriched at CGI centres.      
-* IDH mut samples hypermethylated regions were enriched towards the edge of CGI, except CEMT19 and CEMT47 were also enriched at CGI centres.        
-
-```{r DMR_CGIdis}
-for(lib in libs){
-	print(get(paste0("DMR_", lib, "_CGI_dis_figure")))
-}
+```{r DMR_DHM}
+(DMR_DHM_enrich_figure)
 ```
 
 ### DMR GREAT analysis
@@ -137,20 +139,4 @@ for(lib in libs){
 (GREAT_DMR_CEMT_23_hypo)
 ```
 
-### DMR intersect 
-* Jaccard similarity: intersect (bp) / union (bp).      
-* DMRs between IDH mut vs NPCs were more similar.      
-* CEMT21 and CEMT_23 (wt) were not similar to IDH mut samples, nor were they similar to each other.       
-
-```{r DMR_intersect, results='asis'}
-(DMR_jaccard_hyper_figure)
-(DMR_jaccard_hypo_figure)
-kable(DMR_intersect %>% select(sample1, sample2, hyper_percent1, hyper_percent2, hypo_percent1, hypo_percent2), digits = 4, format = "html", align = "c", row.names = F)
-```
-
-### DMR intersect with differentially marked histone modifications  
-
-```{r DMR_DHM}
-(DMR_DHM_enrich_figure)
-```
 

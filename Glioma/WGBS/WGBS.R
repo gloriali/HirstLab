@@ -20,14 +20,14 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
 ## ------- 5mC distribution------
 quantile_5mC <- read.delim("../qc.5mC.quantile", as.is = T) %>% mutate(type = gsub(".*\\d+_", "", sample), sample = gsub("_[gC].*", "", sample), category = gsub("[_\\.].*", "", sample))
-quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, fill = category)) + 
+(quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, fill = category)) + 
 	geom_boxplot(aes(lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.5, color = "grey") + 
 	facet_grid(type ~ .) + 
 	xlab("") + 
 	ylab("Fractional methylation") + 
 	scale_fill_manual(name = "", values = c("red", "blue")) + 
 	coord_flip() + 
-	theme_bw()
+	theme_bw())
 ggsave(quantile_5mC_figure, file = "../quantile_5mC_figure.pdf", height = 5, width = 6)
 
 ## ------- changes at CGI edges
@@ -41,7 +41,16 @@ CGI_edge <- CGI_edge %>% filter(ID %in% CGI_edge_CpG_ID$ID)
 	xlab("Distance to CGI edge (bp)") + 
 	ylab("Fractional methylation") + 
 	theme_bw())
-ggsave(CGI_edge_figure, file = "../CGI_edge/CGI_edge_figure.pdf", width = 8)
+ggsave(CGI_edge_figure, file = "../CGI_edge/CGI_edge_figure.pdf", width = 8, height = 5)
+CGI_edge_delta <- read.delim("../CGI_edge/CGI.edge.delta.all", head = F, col.names = c("ID", "CGI", "edge", "dis", "delta", "sample", "NPC")) %>% 
+	mutate(NPC = gsub("CEMT_[0-9]+-", "", NPC), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime")))
+(CGI_edge_delta_figure <- ggplot(CGI_edge_delta, aes(-dis, delta, color = NPC)) + 
+		geom_smooth() + 
+		facet_grid(sample ~ edge, scales = "free_x") + 
+		xlab("Distance to CGI edge (bp)") + 
+		ylab("Difference in fractional methylation\nglioma - NPC") + 
+		theme_bw())
+ggsave(CGI_edge_delta_figure, file = "../CGI_edge/CGI_edge_delta_figure.pdf", width = 8, height = 8)
 
 ## ------- DMR glioma vs NPC -------
 ### -------- summary ---------
@@ -82,6 +91,15 @@ genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, 
 	coord_flip() + 
 	theme_bw()
 ggsave(genomic_breakdown_figure, file = "genomic_breakdown_figure.pdf", height = 5, width = 6)
+
+### -------- hyper CGI with K36me3 and K4me3 ---------
+CGI_DMR_hyper_summary <- read.delim("./CGI/CGI.DMR.hyper.summary", as.is = T)
+
+### -------- % of hyper CpGs in hyper CGIs -----------
+CGI_DMR_hyper_DM_all <- read.delim("./CGI/CGI.DMR.hyper.DM.all", as.is = T)
+(CGI_DMR_hyper_DM_figure <- ggplot(CGI_DMR_hyper_DM_all, aes(glioma, percent, fill = NPC)) + 
+		geom_bar(stat = "identity") + 
+		theme_bw())
 
 ### -------- distance to closest CGI --------
 colname <- c("chr", "start", "end", "ID", "CGI_chr", "CGI_start", "CGI_end", "CGI_ID", "distance", "norm_dis")
@@ -200,9 +218,8 @@ DMR_DE <- read.delim("./DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = 
 	theme_bw())
 ggsave(DMR_DE_figure, file = "DMR_DE_figure.pdf")
 
-save(list = c("quantile_5mC_figure", "CGI_edge_figure", "DMR_summary_figure", "genomic_breakdown_figure", "DMR_intersect", "DMR_jaccard_hyper_figure", "DMR_jaccard_hypo_figure", 
-							"DMR_ChromHMM_summary", "DMR_ChromHMM_summary_figure", 
-							ls(pattern = "DMR_CEMT_\\d+_figure"), ls(pattern = "DMR_CEMT_\\d+_CGI_dis_figure"), 
-							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*"), "DMR_DHM_enrich_figure", "DMR_DE_figure"),
+save(list = c("DMR_intersect",  
+							ls(pattern = "summary"), ls(pattern = "figure"), 
+							ls(pattern = "GREAT_DMR_*"), ls(pattern = "Venn_DMR_*")),
 		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 
