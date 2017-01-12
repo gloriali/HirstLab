@@ -125,6 +125,60 @@ for file in *.combine.5mC.CpG; do
     rm $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R 
 done
 cat $dirOut/*.CGI.edge > $dirOut/CGI.edge.all
+cd $dirOut
+for f1 in CEMT*.CGI.edge; do
+	for f2 in NPC*.CGI.edge; do
+		s1=$(echo $f1 | sed 's/.CGI.edge//g'); s2=$(echo $f2 | sed 's/.CGI.edge//g');
+		echo $s1 $s2;
+		join <(less $f1 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) <(less $f2 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) | awk -F' ' '{gsub("+", "\t"); print $1"\t"$2"\t"$3"\t"$5"\t"$4-$6"\t""'$s1'""\t""'$s1'""-""'$s2'"}' > $dirOut/$s1.$s2.CGI.edge.delta
+	done
+done
+cat $dirOut/*.CGI.edge.delta > $dirOut/CGI.edge.delta.all
+## hyper CGI with K36 and K4me3
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+CGI=/home/lli/hg19/CGI.forProfiles.BED
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/
+dirOut=$dirIn/CGI/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Sample\thyper\tCGI\tH3K36me3\tNon-gene\tH3K4me3\tNon-promoter" > $dirOut/CGI.DMR.hyper.summary
+for file in DMR.*.hyper.bed; do
+	sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g')
+	echo $sample
+	$BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $file -u > $dirOut/CGI.$file
+	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K36me3
+	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K36me3 -b <(less $gene | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K36me3.nongene
+	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K4me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K4me3
+	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K4me3 -b <(less $promoter | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K4me3.nonpromoter
+	Nhyper=$(less $file | wc -l)
+	NCGI=$(less $dirOut/CGI.$file | wc -l)
+	NK36=$(less $dirOut/CGI.$file.H3K36me3 | wc -l)
+	Nnongene=$(less $dirOut/CGI.$file.H3K36me3.nongene | wc -l)
+	NK4=$(less $dirOut/CGI.$file.H3K4me3 | wc -l)
+	Nnonpromoter=$(less $dirOut/CGI.$file.H3K4me3.nonpromoter | wc -l)
+	echo -e "$sample\t$Nhyper\t$NCGI\t$NK36\t$Nnongene\t$NK4\t$Nnonpromoter" >> $dirOut/CGI.DMR.hyper.summary
+done
+cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
+cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K4me3.nonpromoter $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K4me3.nonpromoter $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K4me3.nonpromoter | awk '{print $4}' | uniq -c | awk -F' ' '{if($1>1){print $0}}'
+
+# % of hyper CpGs in hyper CGIs
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/intermediate/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
+cd $dirOut
+echo -e "chr\tstart\tend\tID\tDM\ttotal\tpercent\tglioma\tNPC" > $dirOut/CGI.DMR.hyper.DM.all
+for file in CGI.DMR.CEMT_*_NPC.hyper.bed; do
+	sample=$(echo $file | sed 's/CGI.DMR.//g' | sed 's/_NPC.hyper.bed//g')
+	echo $sample
+	for dm in $dirIn/DM.$sample*.bed; do
+		s2=$(basename $dm | sed 's/.m0.75.p0.0005.d0.6.bed//g' | sed 's/DM.CEMT_.*_//g')
+		echo $sample $s2
+		less $dm | awk '$4 ~ /1/ {print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -c | $BEDTOOLS/intersectBed -a stdin -b <(less ~/hg19/CG.BED | awk '{print "chr"$0}') -c | awk '{print $0"\t"$5/$6"\t""'$sample'""\t""'$s2'"}' >> $dirOut/CGI.DMR.hyper.DM.all
+	done
+done
 
 # DMR enrichment in chromatin states
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CpG/'
