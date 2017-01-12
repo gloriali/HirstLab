@@ -594,14 +594,14 @@ for file in *.vs.NPC_GE04.NPC_GE04.unique; do
     cov_glioma=$(less /projects/epigenomics2/users/lli/glioma/ChIPseq/H3K27me3.depth | awk '{if($1=="'$sample'"){print $2}}')
     cov_GE04=35922595
     $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/$sample.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.$sample.H3K27me3 > $dirIn/$file.H3K27me3.log
-    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/NPC_GE04.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K27me3 >> $dirIn/$file.H3K27me3.log
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K27me3/NPC_GE04.q5.F1028.PET.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K27me3 >> $dirIn/$file.H3K27me3.log
     echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K27me3" > b
     join *$file.$sample.H3K27me3.coverage *$file.NPC_GE04.H3K27me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
     join a b | sed 's/ /\t/g' > $file.H3K27me3
     cov_glioma=$(less /projects/epigenomics2/users/lli/glioma/ChIPseq/H3K36me3.depth | awk '{if($1=="'$sample'"){print $2}}')
     cov_GE04=53179871
     $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/$sample.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.$sample.H3K36me3 > $dirIn/$file.H3K36me3.log
-    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/NPC_GE04.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K36me3 >> $dirIn/$file.H3K36me3.log
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/H3K36me3/NPC_GE04.q5.F1028.PET.wig.gz -r <(less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}') -o $dirIn -c $chr -n $file.NPC_GE04.H3K36me3 >> $dirIn/$file.H3K36me3.log
     echo -e "ID\t$sample\tNPC_GE04\tdiff_H3K36me3" > b
     join *$file.$sample.H3K36me3.coverage *$file.NPC_GE04.H3K36me3.coverage -1 4 -2 4 | awk '{print $1"\t"$5/"'$cov_glioma'"*"'$cov_GE04'""\t"$10"\t"$5/"'$cov_glioma'"*"'$cov_GE04'"-$10}' | sort -k1,1 >> b
     join a b | sed 's/ /\t/g' > $file.H3K36me3
