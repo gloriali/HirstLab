@@ -60,3 +60,31 @@ pth=0.005; delta=0.5; m=0.6; cov=3; size=500; cut=3;
 /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn
 
+### intersect with DE genes
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dirDE=/projects/epigenomics2/PING/DEFINE/FDR_0.01/
+dirIn=/projects/epigenomics2/PING/DMR/
+dirOut=$dirIn/DE/
+mkdir -p $dirOut
+echo -e "Sample\tDM\tDE\tN_DM_promoter\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirOut/DMR.DE.summary
+n_total=19865 
+cd $dirIn
+for dmr in DMR.DP_DN*.bed; do
+    lib=$(echo $dmr | sed -e 's/DMR.//g' | sed -e 's/.s500.c3.*.bed//g')
+    dm=$(echo $dmr | sed -e 's/.bed//g' | sed -e 's/.*c3.//g')
+    echo $lib $dm
+    less $dmr | awk '{gsub("chr", ""); print}' | $BEDTOOLS/intersectBed -a stdin -b $promoter -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' | sort -k5,5 > $dirOut/DMR.$lib.$dm.promoter.bed
+    for file in $dirDE/*FDR_0.01.rmin_0.005.Nmin_25; do
+        de=$(basename $file | sed -e 's/.CB_DP_CB_DN.FDR_0.01.rmin_0.005.Nmin_25//g' | sed 's/DEFINE//g')
+        echo $de
+        join $dirOut/DMR.$lib.$dm.promoter.bed <(less $file | sort -k1,1) -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/DMR.$lib.$dm.$de
+        n_dm=$(less $dirOut/DMR.$lib.$dm.promoter.bed | wc -l)
+        n_de=$(less $file | wc -l)
+        n_intersect=$(less $dirOut/DMR.$lib.$dm.$de | wc -l)
+        p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+        echo -e "$lib\t$dm\t$de\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$6/$5}' >> $dirOut/DMR.DE.summary
+    done
+done
+
