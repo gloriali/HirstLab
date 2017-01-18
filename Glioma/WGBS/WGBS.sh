@@ -134,35 +134,31 @@ for f1 in CEMT*.CGI.edge; do
 	done
 done
 cat $dirOut/*.CGI.edge.delta > $dirOut/CGI.edge.delta.all
-## hyper CGI with K36 and K4me3
+## hyper CGI with K36
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 CGI=/home/lli/hg19/CGI.forProfiles.BED
-promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
 gene=/home/lli/hg19/hg19v69_genes.bed
 dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
 dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/
 dirOut=$dirIn/CGI/
 mkdir -p $dirOut
 cd $dirIn
-echo -e "Sample\thyper\tCGI\tH3K36me3\tNon-gene\tH3K4me3\tNon-promoter" > $dirOut/CGI.DMR.hyper.summary
+echo -e "Sample\thyper\tCGI\tNon-gene_CGI\tH3K36me3\tNon-gene\tp_Fisher" > $dirOut/CGI.DMR.hyper.summary
 for file in DMR.*.hyper.bed; do
 	sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g')
 	echo $sample
 	$BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $file -u > $dirOut/CGI.$file
 	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K36me3
 	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K36me3 -b <(less $gene | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K36me3.nongene
-	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K4me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K4me3
-	$BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K4me3 -b <(less $promoter | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K4me3.nonpromoter
 	Nhyper=$(less $file | wc -l)
 	NCGI=$(less $dirOut/CGI.$file | wc -l)
+	NCGI_nongene=$($BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b <(less $gene | awk '{print "chr"$0}') -v | wc -l)
 	NK36=$(less $dirOut/CGI.$file.H3K36me3 | wc -l)
 	Nnongene=$(less $dirOut/CGI.$file.H3K36me3.nongene | wc -l)
-	NK4=$(less $dirOut/CGI.$file.H3K4me3 | wc -l)
-	Nnonpromoter=$(less $dirOut/CGI.$file.H3K4me3.nonpromoter | wc -l)
-	echo -e "$sample\t$Nhyper\t$NCGI\t$NK36\t$Nnongene\t$NK4\t$Nnonpromoter" >> $dirOut/CGI.DMR.hyper.summary
+	p=$(echo "phyper($Nnongene, $NCGI_nongene, $NCGI - $NCGI_nongene, $NK36, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+	echo -e "$sample\t$Nhyper\t$NCGI\t$NCGI_nongene\t$NK36\t$Nnongene\t$p" >> $dirOut/CGI.DMR.hyper.summary
 done
 cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
-cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K4me3.nonpromoter $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K4me3.nonpromoter $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K4me3.nonpromoter | awk '{print $4}' | uniq -c | awk -F' ' '{if($1>1){print $0}}'
 
 # % of hyper CpGs in hyper CGIs
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
