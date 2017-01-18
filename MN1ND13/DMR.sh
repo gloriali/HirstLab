@@ -88,3 +88,34 @@ for dmr in DMR.DP_DN*.bed; do
     done
 done
 
+### intersect with SE
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+CG=/home/lli/hg19/CG.BED
+dirSE=/projects/epigenomics2/PING/Superenhancers/
+dirIn=/projects/epigenomics2/PING/DMR/
+dirOut=$dirIn/SE/
+mkdir -p $dirOut
+echo -e "Sample\tDM\tSE\tN_DMR\tN_SE\tN_intersect\tp_Fisher\tFC" > $dirOut/DMR.SE.summary
+CG_total=$(less $CG | wc -l) 
+cd $dirIn
+for dmr in DMR.DP_DN*.bed; do
+    lib=$(echo $dmr | sed -e 's/DMR.//g' | sed -e 's/.s500.c3.*.bed//g')
+    dm=$(echo $dmr | sed -e 's/.bed//g' | sed -e 's/.*c3.//g')
+    echo $lib $dm
+    for file in $dirSE/*_SuperEnhancers.bed; do
+        se=$(basename $file | sed 's/_H3K27Ac_Gateway_SuperEnhancers.bed//g' | sed 's/.*MN1ND13_//g')
+        echo $se
+        $BEDTOOLS/intersectBed -a $dmr -b $file -wa -wb > $dirOut/DMR.$lib.$dm.SE.$se
+		n_dm=$(less $dmr | wc -l)
+        n_se=$(less $file | wc -l)
+        n_intersect=$(less $dirOut/DMR.$lib.$dm.SE.$se | wc -l)
+		CG_se=$(less $file | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $CG -b stdin -u | wc -l)
+        CG_dm=$(less $dmr | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $CG -b stdin -u | wc -l)
+        CG_intersect=$(less $dirOut/DMR.$lib.$dm.SE.$se | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $CG -b stdin -u | wc -l)
+        p=$(echo "phyper($CG_intersect, $CG_dm, $CG_total - $CG_dm, $CG_se, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+		FC=$(echo -e "$CG_intersect\t$CG_dm\t$CG_se\t$CG_total" | awk '{print ($1/$2)/($3/$4)}')
+        echo -e "$lib\t$dm\t$se\t$n_dm\t$n_se\t$n_intersect\t$p\t$FC" >> $dirOut/DMR.SE.summary
+    done
+done
+
