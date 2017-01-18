@@ -72,8 +72,8 @@ ggsave(DMR_summary_figure, file = "DMR_summary_figure.pdf", height = 5, width = 
 colname <- c("chr", "start", "end", "ID", "DM", "length")
 for(lib in libs){
 	print(lib)
-	assign(paste0("DMR_", lib), read.delim(paste0("DMR.", lib, "_NPC"), head = F, as.is = T, col.names = colname) %>% mutate(chr = paste0("chr", chr)))
-	assign(paste0("DMR_", lib, "_figure"), DMR_figures(get(paste0("DMR_", lib)), lib, "NPCs", figures = c("length", "frequency", "circos"), colname = colname, hist_width = 10))
+	assign(paste0("DMR_", lib), read.delim(paste0("DMR.", lib, "_NPC"), head = F, as.is = T, col.names = colname))
+	assign(paste0("DMR_", lib, "_figure"), DMR_figures(get(paste0("DMR_", lib)), lib, "NPCs", figures = c("length", "frequency", "circos"), colname = colname, hist_width = 3))
 }
 
 ### -------- enrichment in genomic regions ------
@@ -92,14 +92,19 @@ genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, 
 	theme_bw()
 ggsave(genomic_breakdown_figure, file = "genomic_breakdown_figure.pdf", height = 5, width = 6)
 
-### -------- hyper CGI with K36me3 and K4me3 ---------
+### -------- hyper CGI with K36me3 ---------
 CGI_DMR_hyper_summary <- read.delim("./CGI/CGI.DMR.hyper.summary", as.is = T)
 
 ### -------- % of hyper CpGs in hyper CGIs -----------
 CGI_DMR_hyper_DM_all <- read.delim("./CGI/CGI.DMR.hyper.DM.all", as.is = T)
 (CGI_DMR_hyper_DM_figure <- ggplot(CGI_DMR_hyper_DM_all, aes(glioma, percent, fill = NPC)) + 
-		geom_bar(stat = "identity") + 
-		theme_bw())
+		geom_boxplot(position = position_dodge()) + 
+		xlab("")+
+		ylab("Percent of hyper CpGs in each hyper CGIs") + 
+		facet_grid(Type ~.) + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CGI_DMR_hyper_DM_figure, file = "./CGI/CGI_DMR_hyper_DM_figure.pdf")
 
 ### -------- distance to closest CGI --------
 colname <- c("chr", "start", "end", "ID", "CGI_chr", "CGI_start", "CGI_end", "CGI_ID", "distance", "norm_dis")

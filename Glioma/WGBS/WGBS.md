@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Wed Jan 11 11:48:15 2017
+Updated: Tue Jan 17 18:13:10 2017
 
 
 
@@ -17,7 +17,7 @@ Updated: Wed Jan 11 11:48:15 2017
 * CGIs are hypermethylated in IDH mutant gliomas.     
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
-![](WGBS_files/figure-html/5mC_CGI-1.png)<!-- -->![](WGBS_files/figure-html/5mC_CGI-2.png)<!-- -->
+![](WGBS_files/figure-html/5mC_CGI-1.png)<!-- -->
 
 ## DMRs between gliomas and NPCs  
 ### DMR identification 
@@ -50,6 +50,8 @@ Updated: Wed Jan 11 11:48:15 2017
 
 ![](WGBS_files/figure-html/DMR_DE-1.png)<!-- -->
 
+![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
+
 ### Hypermethylated CGIs associated with transcription   
 * There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
 
@@ -59,57 +61,57 @@ Updated: Wed Jan 11 11:48:15 2017
    <th style="text-align:center;"> Sample </th>
    <th style="text-align:center;"> hyper </th>
    <th style="text-align:center;"> CGI </th>
+   <th style="text-align:center;"> Non.gene_CGI </th>
    <th style="text-align:center;"> H3K36me3 </th>
    <th style="text-align:center;"> Non.gene </th>
-   <th style="text-align:center;"> H3K4me3 </th>
-   <th style="text-align:center;"> Non.promoter </th>
+   <th style="text-align:center;"> p_Fisher </th>
   </tr>
  </thead>
 <tbody>
   <tr>
    <td style="text-align:center;"> CEMT_19 </td>
-   <td style="text-align:center;"> 8998 </td>
-   <td style="text-align:center;"> 4033 </td>
-   <td style="text-align:center;"> 652 </td>
-   <td style="text-align:center;"> 58 </td>
-   <td style="text-align:center;"> 2398 </td>
-   <td style="text-align:center;"> 690 </td>
+   <td style="text-align:center;"> 19262 </td>
+   <td style="text-align:center;"> 6145 </td>
+   <td style="text-align:center;"> 1217 </td>
+   <td style="text-align:center;"> 950 </td>
+   <td style="text-align:center;"> 72 </td>
+   <td style="text-align:center;"> 1.0000000 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_21 </td>
-   <td style="text-align:center;"> 525 </td>
-   <td style="text-align:center;"> 130 </td>
-   <td style="text-align:center;"> 30 </td>
-   <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 64 </td>
-   <td style="text-align:center;"> 20 </td>
+   <td style="text-align:center;"> 1840 </td>
+   <td style="text-align:center;"> 340 </td>
+   <td style="text-align:center;"> 54 </td>
+   <td style="text-align:center;"> 65 </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 0.9305089 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_22 </td>
-   <td style="text-align:center;"> 6245 </td>
-   <td style="text-align:center;"> 2658 </td>
-   <td style="text-align:center;"> 508 </td>
-   <td style="text-align:center;"> 38 </td>
-   <td style="text-align:center;"> 1498 </td>
-   <td style="text-align:center;"> 389 </td>
+   <td style="text-align:center;"> 17676 </td>
+   <td style="text-align:center;"> 5015 </td>
+   <td style="text-align:center;"> 973 </td>
+   <td style="text-align:center;"> 882 </td>
+   <td style="text-align:center;"> 65 </td>
+   <td style="text-align:center;"> 1.0000000 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_23 </td>
-   <td style="text-align:center;"> 710 </td>
-   <td style="text-align:center;"> 352 </td>
-   <td style="text-align:center;"> 95 </td>
-   <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 159 </td>
-   <td style="text-align:center;"> 47 </td>
+   <td style="text-align:center;"> 1768 </td>
+   <td style="text-align:center;"> 741 </td>
+   <td style="text-align:center;"> 112 </td>
+   <td style="text-align:center;"> 166 </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 0.9999998 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_47 </td>
-   <td style="text-align:center;"> 9128 </td>
-   <td style="text-align:center;"> 3765 </td>
-   <td style="text-align:center;"> 436 </td>
-   <td style="text-align:center;"> 24 </td>
-   <td style="text-align:center;"> 1343 </td>
-   <td style="text-align:center;"> 291 </td>
+   <td style="text-align:center;"> 22369 </td>
+   <td style="text-align:center;"> 6188 </td>
+   <td style="text-align:center;"> 1242 </td>
+   <td style="text-align:center;"> 633 </td>
+   <td style="text-align:center;"> 36 </td>
+   <td style="text-align:center;"> 1.0000000 </td>
   </tr>
 </tbody>
 </table>
