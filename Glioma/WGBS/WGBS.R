@@ -104,6 +104,7 @@ ggsave(genomic_breakdown_figure, file = "genomic_breakdown_figure.pdf", height =
 
 ### -------- hyper CGI with K36me3 ---------
 CGI_DMR_hyper_summary <- read.delim("./CGI/CGI.DMR.hyper.summary", as.is = T)
+CGI_hyper_summary <- read.delim("./CGI/CGI.hyper.H3K36me3.summary", as.is = T)
 
 ### -------- % of hyper CpGs in hyper CGIs -----------
 CGI_DMR_hyper_DM_all <- read.delim("./CGI/CGI.DMR.hyper.DM.all", as.is = T)
