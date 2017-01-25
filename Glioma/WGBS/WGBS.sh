@@ -136,6 +136,7 @@ done
 cat $dirOut/*.CGI.edge.delta > $dirOut/CGI.edge.delta.all
 ## hyper CGI with K36
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
 CGI=/home/lli/hg19/CGI.forProfiles.BED
 gene=/home/lli/hg19/hg19v69_genes.bed
 dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
@@ -159,6 +160,33 @@ for file in DMR.*.hyper.bed; do
 	echo -e "$sample\t$Nhyper\t$NCGI\t$NCGI_nongene\t$NK36\t$Nnongene\t$p" >> $dirOut/CGI.DMR.hyper.summary
 done
 cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
+## all methylated CGI
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+CGI=/home/lli/hg19/CGI.forProfiles.BED
+gene=/home/lli/hg19/hg19v69_genes.bed
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+dirbam=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
+$BEDTOOLS/intersectBed -a $CGI -b $gene -v > /home/lli/hg19/CGI.nongene.bed
+echo -e "Sample\tCGI\tCGI_hyper\tCGI_K36\tCGI_hyper_K36\tp" > $dirOut/CGI.hyper.H3K36me3.summary
+cd $dir5mC
+for file in CEMT*.combine.5mC.CpG; do
+    sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+    echo $sample;
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/CGI.nongene.bed -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); if(f>=0.75){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f}}}' | sort -k1,1 -k 2,2n > $dirOut/$sample.CGI.nongene.hyper
+    $BEDTOOLS/intersectBed -a $dirOut/$sample.CGI.nongene.hyper -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/$sample.CGI.nongene.hyper.H3K36me3
+    NCGI=$(less /home/lli/hg19/CGI.nongene.bed | wc -l)
+    NCGIK36=$($BEDTOOLS/intersectBed -a <(less /home/lli/hg19/CGI.nongene.bed | awk '{print "chr"$0}') -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u | wc -l)
+    NCGIhyper=$(less $dirOut/$sample.CGI.nongene.hyper | wc -l)
+    NCGIK36hyper=$(less $dirOut/$sample.CGI.nongene.hyper.H3K36me3 | wc -l)
+    p=$(echo "phyper($NCGIK36hyper, $NCGIK36, $NCGI - $NCGIK36, $NCGIhyper, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+    echo -e "$sample\t$NCGI\t$NCGIhyper\t$NCGIK36\t$NCGIK36hyper\t$p" >> $dirOut/CGI.hyper.H3K36me3.summary
+    N=$($samtools view -q 5 -F 1028 $(ls $dirbam/$sample/bams/RNA-Seq/*.bam) | wc -l)
+    $BEDTOOLS/coverageBed -a $dirOut/$sample.CGI.nongene.hyper -b <($samtools view -q 5 -F 1028 -b $(ls $dirbam/$sample/bams/RNA-Seq/*.bam)) -counts
+done
 
 # % of hyper CpGs in hyper CGIs
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
