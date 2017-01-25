@@ -47,6 +47,12 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (CGI_edge_delta_figure)
 ```
 
+## DNA methylation at CTCF loss regions
+
+```{r 5mC_CTCF}
+(CTCF_loss_5mC_figure)
+```
+
 ## DMRs between gliomas and NPCs  
 ### DMR identification 
   * Identify DM CpGs     
@@ -69,6 +75,27 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (DMR_summary_figure)
 ```
 
+### Percentage of hyper CpGs in hyper CGIs
+
+```{r hyperCG_hyperDMR}
+(CGI_DMR_hyper_DM_figure)
+```
+
+### Methylated CGIs associated with transcription   
+
+```{r CGI_K36}
+kable(CGI_hyper_summary, format = "html", align = "c", row.names = F)
+```
+
+### Hypermethylated CGIs associated with transcription   
+* There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
+
+```{r DMR_CGI_K36}
+kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
+```
+
+![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
+
 ### DMR enrichment in genomic regions 
 * Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
 * Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
@@ -85,15 +112,6 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
 ![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
-
-### Hypermethylated CGIs associated with transcription   
-* There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
-
-```{r DMR_CGI}
-kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
-```
-
-![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
 
 ### DMR enrichment in chromatin states
 * Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       

@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Tue Jan 17 18:13:10 2017
+Updated: Wed Jan 25 11:54:03 2017
 
 
 
@@ -18,6 +18,10 @@ Updated: Tue Jan 17 18:13:10 2017
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
 ![](WGBS_files/figure-html/5mC_CGI-1.png)<!-- -->
+
+## DNA methylation at CTCF loss regions
+
+![](WGBS_files/figure-html/5mC_CTCF-1.png)<!-- -->
 
 ## DMRs between gliomas and NPCs  
 ### DMR identification 
@@ -39,18 +43,66 @@ Updated: Tue Jan 17 18:13:10 2017
 
 ![](WGBS_files/figure-html/DMR_summary-1.png)<!-- -->
 
-### DMR enrichment in genomic regions 
-* Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
-* Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
+### Percentage of hyper CpGs in hyper CGIs
 
-![](WGBS_files/figure-html/DMR_genomicBreak-1.png)<!-- -->
+![](WGBS_files/figure-html/hyperCG_hyperDMR-1.png)<!-- -->
 
-### DMR associated with DE genes
-* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
+### Methylated CGIs associated with transcription   
 
-![](WGBS_files/figure-html/DMR_DE-1.png)<!-- -->
-
-![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Sample </th>
+   <th style="text-align:center;"> CGI </th>
+   <th style="text-align:center;"> CGI_hyper </th>
+   <th style="text-align:center;"> CGI_K36 </th>
+   <th style="text-align:center;"> CGI_hyper_K36 </th>
+   <th style="text-align:center;"> p </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> CEMT_19 </td>
+   <td style="text-align:center;"> 5066 </td>
+   <td style="text-align:center;"> 1685 </td>
+   <td style="text-align:center;"> 290 </td>
+   <td style="text-align:center;"> 216 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_21 </td>
+   <td style="text-align:center;"> 5066 </td>
+   <td style="text-align:center;"> 1085 </td>
+   <td style="text-align:center;"> 126 </td>
+   <td style="text-align:center;"> 91 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_22 </td>
+   <td style="text-align:center;"> 5066 </td>
+   <td style="text-align:center;"> 1739 </td>
+   <td style="text-align:center;"> 328 </td>
+   <td style="text-align:center;"> 227 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_23 </td>
+   <td style="text-align:center;"> 5066 </td>
+   <td style="text-align:center;"> 1015 </td>
+   <td style="text-align:center;"> 218 </td>
+   <td style="text-align:center;"> 103 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_47 </td>
+   <td style="text-align:center;"> 5066 </td>
+   <td style="text-align:center;"> 1724 </td>
+   <td style="text-align:center;"> 165 </td>
+   <td style="text-align:center;"> 138 </td>
+   <td style="text-align:center;"> 0 </td>
+  </tr>
+</tbody>
+</table>
 
 ### Hypermethylated CGIs associated with transcription   
 * There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
@@ -117,6 +169,19 @@ Updated: Tue Jan 17 18:13:10 2017
 </table>
 
 ![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
+
+### DMR enrichment in genomic regions 
+* Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
+* Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
+
+![](WGBS_files/figure-html/DMR_genomicBreak-1.png)<!-- -->
+
+### DMR associated with DE genes
+* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
+
+![](WGBS_files/figure-html/DMR_DE-1.png)<!-- -->
+
+![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
 
 ### DMR enrichment in chromatin states
 * Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
