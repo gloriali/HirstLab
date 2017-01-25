@@ -8,6 +8,19 @@ for file in *.5mC.CpG; do
     less $file | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $file.coverage.txt
 done
 
+# CTCF loss region 5mC
+CTCF=/projects/epigenomics2/users/lli/glioma/CTCF.loss.bed
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/CTCF/
+mkdir -p $dirOut
+echo -e "chr\tstart\tend\tID\tfractional\tsample"> $dirOut/CTCF.loss.5mC
+cd $dir5mC
+for file in CEMT*.combine.5mC.CpG; do
+    sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+    echo $sample;
+    $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk '{print $0"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}' | sort -k1,1 -k 2,2n >> $dirOut/CTCF.loss.5mC
+done
+
 # DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
