@@ -14,6 +14,7 @@ Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand> -c <cov> -f
 fi
 
 strand=/home/lli/hg19/CG.strand 
+# mm10: /home/acarles/qcb/mm10.CpG.strand
 cov=3
 format="novomethyl"
 while [ $# -gt 0 ]
