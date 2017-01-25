@@ -52,6 +52,16 @@ CGI_edge_delta <- read.delim("../CGI_edge/CGI.edge.delta.all", head = F, col.nam
 		theme_bw())
 ggsave(CGI_edge_delta_figure, file = "../CGI_edge/CGI_edge_delta_figure.pdf", width = 8, height = 8)
 
+## ------- 5mC at CTCF loss regions -------
+CTCF_loss_5mC <- read.delim("../CTCF/CTCF.loss.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_loss_5mC_figure <- ggplot(CTCF_loss_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_loss_5mC_figure, file = "../CTCF/CTCF_loss_5mC_figure.pdf", height = 4, width = 5)
+
 ## ------- DMR glioma vs NPC -------
 ### -------- summary ---------
 DMR_summary <- read.delim("./intermediate/DMR.summary.stats", head = T, as.is = T)
