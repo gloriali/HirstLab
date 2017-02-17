@@ -6,4 +6,5 @@ CEMT Glioma Project
 * [ChIP-seq](./ChIPseq/ChIPseq.md): Histone modifications ChIP-seq analysis.
 * [RNA-seq](./RNAseq/RNAseq.md): RNA-seq expression analysis.
 * [Jabado](./Jabado): ChIP-seq and RNA-seq analysis of brain tumours from Nada Jabado's lab.
-* [Kongkham](./Kongkham): MeDIP and hMeDIP analysis of brain tumours from Paul Kongkham's lab.       
+* [Kongkham](./Kongkham): MeDIP and hMeDIP analysis of brain tumours from Paul Kongkham's lab.
+* [CTCF](./CTCF): CTCF analysis from Bradley Bernstein's publication.
