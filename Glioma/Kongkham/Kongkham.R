@@ -123,6 +123,28 @@ CG_coverage_hMC_filter_summary <- CG_coverage_hMC %>% filter(Coverage >= 3) %>% 
 	theme(axis.text.x = element_text(angle = 90, size = 4)))
 ggsave(CG_coverage_hMC_filter_summary_figure, file = "CG_coverage_hMC_filter_summary_figure.pdf", height = 6, width = 10)
 
+## ====== merged bam =========
+CG_coverage_merge_MC <- read.delim("./bam/CG.coverage.merge.MC", as.is = T) %>% melt(id = "Coverage") %>% filter(Coverage != ">50") %>%
+	mutate(Coverage = as.numeric(Coverage))
+(CG_coverage_merge_MC_figure <- ggplot(CG_coverage_merge_MC, aes(Coverage, value/10^6, color = variable)) + 
+	geom_point() + 
+	geom_line(group = 1) + 
+	coord_cartesian(xlim = c(0, 30)) + 
+	ylab("# million CpGs") + 
+	ggtitle("MC CpG Coverage Distribution") + 
+	theme_bw())
+ggsave(CG_coverage_merge_MC_figure, file = "CG_coverage_merge_MC_figure.pdf", height = 6, width = 8)
+CG_coverage_merge_MC_filter_summary <- CG_coverage_merge_MC %>% filter(Coverage >= 3) %>% group_by(variable) %>% summarize(N = sum(value))
+(CG_coverage_merge_MC_filter_summary_figure <- ggplot(CG_coverage_merge_MC_filter_summary, aes(variable, N/10^6, fill = variable)) + 
+	geom_bar(stat = "identity", width = 0.5) + 
+	xlab("") + 
+	ylab("# million CpGs") + 
+	ggtitle("MC CpG Coverage >= 3") + 
+	theme_bw() + 
+	theme(axis.text.x = element_text(angle = 90)))
+ggsave(CG_coverage_merge_MC_filter_summary_figure, file = "CG_coverage_merge_MC_filter_summary_figure.pdf", height = 6, width = 6)
+
+
 save(list = c("qc", ls(pattern = "_figure")),
 		 file = "/projects/epigenomics2/users/lli/glioma/Kongkham/Kongkham.Rdata")
 
