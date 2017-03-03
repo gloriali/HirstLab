@@ -15,7 +15,7 @@ dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/CTCF/
 mkdir -p $dirOut
 echo -e "chr\tstart\tend\tID\tfractional\tsample"> $dirOut/CTCF.loss.5mC
 cd $dir5mC
-for file in CEMT*.combine.5mC.CpG; do
+for file in *.combine.5mC.CpG; do
     sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
     echo $sample;
     $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk '{print $0"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}' | sort -k1,1 -k 2,2n >> $dirOut/CTCF.loss.5mC
