@@ -9,14 +9,20 @@ ln -s /projects/edcc_prj2/bs-seq/PX0409/PX0409_AGCGCT_4_lanes_dupsFlagged.ClipOv
 echo -e "sample\ttype\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc.5mC.quantile # QC: genome-wide and CGI methylation level summary; ymin: 10% quantile, ymax: 90% quantile
 cd $dirIn
 for file in *.bed.CpG.txt.gz; do
-	lib=$(echo $file | sed 's/.bed.CpG.txt.gz//g')
-	/home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file
+    lib=$(echo $file | sed 's/.bed.CpG.txt.gz//g')
+    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file
     echo "Coverage profile for" $lib
     less $dirIn/$file.combine.5mC.CpG | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $file.coverage.txt
-	less $dirIn/$file.combine.5mC.CpG | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
+    less $dirIn/$file.combine.5mC.CpG | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
     less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
 done
 join <(less A04_MN1ND13_DP.bed.CpG.txt.gz.combine.5mC.CpG | awk '{print $1":"$2"-"$3"\t"$6}' | sort -k1,1) <(less A05_MN1ND13_DN.bed.CpG.txt.gz.combine.5mC.CpG | awk '{print $1":"$2"-"$3"\t"$6}' | sort -k1,1) | sed 's/ /\t/g' | awk 'BEGIN{for(i=1;i<=21;i++){s[i]=0}} {d=int(($2-$3)*10+11); s[d]++} END{for(i=1;i<=21;i++){print (i-11)/10"\t"s[i]}}' > DP_DN.5mC.delta.summary
+> $dirIn/CGI.5mC
+for file in *.combine.5mC.CpG; do
+    lib=$(echo $file | sed 's/.combine//g' | sed 's/.5mC//g' | sed 's/.CpG//g' | sed 's/.gz//g' | sed 's/.bed.txt//g' | sed 's/CEMT_32_//g' | sed 's/A0._MN1ND13_//g')
+    echo $lib
+    less $dirIn/$file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print i"\t"c[i]/(c[i]+t[i])"\t""'$lib'"}}' >> $dirIn/CGI.5mC
+done
 
 ## DMRs
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
