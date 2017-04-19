@@ -46,6 +46,7 @@ CGI_edge_delta <- read.delim("../CGI_edge/CGI.edge.delta.all", head = F, col.nam
 	mutate(NPC = gsub("CEMT_[0-9]+-", "", NPC), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime")))
 (CGI_edge_delta_figure <- ggplot(CGI_edge_delta, aes(-dis, delta, color = NPC)) + 
 		geom_smooth() + 
+		geom_hline(yintercept = 0) + 
 		facet_grid(sample ~ edge, scales = "free_x") + 
 		xlab("Distance to CGI edge (bp)") + 
 		ylab("Difference in fractional methylation\nglioma - NPC") + 
