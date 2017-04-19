@@ -34,8 +34,21 @@ quantile_5mC <- read.delim("qc.5mC.quantile", as.is = T) %>% mutate(sample = gsu
 	geom_boxplot(stat = "identity") + 
 	xlab("") + 
 	ylab("Fractional methylation") + 
+	scale_fill_manual(values = c("grey", "coral", "royal blue")) + 
 	theme_bw())
-ggsave(quantile_5mC_figure, file = "quantile_5mC_figure.pdf", height = 5, width = 4)
+ggsave(quantile_5mC_figure, file = "quantile_5mC_figure.pdf", height = 4, width = 3)
+CGI_5mC <- read.delim("CGI.5mC", as.is = T, col.names = c("ID", "fractional", "sample")) 
+(CGI_5mC_figure <- ggplot(CGI_5mC, aes(fractional, color = sample)) + 
+		geom_density(size = 1.2) + 
+		xlab("Fractional methylation") + 
+		ylab("") + 
+		scale_color_manual(values = c("darkgrey", "coral", "royal blue")) + 
+		theme_bw())
+ggsave(CGI_5mC_figure, file = "CGI_5mC_figure.pdf", height = 4, width = 5)
+CGI_5mC_wide <- CGI_5mC %>% dcast(ID ~ sample, value.var = "fractional")
+t.test(CGI_5mC_wide$CD34, CGI_5mC_wide$DN)$p.value
+t.test(CGI_5mC_wide$CD34, CGI_5mC_wide$DP)$p.value
+t.test(CGI_5mC_wide$DP, CGI_5mC_wide$DN)$p.value
 delta_5mC_DP_DN <- read.delim("DP_DN.5mC.delta.summary", head = F, as.is = T, col.names = c("delta", "N")) %>% filter(delta != 1) %>% mutate(samples = "DP-DN")
 delta_5mC_DP_CD34 <- read.delim("DP_CD34.5mC.delta.summary", head = F, as.is = T, col.names = c("delta", "N")) %>% filter(delta != 1) %>% mutate(samples = "DP-CD34")
 delta_5mC_DN_CD34 <- read.delim("DN_CD34.5mC.delta.summary", head = F, as.is = T, col.names = c("delta", "N")) %>% filter(delta != 1) %>% mutate(samples = "DN-CD34")
@@ -56,7 +69,9 @@ DMR_DP_DN_figure <- DMR_figures(DMR_DP_DN, "DP", "DN", figures = c("length", "co
 (DMR_DP_DN_figure$length)
 (DMR_DP_DN_figure$count)
 (DMR_DP_DN_figure$dis)
-(DMR_DP_DN_figure$freq)
+(DMR_DP_DN_figure$freq <- DMR_DP_DN_figure$freq + 
+		scale_fill_manual(values = c("coral", "royal blue"), name = "", labels = c("hypo in DN", "hypo in DP")) + 
+		coord_flip(ylim = c(-600, 600)))
 (GREAT_DMR_DP_DN_hyper_figure <- enrich_GREAT("DP_DN_hyper", "DP_DN_hyper", categories = c("GOBP", "DiseaseOntology", "MousePhenotype"), height = 10, width = 8))
 DMR_DP_CD34 <- read.delim("DMR.DP_CD34.s500.c3", head = F, as.is = T, col.names = colname) %>% mutate(chr = paste0("chr", chr))
 DMR_DP_CD34_figure <- DMR_figures(DMR_DP_CD34, "DP", "CD34", figures = c("length", "count", "adjacentDis", "frequency", "circos"), hist_width = 20)
