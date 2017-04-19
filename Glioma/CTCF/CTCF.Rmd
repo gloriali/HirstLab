@@ -1,0 +1,86 @@
+---
+title: "Glioma - CTCF"
+author: "Gloria Li"
+date: "Apr, 4, 2017"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    code_folding: hide
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics2/users/lli/glioma/CTCF/CTCF.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 5, bitmapType='cairo') 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/CTCF/")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+```
+
+## CTCF ChIP-seq processing
+* FindER v0.9.3b enriched regions (no input bam files).     
+* For CTCF gain/loss sites: pairwaise between each IDHmut and each IDHwt samples and then take the intersect.      
+
+## DNA methylation changes at CTCF sites
+* There is significant gain of 5mC at CTCF loss regions in IDHmut gliomas.   
+* There is also slight gain of 5mC at CTCF gain regions, maybe because the CTCF sites were from an independent sample set, or is just a reflection of hypermethylation in IDHmut gliomas.      
+* For CTCF loss regions:   
+	+ responders: 5mC IDHmut-IDHwt >= 0.2     
+	+ non-responders: 5mC IDHmut-IDHwt <= 0
+
+```{r 5mC}
+(CTCF_loss_5mC_figure)
+(CTCF_gain_5mC_figure)
+```
+
+## H3K36me3 change at responders
+* There is a slight gain of H3K36me3 at responders, but also at non-respnders.    
+* Evidence for increase transcription responding for 5mC gain is not strong.   
+
+```{r H3K36me3}
+(CTCF_responder_K36_figure)
+(CTCF_responder_K36_2D_figure)
+(CTCF_nonresponder_K36_figure)
+(CTCF_nonresponder_K36_2D_figure)
+```
+
+## Transcription deregulation associated with CTCF sites
+* Identify genes with transcription deregulation associated with CTCF sites: 
+	+ TSS and enhancer are on opposite sides of CTCF sites.      
+	+ Distance between TSS and enhacner <= 50 kb.      
+	+ RNA-seq RPKM change >= 2-fold.     
+* Genes higher expressed due to loss of CTCF sites unblocking enhancer.    
+	+ SOX8: involved in determination of the cell fate and brain development and function.    
+	+ GRID2IP: plays crucial roles in synaptogenesis and synaptic plasticity.     
+	+ RAI1: involved in neuronal differentiation.    
+	+ PROX1: plays a critical role in embryonic development and functions as a key regulatory protein in neurogenesis.   
+	+ EFNB3: crucial for migration, repulsion and adhesion during neuronal, vascular and epithelial development.    
+	+ CAMKK2: involved with learning and memory, neuronal differentiation and migration, neurite outgrowth, and synapse formation.      
+	+ ZSCAN10: required to maintain ES cell pluripotency.     
+	+ SMARCA4     
+	+ LRP8: a key component of the Reelin pathway which governs neuronal layering of the forebrain during embryonic brain development.     
+
+```{r H3K27ac_CTCFloss}
+kable(H3K27ac_TSS_CTCF_loss, digits = 4, format = "html", align = "c", row.names = F)
+```
+
+* Genes lower expressed due to gain of CTCF sites blocking enhancer.    
+
+```{r H3K27ac_CTCFgain}
+kable(H3K27ac_TSS_CTCF_gain, digits = 4, format = "html", align = "c", row.names = F)
+```
+
