@@ -46,7 +46,7 @@ echo "No. of CpGs shared, and with enough coverage: "$nC
 
 echo "Running methyl_diff; output to "$dirOut/DM.$name.p$pth.d$delta.bed
 less $dirOut/$name.join | awk '{print $2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.input
-less $dirOut/$name.input | /home/mbilenky/methyl_diff-methyl_diff/methyl_diff > $dirOut/$name.output
+less $dirOut/$name.input | /home/lli/bin/methyl_diff-methyl_diff/methyl_diff > $dirOut/$name.output
 l1=($(wc -l $dirOut/$name.input)); l2=($(wc -l $dirOut/$name.output));
 if [ "$l1" != "$l2" ]; then
     echo "ERROR: methyl_diff input has" $l1 "lines, output has" $l2 "lines."; 
