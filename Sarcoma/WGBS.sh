@@ -42,11 +42,16 @@ cd $dirH1
 for file in */E003_ESC.H1_combined */E006_ESDR.H1.MSC_combined; do
 	chr=$(echo $file | sed 's/chr//g' | sed 's/\/.*//g')
 	lib=$(basename $file | cut -d'_' -f1)
+	if [ "$lib" == "E003" ]; then 
+		lib="H1."$lib
+	else
+		lib="MSC."$lib 
+	fi;
 	echo $lib $chr
 	less $file | awk '{printf "%s\t%d\t%s\t%.0f\t%.0f\n", "'$chr'", $1, ".", $2-$2*$3, $2*$3}' >> $dirOut/$lib.5mC.CpG
 done
 cd $dirOut
-for file in E00*.5mC.CpG; do
+for file in *E00*.5mC.CpG; do
 	lib=$(echo $file | sed 's/.5mC.CpG//g')
 	echo $lib
 	/home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirOut -o $dirOut -f $file -format novo5mC
@@ -56,4 +61,27 @@ for file in E00*.5mC.CpG; do
 	less $dirOut/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirOut/qc.5mC.quantile
 	less $dirOut/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.hg19v69_TSS2000.bed -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print i"\t"c[i]/(c[i]+t[i])"\t""'$lib'"}}' >> $dirOut/CGI.promoter.5mC
 done
+
+## DMR
+dirOut=/projects/epigenomics3/epigenomics3_results/alorzadeh/Sarcoma/WGBS/
+mkdir -p $dirOut/DMR/
+echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DMR/DM.summary.stats
+echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR/DMR.summary.stats
+pth=0.0005
+delta=0.6
+m=0.75
+cov=3
+size=500  
+cut=3
+for file1 in DG*.combine.5mC.CpG; do
+	lib1=$(echo $file1 | cut -d'.' -f1)
+	for file2 in NPC.combine.5mC.CpG *E00*.combine.5mC.CpG; do
+		lib2=$(echo $file2 | cut -d'.' -f1)
+		name=$lib1'_'$lib2
+		echo -e "\n"$name
+		/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut -o $dirOut/DMR/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
+		/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/DMR/ -o $dirOut/DMR/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+	done
+done
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut/DMR/
 
