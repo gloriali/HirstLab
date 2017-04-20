@@ -73,15 +73,16 @@ m=0.75
 cov=3
 size=500  
 cut=3
+cd $dirOut
 for file1 in DG*.combine.5mC.CpG; do
-	lib1=$(echo $file1 | cut -d'.' -f1)
-	for file2 in NPC.combine.5mC.CpG *E00*.combine.5mC.CpG; do
-		lib2=$(echo $file2 | cut -d'.' -f1)
-		name=$lib1'_'$lib2
-		echo -e "\n"$name
-		/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut -o $dirOut/DMR/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
-		/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/DMR/ -o $dirOut/DMR/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
-	done
+    lib1=$(echo $file1 | cut -d'.' -f1)
+    for file2 in NPC.combine.5mC.CpG *E00*.combine.5mC.CpG; do
+	lib2=$(echo $file2 | cut -d'.' -f1)
+	name=$lib1'_'$lib2
+	echo -e "\n"$name
+	/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut -o $dirOut/DMR/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
+	/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/DMR/ -o $dirOut/DMR/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+    done
 done
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut/DMR/
 
