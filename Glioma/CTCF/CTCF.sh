@@ -37,6 +37,7 @@ for bam in *h3k27ac*.bam; do
 	echo $bam
 	$JAVA -jar -Xmx10G /home/mbilenky/bin/Solexa_Java/FindER.0.9.3b.jar -i $bam -r $reg -o $dirOut -v -m $map -info -minER 300 > $dirOut/FindER.$bam.log
 done
+### CTCF changes
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/
 cd $dirOut
@@ -52,6 +53,7 @@ for f1 in FindER_scan.mgh7530_ctcf_13.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh69
     done
     less $dirOut/CTCF_loss_all.$s1.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1=="'$i'"){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_loss.$s1.bed 
 done
+> $dirOut/CTCF_loss.intersect.bed
 for file in CTCF_loss.*.bed; do
     s=$(echo $file | cut -d'.' -f2)
     $BEDTOOLS/intersectBed -a CTCF_loss.mgh6971.bed -b $file -u | awk '{print $0"\t""'$s'"}' >> $dirOut/CTCF_loss.intersect.bed
@@ -60,20 +62,30 @@ less $dirOut/CTCF_loss.intersect.bed | awk '{print $4}' | sort | uniq -c | awk '
 for f1 in FindER_scan.mgh7478_idhm_ctcf_12.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh59_idh1m_ctcf_10.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh17m_ctcf_17.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh18m_ctcf_18.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh81_idh1m_ctcf_22.pctl_0.1.FDR_0.05.bed.gz; do
     s1=$(echo $f1 | sed 's/FindER_scan.//g' | cut -d'_' -f1)
     > $dirOut/CTCF_gain_all.$s1.bed
+    > $dirOut/CTCF_retained_all.$s1.bed
     i=0
     for f2 in FindER_scan.mgh7530_ctcf_13.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh6971_ctcf_11.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh7770_ctcf_15.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh80_ctcf_21.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh76_ctcf_19.pctl_0.1.FDR_0.05.bed.gz FindER_scan.mgh79_ctcf_20.pctl_0.1.FDR_0.05.bed.gz; do
         s2=$(echo $f2 | sed 's/FindER_scan.//g' | cut -d'_' -f1)
         echo $s1 $s2
-        i=$i+1
+        i=$((i+1))
         $BEDTOOLS/intersectBed -a $f1 -b $f2 -v | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t""'$s2'"}' >> $dirOut/CTCF_gain_all.$s1.bed
+        $BEDTOOLS/intersectBed -a $f1 -b $f2 -u | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t""'$s2'"}' >> $dirOut/CTCF_retained_all.$s1.bed
     done
-    less $dirOut/CTCF_gain_all.$s1.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1==5){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_gain.$s1.bed 
+    less $dirOut/CTCF_gain_all.$s1.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1=="'$i'"){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_gain.$s1.bed 
+    less $dirOut/CTCF_retained_all.$s1.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1=="'$i'"){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_retained.$s1.bed 
 done
+> $dirOut/CTCF_gain.intersect.bed
 for file in CTCF_gain.*.bed; do
     s=$(echo $file | cut -d'.' -f2)
     $BEDTOOLS/intersectBed -a CTCF_gain.mgh17m.bed -b $file -u | awk '{print $0"\t""'$s'"}' >> $dirOut/CTCF_gain.intersect.bed
 done
-less $dirOut/CTCF_gain.intersect.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1>=5){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_IDHmut_unique.bed
+less $dirOut/CTCF_gain.intersect.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1>=4){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_IDHmut_unique.bed
+> $dirOut/CTCF_retained.intersect.bed
+for file in CTCF_retained.*.bed; do
+    s=$(echo $file | cut -d'.' -f2)
+    $BEDTOOLS/intersectBed -a CTCF_retained.mgh17m.bed -b $file -u | awk '{print $0"\t""'$s'"}' >> $dirOut/CTCF_retained.intersect.bed
+done
+less $dirOut/CTCF_retained.intersect.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1>=4){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_IDHmut_retained.bed
 
 ## 5mC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -81,11 +93,11 @@ dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/
 mkdir -p $dirOut
 cd $dir5mC
-for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHwt_unique.bed /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_unique.bed; do
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDH*.bed; do
     echo -e "chr\tstart\tend\tID\tfractional\tsample" > $dirOut/$(basename $CTCF).5mC
     for file in *.combine.5mC.CpG; do
         sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
-        echo $sample;
+        echo $(basename $CTCF) $sample;
         $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}' | sort -k1,1 -k 2,2n >> $dirOut/$(basename $CTCF).5mC
     done
 done
@@ -97,12 +109,14 @@ responder=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/responder.bed
 nonresponder=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/nonresponder.bed
 gain=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_unique.bed
 loss=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHwt_unique.bed
+retained=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_retained.bed
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/H3K36me3/
 dirK36=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/H3K36me3/
 echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/resonpder.H3K36me3.bed
 echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/nonresonpder.H3K36me3.bed
-echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/gain.H3K36me3.bed
-echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/loss.H3K36me3.bed
+echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/gain.H3K36me3.bed
+echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/loss.H3K36me3.bed
+echo -e "chr\tstart\tend\tID\tsample\tRPKM" > $dirOut/retained.H3K36me3.bed
 mkdir -p $dirOut
 cd $dirK36
 for bam in *.bam; do
@@ -111,8 +125,9 @@ for bam in *.bam; do
     depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $responder -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/resonpder.H3K36me3.bed
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $nonresponder -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/nonresonpder.H3K36me3.bed    
-    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $gain | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/gain.H3K36me3.bed    
-    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $loss | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/loss.H3K36me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $gain | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/gain.H3K36me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $loss | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/loss.H3K36me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $retained | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/retained.H3K36me3.bed    
 done
 
 ## H3K27me3
@@ -122,12 +137,14 @@ responder=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/responder.bed
 nonresponder=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/nonresponder.bed
 gain=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_unique.bed
 loss=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHwt_unique.bed
+retained=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_retained.bed
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/H3K27me3/
 dirK27=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/H3K27me3/
 echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/resonpder.H3K27me3.bed
 echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/nonresonpder.H3K27me3.bed
-echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/gain.H3K27me3.bed
-echo -e "chr\tstart\tend\tID\tmut\twt\tdiff\tN\tsample\tRPKM" > $dirOut/loss.H3K27me3.bed
+echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/gain.H3K27me3.bed
+echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/loss.H3K27me3.bed
+echo -e "chr\tstart\tend\tID\tsample\tRPKM" > $dirOut/retained.H3K27me3.bed
 mkdir -p $dirOut
 cd $dirK27
 for bam in *.bam; do
@@ -136,8 +153,9 @@ for bam in *.bam; do
     depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $responder -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/resonpder.H3K27me3.bed
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $nonresponder -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/nonresonpder.H3K27me3.bed    
-    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $gain | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/gain.H3K27me3.bed    
-    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $loss | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$8*10^9/($3-$2)/"'$depth'"}' >> $dirOut/loss.H3K27me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $gain | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/gain.H3K27me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $loss | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/loss.H3K27me3.bed    
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $retained | sed 's/chr//g') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/retained.H3K27me3.bed    
 done
 
 ## H3K27ac
@@ -163,4 +181,19 @@ for file in $gain $loss; do
         join <(less $dirOut/H3K27ac_id.$sample.$(basename $file) | sort -k5,5) <(less $dirOut/TSS_iu.$(basename $file) | sort -k5,5) -1 5 -2 5 | awk '{d=sqrt(($7-($3+$4)/2)^2); if(d<=1000000){print $9"\t"$1"\t"$5"\t""'$sample'""\t"d}}' >> $dirOut/H3K27ac.TSS.$(basename $file)
     done
     join <(less $dirOut/H3K27ac.TSS.$(basename $file) | sort -k1,1) <(less $RPKM | sort -k1,1) | sed 's/ /\t/g' > $dirOut/H3K27ac.TSS.$(basename $file).RPKM
+done
+
+### Homer for CTCF BS
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/Homer/
+mkdir -p $dirOut
+cd $dirIn
+for file in CTCF_IDH*.bed FindER_scan.*ctcf*.bed.gz CTCF_gain.m*.bed  CTCF_loss.m*.bed  CTCF_retained.m*.bed; do
+	name=$(echo $file | sed 's/.bed//g' | sed 's/_ctcf.*//g' | sed 's/_idh.*//g')
+	echo "Processing "$name
+	mkdir -p $dirOut/$name/
+	/home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
 done
