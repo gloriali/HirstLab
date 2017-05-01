@@ -191,7 +191,8 @@ dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/Homer/
 mkdir -p $dirOut
 cd $dirIn
-for file in CTCF_IDH*.bed FindER_scan.*ctcf*.bed.gz CTCF_gain.m*.bed  CTCF_loss.m*.bed  CTCF_retained.m*.bed; do
+gunzip FindER_scan.*ctcf*.bed.gz 
+for file in CTCF_IDH*.bed FindER_scan.*ctcf*.bed CTCF_gain.m*.bed  CTCF_loss.m*.bed  CTCF_retained.m*.bed; do
 	name=$(echo $file | sed 's/.bed//g' | sed 's/_ctcf.*//g' | sed 's/_idh.*//g')
 	echo "Processing "$name
 	mkdir -p $dirOut/$name/
