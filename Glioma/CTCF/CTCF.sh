@@ -196,5 +196,41 @@ for file in CTCF_IDH*.bed FindER_scan.*ctcf*.bed CTCF_gain.m*.bed  CTCF_loss.m*.
 	name=$(echo $file | sed 's/.bed//g' | sed 's/_ctcf.*//g' | sed 's/_idh.*//g')
 	echo "Processing "$name
 	mkdir -p $dirOut/$name/
-	/home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+	/home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 6,10,15,20 
+done
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_retained.bed hg19 -m $dirOut/CTCF_IDHmut_retained/knownResults/known1.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_retained_long.BS.bed > $dirOut/CTCF_IDHmut_retained_long.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_retained.bed hg19 -m $dirOut/CTCF_IDHmut_retained/homerResults/motif2.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_retained_short.BS.bed > $dirOut/CTCF_IDHmut_retained_short.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_unique.bed hg19 -m $dirOut/CTCF_IDHmut_unique/homerResults/motif1.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_unique_short.BS.bed > $dirOut/CTCF_IDHmut_unique_short.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHwt_unique.bed hg19 -m $dirOut/CTCF_IDHwt_unique/homerResults/motif1.motif -nmotifs -mbed $dirOut/CTCF_IDHwt_unique_short.BS.bed > $dirOut/CTCF_IDHwt_unique_short.annotate
+#### 5mC
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/WGBS/
+mkdir -p $dirOut
+cd $dir5mC
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/Homer/*.bed; do
+    name=$(basename $CTCF | cut -d'.' -f1)
+    echo -e "chr\tstart\tend\tID\tfractional\tsample" > $dirOut/$name.5mC
+    for file in *.combine.5mC.CpG; do
+        sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+        echo $name $sample;
+        $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk 'NR>1{gsub("chr", ""); print $1"\t"$2-20"\t"$3+20"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){if(c[i]+t[i]>0){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}}' | sort -k1,1 -k 2,2n >> $dirOut/$name.5mC
+    done
+done
+#### H3K36me3
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/H3K36me3/
+dirK36=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/H3K36me3/
+mkdir -p $dirOut
+cd $dirK36
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/Homer/*.bed; do
+    name=$(basename $CTCF | cut -d'.' -f1)
+    echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/$name.H3K36me3.bed
+    for bam in *.bam; do
+        sample=$(echo $bam | cut -d'.' -f2)
+        echo $name $sample
+        depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
+        $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $CTCF | awk 'NR>1{gsub("chr", ""); print $1"\t"$2-20"\t"$3+20"\t"$1":"$2"-"$3}') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/$name.H3K36me3.bed    
+    done
 done
