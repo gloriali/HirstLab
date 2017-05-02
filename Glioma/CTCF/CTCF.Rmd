@@ -34,6 +34,10 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ## CTCF ChIP-seq processing
 * FindER v0.9.3b enriched regions (no input bam files).     
 * For CTCF gain/loss sites: pairwaise between each IDHmut and each IDHwt samples and then take the intersect.    
+* No. of CTCF enriched regions: 
+	+ retained between IDHwt and IDHmut: `r system("less /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_retained.bed | wc -l", intern = T)`   
+	+ gain in IDHmut: `r system("less /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHmut_unique.bed | wc -l", intern = T)`   
+	+ lost in IDHmut: `r system("less /projects/epigenomics2/users/lli/glioma/CTCF/FindER/CTCF_IDHwt_unique.bed | wc -l", intern = T)`   
 
 ## Sequence motif comparison
 * CTCF binding site motifs are slightly different for gain/loss sites and retained sites.        

@@ -2,13 +2,17 @@
 Gloria Li  
 Apr, 4, 2017  
 
-Updated: Tue May  2 00:38:00 2017
+Updated: Tue May  2 09:59:10 2017
 
 
 
 ## CTCF ChIP-seq processing
 * FindER v0.9.3b enriched regions (no input bam files).     
 * For CTCF gain/loss sites: pairwaise between each IDHmut and each IDHwt samples and then take the intersect.    
+* No. of CTCF enriched regions: 
+	+ retained between IDHwt and IDHmut: 35108   
+	+ gain in IDHmut: 505   
+	+ lost in IDHmut: 801   
 
 ## Sequence motif comparison
 * CTCF binding site motifs are slightly different for gain/loss sites and retained sites.        
