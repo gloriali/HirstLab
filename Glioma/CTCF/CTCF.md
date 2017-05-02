@@ -2,7 +2,7 @@
 Gloria Li  
 Apr, 4, 2017  
 
-Updated: Tue May  2 09:59:10 2017
+Updated: Tue May  2 10:26:46 2017
 
 
 
@@ -17,7 +17,13 @@ Updated: Tue May  2 09:59:10 2017
 ## Sequence motif comparison
 * CTCF binding site motifs are slightly different for gain/loss sites and retained sites.        
 
-![](CTCF_files/figure-html/motif.png)            
+![](CTCF_files/figure-html/motif.png)          
+
+* Motifs around CTCF retained sites.         
+![](CTCF_files/figure-html/motif_retained.png)         
+
+* Motifs around CTCF loss sites.        
+![](CTCF_files/figure-html/motif_loss.png)         
 
 ## DNA methylation changes at CTCF sites
 * 5mC for CTCF binding sites +/- 20bp.         

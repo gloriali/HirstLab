@@ -42,7 +42,13 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ## Sequence motif comparison
 * CTCF binding site motifs are slightly different for gain/loss sites and retained sites.        
 
-![](CTCF_files/figure-html/motif.png)            
+![](CTCF_files/figure-html/motif.png)          
+
+* Motifs around CTCF retained sites.         
+![](CTCF_files/figure-html/motif_retained.png)         
+
+* Motifs around CTCF loss sites.        
+![](CTCF_files/figure-html/motif_loss.png)         
 
 ## DNA methylation changes at CTCF sites
 * 5mC for CTCF binding sites +/- 20bp.         
