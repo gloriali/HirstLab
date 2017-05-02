@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# RPKM of 5mC modifiers
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
+join <(less $dir5mC/DNAme_regulators.txt | sort -k2,2) $dirRPKM/RPKM/glioma.RPKM -1 2 -2 1 | join - $dirRPKM/NPC_RPKM/NPC.RPKM | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
+
 # check coverage profile
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 cd $dirIn
