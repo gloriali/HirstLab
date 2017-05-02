@@ -2,9 +2,13 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Wed Jan 25 11:54:03 2017
+Updated: Tue May  2 02:49:23 2017
 
 
+
+## RPKM of DNA methylation regulators
+
+![](WGBS_files/figure-html/modifier_RPKM-1.png)<!-- -->
 
 ## Global hypermethylation in IDH mut glioma
 * Genome-wide and CGI hypermethylation in IDH mutant glioma samples: CEMT19, CEMT22, and CEMT_47.      
@@ -18,10 +22,6 @@ Updated: Wed Jan 25 11:54:03 2017
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
 ![](WGBS_files/figure-html/5mC_CGI-1.png)<!-- -->
-
-## DNA methylation at CTCF loss regions
-
-![](WGBS_files/figure-html/5mC_CTCF-1.png)<!-- -->
 
 ## DMRs between gliomas and NPCs  
 ### DMR identification 
@@ -42,6 +42,25 @@ Updated: Wed Jan 25 11:54:03 2017
 * Results against different NPCs were reasonably similar (intersect statistically significant).      
 
 ![](WGBS_files/figure-html/DMR_summary-1.png)<!-- -->
+
+### DMR GREAT analysis
+* DMR - gene association
+	+ Proximal: 5kb upstream, 1kb downstream.     
+	+ Distal: up to 20kb.         
+
+#### Hypermethylated DMRs
+* IDH mut and wt samples showed different terms, and CEMT_21 showed similar terms as wt.      
+	+ Disease Ontology: mut showed CNS/brain disease.     
+	+ GOBP: mut showed neurogenesis/brain development, wt showed regulation of biosynthetic process.   
+	+ GOCC: wt showed transcription factor complex, mut also showed membranes and neurons.         
+
+![](WGBS_files/figure-html/DMR_GREAT_hyper-1.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-2.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-3.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-4.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-5.png)<!-- -->
+
+#### Hypomethylated DMRs
+* IDH mut had few significant term (CEMT22 had none), wt had cancer related terms, and CEMT21 showed similar terms to mut.   
+
+![](WGBS_files/figure-html/DMR_GREAT_hypo1-1.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hypo1-2.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hypo1-3.png)<!-- -->
+![](WGBS_files/figure-html/DMR_GREAT_hypo2-1.png)<!-- -->
 
 ### Percentage of hyper CpGs in hyper CGIs
 
@@ -176,13 +195,6 @@ Updated: Wed Jan 25 11:54:03 2017
 
 ![](WGBS_files/figure-html/DMR_genomicBreak-1.png)<!-- -->
 
-### DMR associated with DE genes
-* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
-
-![](WGBS_files/figure-html/DMR_DE-1.png)<!-- -->
-
-![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
-
 ### DMR enrichment in chromatin states
 * Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
 * Hypomethylated regions were enriched in enhancer regions.    
@@ -193,23 +205,54 @@ Updated: Wed Jan 25 11:54:03 2017
 
 ![](WGBS_files/figure-html/DMR_DHM-1.png)<!-- -->
 
-### DMR GREAT analysis
-* DMR - gene association
-	+ Proximal: 5kb upstream, 1kb downstream.     
-	+ Distal: up to 20kb.         
+### DMR associated with DE genes
+* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
 
-#### Hypermethylated DMRs
-* IDH mut and wt samples showed different terms, and CEMT_21 showed similar terms as wt.      
-	+ Disease Ontology: mut showed CNS/brain disease.     
-	+ GOBP: mut showed neurogenesis/brain development, wt showed regulation of biosynthetic process.   
-	+ GOCC: wt showed transcription factor complex, mut also showed membranes and neurons.         
+![](WGBS_files/figure-html/DMR_DE-1.png)<!-- --><table>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Sample </th>
+   <th style="text-align:center;"> hyper_promoter </th>
+   <th style="text-align:center;"> UP_2FC </th>
+   <th style="text-align:center;"> H3K27ac </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> CEMT_19 </td>
+   <td style="text-align:center;"> 7921 </td>
+   <td style="text-align:center;"> 1951 </td>
+   <td style="text-align:center;"> 1340 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_21 </td>
+   <td style="text-align:center;"> 429 </td>
+   <td style="text-align:center;"> 86 </td>
+   <td style="text-align:center;"> 53 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_22 </td>
+   <td style="text-align:center;"> 6830 </td>
+   <td style="text-align:center;"> 1675 </td>
+   <td style="text-align:center;"> 1053 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_23 </td>
+   <td style="text-align:center;"> 640 </td>
+   <td style="text-align:center;"> 215 </td>
+   <td style="text-align:center;"> 62 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_47 </td>
+   <td style="text-align:center;"> 8254 </td>
+   <td style="text-align:center;"> 1972 </td>
+   <td style="text-align:center;"> 1357 </td>
+  </tr>
+</tbody>
+</table>
 
-![](WGBS_files/figure-html/DMR_GREAT_hyper-1.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-2.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-3.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-4.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hyper-5.png)<!-- -->
+![](WGBS_files/figure-html/hyper_UP_K27ac_homer.png)
+![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
 
-#### Hypomethylated DMRs
-* IDH mut had few significant term (CEMT22 had none), wt had cancer related terms, and CEMT21 showed similar terms to mut.   
-
-![](WGBS_files/figure-html/DMR_GREAT_hypo1-1.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hypo1-2.png)<!-- -->![](WGBS_files/figure-html/DMR_GREAT_hypo1-3.png)<!-- -->
-![](WGBS_files/figure-html/DMR_GREAT_hypo2-1.png)<!-- -->
 
 

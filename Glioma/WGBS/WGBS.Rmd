@@ -30,6 +30,12 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGBS/DM
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
+## RPKM of DNA methylation regulators
+
+```{r modifier_RPKM}
+(modifier_RPKM_figure)
+```
+
 ## Global hypermethylation in IDH mut glioma
 * Genome-wide and CGI hypermethylation in IDH mutant glioma samples: CEMT19, CEMT22, and CEMT_47.      
 * CEMT_21 (10% IDH mutation frequency) showed methylation levels closer to IDH wildtype samples.    
@@ -45,12 +51,6 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
 ```{r 5mC_CGI, fig.height = 10}
 (CGI_edge_delta_figure)
-```
-
-## DNA methylation at CTCF loss regions
-
-```{r 5mC_CTCF}
-(CTCF_loss_5mC_figure)
 ```
 
 ## DMRs between gliomas and NPCs  
@@ -73,58 +73,6 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
 ```{r DMR_summary}
 (DMR_summary_figure)
-```
-
-### Percentage of hyper CpGs in hyper CGIs
-
-```{r hyperCG_hyperDMR}
-(CGI_DMR_hyper_DM_figure)
-```
-
-### Methylated CGIs associated with transcription   
-
-```{r CGI_K36}
-kable(CGI_hyper_summary, format = "html", align = "c", row.names = F)
-```
-
-### Hypermethylated CGIs associated with transcription   
-* There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
-
-```{r DMR_CGI_K36}
-kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
-```
-
-![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
-
-### DMR enrichment in genomic regions 
-* Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
-* Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
-
-```{r DMR_genomicBreak}
-(genomic_breakdown_figure)
-```
-
-### DMR associated with DE genes
-* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
-
-```{r DMR_DE}
-(DMR_DE_figure)
-```
-
-![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
-
-### DMR enrichment in chromatin states
-* Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
-* Hypomethylated regions were enriched in enhancer regions.    
-
-```{r DMR_ChromHMM}
-(DMR_ChromHMM_summary_figure)
-```
-
-### DMR intersect with differentially marked histone modifications  
-
-```{r DMR_DHM}
-(DMR_DHM_enrich_figure)
 ```
 
 ### DMR GREAT analysis
@@ -157,5 +105,60 @@ kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
 ```{r DMR_GREAT_hypo2, fig.height=8}
 (GREAT_DMR_CEMT_23_hypo)
 ```
+
+### Percentage of hyper CpGs in hyper CGIs
+
+```{r hyperCG_hyperDMR}
+(CGI_DMR_hyper_DM_figure)
+```
+
+### Methylated CGIs associated with transcription   
+
+```{r CGI_K36}
+kable(CGI_hyper_summary, format = "html", align = "c", row.names = F)
+```
+
+### Hypermethylated CGIs associated with transcription   
+* There are on average 15% of hypermethylated CGIs overlapping with H3K36me3 enriched regions, 8% of them are not in genebody in IDH mut gliomas, suggesting possible enhancer RNA expression.    
+
+```{r DMR_CGI_K36}
+kable(CGI_DMR_hyper_summary, format = "html", align = "c", row.names = F)
+```
+
+![DMR_CGI_K36](WGBS_files/figure-html/hyperCGI_K36.1.png)        
+
+### DMR enrichment in genomic regions 
+* Enriched in CGIs and CGI shores, esp. hypermethylation in CGIs.    
+* Promoter: TSS +/- 2kb; CGI_shore: CGI +/- 2kb.      
+
+```{r DMR_genomicBreak}
+(genomic_breakdown_figure)
+```
+
+### DMR enrichment in chromatin states
+* Hypermethylated regions were enriched in H3K27me3 marked chromatin states.       
+* Hypomethylated regions were enriched in enhancer regions.    
+
+```{r DMR_ChromHMM}
+(DMR_ChromHMM_summary_figure)
+```
+
+### DMR intersect with differentially marked histone modifications  
+
+```{r DMR_DHM}
+(DMR_DHM_enrich_figure)
+```
+
+### DMR associated with DE genes
+* Hypermethylated DMRs in the promoter regions are significantly associated with both UP and DN regulated genes.         
+
+```{r DMR_DE}
+(DMR_DE_figure)
+kable(hyper_UP_K27ac_summary, format = "html", align = "c", row.names = F)
+```
+
+![](WGBS_files/figure-html/hyper_UP_K27ac_homer.png)
+![DMR_CGI_UP](WGBS_files/figure-html/HyperCGI_UP1.png)        
+
 
 
