@@ -320,4 +320,21 @@ cat DMR.CEMT_19.NPC.hyper.UP.H3K27ac.gain DMR.CEMT_22.NPC.hyper.UP.H3K27ac.gain 
 cat DMR.CEMT_19.NPC.hyper.UP.H3K27me3.loss DMR.CEMT_22.NPC.hyper.UP.H3K27me3.loss DMR.CEMT_47.NPC.hyper.UP.H3K27me3.loss | awk '{print $4}' | sort | uniq > DMR.IDHmut.NPC.hyper.UP.H3K27me3.loss
 cat DMR.CEMT_19.NPC.hyper.DN DMR.CEMT_22.NPC.hyper.DN DMR.CEMT_47.NPC.hyper.DN | awk '{print $1"."$11"."$12}' | sort | uniq | sed -e 's/\./\t/g' > DMR.IDHmut.NPC.hyper.DN
 cat DMR.CEMT_19.NPC.hypo.UP DMR.CEMT_22.NPC.hypo.UP DMR.CEMT_47.NPC.hypo.UP | awk '{print $1"."$11"."$12}' | sort | uniq | sed -e 's/\./\t/g' > DMR.IDHmut.NPC.hypo.UP
-
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
+dirHM=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
+echo -e "Sample\thyper_promoter\tUP_2FC\tH3K27ac" > hyper.UP_2FC.H2K27ac.summary
+for file in *hyper.promoter.bed; do
+    sample=$(echo $file | cut -d'.' -f2)
+    join <(less $file | sort -k5,5) <(less $dirRPKM/RPKM/glioma.RPKM | awk 'NR>1{print $1"\t"($2+$4+$6)/3}') -1 5 -2 1 | join - <(less $dirRPKM/NPC_RPKM/NPC.RPKM | awk 'NR>1{print $1"\t"($4+$5+$10+$11)/4}') | awk '{if(($6+1e-6)/($7+1e-6)>=2){print "chr"$2"\t"$3"\t"$4"\t"$5"\t"$1}}' > DMR.$sample.NPC.hyper.UP.2FC
+    join <(less DMR.$sample.NPC.hyper.UP.2FC | sort -k5,5) <(less $promoter | sort -k4,4) -1 5 -2 4 | awk '{print "chr"$6"\t"$7"\t"$8"\t"$1"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b $dirHM/$sample.FDR_0.05.FindER.bed.gz -wa -wb > DMR.$sample.NPC.hyper.UP.2FC.H3K27ac
+    echo -e "$sample\t$(less $file | wc -l)\t$(less DMR.$sample.NPC.hyper.UP.2FC | wc -l)\t$(less DMR.$sample.NPC.hyper.UP.2FC.H3K27ac | wc -l)" >> hyper.UP_2FC.H2K27ac.summary
+done
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+for file in DMR.CEMT_19.NPC.hyper.UP.2FC.H3K27ac DMR.CEMT_22.NPC.hyper.UP.2FC.H3K27ac DMR.CEMT_47.NPC.hyper.UP.2FC.H3K27ac; do
+    name=$(echo $file | sed 's/DMR.//g')
+    mkdir -p $dirOut/Homer/$name/
+    /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print $6"\t"$7"\t"$8"\t"$9}') hg19 $dirOut/Homer/$name/ -size 200 -len 8 
+done
