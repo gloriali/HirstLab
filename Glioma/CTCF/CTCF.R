@@ -42,10 +42,57 @@ CTCF_gain_5mC <- read.delim("./WGBS/CTCF_IDHmut_unique.bed.5mC", as.is = T) %>% 
 		theme_bw() + 
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(CTCF_gain_5mC_figure, file = "./WGBS/CTCF_gain_5mC_figure.pdf", height = 4, width = 5)
+CTCF_retained_5mC <- read.delim("./WGBS/CTCF_IDHmut_retained.bed.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_retained_5mC_figure <- ggplot(CTCF_retained_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT retained") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_retained_5mC_figure, file = "./WGBS/CTCF_retained_5mC_figure.pdf", height = 4, width = 5)
+
+## ------- 5mC at CTCF BS -------
+CTCF_short_loss_5mC <- read.delim("./WGBS/CTCF_IDHwt_unique_short.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_short_loss_5mC_figure <- ggplot(CTCF_short_loss_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT loss - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_loss_5mC_figure, file = "./WGBS/CTCF_short_loss_5mC_figure.pdf", height = 4, width = 5)
+CTCF_short_gain_5mC <- read.delim("./WGBS/CTCF_IDHmut_unique_short.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_short_gain_5mC_figure <- ggplot(CTCF_short_gain_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT gain - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_gain_5mC_figure, file = "./WGBS/CTCF_short_gain_5mC_figure.pdf", height = 4, width = 5)
+CTCF_short_retained_5mC <- read.delim("./WGBS/CTCF_IDHmut_retained_short.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_short_retained_5mC_figure <- ggplot(CTCF_short_retained_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT retained - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_retained_5mC_figure, file = "./WGBS/CTCF_short_retained_5mC_figure.pdf", height = 4, width = 5)
+CTCF_long_retained_5mC <- read.delim("./WGBS/CTCF_IDHmut_retained_long.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
+(CTCF_long_retained_5mC_figure <- ggplot(CTCF_long_retained_5mC, aes(sample, fractional, fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT retained - known") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_long_retained_5mC_figure, file = "./WGBS/CTCF_long_retained_5mC_figure.pdf", height = 4, width = 5)
 
 ## ------- H3K36me3 at CTCF loss regions -------
 e <- 1e-4
-CTCF_nonresponder_K36 <- read.delim("./H3K36me3/resonpder.H3K36me3.bed", as.is = T, col.names = c("chr", "start", "end", "ID", "mut", "wt", "diff", "N", "sample", "RPKM")) %>% 
+CTCF_nonresponder_K36 <- read.delim("./H3K36me3/nonresonpder.H3K36me3.bed", as.is = T, col.names = c("chr", "start", "end", "ID", "mut", "wt", "diff", "N", "sample", "RPKM")) %>% 
 	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
 (CTCF_nonresponder_K36_figure <- ggplot(CTCF_nonresponder_K36, aes(sample, log10(RPKM), fill = type)) + 
 		geom_boxplot() + 
@@ -93,6 +140,49 @@ CTCF_responder_K36_wide <- rbind(CTCF_responder_K36 %>% filter(sample %in% c("CE
 		ggtitle("responders") + 
 		theme_bw())
 ggsave(CTCF_responder_K36_2D_figure, file = "./H3K36me3/CTCF_responder_K36_2D_figure.pdf", height = 9, width = 7)
+
+## ------- H3K36me3 at CTCF loss BS -------
+e <- 1e-4
+CTCF_short_loss_K36 <- read.delim("./H3K36me3/CTCF_IDHwt_unique_short.H3K36me3.bed", as.is = T) %>% 
+	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
+(CTCF_short_loss_K36_figure <- ggplot(CTCF_short_loss_K36, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 H3K36me3 RPKM") + 
+		ggtitle("CTCF loss - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_loss_K36_figure, file = "./H3K36me3/CTCF_short_loss_K36_figure.pdf", height = 4, width = 5)
+CTCF_short_gain_K36 <- read.delim("./H3K36me3/CTCF_IDHmut_unique_short.H3K36me3.bed", as.is = T) %>% 
+	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
+(CTCF_short_gain_K36_figure <- ggplot(CTCF_short_gain_K36, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 H3K36me3 RPKM") + 
+		ggtitle("CTCF gain - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_gain_K36_figure, file = "./H3K36me3/CTCF_short_gain_K36_figure.pdf", height = 4, width = 5)
+CTCF_short_retained_K36 <- read.delim("./H3K36me3/CTCF_IDHmut_retained_short.H3K36me3.bed", as.is = T) %>% 
+	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
+(CTCF_short_retained_K36_figure <- ggplot(CTCF_short_retained_K36, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 H3K36me3 RPKM") + 
+		ggtitle("CTCF retained - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_retained_K36_figure, file = "./H3K36me3/CTCF_short_retained_K36_figure.pdf", height = 4, width = 5)
+CTCF_long_retained_K36 <- read.delim("./H3K36me3/CTCF_IDHmut_retained_long.H3K36me3.bed", as.is = T) %>% 
+	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
+(CTCF_long_retained_K36_figure <- ggplot(CTCF_long_retained_K36, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 H3K36me3 RPKM") + 
+		ggtitle("CTCF retained - known") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_long_retained_K36_figure, file = "./H3K36me3/CTCF_long_retained_K36_figure.pdf", height = 4, width = 5)
 
 ## ------- H3K27me3 at CTCF loss regions -------
 CTCF_nonresponder_K27 <- read.delim("./H3K27me3/resonpder.H3K27me3.bed", as.is = T, col.names = c("chr", "start", "end", "ID", "mut", "wt", "diff", "N", "sample", "RPKM")) %>% 

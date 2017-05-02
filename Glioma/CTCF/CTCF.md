@@ -2,26 +2,29 @@
 Gloria Li  
 Apr, 4, 2017  
 
-Updated: Wed Apr 19 11:33:24 2017
+Updated: Tue May  2 00:38:00 2017
 
 
 
 ## CTCF ChIP-seq processing
 * FindER v0.9.3b enriched regions (no input bam files).     
-* For CTCF gain/loss sites: pairwaise between each IDHmut and each IDHwt samples and then take the intersect.      
+* For CTCF gain/loss sites: pairwaise between each IDHmut and each IDHwt samples and then take the intersect.    
+
+## Sequence motif comparison
+* CTCF binding site motifs are slightly different for gain/loss sites and retained sites.        
+
+![](CTCF_files/figure-html/motif.png)            
 
 ## DNA methylation changes at CTCF sites
+* 5mC for CTCF binding sites +/- 20bp.         
 * There is significant gain of 5mC at CTCF loss regions in IDHmut gliomas.   
-* There is also slight gain of 5mC at CTCF gain regions, maybe because the CTCF sites were from an independent sample set, or is just a reflection of hypermethylation in IDHmut gliomas.      
-* For CTCF loss regions:   
-	+ responders: 5mC IDHmut-IDHwt >= 0.2     
-	+ non-responders: 5mC IDHmut-IDHwt <= 0
+* CTCF gain regions are methylated, slightly higher in IDHmut but not statistically significant.         
+* Retained CTCF binding sites are unmethylated.             
 
-![](CTCF_files/figure-html/5mC-1.png)<!-- -->![](CTCF_files/figure-html/5mC-2.png)<!-- -->
+![](CTCF_files/figure-html/5mC-1.png)<!-- -->![](CTCF_files/figure-html/5mC-2.png)<!-- -->![](CTCF_files/figure-html/5mC-3.png)<!-- -->![](CTCF_files/figure-html/5mC-4.png)<!-- -->
 
 ## H3K36me3 change at responders
-* There is a slight gain of H3K36me3 at responders, but also at non-respnders.    
-* Evidence for increase transcription responding for 5mC gain is not strong.   
+* There is a slight gain of H3K36me3 at CTCF loss sites compared to retained/gain sites, coresponds to 5mC gain at these regions.      
 
 ![](CTCF_files/figure-html/H3K36me3-1.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-2.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-3.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-4.png)<!-- -->
 
