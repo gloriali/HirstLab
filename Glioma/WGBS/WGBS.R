@@ -18,6 +18,17 @@ load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 setwd("/projects/epigenomics2/users/lli/glioma/WGBS/DMR")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
+## ------- 5mC modifiers RPKM --------
+modifier_RPKM <- read.delim("../DNAme_regulators.RPKM", as.is = T) %>% select(-contains("Brain")) %>% melt(id = c("ENSG", "gene")) %>% 
+	mutate(type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPC")))
+(modifier_RPKM_figure <- ggplot(modifier_RPKM, aes(gene, value, color = type)) + 
+		geom_point(position = position_jitter(width = 0.2)) + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("RPKM") + 
+		theme_bw())
+ggsave(modifier_RPKM_figure, file = "../modifier_RPKM_figure.pdf", height = 5, width = 6)
+
 ## ------- 5mC distribution------
 quantile_5mC <- read.delim("../qc.5mC.quantile", as.is = T) %>% mutate(type = gsub(".*\\d+_", "", sample), sample = gsub("_[gC].*", "", sample), category = gsub("[_\\.].*", "", sample))
 (quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, fill = category)) + 
@@ -234,6 +245,8 @@ DMR_DE <- read.delim("./DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = 
 	ylab("Fraction of DE genes") + 
 	theme_bw())
 ggsave(DMR_DE_figure, file = "DMR_DE_figure.pdf")
+DMR_DE_HM_summary <- read.delim("./DE/DMR.DE.HM.summary", as.is = T)
+hyper_UP_K27ac_summary <- read.delim("./DE/hyper.UP_2FC.H2K27ac.summary", as.is = T)
 
 save(list = c("DMR_intersect",  
 							ls(pattern = "summary"), ls(pattern = "figure"), 
