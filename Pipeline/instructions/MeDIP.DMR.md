@@ -3,7 +3,8 @@
 + Run `RegionsCoverageFromWigCalculator.jar` on MeDIP libraries for CpG +/- 25bp regions and background regions.
 + Input files:
     * CpG +/- 25bp regions for each chr bed files: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`
-    * Background regions for each chr bed files: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_empty_500_chr/`     
+    * Background regions for each chr bed files: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_empty_500_chr/`   
+    * CpG +/- 25bp regions and Background regions for mm10: `/projects/epigenomics/resources/CpG/mm10/`       
     * MeDIP wig file        
 + Output files:   
     * `<chr>.<name>.coverage` file for each chr in each library: `chr   start   end     normalized coverage     max coverage`
