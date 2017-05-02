@@ -199,8 +199,8 @@ for file in CTCF_IDH*.bed FindER_scan.*ctcf*.bed CTCF_gain.m*.bed  CTCF_loss.m*.
 	/home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 6,10,15,20 
 done
 /home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_retained.bed hg19 -m $dirOut/CTCF_IDHmut_retained/knownResults/known1.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_retained_long.BS.bed > $dirOut/CTCF_IDHmut_retained_long.annotate
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_retained.bed hg19 -m $dirOut/CTCF_IDHmut_retained/homerResults/motif2.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_retained_short.BS.bed > $dirOut/CTCF_IDHmut_retained_short.annotate
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_unique.bed hg19 -m $dirOut/CTCF_IDHmut_unique/homerResults/motif1.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_unique_short.BS.bed > $dirOut/CTCF_IDHmut_unique_short.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_retained.bed hg19 -m $dirOut/CTCF_IDHmut_retained/homerResults/motif1.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_retained_short.BS.bed > $dirOut/CTCF_IDHmut_retained_short.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHmut_unique.bed hg19 -m $dirOut/CTCF_IDHmut_unique/homerResults/motif9.motif -nmotifs -mbed $dirOut/CTCF_IDHmut_unique_short.BS.bed > $dirOut/CTCF_IDHmut_unique_short.annotate
 /home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/CTCF_IDHwt_unique.bed hg19 -m $dirOut/CTCF_IDHwt_unique/homerResults/motif1.motif -nmotifs -mbed $dirOut/CTCF_IDHwt_unique_short.BS.bed > $dirOut/CTCF_IDHwt_unique_short.annotate
 #### 5mC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
