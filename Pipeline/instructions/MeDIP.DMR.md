@@ -67,7 +67,7 @@ for i = 1:4
         cdfplot(dip);
         xlabel('Fractional methylation');
         ylabel('Fraction of CpGs');
-        title(strcat(name1,'.',chr));
+        title(strcat(name,'.',chr));
         dirOut='/projects/epigenomics2/users/lli/glioma/Kongkham/CDF_5mC_plots/';
         nameOut=strcat(dirOut, 'CDF_5mC_',name,'.',chr);
         print(gcf, '-dpdf', strcat(nameOut, '.pdf'));
