@@ -5,12 +5,36 @@ dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
 join <(less $dir5mC/DNAme_regulators.txt | sort -k2,2) $dirRPKM/RPKM/glioma.RPKM -1 2 -2 1 | join - $dirRPKM/NPC_RPKM/NPC.RPKM | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
 
-# check coverage profile
+# combine strands 5mC for CEMT and glioma
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 cd $dirIn
 for file in *.5mC.CpG; do
-    echo "Coverage profile for" $file
-    less $file | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $file.coverage.txt
+    lib=$(echo $file | sed -e 's/.5mC.CpG//g')
+    echo "Combining strand for" $lib
+    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -format novo5mC
+done
+
+# Formatting TCGA WGBS
+dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+cd $dirIn
+for file in TCGA*.bed; do
+    lib=$(echo $file | sed -e 's/.bed//g')
+    echo "Processing" $lib
+    less $file | awk 'NR>1{gsub("chr", ""); if($8>=3){printf "%s\t%d\t%d\t%.0f\t%.0f\t%.2f\n", $1, $2, $3+1, $8-$8*$7/100, $8*$7/100, $7}}' > $dirIn/$lib.combine.5mC.CpG
+done
+rm TCGA*.bed
+
+# check coverage profile and 5mC quantile
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+echo -e "sample\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc.5mC.quantile # QC: genome-wide and CGI methylation level summary; ymin: 10% quantile, ymax: 90% quantile
+cd $dirIn
+for file in *.combine.5mC.CpG; do
+    lib=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
+    echo "Processing" $lib
+    less $file | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $lib.coverage.txt
+    less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_genome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_CGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
 done
 
 # CTCF loss region 5mC
@@ -21,7 +45,7 @@ mkdir -p $dirOut
 echo -e "chr\tstart\tend\tID\tfractional\tsample"> $dirOut/CTCF.loss.5mC
 cd $dir5mC
 for file in *.combine.5mC.CpG; do
-    sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
+    sample=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g');
     echo $sample;
     $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk '{print $0"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}' | sort -k1,1 -k 2,2n >> $dirOut/CTCF.loss.5mC
 done
@@ -41,14 +65,7 @@ cov=3
 size=500  
 cut=3
 cd $dirIn
-for file in *.5mC.CpG; do
-    lib=$(echo $file | sed -e 's/.5mC.CpG//g')
-    echo -e "Combining strand for" $lib
-    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -format novo5mC
-    less $dirIn/$file.combine.5mC.CpG | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_genome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
-    less $dirIn/$file.combine.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_CGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
-done    
-for file1 in CEMT*.combine.5mC.CpG; do
+for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
     echo -e "\n\n"$lib1
     for file2 in NPC*.combine.5mC.CpG; do
@@ -67,7 +84,7 @@ size=500
 cut=3
 echo -e "sample\tsize\tcut\thyper\thypo\tlength_hyper\tlength_hypo" > $dirOut/DMR.summary.stats
 cd /projects/epigenomics2/users/lli/glioma/WGBS/
-for file1 in CEMT*.combine.5mC.CpG; do
+for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
     echo -e $lib1
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed
@@ -144,7 +161,7 @@ for file in *.combine.5mC.CpG; do
 done
 cat $dirOut/*.CGI.edge > $dirOut/CGI.edge.all
 cd $dirOut
-for f1 in CEMT*.CGI.edge; do
+for f1 in CEMT*.CGI.edge TCGA*.CGI.edge; do
 	for f2 in NPC*.CGI.edge; do
 		s1=$(echo $f1 | sed 's/.CGI.edge//g'); s2=$(echo $f2 | sed 's/.CGI.edge//g');
 		echo $s1 $s2;
@@ -191,7 +208,7 @@ dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
 $BEDTOOLS/intersectBed -a $CGI -b $gene -v > /home/lli/hg19/CGI.nongene.bed
 echo -e "Sample\tCGI\tCGI_hyper\tCGI_K36\tCGI_hyper_K36\tp" > $dirOut/CGI.hyper.H3K36me3.summary
 cd $dir5mC
-for file in CEMT*.combine.5mC.CpG; do
+for file in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
     sample=$(echo $file | sed 's/.5mC.CpG.combine.5mC.CpG//g');
     echo $sample;
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/CGI.nongene.bed -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); if(f>=0.75){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f}}}' | sort -k1,1 -k 2,2n > $dirOut/$sample.CGI.nongene.hyper
@@ -233,7 +250,7 @@ BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 CG='/home/lli/hg19/CG.BED'
 cd $dirOut
 echo -e "Sample\tDM\tState\tTotal_CpG\tDMR_CpG\tState_CpG\tDMR_State_CpG\tEnrichment" > $dirOut/DMR.chromHMM.enrich
-for file in *CEMT*.CpG.bed; do
+for file in *CEMT*.CpG.bed *TCGA*.CpG.bed; do
     lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
     dm=$(echo $file | sed -e 's/.*NPC.//g' | sed -e 's/.CpG.bed//g')
     echo 'Processing' $lib $dm
@@ -255,7 +272,7 @@ R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
 genome=/home/lli/hg19/hg19.chrom.len
 cd $dirDMR
 echo -e "Sample\tDMR\tMark\tHM\tN_DMR\tN_HM\tN_intersect\tN_total\tFold\tp-value" > $dirDMR/DMR.uniqueHM.enrichment.summary
-for file in DMR.CEMT*.bed; do
+for file in DMR.CEMT*.bed DMR.TCGA*.bed; do
     lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
     dm=$(echo $file | sed -e 's/.bed//g' | sed -e 's/.*NPC.//g')
     echo $lib $dm
