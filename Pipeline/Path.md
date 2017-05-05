@@ -6,7 +6,8 @@ File paths on xhost
 * Java: `/home/mbilenky/jdk1.8.0_92/jre/bin/java`
 * Python: `/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/python`    
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab`  
-* Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/`
+* Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/`  
+* Deeptools: `/home/rislam/anaconda2/bin/deeptools` (`export PATH="/home/rislam/anaconda2/bin"`)
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`    
 * BCFtools: `/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools`   
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
