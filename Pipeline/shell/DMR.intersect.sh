@@ -16,9 +16,9 @@ region_name=''
 while [ $# -gt 0 ]
 do
     case "$1" in
-        -d) dirIn="$2"; shift;
-        -r) region="$2"; shift;
-        -n) region_name="$2"; shift;
+        -d) dirIn="$2"; shift;;
+        -r) region="$2"; shift;;
+        -n) region_name="$2"; shift;;
     esac
     shift
 done
@@ -43,7 +43,7 @@ all_promoter=3888980 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/
 all_CGI=2089538 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.forProfiles.BED -u | wc -l
 all_CGI_shore=2288095 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.2000shores.BED -u |wc -l
 if [ -f "$region" ]; then
-    all_region=$($BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b <(less $region | sed 's/chr//g') -u | wc -l)
+    all_region=$($BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b <(less $region | awk '{gsub("chr", ""); print $0}') -u | wc -l)
 fi
 echo -e "$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore\t$all_region" | awk '{print "Total No. of CpGs: "$1"\nExpectedPercentage:\n-Intergenic: "($1-$2)/$1"\n-Intron: "($2-$3)/$1"\n-Exon: "$3/$1"\n-Gene: "$2/$1"\n-Promoter: "$4/$1"\n-CGI: "$5/$1"\n-CGI shore: "$6/$1"\n-""'$region_name'"": "$7/$1}' 
 echo -e "Name\tNCpG\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\tCGI_shore\t$region_name" > $dirOut/genomic.breakdown.summary
