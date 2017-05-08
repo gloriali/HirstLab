@@ -43,7 +43,7 @@ all_promoter=3888980 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/
 all_CGI=2089538 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.forProfiles.BED -u | wc -l
 all_CGI_shore=2288095 # $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b /home/lli/hg19/CGI.2000shores.BED -u |wc -l
 if [ -f "$region" ]; then
-    all_region=$($BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b <(less $region | awk '{gsub("chr", ""); print $0}') -u | wc -l)
+    all_region=$(less $region | sed 's/chr//g' | $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b stdin -u | wc -l)
 fi
 echo -e "$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore\t$all_region" | awk '{print "Total No. of CpGs: "$1"\nExpectedPercentage:\n-Intergenic: "($1-$2)/$1"\n-Intron: "($2-$3)/$1"\n-Exon: "$3/$1"\n-Gene: "$2/$1"\n-Promoter: "$4/$1"\n-CGI: "$5/$1"\n-CGI shore: "$6/$1"\n-""'$region_name'"": "$7/$1}' 
 echo -e "Name\tNCpG\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI\tCGI_shore\t$region_name" > $dirOut/genomic.breakdown.summary
@@ -65,8 +65,8 @@ for dmr in DMR.*.bed; do
     CGI=$($BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/CGI.forProfiles.BED -u | wc -l)
     CGI_shore=$($BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/CGI.2000shores.BED -u | wc -l)
     if [ -f "$region" ]; then
-        $BEDTOOLS/intersectBed -a $dmr.tmp -b <(less $region | sed 's/chr//g') -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5":"$6"-"$7}' > $dirOut/DMR.$name.$region_name.bed
-        DMR_region=$($BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b <(less $region | sed 's/chr//g') -u | wc -l)
+        less $region | sed 's/chr//g'| $BEDTOOLS/intersectBed -a $dmr.tmp -b stdin -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5":"$6"-"$7}' > $dirOut/DMR.$name.$region_name.bed
+        DMR_region=$(less less $region | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b stdin -u | wc -l)
         echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI\t$CGI_shore\t$DMR_region\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore\t$all_region" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($9-$10)/$9)"\t"(($3-$4)/$2)/(($10-$11)/$9)"\t"($4/$2)/($11/$9)"\t"($3/$2)/($10/$9)"\t"($5/$2)/($12/$9)"\t"($6/$2)/($13/$9)"\t"($7/$2)/($14/$9)"\t"($8/$2)/($15/$9)}' >> $dirOut/genomic.breakdown.summary
     else
         echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI\t$CGI_shore\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($8-$9)/$8)"\t"(($3-$4)/$2)/(($9-$10)/$8)"\t"($4/$2)/($10/$8)"\t"($3/$2)/($9/$8)"\t"($5/$2)/($11/$8)"\t"($6/$2)/($12/$8)"\t"($7/$2)/($13/$8)}' >> $dirOut/genomic.breakdown.summary        
