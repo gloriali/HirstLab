@@ -103,16 +103,23 @@ for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
 done
 
 # DMR enrichment in genomic regions
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+> /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+for file in /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/CEMT*.bed.gz; do
+	less $file | wc -l
+	less $file >> /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+done
+less /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed 
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
-/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut
-## distance to closest CGI (midpoint of DMR to midpoint of CGI)
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed -n enhancer
+
+# distance to closest CGI (midpoint of DMR to midpoint of CGI)
 less /home/lli/hg19/CGI.forProfiles.BED | awk '{mid=int(($2+$3)/2); print $1"\t"mid"\t"mid+1"\t"$4}' > /home/lli/hg19/CGI.midpoint.BED
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 cd $dirOut
 mkdir $dirOut/CGI_dis/
 for file in DMR.*.bed; do
-    name=$(echo $file | sed -e s/'DMR.'//g)
-    name=$(echo $name | sed -e s/'.bed'//g)
+    name=$(echo $file | sed -e s/'DMR.'//g | sed -e s/'.bed'//g)
     echo "Processing $name"
     less $file | awk '{gsub("chr", ""); mid=int(($2+$3)/2); print $1"\t"mid"\t"mid+1"\t"$4}' | sort -k1,1 -k 2,2n > $dirOut/CGI_dis/$name.tmp.bed
     $BEDTOOLS/closestBed -a $dirOut/CGI_dis/$name.tmp.bed -b /home/lli/hg19/CGI.midpoint.BED -D b -t first > $dirOut/CGI_dis/DMR.$name.CGI.dis.tmp
@@ -150,7 +157,7 @@ mkdir -p $dirOut
 #cat $dirIn/DMR/*.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin | awk '{gsub("chr", ""); print $0}' > $dirIn/DMR/DMR.all.bed
 cd $dirIn
 for file in *.combine.5mC.CpG; do
-    name=$(echo $file | sed -e s/'.5mC.CpG.combine.5mC.CpG'//g)
+    name=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo $name
     #$BEDTOOLS/intersectBed -a $file -b $dirIn/DMR/DMR.all.bed -wa > $dirIn/$file.dmr
     less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /L/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-1000)&&($12<=2000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.L
