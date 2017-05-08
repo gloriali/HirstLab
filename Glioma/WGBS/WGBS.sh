@@ -55,7 +55,6 @@ dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 mkdir -p $dirOut/intermediate/
-echo -e "sample\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc.5mC.quantile # QC: genome-wide and CGI methylation level summary; ymin: 10% quantile, ymax: 90% quantile
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/intermediate/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/intermediate/DMR.summary.stats
 pth=0.0005
@@ -66,7 +65,7 @@ size=500
 cut=3
 cd $dirIn
 for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
-    lib1=$(echo $file1 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
+    lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo -e "\n\n"$lib1
     for file2 in NPC*.combine.5mC.CpG; do
         lib2=$(echo $file2 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
@@ -85,7 +84,7 @@ cut=3
 echo -e "sample\tsize\tcut\thyper\thypo\tlength_hyper\tlength_hypo" > $dirOut/DMR.summary.stats
 cd /projects/epigenomics2/users/lli/glioma/WGBS/
 for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
-    lib1=$(echo $file1 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
+    lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo -e $lib1
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed
     $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed
