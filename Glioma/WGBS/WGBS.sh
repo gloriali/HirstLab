@@ -20,7 +20,7 @@ cd $dirIn
 for file in TCGA*.bed; do
     lib=$(echo $file | sed -e 's/.bed//g')
     echo "Processing" $lib
-    less $file | awk 'NR>1{gsub("chr", ""); if($8>=3){printf "%s\t%d\t%d\t%.0f\t%.0f\t%.2f\n", $1, $2, $3+1, $8-$8*$7/100, $8*$7/100, $7}}' > $dirIn/$lib.combine.5mC.CpG
+    less $file | awk 'NR>1{gsub("chr", ""); if($8>=3){printf "%s\t%d\t%d\t%.0f\t%.0f\t%.4f\n", $1, $2, $3+1, $8-$8*$7/100, $8*$7/100, $7/100}}' | sort -k1,1 -k2,2n > $dirIn/$lib.combine.5mC.CpG
 done
 rm TCGA*.bed
 
