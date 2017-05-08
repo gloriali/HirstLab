@@ -1,10 +1,13 @@
 #!/bin/sh
 
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
-# index bam files
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
+# recover bam files
 cd $dirIn
-for file in *.bam
-do
+less bam_link.txt | awk '{gsub(".bam.*", "", $1); print $0}' | join /projects/epigenomics/users/lli/FetalBrain/FetalBrainLibrariesKeys.txt - > bam_locations.txt
+rm bam_link.txt
+less bam_locations.txt | awk '{print "Processing "$1; system("/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in "$5" --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out "$4".bam")}'
+# index bam files
+for file in *.bam; do
     echo "Indexing" $file
     /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
 done
@@ -15,7 +18,7 @@ done
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/H3K4me1/
 mkdir -p $dirOut
 cd $dirIn
@@ -53,7 +56,7 @@ rm -rf x y
 ## with three sizes of minimal enriched regions 200, 300bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/H3K4me3/
 mkdir -p $dirOut
 cd $dirIn
@@ -85,7 +88,7 @@ done
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/H3K9me3/
 mkdir -p $dirOut
 cd $dirIn
@@ -123,7 +126,7 @@ rm -rf x y
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/H3K27me3/
 mkdir -p $dirOut
 cd $dirIn
@@ -161,7 +164,7 @@ rm -rf x y
 ## with three sizes of minimal enriched regions 250, 500, 1000bp
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/H3K36me3/
 mkdir -p $dirOut
 cd $dirIn
@@ -198,7 +201,7 @@ rm -rf x y
 # FindER for Input
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/map/
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/FindER/Input/
 mkdir -p $dirOut
 cd $dirIn
@@ -870,7 +873,7 @@ echo -e "H3K36me3\tGW\tGE02_GE04\t"$s1"\t"$s2"\t"$s1_unique"\t"$s2_unique >> $di
 
 # FindER 1.0.0b GE04 to compare to gliomas
 JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
-dirIn=/projects/epigenomics/users/lli/FetalBrain/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
 dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
 mkdir -p $dirOut
 cd $dirIn
