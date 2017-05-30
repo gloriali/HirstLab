@@ -73,6 +73,20 @@ CGI_edge_delta <- read.delim("../CGI_edge/CGI.edge.delta.all", head = F, col.nam
 		theme_bw())
 ggsave(CGI_edge_delta_figure, file = "../CGI_edge/CGI_edge_delta_figure.pdf", width = 8, height = 8)
 
+## ------- 5mC at enhancer regions --------
+enhancer_5mC <- read.delim("../H3K27ac/enhancer.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>% filter(sample != "CEMT_21") %>% mutate(category = gsub(".*_", "", ID), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")))
+(enhancer_5mC_figure <- ggplot(enhancer_5mC, aes(fractional, log10(signal))) + 
+		stat_density2d(aes(fill = ..density..), geom="tile", contour=FALSE) +
+		scale_fill_gradientn(colors = c("black", "darkblue", "lightblue", "green", "yellow", "orange", "red", "darkred"), values = c(0, 0.01, 0.02, 0.04, 0.08, 0.3, 0.5, 1), guide = "none") +		
+		geom_vline(xintercept = 0.3, color = "white") + 
+		geom_vline(xintercept = 0.7, color = "white") + 
+		facet_grid(sample ~ category) + 
+		coord_cartesian(ylim = c(0, 2)) + 
+		xlab("Fractional methylation") + 
+		ylab("log10 H3K27ac normalized signal") + 
+		theme_bw())
+ggsave(enhancer_5mC_figure, file = "../H3K27ac/enhancer_5mC_figure.pdf", height = 8, width = 8)
+
 ## ------- 5mC at CTCF loss regions -------
 CTCF_loss_5mC <- read.delim("../CTCF/CTCF.loss.5mC", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC.", "", sample))
 (CTCF_loss_5mC_figure <- ggplot(CTCF_loss_5mC, aes(sample, fractional, fill = type)) + 
