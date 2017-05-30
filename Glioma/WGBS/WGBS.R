@@ -16,7 +16,7 @@ source('~/HirstLab/Pipeline/R/enrich.R')
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 setwd("/projects/epigenomics2/users/lli/glioma/WGBS/DMR")
-libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47", "TCGA060128_IDHmut", "TCGA141401_IDHwt", "TCGA141454_IDHwt", "TCGA143477_IDHwt", "TCGA161460_IDHmut", "TCGA191788_IDHmut")
 
 ## ------- 5mC modifiers RPKM --------
 modifier_RPKM <- read.delim("../DNAme_regulators.RPKM", as.is = T) %>% select(-contains("Brain")) %>% melt(id = c("ENSG", "gene")) %>% 
@@ -102,7 +102,7 @@ ggsave(CTCF_loss_5mC_figure, file = "../CTCF/CTCF_loss_5mC_figure.pdf", height =
 DMR_summary <- read.delim("./intermediate/DMR.summary.stats", head = T, as.is = T)
 DMR_summary_tall <- data.frame(glioma = rep(gsub("_NPC.*", "", DMR_summary$sample), 2), NPC = rep(gsub(".*_NPC\\.", "", DMR_summary$sample), 2), DM = rep(c("hyper", "hypo"), each = nrow(DMR_summary)), length = c(DMR_summary$hyper, -DMR_summary$hypo)/10^6)
 #DMR_summary_tall <- DMR_summary_tall %>% filter(glioma != "CEMT_21") %>% mutate(glioma = ifelse(glioma == "CEMT_23", paste0("IDHwt\n", glioma), paste0("IDHmut\n", glioma)))
-DMR_summary_figure <- ggplot(DMR_summary_tall, aes(x = glioma, y = length, color = DM, shape = NPC)) + 
+(DMR_summary_figure <- ggplot(DMR_summary_tall, aes(x = glioma, y = length, color = DM, shape = NPC)) + 
 	geom_point(position = position_jitter(width = 0.1), size = 3) + 
 	geom_hline(yintercept = 0) + 
 	xlab("") + 
@@ -110,7 +110,7 @@ DMR_summary_figure <- ggplot(DMR_summary_tall, aes(x = glioma, y = length, color
 	scale_color_manual(name = "", values = c("red", "blue")) + 
 	coord_flip() + 
 	theme_bw() + 
-	theme(axis.text.y = element_text(size = 15), axis.title.x = element_text(size = 15))
+	theme(axis.text.y = element_text(size = 15), axis.title.x = element_text(size = 15)))
 ggsave(DMR_summary_figure, file = "DMR_summary_figure.pdf", height = 5, width = 6)
 
 ### ------- visualization ----- 
@@ -122,7 +122,7 @@ for(lib in libs){
 }
 
 ### -------- enrichment in genomic regions ------
-genomic_breakdown <- read.delim("./CpG/genomic.breakdown.summary", as.is = T) %>% 
+genomic_breakdown <- read.delim("./intersect/genomic.breakdown.summary", as.is = T) %>% 
 	mutate(sample = gsub("_NPC.*", "", Name), DM = gsub(".*NPC\\.", "", Name), NCpG = NULL, Name = NULL)
 genomic_breakdown_tall <- melt(genomic_breakdown, id = c("sample", "DM")) %>% 
 	mutate(value = ifelse(DM == "hyper", value, -value))
