@@ -66,7 +66,7 @@ for dmr in DMR.*.bed; do
     CGI_shore=$($BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b /home/lli/hg19/CGI.2000shores.BED -u | wc -l)
     if [ -f "$region" ]; then
         less $region | sed 's/chr//g'| $BEDTOOLS/intersectBed -a $dmr.tmp -b stdin -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5":"$6"-"$7}' > $dirOut/DMR.$name.$region_name.bed
-        DMR_region=$(less less $region | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b stdin -u | wc -l)
+        DMR_region=$(less $region | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/DMR.$name.CpG.bed -b stdin -u | wc -l)
         echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI\t$CGI_shore\t$DMR_region\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore\t$all_region" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($9-$10)/$9)"\t"(($3-$4)/$2)/(($10-$11)/$9)"\t"($4/$2)/($11/$9)"\t"($3/$2)/($10/$9)"\t"($5/$2)/($12/$9)"\t"($6/$2)/($13/$9)"\t"($7/$2)/($14/$9)"\t"($8/$2)/($15/$9)}' >> $dirOut/genomic.breakdown.summary
     else
         echo -e "$name\t$total\t$gene\t$exon\t$promoter\t$CGI\t$CGI_shore\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI\t$all_CGI_shore" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($8-$9)/$8)"\t"(($3-$4)/$2)/(($9-$10)/$8)"\t"($4/$2)/($10/$8)"\t"($3/$2)/($9/$8)"\t"($5/$2)/($11/$8)"\t"($6/$2)/($12/$8)"\t"($7/$2)/($13/$8)}' >> $dirOut/genomic.breakdown.summary        
