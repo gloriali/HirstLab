@@ -29,19 +29,28 @@ modifier_RPKM <- read.delim("../DNAme_regulators.RPKM", as.is = T) %>% select(-c
 		theme_bw())
 ggsave(modifier_RPKM_figure, file = "../modifier_RPKM_figure.pdf", height = 5, width = 6)
 
+## ------- CpG coverage ---------
+coverage <- read.delim("../coverage.txt", as.is = T) %>% mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(grepl("IDHwt|CEMT_23", sample), "IDHwt", "IDHmut")), category = gsub("[0-9]*_.*", "", gsub("\\..*", "", sample)))
+(coverage_figure <- ggplot(coverage, aes(coverage, N/1e6, color = category)) + 
+		geom_line(aes(group = sample)) + 
+		ylab("No. of million CpGs") + 
+		coord_cartesian(xlim = c(0, 50)) + 
+		theme_bw())
+ggsave(coverage_figure, file = "../coverage_figure.pdf", height = 5, width = 5)
+
 ## ------- 5mC distribution------
-quantile_5mC <- read.delim("../qc.5mC.quantile", as.is = T) %>% mutate(type = gsub(".*\\d+_", "", sample), sample = gsub("_[gC].*", "", sample), category = gsub("[_\\.].*", "", sample))
-(quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, fill = category)) + 
-	geom_boxplot(aes(lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax), stat = "identity", outlier.shape = NA, width = 0.5, color = "grey") + 
+quantile_5mC <- read.delim("../qc.5mC.quantile", as.is = T) %>% mutate(type = ifelse(grepl("CGI", sample), "CGI", "genome"), category = ifelse(grepl("NPC", sample), "NPC", ifelse(grepl("IDHwt|CEMT_23", sample), "IDHwt", "IDHmut")), sample = gsub("_[gC].*", "", gsub("_IDH.*", "", sample))) %>%
+	filter(sample != "CEMT_21")
+(quantile_5mC_figure <- ggplot(quantile_5mC, aes(x = sample, lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax, fill = category)) + 
+	geom_boxplot(stat = "identity", outlier.shape = NA, width = 0.5, color = "grey") + 
 	facet_grid(type ~ .) + 
 	xlab("") + 
 	ylab("Fractional methylation") + 
-	scale_fill_manual(name = "", values = c("red", "blue")) + 
 	coord_flip() + 
 	theme_bw())
 ggsave(quantile_5mC_figure, file = "../quantile_5mC_figure.pdf", height = 5, width = 6)
 
-## ------- changes at CGI edges
+## ------- changes at CGI edges -------
 CGI_edge <- read.delim("../CGI_edge/CGI.edge.all", head = F, col.names = c("chr", "start", "end", "ID", "mC", "CGI", "edge", "dis", "sample")) %>% 
 	mutate(edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime")))
 CGI_edge_CpG_ID <- CGI_edge %>% group_by(ID) %>% summarise(n = n()) %>% filter(n == 9)
