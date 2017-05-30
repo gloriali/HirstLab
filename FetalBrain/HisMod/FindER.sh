@@ -1,13 +1,21 @@
 #!/bin/sh
 
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/FetalBrain/ChIPseq/bam/
+dirOut=/projects/epigenomics3/bams/hg19/
 # recover bam files
 cd $dirIn
 less bam_link.txt | awk '{gsub(".bam.*", "", $1); print $0}' | join /projects/epigenomics/users/lli/FetalBrain/FetalBrainLibrariesKeys.txt - > bam_locations.txt
 rm bam_link.txt
 less bam_locations.txt | awk '{print "Processing "$1; system("/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in "$5" --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out "$4".bam")}'
-# index bam files
 for file in *.bam; do
+    lib=$(echo $file | cut -d'.' -f1);
+    echo $lib
+    mkdir -p $dirOut/$lib
+    mv $file $dirOut/$lib
+done
+# index bam files
+cd $dirOut
+for file in ./*/*.bam; do
     echo "Indexing" $file
     /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
 done
