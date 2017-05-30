@@ -36,6 +36,12 @@ for file in *.combine.5mC.CpG; do
     less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_genome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_CGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
 done
+echo -e "coverage\tN\tsample" > $dirIn/coverage.txt
+for file in *.coverage.txt; do
+    sample=$(echo $file | sed 's/.coverage.txt//g');
+    echo $sample;
+    less $file | awk '{print $1"\t"$2"\t""'$sample'"}' >> $dirIn/coverage.txt
+done
 
 # CTCF loss region 5mC
 CTCF=/projects/epigenomics2/users/lli/glioma/CTCF.loss.bed
