@@ -371,8 +371,10 @@ done
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+RPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
 dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
 mkdir -p $dirOut
@@ -380,11 +382,74 @@ cd $dirIn
 for file in *.FindER.bed.gz; do
 	sample=$(echo $file | sed 's/A19308.//g' | sed 's/\..*//g')
 	echo $sample
-	$BEDTOOLS/intersectBed -a $file -b <(less $promoter | awk '{print "chr"$0}') -wa | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $dirIn/$sample.promoter.enhancer
-	$BEDTOOLS/intersectBed -a $file -b ./SE/$sample'_Gateway_SuperEnhancers.bed' -wa | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.promoter.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_super"}' > $dirIn/$sample.SE.enhancer
+	$BEDTOOLS/intersectBed -a $file -b <(less $promoter | awk '{print "chr"$0}') -u -f 0.5 | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $dirIn/$sample.promoter.enhancer
+	$BEDTOOLS/intersectBed -a $file -b ./SE/$sample'_Gateway_SuperEnhancers.bed' -u | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.promoter.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_super"}' > $dirIn/$sample.SE.enhancer
 	$BEDTOOLS/intersectBed -a $file -b $dirIn/$sample.promoter.enhancer -v | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.SE.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_regular"}' > $dirIn/$sample.regular.enhancer
 	cat $dirIn/$sample.promoter.enhancer $dirIn/$sample.SE.enhancer $dirIn/$sample.regular.enhancer | sort -k1,1 -k2,2n > $dirIn/$sample.enhancer
 	$JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $dirIn/$sample.enhancer -o $dirOut -c $chr -n $sample > $dirOut/$sample.coverage.log
 	less $dirOut/$sample.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $(ls $dir5mC/$(echo $sample | sed 's/NPC_/NPC./g').*.combine.5mC.CpG) -wa -wb | awk '{t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/$sample.enhancer.5mC
 done
 cat $dirOut/*.enhancer.5mC > $dirOut/enhancer.5mC
+less $gene | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print $0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $dirOut/enhancer.5mC | sort -k1,1 -k2,2n) -b stdin -wa -wb | awk '{gsub("_", "\t", $4); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"."$11}' > $dirOut/enhancer.5mC.gene
+less $dirOut/enhancer.5mC.gene | sort -k8,8 | join - <(sort $RPKM -k1,1) -1 8 -2 1 | awk '{gsub("\\.", "\t", $1); print $2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$1"\t"$9}' > $dirOut/enhancer.5mC.RPKM
+### TCGA validation
+cd $dirIn
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.promoter.enhancer -b $dirIn/CEMT_22.promoter.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.promoter.enhancer -b stdin -wa > $dirIn/IDHmut.promoter.enhancer
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.regular.enhancer -b $dirIn/CEMT_22.regular.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.regular.enhancer -b stdin -wa > $dirIn/IDHmut.regular.enhancer
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.SE.enhancer -b $dirIn/CEMT_22.SE.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.SE.enhancer -b stdin -wa > $dirIn/IDHmut.SE.enhancer
+cat $dirIn/CEMT_23.promoter.enhancer > $dirIn/IDHwt.promoter.enhancer
+cat $dirIn/CEMT_23.regular.enhancer > $dirIn/IDHwt.regular.enhancer
+cat $dirIn/CEMT_23.SE.enhancer > $dirIn/IDHwt.SE.enhancer
+cat $dirIn/CEMT_47.promoter.enhancer > $dirIn/IDHmut.promoter.enhancer
+cat $dirIn/CEMT_47.regular.enhancer > $dirIn/IDHmut.regular.enhancer
+cat $dirIn/CEMT_47.SE.enhancer > $dirIn/IDHmut.SE.enhancer
+for file in IDHmut*enhancer; do
+    echo $file
+    for sample in CEMT_19 CEMT_22 CEMT_47; do
+        echo $sample
+        $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHmut.$sample.coverage.log
+    done
+    join $dirOut/$file.CEMT_19.coverage $dirOut/$file.CEMT_22.coverage -1 5 -2 5 | join - $dirOut/$file.CEMT_47.coverage -1 1 -2 5 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"($6+$12+$18)/3}' > $dirOut/$file.coverage
+    > $dirOut/$file.coverage.5mC
+    for mC in $dir5mC/TCGA*IDHmut.combine.5mC.CpG; do
+        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
+        echo $sample2
+        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
+    done
+done
+for file in IDHwt*enhancer; do
+    echo $file
+    sample=CEMT_23
+    $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHwt.$sample.coverage.log
+    less $dirOut/$file.CEMT_23.coverage | awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6}' > $dirOut/$file.coverage
+    > $dirOut/$file.coverage.5mC
+    for mC in $dir5mC/TCGA*IDHwt.combine.5mC.CpG; do
+        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
+        echo $sample2
+        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
+    done
+done
+cat $dirOut/IDH*.enhancer.coverage.5mC > $dirOut/TCGA.enhancer.coverage.5mC
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+cd $dirOut
+mkdir -p $dirOut/homer/
+for file in *.enhancer.5mC; do
+    sample=$(echo $file | sed 's/.enhancer.5mC//g')
+    echo $sample
+    less $file | awk '{if($6>0.7){print "chr"$0"\thyper"}}' > $file.hyper
+    less $file | awk '{if($6<0.3){print "chr"$0"\thypo"}}' > $file.hypo
+    mkdir -p $dirOut/homer/$file.hyper/
+    mkdir -p $dirOut/homer/$file.hypo/
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file.hyper hg19 $dirOut/homer/$file.hyper/ -size 200 -len 8
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file.hypo hg19 $dirOut/homer/$file.hypo/ -size 200 -len 8
+done
+cd $dirOut/homer/
+echo -e "TF\tmotif\tq\tpercent_with_motif" > homer.knownResults.summary
+for lib in CEMT_19 CEMT_22 CEMT_23 CEMT_47 NPC_GE04; do
+    for dm in hyper hypo; do
+        echo $lib $dm
+        less ./$lib.enhancer.5mC.$dm/knownResults.txt | awk 'NR > 1 {tf=gensub("/.*", "", "g", $1); gsub("%", ""); if($5<=0.01){print tf"\t"$1"\t"$5"\t"$7"\t""'$lib'""\t""'$dm'"}}' >> homer.knownResults.summary
+    done
+done
