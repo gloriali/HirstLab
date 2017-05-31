@@ -454,23 +454,28 @@ cat $dirOut/IDH*.enhancer.coverage.5mC > $dirOut/TCGA.enhancer.coverage.5mC
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
 cd $dirOut
 mkdir -p $dirOut/homer/
 for file in *.enhancer.5mC; do
     sample=$(echo $file | sed 's/.enhancer.5mC//g')
     echo $sample
-    less $file | awk '{if($6>0.7){print "chr"$0"\thyper"}}' > $file.hyper
-    less $file | awk '{if($6<0.3){print "chr"$0"\thypo"}}' > $file.hypo
-    mkdir -p $dirOut/homer/$file.hyper/
-    mkdir -p $dirOut/homer/$file.hypo/
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $file.hyper hg19 $dirOut/homer/$file.hyper/ -size 200 -len 8
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $file.hypo hg19 $dirOut/homer/$file.hypo/ -size 200 -len 8
+    for category in promoter regular super; do
+        less $file | awk '{if($6>0.7 && $4~"'$category'"){print "chr"$0"\thyper"}}' > $file.$category.hyper
+        less $file | awk '{if($6<0.3 && $4~"'$category'"){print "chr"$0"\thypo"}}' > $file.$category.hypo
+        mkdir -p $dirOut/homer/$file.$category.hyper/
+        mkdir -p $dirOut/homer/$file.$category.hypo/
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hyper hg19 $dirOut/homer/$file.$category.hyper/ -size 200 -len 8
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hypo hg19 $dirOut/homer/$file.$category.hypo/ -size 200 -len 8
+    done
 done
 cd $dirOut/homer/
-echo -e "TF\tmotif\tq\tpercent_with_motif" > homer.knownResults.summary
-for lib in CEMT_19 CEMT_22 CEMT_23 CEMT_47 NPC_GE04; do
-    for dm in hyper hypo; do
-        echo $lib $dm
-        less ./$lib.enhancer.5mC.$dm/knownResults.txt | awk 'NR > 1 {tf=gensub("/.*", "", "g", $1); gsub("%", ""); if($5<=0.01){print tf"\t"$1"\t"$5"\t"$7"\t""'$lib'""\t""'$dm'"}}' >> homer.knownResults.summary
+for category in promoter regular super; do
+    echo -e "TF\tmotif\tq\tpercent_with_motif\tsample\tgroup\tcategory" > homer.knownResults.summary.$category
+    for lib in CEMT_19 CEMT_22 CEMT_23 CEMT_47 NPC_GE04; do
+        for dm in hyper hypo; do
+            echo $lib $dm $category
+            less ./$lib.enhancer.5mC.$category.$dm/knownResults.txt | awk 'NR > 1 {tf=gensub("/.*", "", "g", $1); gsub("%", ""); print tf"\t"$1"\t"$5"\t"$7"\t""'$lib'""\t""'$dm'""\t""'$category'"}' >> homer.knownResults.summary.$category
+        done
     done
 done
