@@ -5,13 +5,13 @@ dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
 join <(less $dir5mC/DNAme_regulators.txt | sort -k2,2) $dirRPKM/RPKM/glioma.RPKM -1 2 -2 1 | join - $dirRPKM/NPC_RPKM/NPC.RPKM | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
 
-# combine strands 5mC for CEMT and glioma
+# combine strands 5mC for CEMT and NPC
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 cd $dirIn
-for file in *.5mC.CpG; do
-    lib=$(echo $file | sed -e 's/.5mC.CpG//g')
+for file in *.5mC.CpG.gz; do
+    lib=$(echo $file | sed -e 's/.5mC.CpG.gz//g')
     echo "Combining strand for" $lib
-    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -format novo5mC
+    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -n $lib -format novo5mC
 done
 
 # Formatting TCGA WGBS
