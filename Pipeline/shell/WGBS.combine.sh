@@ -3,12 +3,13 @@
 # Combine CpG coverage on both strand
 if [ "$1" == "-h" ] ; then
     echo -e "Combine CpG coverage on both strand
-Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand> -c <cov> -format <format>
+Usage: `basename $0` -i <dirIn> -o <dirOut> -f <file> -s <CG.strand> -c <cov> -n <name> -format <format>
     <dirIn>: input directory
     <dirOut>: output directory
-    <file>: input file.      
+    <file>: input file      
     <CG.strand>: mapping of stranded CpG IDs and combined CpG IDs, default genome hg19
-    <cov>: minimal coverage required, default to 3. 
+    <cov>: minimal coverage required, default to 3 
+    <name>: prefix of output file name
     <format>: input file format. novomethyl (default): chr\tposition\tQUAL\tcontext\tstrand\tMQUAL\tfractional\tunconverted\tcoverage; novo5mC: chr\tposition\tstrand\tconverted\tunconverted; bismark: chr\tstart\tend\tfractional\tunconverted\tconverted."
     exit 0
 fi
@@ -25,6 +26,7 @@ do
         -f) file="$2"; shift;;
         -s) strand="$2"; shift;;
         -c) cov="$2"; shift;;
+        -n) name="$2"; shift;;
         -format) format="$2"; shift;;
     esac
     shift
@@ -44,6 +46,6 @@ else
     exit 1
 fi
 awk 'NR==FNR {h[$1]=$2; next} {if($1 in h){print $0"\t"h[$1]}}' $strand $dirOut/$file.tmp > $dirOut/$file.tmp.join
-less $dirOut/$file.tmp.join | awk '{c[$4]=c[$4]+$3; t[$4]=t[$4]+$2; count[$4]=count[$4]+1; if($2+$3>="'$cov'"+0){flag[$4]=flag[$4]+1}} END{for(i in count){if(count[i]>2){print i"\t"c[i]"\t"t[i]"\t"count[i] >> "'$dirOut'""/ERROR.""'$file'"".error"}}; for(i in c){chr=gensub(":.+", "", "g", i); end=gensub(".+-", "", "g", i); if(flag[i]>0){print chr"\t"end-2"\t"end"\t"t[i]"\t"c[i]"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 -k2,2n -T /projects/epigenomics/temp/ > $dirOut/$file.combine.5mC.CpG
+less $dirOut/$file.tmp.join | awk '{c[$4]=c[$4]+$3; t[$4]=t[$4]+$2; count[$4]=count[$4]+1; if($2+$3>="'$cov'"+0){flag[$4]=flag[$4]+1}} END{for(i in count){if(count[i]>2){print i"\t"c[i]"\t"t[i]"\t"count[i] >> "'$dirOut'""/ERROR.""'$file'"".error"}}; for(i in c){chr=gensub(":.+", "", "g", i); end=gensub(".+-", "", "g", i); if(flag[i]>0){print chr"\t"end-2"\t"end"\t"t[i]"\t"c[i]"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 -k2,2n -T /projects/epigenomics/temp/ > $dirOut/$name.combine.5mC.CpG
 rm $dirOut/$file.tmp $dirOut/$file.tmp.join
 
