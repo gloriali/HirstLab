@@ -36,13 +36,51 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (modifier_RPKM_figure)
 ```
 
+## CpG coverage profile
+* TCGA data have particularly lower coverage.       
+
+```{r coverage}
+(coverage_figure)
+```
+
 ## Global hypermethylation in IDH mut glioma
 * Genome-wide and CGI hypermethylation in IDH mutant glioma samples: CEMT19, CEMT22, and CEMT_47.      
 * CEMT_21 (10% IDH mutation frequency) showed methylation levels closer to IDH wildtype samples.    
+* TCGA data seem to have lower fractional methylation geonme-wide, possibly due to different processing pipeline.         
 * Whiskers of the box plot represent 10% and 90% quantile.     
 
 ```{r global_5mC}
 (quantile_5mC_figure)
+```
+
+## Clustering
+* CGI clustering showed clusters based on IDH mut and wt.      
+
+```{r cluster}
+op <- par(mar = c(5, 4, 4, 8))
+plot(spearman_all_5mC_dend, main = "genome-wide spearman", horiz = TRUE)
+plot(pearson_all_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
+plot(spearman_CGI_5mC_dend, main = "CGI spearman", horiz = TRUE)
+plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
+par(op)
+```
+
+## Enhancer and 5mC
+* Hypermethylated enhancers also present at promoters - more so in IDH mutant glioma    
+* Expression levels of the closest genes are not significantly affected by 5mC at these bivalent enhancers     
+* Genes associated with each profile group are significantly overlapped across the three IDH mutant gliomas        
+
+```{r enhancer}
+(enhancer_5mC_figure)
+(enhancer_5mC_TCGA_figure)
+(enhancer_5mC_RPKM_figure)
+grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHmut_venn_hyper_regular), gTree(children = IDHmut_venn_hyper_super), 
+						 gTree(children = IDHmut_venn_median_promoter), gTree(children = IDHmut_venn_median_regular), gTree(children = IDHmut_venn_median_super), 
+						 gTree(children = IDHmut_venn_hypo_promoter), gTree(children = IDHmut_venn_hypo_regular), gTree(children = IDHmut_venn_hypo_super), 
+						 nrow = 3)
+(enhancer_5mC_homer_known_promoter_figure + ggtitle("promoter"))
+(enhancer_5mC_homer_known_regular_figure + ggtitle("regular"))
+(enhancer_5mC_homer_known_super_figure + ggtitle("SE"))
 ```
 
 ## DNA methylation changes around CGI edges
@@ -50,7 +88,7 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
 ```{r 5mC_CGI, fig.height = 10}
-(CGI_edge_delta_figure)
+#(CGI_edge_delta_figure)
 ```
 
 ## DMRs between gliomas and NPCs  
