@@ -43,6 +43,27 @@ for file in *.coverage.txt; do
     less $file | awk '{print $1"\t"$2"\t""'$sample'"}' >> $dirIn/coverage.txt
 done
 
+# clustering
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+cd $dirIn
+less /home/lli/hg19/CG.strand | awk '{if(NR%2){print $2}}' | sort > x
+for file in *combine.5mC.CpG; do
+    sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g')
+    echo $sample
+    less $file | awk '{print $1":"$2"-"$3"\t"$6}' | sort -k1,1 | join x - > y
+    mv y x
+done
+mv x all.combine.5mC
+less /home/lli/hg19/CGI.forProfiles.BED | awk '{print $4}' | sort > a
+for file in *combine.5mC.CpG; do
+    sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g')
+    echo $sample
+    less $file | $BEDTOOLS/intersectBed -a /home/lli/hg19/CGI.forProfiles.BED -b stdin -wa -wb | awk '{t[$4]=t[$4]+$8; c[$4]=c[$4]+$9} END{for(i in t){if(t[i]+c[i]>0){print i"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join a - > b
+    mv b a
+done
+mv a CGI.combine.5mC
+
 # CTCF loss region 5mC
 CTCF=/projects/epigenomics2/users/lli/glioma/CTCF.loss.bed
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
