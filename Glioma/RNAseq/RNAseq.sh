@@ -95,6 +95,7 @@ rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 
 # RPKM matrix
+> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/
 echo "ENSG" > glioma.RPKM
 less CEMT_19.G.A.rpkm.pc | awk '{print $1}' >> glioma.RPKM
@@ -104,6 +105,7 @@ for file in *.G.A.rpkm.pc; do
     less $file | awk '{print $1"\t"$3}' >> x
     join glioma.RPKM x | sed 's/ /\t/g' >y
     mv y glioma.RPKM
+    less $file | awk '{print "'$lib'""."$1"\t"$3}' >> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
 done
 rm x
 cd /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
@@ -115,6 +117,7 @@ for file in */coverage/*.G.A.rpkm.pc; do
     less $file | awk '{print $1"\t"$3}' >> x
     join NPC.RPKM x | sed 's/ /\t/g' >y
     mv y NPC.RPKM
+    less $file | awk '{print "NPC_""'$lib'""."$1"\t"$3}' >> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
 done
 rm x
 
