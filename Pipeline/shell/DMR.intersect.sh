@@ -10,19 +10,6 @@ Usage: `basename $0` -d <dirIn> -r <region> -n <region_name>
     <region_name>: name of the customized region."
     exit 0
 fi
-echo -e "Processing all DMR.<name>.bed files in the input directory. Reference: hg19, Ensembl hg19v69. 
-Output files:
-$dirOut/genomic.breakdown.summary (fold enrichment for plotting): Name\tTotal No. of CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI_promoter\tCGI_genebody\tCGI_intergenic\tCGI_shore\t$region_name
-$dirOut/DMR.<name>.CpG.bed: chr\tstart\tend\tDMR_ID
-$dirOut/DMR.<name>.gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.exon.bed: chr\tstart\tend\tDMR_ID\tExon_ID
-$dirOut/DMR.<name>.promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.CGI_promoter.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_genebody.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_intergenic.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_shore.bed: chr\tstart\tend\tDMR_ID\tCGI_shore_ID
-$dirOut/DMR.<name>.$region_name.bed: chr\tstart\tend\tDMR_ID\tregion_ID\n"
 
 ## command line arguments
 region=''
@@ -50,6 +37,19 @@ CGI_shore=/home/lli/hg19/CGI.2000shores.BED
 dirOut=$dirIn/intersect/
 mkdir -p $dirOut
 cd $dirIn
+echo -e "Processing all DMR.<name>.bed files in the input directory. Reference: hg19, Ensembl hg19v69. 
+Output files:
+$dirOut/genomic.breakdown.summary (fold enrichment for plotting): Name\tTotal No. of CpGs\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI_promoter\tCGI_genebody\tCGI_intergenic\tCGI_shore\t$region_name
+$dirOut/DMR.<name>.CpG.bed: chr\tstart\tend\tDMR_ID
+$dirOut/DMR.<name>.gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.exon.bed: chr\tstart\tend\tDMR_ID\tExon_ID
+$dirOut/DMR.<name>.promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/DMR.<name>.CGI_promoter.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/DMR.<name>.CGI_genebody.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/DMR.<name>.CGI_intergenic.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/DMR.<name>.CGI_shore.bed: chr\tstart\tend\tDMR_ID\tCGI_shore_ID
+$dirOut/DMR.<name>.$region_name.bed: chr\tstart\tend\tDMR_ID\tregion_ID\n"
 
 ## genome-wide #CpGs in each region
 all_total=28217448 # wc -l /home/lli/hg19/CG.BED
