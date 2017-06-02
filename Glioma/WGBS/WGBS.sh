@@ -17,30 +17,28 @@ done
 # Formatting TCGA WGBS
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 cd $dirIn
-for file in TCGA*.bed; do
+for file in *TCGA*.bed; do
     lib=$(echo $file | sed -e 's/.bed//g')
     echo "Processing" $lib
     less $file | awk 'NR>1{gsub("chr", ""); if($8>=3){printf "%s\t%d\t%d\t%.0f\t%.0f\t%.4f\n", $1, $2, $3+1, $8-$8*$7/100, $8*$7/100, $7/100}}' | sort -k1,1 -k2,2n > $dirIn/$lib.combine.5mC.CpG
 done
-rm TCGA*.bed
+rm *TCGA*.bed
 
-# check coverage profile and 5mC quantile
+# check coverage profile and 5mC profile
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
-echo -e "sample\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc.5mC.quantile # QC: genome-wide and CGI methylation level summary; ymin: 10% quantile, ymax: 90% quantile
+echo -e "sample\tcoverage\tN" > $dirIn/qc_5mC_coverage.txt
+echo -e "sample\ttype\tfractional\tN" > $dirIn/qc_5mC_profile.txt 
+echo -e "sample\ttype\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc_5mC_quantile.txt #ymin: 10% quantile; ymax: 90% quantile
 cd $dirIn
 for file in *.combine.5mC.CpG; do
     lib=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo "Processing" $lib
-    less $file | awk 'BEGIN{for(i=1;i<=5001;i++){s[i]=0}} {c=$4+$5; if(c>=5000){s[5001]++} else {s[c]++}} END{for(i=1;i<=5001;i++){print i"\t"s[i]}}' > $lib.coverage.txt
-    less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_genome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
-    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""_CGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc.5mC.quantile
-done
-echo -e "coverage\tN\tsample" > $dirIn/coverage.txt
-for file in *.coverage.txt; do
-    sample=$(echo $file | sed 's/.coverage.txt//g');
-    echo $sample;
-    less $file | awk '{print $1"\t"$2"\t""'$sample'"}' >> $dirIn/coverage.txt
+    less $file | awk '{c = $4 + $5; if(c >= 5000){s[5001]++} else {s[c]++}} END{for(i = 1; i <= 5001; i++){print "'$lib'""\t"i"\t"s[i]}}' >> $dirIn/qc_5mC_coverage.txt
+    less $file | awk '{s[int($6*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tgenome\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | awk '{s[int($1*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tCGI\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
 done
 
 # clustering
@@ -48,34 +46,165 @@ BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
 cd $dirIn
 less /home/lli/hg19/CG.strand | awk '{if(NR%2){print $2}}' | sort > x
+less /home/lli/hg19/CGI.forProfiles.BED | awk '{print $4}' | sort > a
 for file in *combine.5mC.CpG; do
     sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo $sample
     less $file | awk '{print $1":"$2"-"$3"\t"$6}' | sort -k1,1 | join x - > y
     mv y x
-done
-mv x all.combine.5mC
-less /home/lli/hg19/CGI.forProfiles.BED | awk '{print $4}' | sort > a
-for file in *combine.5mC.CpG; do
-    sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g')
-    echo $sample
     less $file | $BEDTOOLS/intersectBed -a /home/lli/hg19/CGI.forProfiles.BED -b stdin -wa -wb | awk '{t[$4]=t[$4]+$8; c[$4]=c[$4]+$9} END{for(i in t){if(t[i]+c[i]>0){print i"\t"c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join a - > b
     mv b a
 done
-mv a CGI.combine.5mC
+mv x matrix_genome.5mC
+mv a matrix_CGI.5mC
 
-# CTCF loss region 5mC
-CTCF=/projects/epigenomics2/users/lli/glioma/CTCF.loss.bed
-dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
-dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/CTCF/
+# methylation profile around CGI edges
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+dirOut=$dirIn/CGI_edge/
 mkdir -p $dirOut
-echo -e "chr\tstart\tend\tID\tfractional\tsample"> $dirOut/CTCF.loss.5mC
-cd $dir5mC
+cd $dirIn
+echo -e "sample\tedge\tdistance\tfractional" > $dirOut/CGI.edge.profile
 for file in *.combine.5mC.CpG; do
-    sample=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g');
-    echo $sample;
-    $BEDTOOLS/intersectBed -a $file -b <(less $CTCF | awk '{print $0"\t"$1":"$2"-"$3}') -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f"\t""'$sample'"}}' | sort -k1,1 -k 2,2n >> $dirOut/CTCF.loss.5mC
+    name=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
+    echo $name
+    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /L/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-1000)&&($12<=2000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.L
+    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /R/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-2000)&&($12<=1000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.R
+    less $dirOut/$name.CGI.edge.L | awk '{s[int($8/50)] = s[int($8/50)] + $5; c[int($8/50)]++} END{for(i in c){print "'$name'""\tL\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3n >> $dirOut/CGI.edge.profile
+    less $dirOut/$name.CGI.edge.R | awk '{s[int($8/50)] = s[int($8/50)] + $5; c[int($8/50)]++} END{for(i in c){print "'$name'""\tR\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3n >> $dirOut/CGI.edge.profile
+    cat $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R > $dirOut/$name.CGI.edge
+    rm $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R 
 done
+cd $dirOut
+echo -e "sample1\tsample2\tedge\tdistance\tdelta" > $dirOut/CGI.edge.delta.profile
+for f1 in IDH*.CGI.edge; do
+    for f2 in NPC*.CGI.edge; do
+        s1=$(echo $f1 | sed 's/.CGI.edge//g'); s2=$(echo $f2 | sed 's/.CGI.edge//g');
+        echo $s1 $s2;
+        join <(less $f1 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) <(less $f2 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) | awk -F' ' '{gsub("+", "\t"); print $1"\t"$2"\t"$3"\t"$5"\t"$4-$6"\t""'$s1'""\t""'$s1'""-""'$s2'"}' > $dirOut/$s1.$s2.CGI.edge.delta
+        less $dirOut/$s1.$s2.CGI.edge.delta | awk '{s[int($4/50)] = s[int($4/50)] + $5; c[int($4/50)]++; edge[int($4/50)]=$3} END{for(i in c){print "'$s1'""\t""'$s2'""\t"edge[i]"\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3 -k4,4n >> $dirOut/CGI.edge.delta.profile
+    done
+done
+
+## enhancer vs 5mC
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+RPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
+mkdir -p $dirOut
+cd $dirIn
+for file in *.FindER.bed.gz; do
+	sample=$(echo $file | sed 's/A19308.//g' | sed 's/\..*//g')
+	echo $sample
+	$BEDTOOLS/intersectBed -a $file -b <(less $promoter | awk '{print "chr"$0}') -u -f 0.5 | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $dirIn/$sample.promoter.enhancer
+	$BEDTOOLS/intersectBed -a $file -b ./SE/$sample'_Gateway_SuperEnhancers.bed' -u | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.promoter.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_super"}' > $dirIn/$sample.SE.enhancer
+	$BEDTOOLS/intersectBed -a $file -b $dirIn/$sample.promoter.enhancer -v | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.SE.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_regular"}' > $dirIn/$sample.regular.enhancer
+	cat $dirIn/$sample.promoter.enhancer $dirIn/$sample.SE.enhancer $dirIn/$sample.regular.enhancer | sort -k1,1 -k2,2n > $dirIn/$sample.enhancer
+	$JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $dirIn/$sample.enhancer -o $dirOut -c $chr -n $sample > $dirOut/$sample.coverage.log
+	less $dirOut/$sample.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $(ls $dir5mC/*$sample*.combine.5mC.CpG) -wa -wb | awk '{t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/$sample.enhancer.5mC
+done
+cat $dirOut/*.enhancer.5mC > $dirOut/enhancer.5mC
+less $gene | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print $0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $dirOut/enhancer.5mC | sort -k1,1 -k2,2n) -b stdin -wa -wb | awk '{gsub("_", "\t", $4); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"."$11}' > $dirOut/enhancer.5mC.gene
+less $dirOut/enhancer.5mC.gene | sort -k8,8 | join - <(sort $RPKM -k1,1) -1 8 -2 1 | awk '{gsub("\\.", "\t", $1); print $2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$1"\t"$9}' > $dirOut/enhancer.5mC.RPKM
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
+cd $dirOut
+mkdir -p $dirOut/homer/
+for file in *.enhancer.5mC; do
+    sample=$(echo $file | sed 's/.enhancer.5mC//g')
+    echo $sample
+    for category in promoter regular super; do
+        less $file | awk '{if($6>0.7 && $4~"'$category'"){print "chr"$0"\thyper"}}' > $file.$category.hyper
+        less $file | awk '{if($6<0.3 && $4~"'$category'"){print "chr"$0"\thypo"}}' > $file.$category.hypo
+        mkdir -p $dirOut/homer/$file.$category.hyper/
+        mkdir -p $dirOut/homer/$file.$category.hypo/
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hyper hg19 $dirOut/homer/$file.$category.hyper/ -size 200 -len 8
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hypo hg19 $dirOut/homer/$file.$category.hypo/ -size 200 -len 8
+    done
+done
+cd $dirOut/homer/
+for category in promoter regular super; do
+    echo -e "TF\tmotif\tq\tpercent_with_motif\tsample\tgroup\tcategory" > homer.knownResults.summary.$category
+    for lib in CEMT_19 CEMT_22 CEMT_23 CEMT_47 NPC_GE04; do
+        for dm in hyper hypo; do
+            echo $lib $dm $category
+            less ./$lib.enhancer.5mC.$category.$dm/knownResults.txt | awk 'NR > 1 {tf=gensub("/.*", "", "g", $1); gsub("%", ""); print tf"\t"$1"\t"$5"\t"$7"\t""'$lib'""\t""'$dm'""\t""'$category'"}' >> homer.knownResults.summary.$category
+        done
+    done
+done
+### TCGA validation
+cd $dirIn
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.promoter.enhancer -b $dirIn/CEMT_22.promoter.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.promoter.enhancer -b stdin -wa > $dirIn/IDHmut.promoter.enhancer
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.regular.enhancer -b $dirIn/CEMT_22.regular.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.regular.enhancer -b stdin -wa > $dirIn/IDHmut.regular.enhancer
+$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.SE.enhancer -b $dirIn/CEMT_22.SE.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.SE.enhancer -b stdin -wa > $dirIn/IDHmut.SE.enhancer
+cat $dirIn/CEMT_23.promoter.enhancer > $dirIn/IDHwt.promoter.enhancer
+cat $dirIn/CEMT_23.regular.enhancer > $dirIn/IDHwt.regular.enhancer
+cat $dirIn/CEMT_23.SE.enhancer > $dirIn/IDHwt.SE.enhancer
+cat $dirIn/CEMT_47.promoter.enhancer > $dirIn/IDHmut.promoter.enhancer
+cat $dirIn/CEMT_47.regular.enhancer > $dirIn/IDHmut.regular.enhancer
+cat $dirIn/CEMT_47.SE.enhancer > $dirIn/IDHmut.SE.enhancer
+for file in IDHmut*enhancer; do
+    echo $file
+    for sample in CEMT_19 CEMT_22 CEMT_47; do
+        echo $sample
+        $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHmut.$sample.coverage.log
+    done
+    join $dirOut/$file.CEMT_19.coverage $dirOut/$file.CEMT_22.coverage -1 5 -2 5 | join - $dirOut/$file.CEMT_47.coverage -1 1 -2 5 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"($6+$12+$18)/3}' > $dirOut/$file.coverage
+    > $dirOut/$file.coverage.5mC
+    for mC in $dir5mC/TCGA*IDHmut.combine.5mC.CpG; do
+        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
+        echo $sample2
+        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
+    done
+done
+for file in IDHwt*enhancer; do
+    echo $file
+    sample=CEMT_23
+    $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHwt.$sample.coverage.log
+    less $dirOut/$file.CEMT_23.coverage | awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6}' > $dirOut/$file.coverage
+    > $dirOut/$file.coverage.5mC
+    for mC in $dir5mC/TCGA*IDHwt.combine.5mC.CpG; do
+        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
+        echo $sample2
+        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
+    done
+done
+cat $dirOut/IDH*.enhancer.coverage.5mC > $dirOut/TCGA.enhancer.coverage.5mC
+### promoter hyper enhancer in other tissues
+dirIn=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/others/
+mkdir -p $dirOut
+cd $dirIn
+for lib in CEMT*; do
+    echo $lib
+    if [[ -f $(ls ./$lib/bams/Bisulfite-Seq/DNAMethylation/*.5mC.CpG) && -f $(ls ./$lib/bams/ChIP-Seq/H3K27ac/wig/*.wig.gz) && -f $(ls ./$lib/bams/ChIP-Seq/H3K27ac/FindER.1.0.0b/*.FindER.bed.gz) ]]; then
+        echo "Files exist"
+        ln -s $dirIn/$lib/bams/Bisulfite-Seq/DNAMethylation/*.5mC.CpG $dirOut/$lib.5mC.CpG
+        ln -s $dirIn/$lib/bams/ChIP-Seq/H3K27ac/wig/*.wig.gz $dirOut/$lib.H3K27ac.wig.gz
+        ln -s $dirIn/$lib/bams/ChIP-Seq/H3K27ac/FindER.1.0.0b/*.FindER.bed.gz $dirOut/$lib.FindER.bed.gz
+    fi
+done
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+cd $dirOut
+for file in *.FindER.bed.gz; do
+    sample=$(echo $file | sed 's/.FindER.bed.gz//g')
+    echo $sample
+    $BEDTOOLS/intersectBed -a $file -b <(less $promoter | awk '{print "chr"$0}') -u -f 0.5 | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $sample.promoter.enhancer
+    $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $sample.H3K27ac.wig.gz -r $sample.promoter.enhancer -o $dirOut -c $chr -n $sample > $dirOut/$sample.coverage.log
+    less $sample.promoter.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b <(less $sample.5mC.CpG | awk '{print $1"\t"$2"\t"$2+1"\t"$4"\t"$5}') -wa -wb | awk '{if($11+$12 >= 3){t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/$sample.promoter.enhancer.5mC
+done
+cat $dirOut/*.promoter.enhancer.5mC > $dirOut/promoter.enhancer.5mC
 
 # DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
@@ -91,11 +220,11 @@ cov=3
 size=500  
 cut=3
 cd $dirIn
-for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
+for file1 in IDH*.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo -e "\n\n"$lib1
     for file2 in NPC*.combine.5mC.CpG; do
-        lib2=$(echo $file2 | sed -e 's/.5mC.CpG.combine.5mC.CpG//g')
+        lib2=$(echo $file2 | sed -e 's/.combine.5mC.CpG//g')
         name=$lib1'_'$lib2
         echo -e "\n"$name
         /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut/intermediate/ -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
@@ -103,23 +232,23 @@ for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
     done
 done
 
-# For each glioma sample, take the intersect of DMRs compared to all 4 NPCs
+## For each glioma sample, take the intersect of DMRs compared to all 4 NPCs
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 size=500  
 cut=3
 echo -e "sample\tsize\tcut\thyper\thypo\tlength_hyper\tlength_hypo" > $dirOut/DMR.summary.stats
 cd /projects/epigenomics2/users/lli/glioma/WGBS/
-for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
+for file1 in IDH*.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
     echo -e $lib1
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hyper
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex.hyper.bed
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_GE02.s$size.c$cut.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_GE04.s$size.c$cut.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC_GE.hyper.bed
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex.hyper.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_GE.hyper.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hyper
     less $dirOut/DMR.$lib1'_'NPC.hyper | awk '!/GL/ {print $1"\t"$2"\t"$3"\t"$4}' | sort -k1,1 -k2,2n > $dirOut/DMR.$lib1'_'NPC.hyper.bed
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex02.s$size.c$cut.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hypo.bed
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.GE02.s$size.c$cut.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hypo.bed
-    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC.Cortex.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC.GE.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t-1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hypo
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex02.s$size.c$cut.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex.hypo.bed
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_GE02.s$size.c$cut.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_GE04.s$size.c$cut.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/intermediate/DMR.$lib1'_'NPC_GE.hypo.bed
+    $BEDTOOLS/intersectBed -a $dirOut/intermediate/DMR.$lib1'_'NPC_Cortex.hypo.bed -b $dirOut/intermediate/DMR.$lib1'_'NPC_GE.hypo.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t-1\t"$3-$2}' > $dirOut/DMR.$lib1'_'NPC.hypo
     cat $dirOut/DMR.$lib1'_'NPC.hyper $dirOut/DMR.$lib1'_'NPC.hypo > $dirOut/DMR.$lib1'_'NPC
     less $dirOut/DMR.$lib1'_'NPC.hypo | awk '!/GL/ {print $1"\t"$2"\t"$3"\t"$4}' | sort -k1,1 -k2,2n > $dirOut/DMR.$lib1'_'NPC.hypo.bed
     hyper=($(wc -l $dirOut/DMR.$lib1'_'NPC.hyper))
@@ -129,17 +258,17 @@ for file1 in CEMT*.combine.5mC.CpG TCGA*.combine.5mC.CpG; do
     echo -e $lib1"_NPCs\t"$size"\t"$cut"\t"$hyper"\t"$hypo"\t"$length_hyper"\t"$length_hypo >> $dirOut/DMR.summary.stats
 done
 
-# DMR enrichment in genomic regions
+## DMR enrichment in genomic regions
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 > /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
 for file in /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/CEMT*.bed.gz; do
-	less $file >> /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+    less $file >> /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
 done
 less /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed 
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed -n enhancer
 
-# distance to closest CGI (midpoint of DMR to midpoint of CGI)
+## DMR distance to closest CGI (midpoint of DMR to midpoint of CGI)
 less /home/lli/hg19/CGI.forProfiles.BED | awk '{mid=int(($2+$3)/2); print $1"\t"mid"\t"mid+1"\t"$4}' > /home/lli/hg19/CGI.midpoint.BED
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 cd $dirOut
@@ -153,7 +282,7 @@ for file in DMR.*.bed; do
     rm $dirOut/CGI_dis/$name.tmp.bed $dirOut/CGI_dis/DMR.$name.CGI.dis.tmp 
 done
 
-# intersect CEMT_21 with IDH mut: noise or priming events?
+## intersect CEMT_21 with IDH mut: noise or priming events?
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 cd $dirOut
@@ -174,88 +303,7 @@ wc -l /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC04_GE
 $BEDTOOLS/intersectBed -a /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -b DMR.CEMT_19_NPC.hypo.bed DMR.CEMT_22_NPC.hypo.bed DMR.CEMT_47_NPC.hypo.bed -wa -u | wc -l
 wc -l /projects/epigenomics/users/lli/FetalBrain/WGBS/DMR/DMR.Cortex-HuFNSC04_GE-HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed
 
-# methylation profile around CGI edges
-BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
-dirOut=$dirIn/CGI_edge/
-cov=3
-mkdir -p $dirOut
-#cat $dirIn/DMR/*.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin | awk '{gsub("chr", ""); print $0}' > $dirIn/DMR/DMR.all.bed
-cd $dirIn
-for file in *.combine.5mC.CpG; do
-    name=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
-    echo $name
-    #$BEDTOOLS/intersectBed -a $file -b $dirIn/DMR/DMR.all.bed -wa > $dirIn/$file.dmr
-    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /L/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-1000)&&($12<=2000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.L
-    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /R/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-2000)&&($12<=1000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.R
-    cat $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R > $dirOut/$name.CGI.edge
-    rm $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R 
-done
-cat $dirOut/*.CGI.edge > $dirOut/CGI.edge.all
-cd $dirOut
-for f1 in CEMT*.CGI.edge TCGA*.CGI.edge; do
-    for f2 in NPC*.CGI.edge; do
-        s1=$(echo $f1 | sed 's/.CGI.edge//g'); s2=$(echo $f2 | sed 's/.CGI.edge//g');
-        echo $s1 $s2;
-        join <(less $f1 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) <(less $f2 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) | awk -F' ' '{gsub("+", "\t"); print $1"\t"$2"\t"$3"\t"$5"\t"$4-$6"\t""'$s1'""\t""'$s1'""-""'$s2'"}' > $dirOut/$s1.$s2.CGI.edge.delta
-    done
-done
-cat $dirOut/*.CGI.edge.delta > $dirOut/CGI.edge.delta.all
-## hyper CGI with K36
-BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
-CGI=/home/lli/hg19/CGI.forProfiles.BED
-gene=/home/lli/hg19/hg19v69_genes.bed
-dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
-dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/
-dirOut=$dirIn/CGI/
-mkdir -p $dirOut
-cd $dirIn
-echo -e "Sample\thyper\tCGI\tNon-gene_CGI\tH3K36me3\tNon-gene\tp_Fisher" > $dirOut/CGI.DMR.hyper.summary
-for file in DMR.CEMT*.hyper.bed; do
-    sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g')
-    echo $sample
-    $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $file -u > $dirOut/CGI.$file
-    $BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K36me3
-    $BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K36me3 -b <(less $gene | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K36me3.nongene
-    Nhyper=$(less $file | wc -l)
-    NCGI=$(less $dirOut/CGI.$file | wc -l)
-    NCGI_nongene=$($BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b <(less $gene | awk '{print "chr"$0}') -v | wc -l)
-    NK36=$(less $dirOut/CGI.$file.H3K36me3 | wc -l)
-    Nnongene=$(less $dirOut/CGI.$file.H3K36me3.nongene | wc -l)
-    p=$(echo "phyper($Nnongene, $NCGI_nongene, $NCGI - $NCGI_nongene, $NK36, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
-    echo -e "$sample\t$Nhyper\t$NCGI\t$NCGI_nongene\t$NK36\t$Nnongene\t$p" >> $dirOut/CGI.DMR.hyper.summary
-done
-cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
-## all methylated CGI
-BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
-R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
-CGI=/home/lli/hg19/CGI.forProfiles.BED
-gene=/home/lli/hg19/hg19v69_genes.bed
-dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
-dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
-dirbam=/projects/edcc_new/reference_epigenomes/
-dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
-$BEDTOOLS/intersectBed -a $CGI -b $gene -v > /home/lli/hg19/CGI.nongene.bed
-echo -e "Sample\tCGI\tCGI_hyper\tCGI_K36\tCGI_hyper_K36\tp" > $dirOut/CGI.hyper.H3K36me3.summary
-cd $dir5mC
-for file in CEMT*.combine.5mC.CpG; do
-    sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g');
-    echo $sample;
-    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/CGI.nongene.bed -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); if(f>=0.75){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f}}}' | sort -k1,1 -k 2,2n > $dirOut/$sample.CGI.nongene.hyper
-    $BEDTOOLS/intersectBed -a $dirOut/$sample.CGI.nongene.hyper -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/$sample.CGI.nongene.hyper.H3K36me3
-    NCGI=$(less /home/lli/hg19/CGI.nongene.bed | wc -l)
-    NCGIK36=$($BEDTOOLS/intersectBed -a <(less /home/lli/hg19/CGI.nongene.bed | awk '{print "chr"$0}') -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u | wc -l)
-    NCGIhyper=$(less $dirOut/$sample.CGI.nongene.hyper | wc -l)
-    NCGIK36hyper=$(less $dirOut/$sample.CGI.nongene.hyper.H3K36me3 | wc -l)
-    p=$(echo "phyper($NCGIK36hyper, $NCGIK36, $NCGI - $NCGIK36, $NCGIhyper, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
-    echo -e "$sample\t$NCGI\t$NCGIhyper\t$NCGIK36\t$NCGIK36hyper\t$p" >> $dirOut/CGI.hyper.H3K36me3.summary
-    N=$($samtools view -q 5 -F 1028 $(ls $dirbam/$sample/bams/RNA-Seq/*.bam) | wc -l)
-    $BEDTOOLS/coverageBed -a $dirOut/$sample.CGI.nongene.hyper -b <($samtools view -q 5 -F 1028 -b $(ls $dirbam/$sample/bams/RNA-Seq/*.bam)) -counts
-done
-
-# % of hyper CpGs in hyper CGIs
+## % of hyper CpGs in hyper CGIs
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 CGI=/home/lli/hg19/CGI.forProfiles.BED
 dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/intermediate/
@@ -274,8 +322,61 @@ for dm in DM.*.bed; do
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $dmr -u | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/$samples.join | awk '{if($5-$6>=0.5){print $0}}') -c | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$samples.join -c | awk '{if($5>0){print $0"\t"$5/$6"\t""'$s1'""\t""'$s2'""\tdelta>=0.5"}}' >> $dirOut/CGI.DMR.hyper.DM.all
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $dmr -u | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/$samples.join | awk '{if($5-$6>=0.2){print $0}}') -c | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$samples.join -c | awk '{if($5>0){print $0"\t"$5/$6"\t""'$s1'""\t""'$s2'""\tdelta>=0.2"}}' >> $dirOut/CGI.DMR.hyper.DM.all
 done
+### hyper CGI with K36
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+CGI=/home/lli/hg19/CGI.forProfiles.BED
+gene=/home/lli/hg19/hg19v69_genes.bed
+dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+dirIn=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/
+dirOut=$dirIn/CGI/
+mkdir -p $dirOut
+cd $dirIn
+echo -e "Sample\thyper\tCGI\tNon-gene_CGI\tH3K36me3\tNon-gene\tp_Fisher" > $dirOut/CGI.DMR.hyper.summary
+for file in DMR.IDH*.hyper.bed; do
+    sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g')
+    echo $sample
+    $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $file -u > $dirOut/CGI.$file
+    $BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K36me3
+    $BEDTOOLS/intersectBed -a $dirOut/CGI.$file.H3K36me3 -b <(less $gene | awk '{print "chr"$0}') -v > $dirOut/CGI.$file.H3K36me3.nongene
+    Nhyper=$(less $file | wc -l)
+    NCGI=$(less $dirOut/CGI.$file | wc -l)
+    NCGI_nongene=$($BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b <(less $gene | awk '{print "chr"$0}') -v | wc -l)
+    NK36=$(less $dirOut/CGI.$file.H3K36me3 | wc -l)
+    Nnongene=$(less $dirOut/CGI.$file.H3K36me3.nongene | wc -l)
+    p=$(echo "phyper($Nnongene, $NCGI_nongene, $NCGI - $NCGI_nongene, $NK36, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+    echo -e "$sample\t$Nhyper\t$NCGI\t$NCGI_nongene\t$NK36\t$Nnongene\t$p" >> $dirOut/CGI.DMR.hyper.summary
+done
+cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
+### all methylated CGI
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+CGI=/home/lli/hg19/CGI.forProfiles.BED
+gene=/home/lli/hg19/hg19v69_genes.bed
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirER=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+dirbam=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
+$BEDTOOLS/intersectBed -a $CGI -b $gene -v > /home/lli/hg19/CGI.nongene.bed
+echo -e "Sample\tCGI\tCGI_hyper\tCGI_K36\tCGI_hyper_K36\tp" > $dirOut/CGI.hyper.H3K36me3.summary
+cd $dir5mC
+for file in IDH*.combine.5mC.CpG; do
+    sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g');
+    echo $sample;
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/CGI.nongene.bed -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); if(f>=0.75){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f}}}' | sort -k1,1 -k 2,2n > $dirOut/$sample.CGI.nongene.hyper
+    $BEDTOOLS/intersectBed -a $dirOut/$sample.CGI.nongene.hyper -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/$sample.CGI.nongene.hyper.H3K36me3
+    NCGI=$(less /home/lli/hg19/CGI.nongene.bed | wc -l)
+    NCGIK36=$($BEDTOOLS/intersectBed -a <(less /home/lli/hg19/CGI.nongene.bed | awk '{print "chr"$0}') -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u | wc -l)
+    NCGIhyper=$(less $dirOut/$sample.CGI.nongene.hyper | wc -l)
+    NCGIK36hyper=$(less $dirOut/$sample.CGI.nongene.hyper.H3K36me3 | wc -l)
+    p=$(echo "phyper($NCGIK36hyper, $NCGIK36, $NCGI - $NCGIK36, $NCGIhyper, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+    echo -e "$sample\t$NCGI\t$NCGIhyper\t$NCGIK36\t$NCGIK36hyper\t$p" >> $dirOut/CGI.hyper.H3K36me3.summary
+    N=$($samtools view -q 5 -F 1028 $(ls $dirbam/$sample/bams/RNA-Seq/*.bam) | wc -l)
+    $BEDTOOLS/coverageBed -a $dirOut/$sample.CGI.nongene.hyper -b <($samtools view -q 5 -F 1028 -b $(ls $dirbam/$sample/bams/RNA-Seq/*.bam)) -counts
+done
 
-# DMR enrichment in chromatin states
+## DMR enrichment in chromatin states
 dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/intersect/'
 dirState='/projects/epigenomics2/users/lli/glioma/ChIPseq/ChromHMM/'
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
@@ -319,7 +420,7 @@ for file in DMR.CEMT*.bed; do
     done
 done
 
-## intersect with DE genes
+## DMR intersect with DE genes
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
@@ -388,94 +489,3 @@ for file in DMR.CEMT_19.NPC.hyper.UP.2FC.H3K27ac DMR.CEMT_22.NPC.hyper.UP.2FC.H3
     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print $6"\t"$7"\t"$8"\t"$9}') hg19 $dirOut/Homer/$name/ -size 200 -len 8 
 done
 
-## enhancer vs 5mC
-JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
-gene=/home/lli/hg19/hg19v69_genes.bed
-chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
-dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
-RPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
-dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
-mkdir -p $dirOut
-cd $dirIn
-for file in *.FindER.bed.gz; do
-	sample=$(echo $file | sed 's/A19308.//g' | sed 's/\..*//g')
-	echo $sample
-	$BEDTOOLS/intersectBed -a $file -b <(less $promoter | awk '{print "chr"$0}') -u -f 0.5 | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $dirIn/$sample.promoter.enhancer
-	$BEDTOOLS/intersectBed -a $file -b ./SE/$sample'_Gateway_SuperEnhancers.bed' -u | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.promoter.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_super"}' > $dirIn/$sample.SE.enhancer
-	$BEDTOOLS/intersectBed -a $file -b $dirIn/$sample.promoter.enhancer -v | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$sample.SE.enhancer -v | awk '{print $0"\t"$1":"$2"-"$3"_regular"}' > $dirIn/$sample.regular.enhancer
-	cat $dirIn/$sample.promoter.enhancer $dirIn/$sample.SE.enhancer $dirIn/$sample.regular.enhancer | sort -k1,1 -k2,2n > $dirIn/$sample.enhancer
-	$JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $dirIn/$sample.enhancer -o $dirOut -c $chr -n $sample > $dirOut/$sample.coverage.log
-	less $dirOut/$sample.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $(ls $dir5mC/$(echo $sample | sed 's/NPC_/NPC./g').*.combine.5mC.CpG) -wa -wb | awk '{t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/$sample.enhancer.5mC
-done
-cat $dirOut/*.enhancer.5mC > $dirOut/enhancer.5mC
-less $gene | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print $0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $dirOut/enhancer.5mC | sort -k1,1 -k2,2n) -b stdin -wa -wb | awk '{gsub("_", "\t", $4); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"."$11}' > $dirOut/enhancer.5mC.gene
-less $dirOut/enhancer.5mC.gene | sort -k8,8 | join - <(sort $RPKM -k1,1) -1 8 -2 1 | awk '{gsub("\\.", "\t", $1); print $2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$1"\t"$9}' > $dirOut/enhancer.5mC.RPKM
-### TCGA validation
-cd $dirIn
-$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.promoter.enhancer -b $dirIn/CEMT_22.promoter.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.promoter.enhancer -b stdin -wa > $dirIn/IDHmut.promoter.enhancer
-$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.regular.enhancer -b $dirIn/CEMT_22.regular.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.regular.enhancer -b stdin -wa > $dirIn/IDHmut.regular.enhancer
-$BEDTOOLS/intersectBed -a $dirIn/CEMT_19.SE.enhancer -b $dirIn/CEMT_22.SE.enhancer -wa | $BEDTOOLS/intersectBed -a $dirIn/CEMT_47.SE.enhancer -b stdin -wa > $dirIn/IDHmut.SE.enhancer
-cat $dirIn/CEMT_23.promoter.enhancer > $dirIn/IDHwt.promoter.enhancer
-cat $dirIn/CEMT_23.regular.enhancer > $dirIn/IDHwt.regular.enhancer
-cat $dirIn/CEMT_23.SE.enhancer > $dirIn/IDHwt.SE.enhancer
-cat $dirIn/CEMT_47.promoter.enhancer > $dirIn/IDHmut.promoter.enhancer
-cat $dirIn/CEMT_47.regular.enhancer > $dirIn/IDHmut.regular.enhancer
-cat $dirIn/CEMT_47.SE.enhancer > $dirIn/IDHmut.SE.enhancer
-for file in IDHmut*enhancer; do
-    echo $file
-    for sample in CEMT_19 CEMT_22 CEMT_47; do
-        echo $sample
-        $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHmut.$sample.coverage.log
-    done
-    join $dirOut/$file.CEMT_19.coverage $dirOut/$file.CEMT_22.coverage -1 5 -2 5 | join - $dirOut/$file.CEMT_47.coverage -1 1 -2 5 | awk '{print $2"\t"$3"\t"$4"\t"$1"\t"($6+$12+$18)/3}' > $dirOut/$file.coverage
-    > $dirOut/$file.coverage.5mC
-    for mC in $dir5mC/TCGA*IDHmut.combine.5mC.CpG; do
-        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
-        echo $sample2
-        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
-    done
-done
-for file in IDHwt*enhancer; do
-    echo $file
-    sample=CEMT_23
-    $JAVA -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $(ls ../../wig/H3K27ac/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample > $dirOut/IDHwt.$sample.coverage.log
-    less $dirOut/$file.CEMT_23.coverage | awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6}' > $dirOut/$file.coverage
-    > $dirOut/$file.coverage.5mC
-    for mC in $dir5mC/TCGA*IDHwt.combine.5mC.CpG; do
-        sample2=$(basename $mC | sed 's/.combine.5mC.CpG//g')
-        echo $sample2
-        less $dirOut/$file.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $mC -wa -wb | awk '{t[$4]=t[$4]+$9; c[$4]=c[$4]+$10; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample2'"}}}' | sort -k1,1 -k2,2n >> $dirOut/$file.coverage.5mC
-    done
-done
-cat $dirOut/IDH*.enhancer.coverage.5mC > $dirOut/TCGA.enhancer.coverage.5mC
-### Homer
-PATH=$PATH:/home/lli/bin/homer/.//bin/
-PATH=$PATH:/home/acarles/weblogo/
-dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
-cd $dirOut
-mkdir -p $dirOut/homer/
-for file in *.enhancer.5mC; do
-    sample=$(echo $file | sed 's/.enhancer.5mC//g')
-    echo $sample
-    for category in promoter regular super; do
-        less $file | awk '{if($6>0.7 && $4~"'$category'"){print "chr"$0"\thyper"}}' > $file.$category.hyper
-        less $file | awk '{if($6<0.3 && $4~"'$category'"){print "chr"$0"\thypo"}}' > $file.$category.hypo
-        mkdir -p $dirOut/homer/$file.$category.hyper/
-        mkdir -p $dirOut/homer/$file.$category.hypo/
-        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hyper hg19 $dirOut/homer/$file.$category.hyper/ -size 200 -len 8
-        /home/lli/bin/homer/bin/findMotifsGenome.pl $file.$category.hypo hg19 $dirOut/homer/$file.$category.hypo/ -size 200 -len 8
-    done
-done
-cd $dirOut/homer/
-for category in promoter regular super; do
-    echo -e "TF\tmotif\tq\tpercent_with_motif\tsample\tgroup\tcategory" > homer.knownResults.summary.$category
-    for lib in CEMT_19 CEMT_22 CEMT_23 CEMT_47 NPC_GE04; do
-        for dm in hyper hypo; do
-            echo $lib $dm $category
-            less ./$lib.enhancer.5mC.$category.$dm/knownResults.txt | awk 'NR > 1 {tf=gensub("/.*", "", "g", $1); gsub("%", ""); print tf"\t"$1"\t"$5"\t"$7"\t""'$lib'""\t""'$dm'""\t""'$category'"}' >> homer.knownResults.summary.$category
-        done
-    done
-done
