@@ -77,7 +77,7 @@ for dmr in DMR.*.bed; do
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_promoter -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CGI_promoter.bed
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_genebody -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CGI_genebody.bed
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_intergenic -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CGI_intergenic.bed
-    $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_shores -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CGI_shore.bed
+    $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_shore -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/DMR.$name.CGI_shore.bed
     less $dirOut/DMR.$name.gene.bed | awk '/protein_coding/ {gsub("_protein_coding", "", $5); print $1"\t"$2"\t"$3"\t"$4"\t"$5}' > $dirOut/DMR.$name.gene_pc.bed
     $BEDTOOLS/intersectBed -a /home/lli/hg19/CG.BED -b $dmr.tmp -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$8"_"$1":"$2"-"$3}' > $dirOut/DMR.$name.CpG.bed
     total=$(less $dirOut/DMR.$name.CpG.bed | wc -l)
