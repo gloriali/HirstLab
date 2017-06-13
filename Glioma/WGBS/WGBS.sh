@@ -274,6 +274,7 @@ dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 ## DMR distance to closest CGI (midpoint of DMR to midpoint of CGI)
 less /home/lli/hg19/CGI.forProfiles.BED | awk '{mid=int(($2+$3)/2); print $1"\t"mid"\t"mid+1"\t"$4}' > /home/lli/hg19/CGI.midpoint.BED
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirOut='/projects/epigenomics2/users/lli/glioma/WGBS/DMR/'
 cd $dirOut
 mkdir $dirOut/CGI_dis/
 for file in DMR.*.bed; do
@@ -320,7 +321,7 @@ for dm in DM.*.bed; do
     s1=$(echo $samples | sed 's/_NPC.*//g'); s2=$(echo $samples | sed 's/.*_//g')
     dmr=DMR.$samples.s500.c3.hyper.bed
     echo $samples $s1 $s2
-    awk 'NR==FNR {id=$1":"$2; if(($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){h[id]=$6}; next} {id=$1":"$2; if((id in h)&&($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){print "chr"$1"\t"$2"\t"$3"\t"id"\t"$6"\t"h[id]}}' $(ls $dir5mC/$s2.*combine.5mC.CpG) $(ls $dir5mC/$s1.*combine.5mC.CpG) > $dirIn/$samples.join
+    awk 'NR==FNR {id=$1":"$2; if(($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){h[id]=$6}; next} {id=$1":"$2; if((id in h)&&($4+$5 >= "'$cov'"+0)&&($4+$5 <= 5000)){print "chr"$1"\t"$2"\t"$3"\t"id"\t"$6"\t"h[id]}}' $(ls $dir5mC/*$s2.*combine.5mC.CpG) $(ls $dir5mC/*$s1.*combine.5mC.CpG) > $dirIn/$samples.join
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $dmr -u | $BEDTOOLS/intersectBed -a stdin -b <(less $dm | awk '$4 ~ /1/ {print "chr"$0}') -c | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$samples.join -c | awk '{if($5>0){print $0"\t"$5/$6"\t""'$s1'""\t""'$s2'""\tDM"}}' >> $dirOut/CGI.DMR.hyper.DM.all
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $dmr -u | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/$samples.join | awk '{if($5-$6>=0.5){print $0}}') -c | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$samples.join -c | awk '{if($5>0){print $0"\t"$5/$6"\t""'$s1'""\t""'$s2'""\tdelta>=0.5"}}' >> $dirOut/CGI.DMR.hyper.DM.all
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $dmr -u | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/$samples.join | awk '{if($5-$6>=0.2){print $0}}') -c | $BEDTOOLS/intersectBed -a stdin -b $dirIn/$samples.join -c | awk '{if($5>0){print $0"\t"$5/$6"\t""'$s1'""\t""'$s2'""\tdelta>=0.2"}}' >> $dirOut/CGI.DMR.hyper.DM.all
@@ -336,8 +337,8 @@ dirOut=$dirIn/CGI/
 mkdir -p $dirOut
 cd $dirIn
 echo -e "Sample\thyper\tCGI\tNon-gene_CGI\tH3K36me3\tNon-gene\tp_Fisher" > $dirOut/CGI.DMR.hyper.summary
-for file in DMR.IDH*.hyper.bed; do
-    sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g')
+for file in DMR.*CEMT*.hyper.bed; do
+    sample=$(echo $file | sed 's/DMR.//g' | sed 's/_NPC.hyper.bed//g' | sed 's/IDH.*t_//g')
     echo $sample
     $BEDTOOLS/intersectBed -a <(less $CGI | awk '{print "chr"$0}') -b $file -u > $dirOut/CGI.$file
     $BEDTOOLS/intersectBed -a $dirOut/CGI.$file -b $dirER/H3K36me3/$sample.FDR_0.05.FindER.bed.gz -u > $dirOut/CGI.$file.H3K36me3
@@ -350,7 +351,7 @@ for file in DMR.IDH*.hyper.bed; do
     p=$(echo "phyper($Nnongene, $NCGI_nongene, $NCGI - $NCGI_nongene, $NK36, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
     echo -e "$sample\t$Nhyper\t$NCGI\t$NCGI_nongene\t$NK36\t$Nnongene\t$p" >> $dirOut/CGI.DMR.hyper.summary
 done
-cat $dirOut/CGI.DMR.CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
+cat $dirOut/CGI.DMR.IDHmut_CEMT_19_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.IDHmut_CEMT_22_NPC.hyper.bed.H3K36me3.nongene $dirOut/CGI.DMR.IDHmut_CEMT_47_NPC.hyper.bed.H3K36me3.nongene | awk '{print $4}' | uniq -c
 ### all methylated CGI
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
@@ -364,7 +365,7 @@ dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/DMR/CGI/
 $BEDTOOLS/intersectBed -a $CGI -b $gene -v > /home/lli/hg19/CGI.nongene.bed
 echo -e "Sample\tCGI\tCGI_hyper\tCGI_K36\tCGI_hyper_K36\tp" > $dirOut/CGI.hyper.H3K36me3.summary
 cd $dir5mC
-for file in IDH*.combine.5mC.CpG; do
+for file in *CEMT*.combine.5mC.CpG; do
     sample=$(echo $file | sed 's/.5mC.CpG//g' | sed 's/.combine//g');
     echo $sample;
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/CGI.nongene.bed -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){f=c[i]/(c[i]+t[i]); if(f>=0.75){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"f}}}' | sort -k1,1 -k 2,2n > $dirOut/$sample.CGI.nongene.hyper
@@ -387,7 +388,7 @@ CG='/home/lli/hg19/CG.BED'
 cd $dirOut
 echo -e "Sample\tDM\tState\tTotal_CpG\tDMR_CpG\tState_CpG\tDMR_State_CpG\tEnrichment" > $dirOut/DMR.chromHMM.enrich
 for file in *CEMT*.CpG.bed; do
-    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
+    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g' | sed 's/IDH.*t_//g')
     dm=$(echo $file | sed -e 's/.*NPC.//g' | sed -e 's/.CpG.bed//g')
     echo 'Processing' $lib $dm
     less $dirState/$lib'_18_segments.bed' | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/intersectBed -a $CG -b stdin -wa -wb | awk '{c[$8]=c[$8]+1}END{for(i in c){print i"\t"c[i]}}' > $lib.state
@@ -408,8 +409,8 @@ R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
 genome=/home/lli/hg19/hg19.chrom.len
 cd $dirDMR
 echo -e "Sample\tDMR\tMark\tHM\tN_DMR\tN_HM\tN_intersect\tN_total\tFold\tp-value" > $dirDMR/DMR.uniqueHM.enrichment.summary
-for file in DMR.CEMT*.bed; do
-    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g')
+for file in DMR.*CEMT*.bed; do
+    lib=$(echo $file | sed -e 's/DMR.//g' | sed -e 's/_NPC.*//g' | sed 's/IDH.*t_//g')
     dm=$(echo $file | sed -e 's/.bed//g' | sed -e 's/.*NPC.//g')
     echo $lib $dm
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K27ac H3K36me3; do
@@ -434,8 +435,8 @@ mkdir -p $dirOut
 echo -e "Sample\tDM\tDE\tN_DM_promoter\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirOut/DMR.DE.summary
 n_total=19865 
 cd $dirIn
-for dmr in DMR.CEMT*.bed; do
-    lib=$(echo $dmr | sed -e 's/DMR.//g' | sed -e 's/_NPC.*.bed//g')
+for dmr in DMR.*CEMT*.bed; do
+    lib=$(echo $dmr | sed -e 's/DMR.//g' | sed -e 's/_NPC.*.bed//g' | sed 's/IDH.*t_//g')
     dm=$(echo $dmr | sed -e 's/.bed//g' | sed -e 's/.*NPC.//g')
     echo $lib $dm
     less $dmr | awk '{gsub("chr", ""); print}' | $BEDTOOLS/intersectBed -a stdin -b $promoter -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' | sort -k5,5 > $dirOut/DMR.$lib.NPC.$dm.promoter.bed
