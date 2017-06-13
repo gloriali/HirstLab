@@ -111,6 +111,7 @@ done
 cat $dirOut/*.enhancer.5mC > $dirOut/enhancer.5mC
 less $gene | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print $0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $dirOut/enhancer.5mC | sort -k1,1 -k2,2n) -b stdin -wa -wb | awk '{gsub("_", "\t", $4); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"."$11}' > $dirOut/enhancer.5mC.gene
 less $dirOut/enhancer.5mC.gene | sort -k8,8 | join - <(sort $RPKM -k1,1) -1 8 -2 1 | awk '{gsub("\\.", "\t", $1); print $2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$1"\t"$9}' > $dirOut/enhancer.5mC.RPKM
+$BEDTOOLS/intersectBed -a $dirOut/enhancer.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/enhancer.5mC.CpG
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -180,6 +181,7 @@ for file in IDHwt*enhancer; do
     done
 done
 cat $dirOut/IDH*.enhancer.coverage.5mC > $dirOut/TCGA.enhancer.coverage.5mC
+$BEDTOOLS/intersectBed -a $dirOut/TCGA.enhancer.coverage.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/TCGA.enhancer.coverage.5mC.CpG
 ### promoter hyper enhancer in other tissues
 dirIn=/projects/edcc_new/reference_epigenomes/
 dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/others/
@@ -208,6 +210,7 @@ for file in *.FindER.bed.gz; do
     less $sample.promoter.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b <(less $sample.5mC.CpG | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+1"\t"$4"\t"$5}') -wa -wb | awk '{if($11+$12 >= 3){t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/$sample.promoter.enhancer.5mC
 done
 cat $dirOut/*.promoter.enhancer.5mC > $dirOut/promoter.enhancer.5mC
+$BEDTOOLS/intersectBed -a $dirOut/promoter.enhancer.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/promoter.enhancer.5mC.CpG
 
 # DMR between glioma and NPCs: pairwise between each glioma and all 4 NPCs
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
