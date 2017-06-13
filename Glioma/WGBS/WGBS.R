@@ -107,16 +107,17 @@ CGI_edge <- read.delim("./CGI_edge/CGI.edge.profile") %>% mutate(category = gsub
 	ylab("Fractional methylation") + 
 	theme_bw())
 ggsave(CGI_edge_figure, file = "./CGI_edge/CGI_edge_figure.pdf", width = 8, height = 5)
-CGI_edge_delta <- read.delim("./CGI_edge/CGI.edge.delta.profile") %>% mutate(category = gsub("_.*", "", sample1), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime"))) %>% filter(grepl("IDHmut_CEMT_21", sample1))
-(CGI_edge_delta_figure <- ggplot(CGI_edge_delta, aes(-distance, delta, color = sample2, group = interaction(sample1, sample2))) + 
+CGI_edge_delta <- read.delim("./CGI_edge/CGI.edge.delta.profile") %>% mutate(category = gsub("_.*", "", sample1), sample1 = gsub("(IDH.*t)_", "\\1\n", sample1), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime"))) %>% filter(!grepl("CEMT_21", sample1))
+(CGI_edge_delta_figure <- ggplot(CGI_edge_delta, aes(-distance, delta, color = category, linetype = sample2, group = interaction(sample1, sample2))) + 
 		geom_smooth(se = F, span = 0.4) + 
 		geom_hline(yintercept = 0) + 
-		facet_grid(sample1 ~ edge, scales = "free_x") + 
-		guides(color = guide_legend(title = NULL)) + 
+		facet_grid(. ~ edge, scales = "free_x") + 
+		scale_color_manual(values = c("IDHmut" = "red", "IDHwt" = "blue")) + 
+		guides(color = guide_legend(title = NULL), linetype = guide_legend(title = NULL, color = "black")) + 
 		xlab("Distance to CGI edge (bp)") + 
 		ylab("Difference in fractional methylation\nglioma - NPC") + 
 		theme_bw())
-ggsave(CGI_edge_delta_figure, file = "./CGI_edge/CGI_edge_delta_figure.pdf", width = 8, height = 12)
+ggsave(CGI_edge_delta_figure, file = "./CGI_edge/CGI_edge_delta_figure.pdf", width = 8, height = 5)
 
 ## ------- 5mC at enhancer regions --------
 enhancer_5mC <- read.delim("./H3K27ac/enhancer.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>% filter(sample != "CEMT_21") %>% 
@@ -150,8 +151,18 @@ for(lib in c("CEMT_19", "CEMT_22", "CEMT_23", "CEMT_47", "GE04")){
 		RPKM_p <- rbind(RPKM_p, data.frame(sample = lib, category = c, p = t.test((enhancer_5mC_RPKM %>% filter(category == c, grepl(lib, sample), group == "hyper"))$RPKM, (enhancer_5mC_RPKM %>% filter(category == c, grepl(lib, sample), group == "hypo"))$RPKM)$p.value))
 	}
 }
+enhancer_5mC_CpG <- read.delim("./H3K27ac/enhancer.5mC.CpG", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample", "NCpG", "CpGdensity")) %>% filter(sample != "CEMT_21") %>% 
+	mutate(category = gsub(".*_", "", ID), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = paste0(type, "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
+(enhancer_5mC_CpG_figure <- ggplot(enhancer_5mC_CpG, aes(CpGdensity, color = group)) + 
+		geom_density(adjust = 2) +
+		facet_grid(sample ~ category, scale = "free_y") + 
+		coord_cartesian(xlim = c(0, 100)) + 
+		xlab("No. of CpGs per kB") + 
+		ylab("density") + 
+		theme_bw())
+ggsave(enhancer_5mC_CpG_figure, file = "./H3K27ac/enhancer_5mC_CpG_figure.pdf", height = 6, width = 6)
 enhancer_5mC_TCGA <- read.delim("./H3K27ac/TCGA.enhancer.coverage.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>%
-	mutate(category = gsub(".*_", "", ID), type = gsub(".*_", "", sample), sample = paste0(type, "\n", gsub("_.*", "", sample)), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
+	mutate(category = gsub(".*_", "", ID), type = gsub("_.*", "", sample), sample = gsub("_", "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
 enhancer_5mC_TCGA_summary <- merge(enhancer_5mC_TCGA %>% group_by(sample, category, group) %>% summarize(N=n()), enhancer_5mC_TCGA %>% group_by(sample, category) %>% summarize(Total=n())) %>% 
 	mutate(percent = N/Total, signal = 2.1, fractional = ifelse(group == "hypo", 0.15, ifelse(group == "hyper", 0.85, 0.5)), labels = paste0(round(percent*100, 0), "%"))
 (enhancer_5mC_TCGA_figure <- ggplot(enhancer_5mC_TCGA, aes(fractional, log10(signal))) + 
@@ -165,7 +176,45 @@ enhancer_5mC_TCGA_summary <- merge(enhancer_5mC_TCGA %>% group_by(sample, catego
 		xlab("Fractional methylation") + 
 		ylab("log10 H3K27ac normalized signal") + 
 		theme_bw())
-ggsave(enhancer_5mC_TCGA_figure, file = "./H3K27ac/enhancer_5mC_TCGA_figure.pdf", height = 6, width = 6)
+ggsave(enhancer_5mC_TCGA_figure, file = "./H3K27ac/enhancer_5mC_TCGA_figure.pdf", height = 7, width = 8)
+enhancer_5mC_CpG_TCGA <- read.delim("./H3K27ac/TCGA.enhancer.coverage.5mC.CpG", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample", "NCpG", "CpGdensity")) %>% 
+	mutate(category = gsub(".*_", "", ID), sample = gsub("_", "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
+(enhancer_5mC_CpG_TCGA_figure <- ggplot(enhancer_5mC_CpG_TCGA, aes(CpGdensity, color = group)) + 
+		geom_density(adjust = 2) +
+		facet_grid(sample ~ category, scale = "free_y") + 
+		coord_cartesian(xlim = c(0, 100)) + 
+		xlab("No. of CpGs per kB") + 
+		ylab("density") + 
+		theme_bw())
+ggsave(enhancer_5mC_CpG_TCGA_figure, file = "./H3K27ac/enhancer_5mC_CpG_TCGA_figure.pdf", height = 6, width = 6)
+CEMT <- read.delim("../CEMT.txt", head = F, as.is = T) %>% mutate(V1 = paste0("CEMT_", V1))
+row.names(CEMT) <- CEMT$V1
+enhancer_5mC_other <- read.delim("./H3K27ac/others/promoter.enhancer.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>%
+	mutate(sample = paste0(CEMT[sample, "V2"], "_", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median"))) %>% filter(!grepl("Brain", sample))
+enhancer_5mC_other_summary <- merge(enhancer_5mC_other %>% group_by(sample, group) %>% summarize(N=n()), enhancer_5mC_other %>% group_by(sample) %>% summarize(Total=n())) %>% 
+	mutate(percent = N/Total, signal = 2.2, fractional = ifelse(group == "hypo", 0.15, ifelse(group == "hyper", 0.85, 0.5)), labels = paste0(round(percent*100, 0), "%"))
+(enhancer_5mC_other_figure <- ggplot(enhancer_5mC_other, aes(fractional, log10(signal))) + 
+		stat_density2d(aes(fill = ..density..), geom="tile", contour=FALSE) +
+		scale_fill_gradientn(colors = c("black", "darkblue", "lightblue", "green", "yellow", "orange", "red", "darkred"), values = c(0, 0.01, 0.02, 0.04, 0.08, 0.3, 0.5, 1), guide = "none") +		
+		geom_vline(xintercept = 0.3, color = "white") + 
+		geom_vline(xintercept = 0.7, color = "white") + 
+		geom_text(data = enhancer_5mC_other_summary, aes(fractional, signal, label = labels), color = "white", size = 3) + 
+		facet_wrap(~ sample) + 
+		coord_cartesian(ylim = c(0.3, 2.3)) + 
+		xlab("Fractional methylation") + 
+		ylab("log10 H3K27ac normalized signal") + 
+		theme_bw())
+ggsave(enhancer_5mC_other_figure, file = "./H3K27ac/enhancer_5mC_other_figure.pdf", height = 6, width = 6)
+enhancer_5mC_CpG_other <- read.delim("./H3K27ac/others/promoter.enhancer.5mC.CpG", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample", "NCpG", "CpGdensity")) %>% 
+	mutate(sample = paste0(CEMT[sample, "V2"], "_", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median"))) %>% filter(!grepl("Brain", sample))
+(enhancer_5mC_CpG_other_figure <- ggplot(enhancer_5mC_CpG_other, aes(CpGdensity, color = group)) + 
+		geom_density(adjust = 2) +
+		facet_wrap(~ sample) + 
+		coord_cartesian(xlim = c(0, 100)) + 
+		xlab("No. of CpGs per kB") + 
+		ylab("density") + 
+		theme_bw())
+ggsave(enhancer_5mC_CpG_other_figure, file = "./H3K27ac/enhancer_5mC_CpG_other_figure.pdf", height = 6, width = 6)
 for(g in c("hypo", "median", "hyper")){
 	for(c in c("promoter", "regular", "super")){
 		assign(paste0("IDHmut_gene_", g, "_", c), list(CEMT_19 = (enhancer_5mC_RPKM %>% filter(as.character(group) == g, as.character(category) == c, grepl("CEMT_19", sample)))[, "ENSG"], 
@@ -189,10 +238,10 @@ for(c in c("promoter", "regular", "super")){
 				 	mutate(significant = ifelse(q <= 0.05, TRUE, FALSE), percent_with_motif = ifelse(group == "hypo", -percent_with_motif, percent_with_motif), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut"))))
 	tf <- (get(paste0("enhancer_5mC_homer_known_", c)) %>% filter(abs(percent_with_motif) >= 20, q <= 0.05) %>% arrange(percent_with_motif) %>% distinct(motif))$TF
 	assign(paste0("enhancer_5mC_homer_known_", c), get(paste0("enhancer_5mC_homer_known_", c)) %>% filter(TF %in% tf) %>% mutate(TF = factor(TF, levels = tf)))
-	assign(paste0("enhancer_5mC_homer_known_", c, "_figure"), ggplot(get(paste0("enhancer_5mC_homer_known_", c)), aes(TF, percent_with_motif, fill = type, color = significant)) + 
+	assign(paste0("enhancer_5mC_homer_known_", c, "_figure"), ggplot(get(paste0("enhancer_5mC_homer_known_", c)), aes(TF, percent_with_motif, fill = type, alpha = significant)) + 
 				 	geom_bar(stat = "identity", position = position_dodge()) + 
 				 	geom_hline(yintercept = 0) + 
-				 	scale_color_manual(values = c("grey", "black")) +
+				 	scale_alpha_manual(values = c(0.2, 1), guide = "none") +
 				 	scale_y_continuous(breaks = c(-60, -30, 0 , 30, 60), labels = c(60, 30, 0, 30, 60)) + 
 				 	xlab("") + 
 				 	ylab("Percent of enhancers with motif") + 
@@ -272,23 +321,23 @@ for(lib in libs){
 				 	ylab("density") + 
 				 	ggtitle(lib) + 
 				 	theme_bw())
-	ggsave(get(paste0("DMR_", lib, "_CGI_dis_figure")), file = paste0("./DMR/DMR_", lib, "_CGI_dis_figure.pdf"), height = 5, width = 6)
+	ggsave(get(paste0("DMR_", lib, "_CGI_dis_figure")), file = paste0("./DMR/CGI_dis/DMR_", lib, "_CGI_dis_figure.pdf"), height = 5, width = 6)
 }
 
 ### -------- GREAT --------
-(GREAT_DMR_CEMT_19_hyper_figure <- enrich_GREAT("CEMT_19_hyper", "CEMT_19_hyper", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
-(GREAT_DMR_CEMT_19_hypo_figure <- enrich_GREAT("CEMT_19_hypo", "CEMT_19_hypo", dirIn = "./DMR/enrich/", categories = c("GOBP"), height = 3, width = 7))
-(GREAT_DMR_CEMT_21_hyper_figure <- enrich_GREAT("CEMT_21_hyper", "CEMT_21_hyper", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
-(GREAT_DMR_CEMT_21_hypo_figure <- enrich_GREAT("CEMT_21_hypo", "CEMT_21_hypo", dirIn = "./DMR/enrich/", categories = c("MSigPerturbation"), height = 4, width = 7))
-(GREAT_DMR_CEMT_22_hyper_figure <- enrich_GREAT("CEMT_22_hyper", "CEMT_22_hyper", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
+(GREAT_DMR_CEMT_19_hyper_figure <- enrich_GREAT("CEMT_19_hyper", "CEMT_19_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
+(GREAT_DMR_CEMT_19_hypo_figure <- enrich_GREAT("CEMT_19_hypo", "CEMT_19_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP"), height = 3, width = 7))
+(GREAT_DMR_CEMT_21_hyper_figure <- enrich_GREAT("CEMT_21_hyper", "CEMT_21_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
+(GREAT_DMR_CEMT_21_hypo_figure <- enrich_GREAT("CEMT_21_hypo", "CEMT_21_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("MSigPerturbation"), height = 4, width = 7))
+(GREAT_DMR_CEMT_22_hyper_figure <- enrich_GREAT("CEMT_22_hyper", "CEMT_22_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 8, width = 7))
 # GREAT_DMR_CEMT_22_hypo_figure : no enrichment
-(GREAT_DMR_CEMT_23_hyper_figure <- enrich_GREAT("CEMT_23_hyper", "CEMT_23_hyper", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
-(GREAT_DMR_CEMT_23_hypo_figure <- enrich_GREAT("CEMT_23_hypo", "CEMT_23_hypo", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
-(GREAT_DMR_CEMT_47_hyper_figure <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", dirIn = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
-(GREAT_DMR_CEMT_47_hypo_figure <- enrich_GREAT("CEMT_47_hypo", "CEMT_47_hypo", dirIn = "./DMR/enrich/", categories = c("MSigPerturbation"), height = 2, width = 7))
+(GREAT_DMR_CEMT_23_hyper_figure <- enrich_GREAT("CEMT_23_hyper", "CEMT_23_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
+(GREAT_DMR_CEMT_23_hypo_figure <- enrich_GREAT("CEMT_23_hypo", "CEMT_23_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
+(GREAT_DMR_CEMT_47_hyper_figure <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
+(GREAT_DMR_CEMT_47_hypo_figure <- enrich_GREAT("CEMT_47_hypo", "CEMT_47_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("MSigPerturbation"), height = 2, width = 7))
 
 ### -------- enrichment in chromatin states --------
-DMR_ChromHMM_summary <- read.delim("./DMR/CpG/DMR.chromHMM.enrich.summary", as.is = T) 
+DMR_ChromHMM_summary <- read.delim("./DMR/intersect/DMR.chromHMM.enrich.summary", as.is = T) 
 (DMR_ChromHMM_summary_figure <- ggplot(DMR_ChromHMM_summary, aes(Name, Enrichment, fill = Sample)) + 
 	geom_bar(stat = "identity", position = position_dodge()) + 
 	facet_grid(. ~ DM) + 
@@ -301,9 +350,9 @@ ggsave(DMR_ChromHMM_summary_figure, file = "./DMR/DMR_ChromHMM_summary_figure.pd
 ### -------- enrichment in differentially marked histone mods -------
 DMR_DHM_enrich <- read.delim("./DMR/DMR.uniqueHM.enrichment.summary", as.is = T) %>% 
 	mutate(HM = gsub("CEMT.*.unique", "Histone modification gain", HM), HM = gsub("NPC.*.unique", "Histone modification loss", HM), sig = ifelse(p.value <= 0.01, "p-value <= 0.01", "p-value > 0.01"))
-(DMR_DHM_enrich_figure <- ggplot(DMR_DHM_enrich, aes(Sample, log2(Fold), fill = Mark, color = sig)) + 
+(DMR_DHM_enrich_figure <- ggplot(DMR_DHM_enrich, aes(Sample, log2(Fold), fill = Mark, alpha = sig)) + 
 	geom_bar(stat = "identity", position = position_dodge(), width = 0.8) + 
-	scale_color_manual(name = "", values = c("red", "transparent")) + 
+	scale_alpha_manual(guide = "none", values = c(1, 0.2)) + 
 	facet_grid(HM ~ DMR) + 
 	coord_flip() + 
 	xlab("") + 
@@ -316,11 +365,11 @@ DMR_enhancer_enrich_venn <- draw.pairwise.venn(area1 = 9128, area2 = 10940, cros
 dev.off()
 
 ### -------- associated with DE genes ----------
-DMR_DE <- read.delim("./DMR/DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.01)
-(DMR_DE_figure <- ggplot(DMR_DE, aes(DM, Percent_intersect, fill = DE, color = Significant)) + 
+DMR_DE <- read.delim("./DMR/DE/DMR.DE.summary", as.is = T) %>% mutate(Significant = p_Fisher < 0.05) %>% filter(Sample != "CEMT_21")
+(DMR_DE_figure <- ggplot(DMR_DE, aes(DM, Percent_intersect, fill = DE, alpha = Significant)) + 
 	geom_bar(stat = "identity", position = position_dodge(), width = 0.6) + 
 	scale_fill_manual(name = "", values = c("blue", "red")) + 
-	scale_color_manual(values = c("transparent", "green")) + 
+	scale_alpha_manual(values = c(0.3, 1), guide = "none") + 
 	facet_wrap(~ Sample) + 
 	xlab("") + 
 	ylab("Fraction of DE genes") + 
