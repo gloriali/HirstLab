@@ -27,20 +27,19 @@ library(knitr)
 load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
 knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 7) 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/WGBS/DMR/")
-libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
 
 ## RPKM of DNA methylation regulators
 
 ```{r modifier_RPKM}
-(modifier_RPKM_figure)
+(DNAme_regulators_RPKM_figure)
 ```
 
 ## CpG coverage profile
 * TCGA data have particularly lower coverage.       
 
 ```{r coverage}
-(coverage_figure)
+(qc_5mC_coverage_figure)
 ```
 
 ## Global hypermethylation in IDH mut glioma
@@ -50,7 +49,7 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 * Whiskers of the box plot represent 10% and 90% quantile.     
 
 ```{r global_5mC}
-(quantile_5mC_figure)
+(qc_5mC_profile_figure)
 ```
 
 ## Clustering
@@ -58,9 +57,7 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
 ```{r cluster}
 op <- par(mar = c(5, 4, 4, 8))
-plot(spearman_all_5mC_dend, main = "genome-wide spearman", horiz = TRUE)
-plot(pearson_all_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
-plot(spearman_CGI_5mC_dend, main = "CGI spearman", horiz = TRUE)
+plot(pearson_genome_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
 plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
 par(op)
 ```
@@ -72,7 +69,11 @@ par(op)
 
 ```{r enhancer}
 (enhancer_5mC_figure)
+(enhancer_5mC_CpG_figure)
 (enhancer_5mC_TCGA_figure)
+(enhancer_5mC_CpG_TCGA_figure)
+(enhancer_5mC_other_figure)
+(enhancer_5mC_CpG_other_figure)
 (enhancer_5mC_RPKM_figure)
 grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHmut_venn_hyper_regular), gTree(children = IDHmut_venn_hyper_super), 
 						 gTree(children = IDHmut_venn_median_promoter), gTree(children = IDHmut_venn_median_regular), gTree(children = IDHmut_venn_median_super), 
@@ -87,8 +88,8 @@ grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHm
 * CGIs are hypermethylated in IDH mutant gliomas.     
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
-```{r 5mC_CGI, fig.height = 10}
-#(CGI_edge_delta_figure)
+```{r 5mC_CGI, fig.height = 6}
+(CGI_edge_delta_figure)
 ```
 
 ## DMRs between gliomas and NPCs  
@@ -125,23 +126,23 @@ grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHm
 	+ GOCC: wt showed transcription factor complex, mut also showed membranes and neurons.         
 
 ```{r DMR_GREAT_hyper, fig.height=9}
-(GREAT_DMR_CEMT_19_hyper)
-(GREAT_DMR_CEMT_22_hyper)
-(GREAT_DMR_CEMT_47_hyper)
-(GREAT_DMR_CEMT_21_hyper)
-(GREAT_DMR_CEMT_23_hyper)
+(GREAT_DMR_CEMT_19_hyper_figure)
+(GREAT_DMR_CEMT_22_hyper_figure)
+(GREAT_DMR_CEMT_47_hyper_figure)
+(GREAT_DMR_CEMT_21_hyper_figure)
+(GREAT_DMR_CEMT_23_hyper_figure)
 ```
 
 #### Hypomethylated DMRs
 * IDH mut had few significant term (CEMT22 had none), wt had cancer related terms, and CEMT21 showed similar terms to mut.   
 
 ```{r DMR_GREAT_hypo1, fig.height=4}
-(GREAT_DMR_CEMT_19_hypo)
-(GREAT_DMR_CEMT_21_hypo)
-(GREAT_DMR_CEMT_47_hypo)
+(GREAT_DMR_CEMT_19_hypo_figure)
+(GREAT_DMR_CEMT_21_hypo_figure)
+(GREAT_DMR_CEMT_47_hypo_figure)
 ```
 ```{r DMR_GREAT_hypo2, fig.height=8}
-(GREAT_DMR_CEMT_23_hypo)
+(GREAT_DMR_CEMT_23_hypo_figure)
 ```
 
 ### Percentage of hyper CpGs in hyper CGIs

@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Wed May 31 01:52:16 2017
+Updated: Tue Jun 13 13:28:59 2017
 
 
 
@@ -26,20 +26,20 @@ Updated: Wed May 31 01:52:16 2017
 ## Clustering
 * CGI clustering showed clusters based on IDH mut and wt.      
 
-![](WGBS_files/figure-html/cluster-1.png)<!-- -->![](WGBS_files/figure-html/cluster-2.png)<!-- -->![](WGBS_files/figure-html/cluster-3.png)<!-- -->![](WGBS_files/figure-html/cluster-4.png)<!-- -->
+![](WGBS_files/figure-html/cluster-1.png)<!-- -->![](WGBS_files/figure-html/cluster-2.png)<!-- -->
 
 ## Enhancer and 5mC
 * Hypermethylated enhancers also present at promoters - more so in IDH mutant glioma    
 * Expression levels of the closest genes are not significantly affected by 5mC at these bivalent enhancers     
 * Genes associated with each profile group are significantly overlapped across the three IDH mutant gliomas        
 
-![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- -->![](WGBS_files/figure-html/enhancer-3.png)<!-- -->![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- -->![](WGBS_files/figure-html/enhancer-6.png)<!-- -->![](WGBS_files/figure-html/enhancer-7.png)<!-- -->
+![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- -->![](WGBS_files/figure-html/enhancer-3.png)<!-- -->![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- -->![](WGBS_files/figure-html/enhancer-6.png)<!-- -->![](WGBS_files/figure-html/enhancer-7.png)<!-- -->![](WGBS_files/figure-html/enhancer-8.png)<!-- -->![](WGBS_files/figure-html/enhancer-9.png)<!-- -->![](WGBS_files/figure-html/enhancer-10.png)<!-- -->![](WGBS_files/figure-html/enhancer-11.png)<!-- -->
 
 ## DNA methylation changes around CGI edges
 * CGIs are hypermethylated in IDH mutant gliomas.     
 * DNA methylation changes around CGI occur at the edge of CGIs.     
 
-
+![](WGBS_files/figure-html/5mC_CGI-1.png)<!-- -->
 
 ## DMRs between gliomas and NPCs  
 ### DMR identification 
@@ -99,43 +99,27 @@ Updated: Wed May 31 01:52:16 2017
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:center;"> CEMT_19 </td>
+   <td style="text-align:center;"> IDHmut_CEMT_19 </td>
    <td style="text-align:center;"> 5066 </td>
    <td style="text-align:center;"> 1685 </td>
-   <td style="text-align:center;"> 290 </td>
-   <td style="text-align:center;"> 216 </td>
+   <td style="text-align:center;"> 0 </td>
+   <td style="text-align:center;"> 0 </td>
    <td style="text-align:center;"> 0 </td>
   </tr>
   <tr>
-   <td style="text-align:center;"> CEMT_21 </td>
+   <td style="text-align:center;"> IDHmut_CEMT_21 </td>
    <td style="text-align:center;"> 5066 </td>
    <td style="text-align:center;"> 1085 </td>
-   <td style="text-align:center;"> 126 </td>
-   <td style="text-align:center;"> 91 </td>
+   <td style="text-align:center;"> 0 </td>
+   <td style="text-align:center;"> 0 </td>
    <td style="text-align:center;"> 0 </td>
   </tr>
   <tr>
-   <td style="text-align:center;"> CEMT_22 </td>
+   <td style="text-align:center;"> IDHmut_CEMT_22 </td>
    <td style="text-align:center;"> 5066 </td>
    <td style="text-align:center;"> 1739 </td>
-   <td style="text-align:center;"> 328 </td>
-   <td style="text-align:center;"> 227 </td>
    <td style="text-align:center;"> 0 </td>
-  </tr>
-  <tr>
-   <td style="text-align:center;"> CEMT_23 </td>
-   <td style="text-align:center;"> 5066 </td>
-   <td style="text-align:center;"> 1015 </td>
-   <td style="text-align:center;"> 218 </td>
-   <td style="text-align:center;"> 103 </td>
    <td style="text-align:center;"> 0 </td>
-  </tr>
-  <tr>
-   <td style="text-align:center;"> CEMT_47 </td>
-   <td style="text-align:center;"> 5066 </td>
-   <td style="text-align:center;"> 1724 </td>
-   <td style="text-align:center;"> 165 </td>
-   <td style="text-align:center;"> 138 </td>
    <td style="text-align:center;"> 0 </td>
   </tr>
 </tbody>
@@ -185,21 +169,21 @@ Updated: Wed May 31 01:52:16 2017
    <td style="text-align:center;"> 1.0000000 </td>
   </tr>
   <tr>
-   <td style="text-align:center;"> CEMT_23 </td>
-   <td style="text-align:center;"> 1718 </td>
-   <td style="text-align:center;"> 703 </td>
-   <td style="text-align:center;"> 107 </td>
-   <td style="text-align:center;"> 162 </td>
-   <td style="text-align:center;"> 5 </td>
-   <td style="text-align:center;"> 1.0000000 </td>
-  </tr>
-  <tr>
    <td style="text-align:center;"> CEMT_47 </td>
    <td style="text-align:center;"> 22146 </td>
    <td style="text-align:center;"> 6034 </td>
    <td style="text-align:center;"> 1222 </td>
    <td style="text-align:center;"> 629 </td>
    <td style="text-align:center;"> 36 </td>
+   <td style="text-align:center;"> 1.0000000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CEMT_23 </td>
+   <td style="text-align:center;"> 1718 </td>
+   <td style="text-align:center;"> 703 </td>
+   <td style="text-align:center;"> 107 </td>
+   <td style="text-align:center;"> 162 </td>
+   <td style="text-align:center;"> 5 </td>
    <td style="text-align:center;"> 1.0000000 </td>
   </tr>
 </tbody>
@@ -238,33 +222,33 @@ Updated: Wed May 31 01:52:16 2017
 <tbody>
   <tr>
    <td style="text-align:center;"> CEMT_19 </td>
-   <td style="text-align:center;"> 7921 </td>
-   <td style="text-align:center;"> 1951 </td>
-   <td style="text-align:center;"> 1340 </td>
+   <td style="text-align:center;"> 7840 </td>
+   <td style="text-align:center;"> 1940 </td>
+   <td style="text-align:center;"> 1332 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_21 </td>
-   <td style="text-align:center;"> 429 </td>
-   <td style="text-align:center;"> 86 </td>
-   <td style="text-align:center;"> 53 </td>
+   <td style="text-align:center;"> 406 </td>
+   <td style="text-align:center;"> 82 </td>
+   <td style="text-align:center;"> 52 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_22 </td>
-   <td style="text-align:center;"> 6830 </td>
-   <td style="text-align:center;"> 1675 </td>
-   <td style="text-align:center;"> 1053 </td>
+   <td style="text-align:center;"> 6633 </td>
+   <td style="text-align:center;"> 1622 </td>
+   <td style="text-align:center;"> 1005 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_23 </td>
-   <td style="text-align:center;"> 640 </td>
-   <td style="text-align:center;"> 215 </td>
+   <td style="text-align:center;"> 612 </td>
+   <td style="text-align:center;"> 205 </td>
    <td style="text-align:center;"> 62 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> CEMT_47 </td>
-   <td style="text-align:center;"> 8254 </td>
-   <td style="text-align:center;"> 1972 </td>
-   <td style="text-align:center;"> 1357 </td>
+   <td style="text-align:center;"> 8149 </td>
+   <td style="text-align:center;"> 1959 </td>
+   <td style="text-align:center;"> 1340 </td>
   </tr>
 </tbody>
 </table>
