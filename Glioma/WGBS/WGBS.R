@@ -99,7 +99,7 @@ dev.off()
 
 ## ------- changes at CGI edges -------
 CGI_edge <- read.delim("./CGI_edge/CGI.edge.profile") %>% mutate(category = gsub("_.*", "", sample), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime"))) %>% filter(sample != "IDHmut_CEMT_21")
-(CGI_edge_figure <- ggplot(CGI_edge, aes(-distance, fractional, color = category, group = sample)) + 
+(CGI_edge_figure <- ggplot(CGI_edge %>% filter(sample %in% libs), aes(-distance, fractional, color = category, group = sample)) + 
 	geom_smooth(se = F, span = 0.2, size = 0.5) + 
 	facet_wrap(~ edge, scales = "free_x") + 
 	guides(color = guide_legend(title = NULL)) + 
@@ -108,7 +108,7 @@ CGI_edge <- read.delim("./CGI_edge/CGI.edge.profile") %>% mutate(category = gsub
 	theme_bw())
 ggsave(CGI_edge_figure, file = "./CGI_edge/CGI_edge_figure.pdf", width = 8, height = 5)
 CGI_edge_delta <- read.delim("./CGI_edge/CGI.edge.delta.profile") %>% mutate(category = gsub("_.*", "", sample1), sample1 = gsub("(IDH.*t)_", "\\1\n", sample1), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime"))) %>% filter(!grepl("CEMT_21", sample1))
-(CGI_edge_delta_figure <- ggplot(CGI_edge_delta, aes(-distance, delta, color = category, linetype = sample2, group = interaction(sample1, sample2))) + 
+(CGI_edge_delta_figure <- ggplot(CGI_edge_delta %>% filter(sample1 %in% libs), aes(-distance, delta, color = category, linetype = sample2, group = interaction(sample1, sample2))) + 
 		geom_smooth(se = F, span = 0.4) + 
 		geom_hline(yintercept = 0) + 
 		facet_grid(. ~ edge, scales = "free_x") + 
