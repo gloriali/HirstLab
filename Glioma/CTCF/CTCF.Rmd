@@ -26,7 +26,7 @@ library(dplyr)
 library(RCircos)
 library(knitr)
 load("/projects/epigenomics2/users/lli/glioma/CTCF/CTCF.Rdata")
-knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 5, bitmapType='cairo') 
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 5, fig.width = 5, bitmapType='cairo') 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics2/users/lli/glioma/CTCF/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ```
@@ -58,19 +58,16 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 
 ```{r 5mC}
 (CTCF_short_loss_5mC_figure)
-(CTCF_short_gain_5mC_figure)
 (CTCF_short_retained_5mC_figure)
-(CTCF_long_retained_5mC_figure)
 ```
 
-## H3K36me3 change at responders
+## H3K36me3 change at CTCF sites
 * There is a slight gain of H3K36me3 at CTCF loss sites compared to retained/gain sites, coresponds to 5mC gain at these regions.      
 
 ```{r H3K36me3}
 (CTCF_short_loss_K36_figure)
-(CTCF_short_gain_K36_figure)
 (CTCF_short_retained_K36_figure)
-(CTCF_long_retained_K36_figure)
+(CTCF_short_loss_5mC_K36_figure)
 ```
 
 ## Transcription deregulation associated with CTCF sites

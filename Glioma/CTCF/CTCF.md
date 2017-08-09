@@ -2,7 +2,7 @@
 Gloria Li  
 Apr, 4, 2017  
 
-Updated: Tue May  2 10:26:46 2017
+Updated: Wed Aug  9 09:00:08 2017
 
 
 
@@ -31,12 +31,12 @@ Updated: Tue May  2 10:26:46 2017
 * CTCF gain regions are methylated, slightly higher in IDHmut but not statistically significant.         
 * Retained CTCF binding sites are unmethylated.             
 
-![](CTCF_files/figure-html/5mC-1.png)<!-- -->![](CTCF_files/figure-html/5mC-2.png)<!-- -->![](CTCF_files/figure-html/5mC-3.png)<!-- -->![](CTCF_files/figure-html/5mC-4.png)<!-- -->
+![](CTCF_files/figure-html/5mC-1.png)<!-- -->![](CTCF_files/figure-html/5mC-2.png)<!-- -->
 
-## H3K36me3 change at responders
+## H3K36me3 change at CTCF sites
 * There is a slight gain of H3K36me3 at CTCF loss sites compared to retained/gain sites, coresponds to 5mC gain at these regions.      
 
-![](CTCF_files/figure-html/H3K36me3-1.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-2.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-3.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-4.png)<!-- -->
+![](CTCF_files/figure-html/H3K36me3-1.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-2.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-3.png)<!-- -->
 
 ## Transcription deregulation associated with CTCF sites
 * Identify genes with transcription deregulation associated with CTCF sites: 
