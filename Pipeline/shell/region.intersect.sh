@@ -39,15 +39,15 @@ cd $dirIn
 echo -e "Processing all DMR.<name>.bed files in the input directory. Reference: hg19, Ensembl hg19v69. 
 Output files:
 $dirOut/genomic.breakdown.summary (fold enrichment for plotting): Name\tTotal length\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI_promoter\tCGI_genebody\tCGI_intergenic\tCGI_shore\t$region_name
-$dirOut/DMR.<name>.gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.exon.bed: chr\tstart\tend\tDMR_ID\tExon_ID
-$dirOut/DMR.<name>.promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
-$dirOut/DMR.<name>.CGI_promoter.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_genebody.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_intergenic.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
-$dirOut/DMR.<name>.CGI_shore.bed: chr\tstart\tend\tDMR_ID\tCGI_shore_ID
-$dirOut/DMR.<name>.$region_name.bed: chr\tstart\tend\tDMR_ID\tregion_ID\n"
+$dirOut/<name>.gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/<name>.exon.bed: chr\tstart\tend\tDMR_ID\tExon_ID
+$dirOut/<name>.promoter.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/<name>.gene_pc.bed: chr\tstart\tend\tDMR_ID\tEnsembl
+$dirOut/<name>.CGI_promoter.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/<name>.CGI_genebody.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/<name>.CGI_intergenic.bed: chr\tstart\tend\tDMR_ID\tCGI_ID
+$dirOut/<name>.CGI_shore.bed: chr\tstart\tend\tDMR_ID\tCGI_shore_ID
+$dirOut/<name>.$region_name.bed: chr\tstart\tend\tDMR_ID\tregion_ID\n"
 
 ## genomic features region size
 all_total=3095677412 # less /home/lli/hg19/hg19.chrom.len.autoXY | awk '{s=s+$2}END{print s}'
@@ -76,7 +76,7 @@ for dmr in *.bed; do
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_genebody -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/$name.CGI_genebody.bed
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_intergenic -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/$name.CGI_intergenic.bed
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_shore -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/$name.CGI_shore.bed
-    less $dirOut/DMR.$name.gene.bed | awk '/protein_coding/ {gsub("_protein_coding", "", $5); print $1"\t"$2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.gene_pc.bed
+    less $dirOut/$name.gene.bed | awk '/protein_coding/ {gsub("_protein_coding", "", $5); print $1"\t"$2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.gene_pc.bed
     dmr_total=$(less $dmr | awk '{s=s+$3-$2}END{print s}')
     dmr_gene=$(less $dirOut/$name.gene.bed | awk '{s=s+$3-$2}END{print s}')
     dmr_exon=$(less $dirOut/$name.exon.bed | awk '{s=s+$3-$2}END{print s}')
