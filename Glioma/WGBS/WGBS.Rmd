@@ -70,11 +70,11 @@ par(op)
 ```{r enhancer}
 (enhancer_5mC_figure)
 (enhancer_5mC_CpG_figure)
-(enhancer_5mC_TCGA_figure)
-(enhancer_5mC_CpG_TCGA_figure)
-(enhancer_5mC_other_figure)
-(enhancer_5mC_CpG_other_figure)
+(enhancer_5mC_CGI_figure)
+(enhancer_5mC_nonCGI_figure)
 (enhancer_5mC_RPKM_figure)
+kable(IDHmut_promoter_hyper_DE_summary, format = "html", align = "c", row.names = F)
+kable(IDHmut_promoter_hyper_states_summary, format = "html", align = "c", row.names = F)
 grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHmut_venn_hyper_regular), gTree(children = IDHmut_venn_hyper_super), 
 						 gTree(children = IDHmut_venn_median_promoter), gTree(children = IDHmut_venn_median_regular), gTree(children = IDHmut_venn_median_super), 
 						 gTree(children = IDHmut_venn_hypo_promoter), gTree(children = IDHmut_venn_hypo_regular), gTree(children = IDHmut_venn_hypo_super), 

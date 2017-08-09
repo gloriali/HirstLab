@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Tue Jun 13 13:28:59 2017
+Updated: Wed Aug  9 02:41:12 2017
 
 
 
@@ -33,7 +33,381 @@ Updated: Tue Jun 13 13:28:59 2017
 * Expression levels of the closest genes are not significantly affected by 5mC at these bivalent enhancers     
 * Genes associated with each profile group are significantly overlapped across the three IDH mutant gliomas        
 
-![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- -->![](WGBS_files/figure-html/enhancer-3.png)<!-- -->![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- -->![](WGBS_files/figure-html/enhancer-6.png)<!-- -->![](WGBS_files/figure-html/enhancer-7.png)<!-- -->![](WGBS_files/figure-html/enhancer-8.png)<!-- -->![](WGBS_files/figure-html/enhancer-9.png)<!-- -->![](WGBS_files/figure-html/enhancer-10.png)<!-- -->![](WGBS_files/figure-html/enhancer-11.png)<!-- -->
+![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- -->![](WGBS_files/figure-html/enhancer-3.png)<!-- -->![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- --><table>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> DE </th>
+   <th style="text-align:center;"> DM </th>
+   <th style="text-align:center;"> H3K27ac </th>
+   <th style="text-align:center;"> CEMT_19 </th>
+   <th style="text-align:center;"> CEMT_22 </th>
+   <th style="text-align:center;"> CEMT_47 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> DN </td>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 16 </td>
+   <td style="text-align:center;"> 14 </td>
+   <td style="text-align:center;"> 12 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 1126 </td>
+   <td style="text-align:center;"> 1815 </td>
+   <td style="text-align:center;"> 4571 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 407 </td>
+   <td style="text-align:center;"> 586 </td>
+   <td style="text-align:center;"> 788 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 82 </td>
+   <td style="text-align:center;"> 64 </td>
+   <td style="text-align:center;"> 98 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 186 </td>
+   <td style="text-align:center;"> 230 </td>
+   <td style="text-align:center;"> 161 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 210 </td>
+   <td style="text-align:center;"> 279 </td>
+   <td style="text-align:center;"> 590 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ST </td>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 236 </td>
+   <td style="text-align:center;"> 305 </td>
+   <td style="text-align:center;"> 404 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UP </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 56 </td>
+   <td style="text-align:center;"> 33 </td>
+   <td style="text-align:center;"> 54 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UP </td>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 20 </td>
+   <td style="text-align:center;"> 12 </td>
+   <td style="text-align:center;"> 24 </td>
+  </tr>
+</tbody>
+</table>
+
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> DM </th>
+   <th style="text-align:center;"> H3K27ac </th>
+   <th style="text-align:center;"> H3K4me1 </th>
+   <th style="text-align:center;"> H3K4me3 </th>
+   <th style="text-align:center;"> H3K27me3 </th>
+   <th style="text-align:center;"> CEMT_19 </th>
+   <th style="text-align:center;"> CEMT_22 </th>
+   <th style="text-align:center;"> CEMT_47 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 411 </td>
+   <td style="text-align:center;"> 661 </td>
+   <td style="text-align:center;"> 1410 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> 39 </td>
+   <td style="text-align:center;"> 43 </td>
+   <td style="text-align:center;"> 92 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 31 </td>
+   <td style="text-align:center;"> 14 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 11 </td>
+   <td style="text-align:center;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 72 </td>
+   <td style="text-align:center;"> 116 </td>
+   <td style="text-align:center;"> 208 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 303 </td>
+   <td style="text-align:center;"> 518 </td>
+   <td style="text-align:center;"> 1794 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> 17 </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 120 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 12 </td>
+   <td style="text-align:center;"> 25 </td>
+   <td style="text-align:center;"> 33 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 13 </td>
+   <td style="text-align:center;"> 13 </td>
+   <td style="text-align:center;"> 57 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 185 </td>
+   <td style="text-align:center;"> 295 </td>
+   <td style="text-align:center;"> 619 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 29 </td>
+   <td style="text-align:center;"> 21 </td>
+   <td style="text-align:center;"> 145 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 38 </td>
+   <td style="text-align:center;"> 63 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 75 </td>
+   <td style="text-align:center;"> 92 </td>
+   <td style="text-align:center;"> 112 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 22 </td>
+   <td style="text-align:center;"> 31 </td>
+   <td style="text-align:center;"> 84 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 210 </td>
+   <td style="text-align:center;"> 286 </td>
+   <td style="text-align:center;"> 374 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 26 </td>
+   <td style="text-align:center;"> 35 </td>
+   <td style="text-align:center;"> 67 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 18 </td>
+   <td style="text-align:center;"> 37 </td>
+   <td style="text-align:center;"> 27 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 37 </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 17 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 47 </td>
+   <td style="text-align:center;"> 56 </td>
+   <td style="text-align:center;"> 34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 41 </td>
+   <td style="text-align:center;"> 66 </td>
+   <td style="text-align:center;"> 137 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 18 </td>
+   <td style="text-align:center;"> 26 </td>
+   <td style="text-align:center;"> 33 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 21 </td>
+   <td style="text-align:center;"> 29 </td>
+   <td style="text-align:center;"> 149 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 29 </td>
+   <td style="text-align:center;"> 48 </td>
+   <td style="text-align:center;"> 83 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 39 </td>
+   <td style="text-align:center;"> 39 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 70 </td>
+   <td style="text-align:center;"> 112 </td>
+   <td style="text-align:center;"> 183 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 22 </td>
+   <td style="text-align:center;"> 40 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> F-F </td>
+   <td style="text-align:center;"> 31 </td>
+   <td style="text-align:center;"> 31 </td>
+   <td style="text-align:center;"> 34 </td>
+  </tr>
+</tbody>
+</table>
+
+![](WGBS_files/figure-html/enhancer-6.png)<!-- -->![](WGBS_files/figure-html/enhancer-7.png)<!-- -->![](WGBS_files/figure-html/enhancer-8.png)<!-- -->![](WGBS_files/figure-html/enhancer-9.png)<!-- -->
 
 ## DNA methylation changes around CGI edges
 * CGIs are hypermethylated in IDH mutant gliomas.     
