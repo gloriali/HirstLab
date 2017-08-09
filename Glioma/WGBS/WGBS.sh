@@ -112,6 +112,34 @@ cat $dirOut/*.enhancer.5mC > $dirOut/enhancer.5mC
 less $gene | awk '$4 ~ /protein_coding/ {gsub("_protein_coding", ""); print $0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a <(less $dirOut/enhancer.5mC | sort -k1,1 -k2,2n) -b stdin -wa -wb | awk '{gsub("_", "\t", $4); print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"."$11}' > $dirOut/enhancer.5mC.gene
 less $dirOut/enhancer.5mC.gene | sort -k8,8 | join - <(sort $RPKM -k1,1) -1 8 -2 1 | awk '{gsub("\\.", "\t", $1); print $2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$1"\t"$9}' > $dirOut/enhancer.5mC.RPKM
 $BEDTOOLS/intersectBed -a $dirOut/enhancer.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/enhancer.5mC.CpG
+$BEDTOOLS/intersectBed -a $dirOut/enhancer.5mC -b /home/lli/hg19/CGI.forProfiles.BED -u > $dirOut/enhancer.5mC.CGI 
+$BEDTOOLS/intersectBed -a $dirOut/enhancer.5mC -b /home/lli/hg19/CGI.forProfiles.BED -v > $dirOut/enhancer.5mC.nonCGI 
+### change of state
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirDE=/projects/epigenomics2/users/lli/glioma/RNAseq/DEfine/
+dirHM=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
+dirOut=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/
+cd $dirOut
+for file in CEMT*.enhancer.5mC.*.*; do
+    sample=$(echo $file | cut -d'.' -f1)
+    echo $file $sample
+    less $file | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $dir5mC/NPC_GE04.combine.5mC.CpG -wa -wb | awk '{t[$4]=t[$4]+$12; c[$4]=c[$4]+$13; chr[$4]=$1; start[$4]=$2; end[$4]=$3; signal[$4]=$5; fractional[$4]=$6; sample[$4]=$7; type[$4]=$8} END{for(i in chr){if(t[i]+c[i]>0){f=c[i]/(c[i]+t[i]); if(f>0.7){category="hyper";}else if(f<0.3){category="hypo";}else{category="median";}; print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"fractional[i]"\t"sample[i]"\t"type[i]"\t"f"\t"category}}}' | sort -k1,1 -k2,2n > $dirOut/$file.states
+    $BEDTOOLS/closestBed -a $dirOut/$file.states -b <(less $promoter | sort -k1,1 -k2,2n) | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$14}' > $dirOut/$file.states.gene
+    cat <(less $dirDE/UP."$sample"_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $0"\tUP"}') <(less $dirDE/DN."$sample"_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $0"\tDN"}') > $dirDE/DE."$sample"_NPC.FDR_0.01.rmin_0.005.Nmin_25
+    awk 'NR==FNR{de[$1]=$9; next} {if(!($11 in de))de[$11]="ST"; print $0"\t"de[$11]}' $dirDE/DE."$sample"_NPC.FDR_0.01.rmin_0.005.Nmin_25 $dirOut/$file.states.gene > $dirOut/$file.states
+    for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3; do
+        less $(ls $dirHM/$mark/"$sample"*.FindER.bed.gz) | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/$file.states -b stdin -u | awk '{print $0"\t""'$mark'""_glioma_T"}' > $dirOut/$file.states.T
+        less $(ls $dirHM/$mark/"$sample"*.FindER.bed.gz) | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/$file.states -b stdin -v | awk '{print $0"\t""'$mark'""_glioma_F"}' > $dirOut/$file.states.F
+        cat $dirOut/$file.states.T $dirOut/$file.states.F | sort -k1,1 -k2,2n > $dirOut/$file.states
+        less $(ls $dirHM/$mark/*GE04*.FindER.bed.gz) | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/$file.states -b stdin -u | awk '{print $0"\t""'$mark'""_NPC_T"}' > $dirOut/$file.states.T
+        less $(ls $dirHM/$mark/*GE04*.FindER.bed.gz) | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $dirOut/$file.states -b stdin -v | awk '{print $0"\t""'$mark'""_NPC_F"}' > $dirOut/$file.states.F
+        cat $dirOut/$file.states.T $dirOut/$file.states.F | sort -k1,1 -k2,2n > $dirOut/$file.states
+        rm $dirOut/$file.states.T $dirOut/$file.states.F
+    done
+done
+cat CEMT_19.enhancer.5mC.promoter.hyper.states CEMT_22.enhancer.5mC.promoter.hyper.states CEMT_47.enhancer.5mC.promoter.hyper.states > IDHmut.enhancer.5mC.promoter.hyper.states
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
