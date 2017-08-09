@@ -733,4 +733,29 @@ for mark in H3K27me3 H3K36me3 H3K9me3 H3K27ac H3K4me1 H3K4me3 Input; do
         join <(less $file1 | awk '{print $1":"$2"-"$3"\t"$4}') <(less $file1 | awk '{print $1":"$2"-"$3"\t"$4}') | awk '{if($2+$3>0){print $1"\t"$2"\t"$3}}' > CEMT_19.NPC_GE04.coverage
 done
 
+########################################################
 
+## Differentially marked regions between IDH mut and wt
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+mkdir -p $dirIn/unique_wt/
+echo -e "Sample\tMark\tN_mut\tlen_mut\tN_wt\tlen_wt\tN_mut_unique\tlen_mut_unique\tN_wt_unique\tlen_wt_unique" > $dirIn/unique_wt/ER.unique.summary
+for lib in 19 22 47; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+        echo "CEMT_"$lib $mark
+        echo -e "\n\nCEMT_"$lib $mark >> $dirIn/unique_wt/ER.unique.log
+        dirOut=$dirIn/unique_wt/$mark/
+        mkdir -p $dirOut/
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_23.wig.gz -excl $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz -o $dirOut/ -n CEMT_$lib.vs.wt.CEMT_$lib >> $dirIn/unique_wt/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_$lib.wig.gz -r $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz -o $dirOut/ -n CEMT_$lib.vs.wt.wt >> $dirIn/unique_wt/ER.unique.log
+        N_mut=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | wc -l)
+        len_mut=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_wt=$(less $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz | wc -l)
+        len_wt=$(less $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_mut_unique=$(less $dirOut/CEMT_$lib.vs.wt.CEMT_$lib.unique | wc -l)
+        len_mut_unique=$(less $dirOut/CEMT_$lib.vs.wt.CEMT_$lib.unique | awk '{s=s+$3-$2}END{print s}')
+        N_wt_unique=$(less $dirOut/CEMT_$lib.vs.wt.wt.unique | wc -l)
+        len_wt_unique=$(less $dirOut/CEMT_$lib.vs.wt.wt.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e "$lib\t$mark\t$N_mut\t$len_mut\t$N_wt\t$len_wt\t$N_mut_unique\t$len_mut_unique\t$N_wt_unique\t$len_wt_unique" >> $dirIn/unique_wt/ER.unique.summary
+    done
+done
+less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
