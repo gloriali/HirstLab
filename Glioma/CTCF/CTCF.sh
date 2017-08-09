@@ -234,3 +234,22 @@ for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/Homer/*.bed; do
         $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $CTCF | awk 'NR>1{gsub("chr", ""); print $1"\t"$2-20"\t"$3+20"\t"$1":"$2"-"$3}') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/$name.H3K36me3.bed    
     done
 done
+#### RNA-seq
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/RNAseq/
+mkdir -p $dirOut
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/Homer/*.bed; do
+    name=$(basename $CTCF | cut -d'.' -f1)
+    echo -e "chr\tstart\tend\tID\tN\tsample\tRPKM" > $dirOut/$name.RNAseq.bed
+    for dirRNA in /projects/epigenomics2/users/lli/glioma/RNAseq/bam/ /projects/epigenomics/users/lli/FetalBrain/RNAseq/bam/; do
+        cd $dirRNA
+        for bam in *.bam; do
+            sample=$(echo $bam | cut -d'.' -f2)
+            echo $name $sample
+            depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
+            $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a <(less $CTCF | awk 'NR>1{gsub("chr", ""); print $1"\t"$2-20"\t"$3+20"\t"$1":"$2"-"$3}') -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> $dirOut/$name.RNAseq.bed    
+        done
+    done
+done
+
