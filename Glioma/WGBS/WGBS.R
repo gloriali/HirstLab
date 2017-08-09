@@ -315,7 +315,7 @@ genomic_breakdown <- read.delim("./DMR/intersect/genomic.breakdown.summary", as.
 	mutate(sample = gsub("_NPC.*", "", Name), DM = gsub(".*NPC\\.", "", Name), NCpG = NULL, Name = NULL)
 genomic_breakdown_tall <- melt(genomic_breakdown, id = c("sample", "DM")) %>% 
 	mutate(value = ifelse(DM == "hyper", value, -value))
-(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, fill = DM)) + 
+(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall %>% filter(sample %in% libs), aes(variable, value, fill = DM)) + 
 	geom_bar(position = "identity", stat = "identity", width = 0.5) + 
 	geom_hline(yintercept = c(-2, 2)) + 
 	facet_wrap(~sample) + 
