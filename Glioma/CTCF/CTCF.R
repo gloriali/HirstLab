@@ -184,6 +184,20 @@ CTCF_long_retained_K36 <- read.delim("./H3K36me3/CTCF_IDHmut_retained_long.H3K36
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(CTCF_long_retained_K36_figure, file = "./H3K36me3/CTCF_long_retained_K36_figure.pdf", height = 4, width = 5)
 
+## ------- 5mC vs H3K36me3 at CTCF loss BS -------
+CTCF_short_loss_5mC_K36 <- merge(CTCF_short_loss_5mC, CTCF_short_loss_K36, by = c("ID", "sample", "type")) 
+level <- (CTCF_short_loss_5mC_K36 %>% filter(sample == "CEMT_19") %>% arrange(fractional))$ID
+CTCF_short_loss_5mC_K36 <- CTCF_short_loss_5mC_K36 %>% mutate(ID = factor(ID, levels = level)) %>% select(ID, sample, type, fractional, RPKM) %>% melt(id.vars = c("ID", "sample", "type"))
+(CTCF_short_loss_5mC_K36_figure <- ggplot(CTCF_short_loss_5mC_K36, aes(ID, value, color = type, group = sample)) + 
+		geom_line() + 
+		geom_smooth(se = F, span = 0.5, color = "black") + 
+		facet_grid(variable ~ sample, scales = "free_y") + 
+		xlab("regions") + 
+		ylab("") + 
+		theme_bw() +
+		theme(axis.text.x = element_text(size = 0)))
+ggsave(CTCF_short_loss_5mC_K36_figure, file = "CTCF_short_loss_5mC_K36_figure.pdf", height = 6, width = 5)
+
 ## ------- H3K27me3 at CTCF loss regions -------
 CTCF_nonresponder_K27 <- read.delim("./H3K27me3/resonpder.H3K27me3.bed", as.is = T, col.names = c("chr", "start", "end", "ID", "mut", "wt", "diff", "N", "sample", "RPKM")) %>% 
 	mutate(type = ifelse(grepl("NPC", sample), "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = gsub("NPC_", "", sample))
