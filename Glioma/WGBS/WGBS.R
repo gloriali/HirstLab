@@ -161,6 +161,40 @@ enhancer_5mC_CpG <- read.delim("./H3K27ac/enhancer.5mC.CpG", head = F, as.is = T
 		ylab("density") + 
 		theme_bw())
 ggsave(enhancer_5mC_CpG_figure, file = "./H3K27ac/enhancer_5mC_CpG_figure.pdf", height = 6, width = 6)
+enhancer_5mC_CGI <- read.delim("./H3K27ac/enhancer.5mC.CGI", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>% filter(sample != "CEMT_21") %>% 
+	mutate(category = gsub(".*_", "", ID), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = paste0(type, "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
+enhancer_5mC_CGI_summary <- merge(enhancer_5mC_CGI %>% group_by(sample, category, group) %>% summarize(N=n()), enhancer_5mC_CGI %>% group_by(sample, category) %>% summarize(Total=n())) %>% 
+	mutate(percent = N/Total, signal = 2.1, fractional = ifelse(group == "hypo", 0.15, ifelse(group == "hyper", 0.85, 0.5)), labels = paste0(round(percent*100, 0), "%"))
+(enhancer_5mC_CGI_figure <- ggplot(enhancer_5mC_CGI, aes(fractional, log10(signal))) + 
+		stat_density2d(aes(fill = ..density..), geom="tile", contour=FALSE) +
+		scale_fill_gradientn(colors = c("black", "darkblue", "lightblue", "green", "yellow", "orange", "red", "darkred"), values = c(0, 0.01, 0.02, 0.04, 0.08, 0.3, 0.5, 1), guide = "none") +		
+		geom_vline(xintercept = 0.3, color = "white") + 
+		geom_vline(xintercept = 0.7, color = "white") + 
+		geom_text(data = enhancer_5mC_CGI_summary, aes(fractional, signal, label = labels), color = "white", size = 3) + 
+		facet_grid(sample ~ category) + 
+		coord_cartesian(ylim = c(0.5, 2.2)) + 
+		xlab("Fractional methylation") + 
+		ylab("log10 H3K27ac normalized signal") + 
+		ggtitle("CGI enhancers") + 
+		theme_bw())
+ggsave(enhancer_5mC_CGI_figure, file = "./H3K27ac/enhancer_5mC_CGI_figure.pdf", height = 6, width = 6)
+enhancer_5mC_nonCGI <- read.delim("./H3K27ac/enhancer.5mC.nonCGI", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>% filter(sample != "CEMT_21") %>% 
+	mutate(category = gsub(".*_", "", ID), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut")), sample = paste0(type, "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
+enhancer_5mC_nonCGI_summary <- merge(enhancer_5mC_nonCGI %>% group_by(sample, category, group) %>% summarize(N=n()), enhancer_5mC_nonCGI %>% group_by(sample, category) %>% summarize(Total=n())) %>% 
+	mutate(percent = N/Total, signal = 2.1, fractional = ifelse(group == "hypo", 0.15, ifelse(group == "hyper", 0.85, 0.5)), labels = paste0(round(percent*100, 0), "%"))
+(enhancer_5mC_nonCGI_figure <- ggplot(enhancer_5mC_nonCGI, aes(fractional, log10(signal))) + 
+		stat_density2d(aes(fill = ..density..), geom="tile", contour=FALSE) +
+		scale_fill_gradientn(colors = c("black", "darkblue", "lightblue", "green", "yellow", "orange", "red", "darkred"), values = c(0, 0.01, 0.02, 0.04, 0.08, 0.3, 0.5, 1), guide = "none") +		
+		geom_vline(xintercept = 0.3, color = "white") + 
+		geom_vline(xintercept = 0.7, color = "white") + 
+		geom_text(data = enhancer_5mC_nonCGI_summary, aes(fractional, signal, label = labels), color = "white", size = 3) + 
+		facet_grid(sample ~ category) + 
+		coord_cartesian(ylim = c(0.5, 2.2)) + 
+		xlab("Fractional methylation") + 
+		ylab("log10 H3K27ac normalized signal") + 
+		ggtitle("nonCGI enhancers") + 
+		theme_bw())
+ggsave(enhancer_5mC_nonCGI_figure, file = "./H3K27ac/enhancer_5mC_nonCGI_figure.pdf", height = 6, width = 6)
 enhancer_5mC_TCGA <- read.delim("./H3K27ac/TCGA.enhancer.coverage.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "signal", "fractional", "sample")) %>%
 	mutate(category = gsub(".*_", "", ID), type = gsub("_.*", "", sample), sample = gsub("_", "\n", sample), group = ifelse(fractional < 0.3, "hypo", ifelse(fractional > 0.7, "hyper", "median")))
 enhancer_5mC_TCGA_summary <- merge(enhancer_5mC_TCGA %>% group_by(sample, category, group) %>% summarize(N=n()), enhancer_5mC_TCGA %>% group_by(sample, category) %>% summarize(Total=n())) %>% 
