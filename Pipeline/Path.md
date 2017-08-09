@@ -57,6 +57,10 @@ File paths on xhost
     + DMRs from MeDIP: `/projects/epigenomics/users/lli/FetalBrain/MeDIP/DMR/`  
     + Junction coverage: `/home/lli/FetalBrain/RNAseq/junction/`
     + UCSC browser hubs: `/gsc/www/bcgsc.ca/downloads/mb/BrainHubs/`  
+        * MeDIP URL: `http://www.bcgsc.ca/downloads/mb/BrainHubs/MeDIPHub/hub.txt`    
+        * WGBS URL: `http://www.bcgsc.ca/downloads/mb/BrainHubs/WGBSHub/hub.txt`    
+        * RNA-seq URL: `http://www.bcgsc.ca/downloads/mb/BrainHubs/RNAseqHub/hub.txt`    
+        * Histone mods URL: `http://www.bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/hub.txt`    
 * H1:   
     + WGBS: `/projects/mbilenky/REMC/H1/hg19/WGBS/` 
     + Histone modifications: `/projects/mbilenky/REMC/H1/UCSF_UBC/wigs_175/`   
