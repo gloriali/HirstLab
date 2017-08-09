@@ -758,4 +758,23 @@ for lib in 19 22 47; do
         echo -e "$lib\t$mark\t$N_mut\t$len_mut\t$N_wt\t$len_wt\t$N_mut_unique\t$len_mut_unique\t$N_wt_unique\t$len_wt_unique" >> $dirIn/unique_wt/ER.unique.summary
     done
 done
-less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
+less $dirIn/unique_wt/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+for mark in H3K9me3 H3K27me3 H3K4me1 H3K4me3 H3K36me3 H3K27ac; do
+    echo $mark
+    cd $dirIn/unique_wt/$mark/
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.wt.CEMT_19.unique -b CEMT_22.vs.wt.CEMT_22.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.wt.CEMT_47.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHmut.unique
+    $BEDTOOLS/intersectBed -a CEMT_19.vs.wt.wt.unique -b CEMT_22.vs.wt.wt.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.wt.wt.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt.unique
+    for file in *.CEMT*.unique; do
+        sample=$(echo $file | cut -d'.' -f1)
+        echo $file $sample
+        less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $sample.hyper.bed
+    done
+    for file in *.wt.unique; do
+        sample=$(echo $file | cut -d'.' -f1)
+        echo $file $sample
+        less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' > $sample.hypo.bed
+    done
+    /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirIn/unique_wt/$mark/ -r /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed -n enhancer
+done
+
