@@ -4,6 +4,7 @@ Pipeline shell scripts
 * [methyl_diff.sh](./methyl_diff.sh): shell script to identify DM CpGs for WGBS using methyl_diff.  
 * [DMR.dynamic.sh](./DMR.dynamic.sh): shell script to collapse DM CpGs into DMRs.
 * [DMR.intersect.sh](./DMR.intersect.sh): intersecting DMRs with genomic regions and report CpG% breakdown in intergenic, intron, exon, gene, promoter regions.     
+* [region.intersect.sh](./region.intersect.sh): intersecting region of interest with genomic regions and report bp breakdown in intergenic, intron, exon, gene, promoter regions.     
 * [region.mean.sh](./region.mean.sh): shell script to compute regional mean, sum or weighted mean.   
 * [ER.unique.sh](./ER.unique.sh): shell script to identify histone modification ChIP-seq unique enriched regions for pairwise comparison.     
 * [jaguar.sh](./jaguar.sh): shell script to calculate RPKM from fastq files using Jaguar alignment.      
