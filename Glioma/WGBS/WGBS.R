@@ -257,6 +257,8 @@ for(g in c("hypo", "median", "hyper")){
 		assign(paste0("IDHmut_venn_", g, "_", c), venn.diagram(get(paste0("IDHmut_gene_", g, "_", c)), filename = NULL, fill = c("green", "red", "blue"), cat.cex = 0.5))
 	}
 }
+IDHmut_promoter_hyper_gene <- intersect((enhancer_5mC_RPKM %>% filter(as.character(group) == "hyper", as.character(category) == "promoter", grepl("CEMT_19", sample)))[, "ENSG"], intersect((enhancer_5mC_RPKM %>% filter(as.character(group) == "hyper", as.character(category) == "promoter", grepl("CEMT_22", sample)))[, "ENSG"], (enhancer_5mC_RPKM %>% filter(as.character(group) == "hyper", as.character(category) == "promoter", grepl("CEMT_47", sample)))[, "ENSG"]))
+write.table(IDHmut_promoter_hyper_gene, file = "./H3K27ac/IDHmut_promoter_hyper_gene.txt", quote = F, row.names = F, col.names = F)
 grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHmut_venn_hyper_regular), gTree(children = IDHmut_venn_hyper_super), 
 						 gTree(children = IDHmut_venn_median_promoter), gTree(children = IDHmut_venn_median_regular), gTree(children = IDHmut_venn_median_super), 
 						 gTree(children = IDHmut_venn_hypo_promoter), gTree(children = IDHmut_venn_hypo_regular), gTree(children = IDHmut_venn_hypo_super), 
@@ -267,6 +269,11 @@ grid.arrange(gTree(children = IDHmut_venn_hyper_promoter), gTree(children = IDHm
 						 gTree(children = IDHmut_venn_hypo_promoter), gTree(children = IDHmut_venn_hypo_regular), gTree(children = IDHmut_venn_hypo_super), 
 						 nrow = 3)
 dev.off()
+IDHmut_promoter_hyper_states <- read.delim("./H3K27ac/IDHmut.enhancer.5mC.promoter.hyper.states", as.is = T, head = F) %>% rename(chr = V1, start = V2, end = V3, ID = V4, sample = V7, DE = V12) %>% 
+	mutate(DM = paste0(V8, "-", V10), H3K27ac = paste0(gsub(".*_", "", V13), "-", gsub(".*_", "", V14)), H3K4me1 = paste0(gsub(".*_", "", V15), "-", gsub(".*_", "", V16)), H3K4me3 = paste0(gsub(".*_", "", V17), "-", gsub(".*_", "", V18)), H3K27me3 = paste0(gsub(".*_", "", V19), "-", gsub(".*_", "", V20))) %>%
+	select(-starts_with("V")) 
+IDHmut_promoter_hyper_states_summary <- IDHmut_promoter_hyper_states %>% group_by(sample, DM, H3K27ac, H3K4me1, H3K4me3, H3K27me3) %>% summarize(N = n()) %>% filter(N >= 10) %>% dcast(DM + H3K27ac + H3K4me1 + H3K4me3 + H3K27me3 ~ sample) %>% na.omit() 
+IDHmut_promoter_hyper_DE_summary <- IDHmut_promoter_hyper_states %>% group_by(sample, DE, DM, H3K27ac) %>% summarize(N = n()) %>% filter(N >= 10) %>% dcast(DE + DM + H3K27ac ~ sample) %>% na.omit() 
 for(c in c("promoter", "regular", "super")){
 	assign(paste0("enhancer_5mC_homer_known_", c), read.delim(paste0("./H3K27ac/homer/homer.knownResults.summary.", c), as.is = T) %>% 
 				 	mutate(significant = ifelse(q <= 0.05, TRUE, FALSE), percent_with_motif = ifelse(group == "hypo", -percent_with_motif, percent_with_motif), type = ifelse(sample == "NPC_GE04", "NPC", ifelse(sample == "CEMT_23", "IDHwt", "IDHmut"))))
