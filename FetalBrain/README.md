@@ -1,5 +1,7 @@
 REMC Fetal Brain Project
 =====================
+Project directory: `/projects/epigenomics/users/lli/FetalBrain/`
+
 * [FetalBrainLibraries.tsv](./FetalBrainLibraries.tsv): Fetal Brain samples metadata.   
 * [FetalBrainLibrariesDetail.tsv](./FetalBrainLibrariesDetail.tsv): Detailed information on Fetal Brain libraries.   
 * [Summary](./Summary/Summary.md): Results summary and integrated analysis, including the [Manuscript](./Summary/Manuscript.md), [Figures](./Summary/Figures.md), [gestational week](./Summary/GW.md), and [hydroxymethylation](./Summary/hydroxy.md).   
