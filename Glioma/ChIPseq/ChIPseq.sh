@@ -759,6 +759,7 @@ for lib in 19 22 47; do
     done
 done
 less $dirIn/unique_wt/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
+### genomic breakdown
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 for mark in H3K9me3 H3K27me3 H3K4me1 H3K4me3 H3K36me3 H3K27ac; do
     echo $mark
@@ -777,4 +778,19 @@ for mark in H3K9me3 H3K27me3 H3K4me1 H3K4me3 H3K36me3 H3K27ac; do
     done
     /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirIn/unique_wt/$mark/ -r /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed -n enhancer
 done
-
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirIn/unique_wt/H3K9me3/ -r /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed -n LTR
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirIn/unique_wt/H3K27me3/ -r /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed -n LTR
+### K9me3/K27me3 gain vs 5mC
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/unique_wt/
+for mark in H3K9me3 H3K27me3; do
+    for f1 in IDHmut.unique IDHwt.unique; do
+        cd $dirIn/$mark/
+        for file in $dir5mC/*CEMT*combine.5mC.CpG; do
+            sample=$(basename $file | sed 's/.combine.5mC.CpG//g')
+            echo $mark $f1 $sample
+            less $f1 | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9} END{for(i in chr){if(t[i]+c[i] > 0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' >> $f1.5mC
+        done
+    done
+done
