@@ -1,11 +1,11 @@
 #!/bin/sh
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/others/
-cd /prjects/epigenomics2/users/lli/
+cd /projects/epigenomics2/users/lli/
 for file in $dir5mC/CEMT*.5mC.CpG; do
     sample=$(basename $file | sed 's/.5mC.CpG//g')
     echo $sample
-    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+1"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a meDIP_qPCR_primers_hg19.bed -b stdin -wa -wb | awk '{if($8+$9 >= 3){t[$4]=t[$4]+$8; c[$4]=c[$4]+$9; chr[$4]=$1; start[$4]=$2; end[$4]=$3}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' >> meDIP_qPCR_primers_hg19.5mC.bed
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+1"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a meDIP_qPCR_primers_hg19.bed -b stdin -wa -wb | awk '{if($8+$9 >= 3){n[$4]=n[$4]+1; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9; chr[$4]=$1; start[$4]=$2; end[$4]=$3}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"c[i]/(c[i]+t[i])"\t"n[i]"\t""'$sample'"}}}' >> meDIP_qPCR_primers_hg19.5mC.bed
 done
 
 /gsc/software/linux-x86_64-centos6/R-3.3.1/bin/R
