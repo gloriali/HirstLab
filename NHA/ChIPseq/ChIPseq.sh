@@ -59,3 +59,20 @@ for mark in H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 input; do
     mv $dirIn/a $dirIn/summary.txt
 done
 
+## FindER
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
+cd $dirIn
+for file in H*/*.bam; do
+    mark=$(basename $file | sed 's/_.*//g')
+    file=$(basename $file)
+    sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
+    echo $mark $sample
+    mkdir -p $dirOut/$mark/
+    $JAVA -jar -Xmx12G $FindER -signalBam $dirIn/$mark/$file -inputBam $dirIn/input/input_$sample.bam -out $dirOut/$mark/ > $dirOut/$mark/"$mark"_"$sample".log
+    echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
+done
+
