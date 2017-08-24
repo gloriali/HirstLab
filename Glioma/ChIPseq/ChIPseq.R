@@ -16,6 +16,7 @@ source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 load("/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 setwd("/projects/epigenomics2/users/lli/glioma/ChIPseq/")
 libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47", "GE04")
+marks <- c("H3K27me3", "H3K9me3", "H3K27ac", "H3K4me1", "H3K4me3", "H3K36me3")
 Ensembl <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.EnsID_sorted.HUGO", as.is = T, head = F, row.names = 1)
 
 ## -------- ER summary -----------
@@ -64,7 +65,85 @@ for(i in 1:nrow(ER_adjust_summary)){
 }
 dev.off()
 
-## -------- Differentially marked regions --------
+## -------- Differentially marked regions mut vs wt --------
+### summary
+ER_unique_wt_summary <- read.delim("./unique_wt/ER.unique.summary", as.is = T) %>% 
+	melt(id = c("Sample", "Mark")) %>% 
+	mutate(Sample = paste0("CEMT_", Sample), category = ifelse(grepl("len", variable), "Total No. of bases", "Total No. of regions"), type = ifelse(grepl("mut", variable), "mut", "wt"), unique = ifelse(grepl("unique", variable), T, F), value = ifelse(type == "mut", value, -value))
+(ER_unique_wt_summary_figure <- ggplot(ER_unique_wt_summary %>% filter(unique == T, Sample %in% libs), aes(Mark, value, fill = Sample)) + 
+		geom_bar(stat = "identity", position = position_dodge()) +
+		geom_hline(yintercept = 0) + 
+		facet_grid(category ~., scales = "free_y") + 
+		xlab("") + 
+		ylab("") + 
+		theme_bw())
+ggsave(ER_unique_wt_summary_figure, file = "./unique_wt/ER_unique_wt_summary_figure.pdf", width = 7, height = 5)
+
+for(mark in marks){
+	assign(paste0(mark, "_genomic_breakdown"), read.delim(paste0("./unique_wt/", mark, "/intersect/genomic.breakdown.summary"), as.is = T) %>% 
+		mutate(sample = gsub("\\..*", "", Name), DM = revalue(gsub(".*\\.", "", Name), c("hyper" = "gain", "hypo" = "loss")), NCpG = NULL, Name = NULL))
+	assign(paste0(mark, "_genomic_breakdown_tall"), melt(get(paste0(mark, "_genomic_breakdown")), id = c("sample", "DM")) %>% 
+		mutate(value = ifelse(DM == "gain", value, -value)))
+	assign(paste0(mark, "_genomic_breakdown_figure"), ggplot(get(paste0(mark, "_genomic_breakdown_tall")), aes(variable, value, fill = DM)) + 
+			geom_bar(position = "identity", stat = "identity", width = 0.5) + 
+			geom_hline(yintercept = c(-2, 2)) + 
+			facet_wrap(~ sample, scales = "free_x") + 
+			xlab("") + 
+			ylab("Fold enrichment") + 
+			ggtitle(mark) +
+			scale_fill_manual(name = "", values = c("red", "blue")) + 
+			coord_flip() + 
+			theme_bw())
+	ggsave(get(paste0(mark, "_genomic_breakdown_figure")), file = paste0("./unique_wt/", mark, "/", mark, "_genomic_breakdown_figure.pdf"), height = 5, width = 6)
+}
+(GREAT_K27me3_IDHmut_gain_figure <- enrich_GREAT("K27me3_IDHmut_gain", "K27me3_IDHmut_gain", dirIn = "./unique_wt/H3K27me3/enrich/", dirOut = "./unique_wt/H3K27me3/enrich/", FDR = 0.01, height = 8, width = 7))
+### H3K9me3/H3K27me3 gain vs 5mC
+K9me3_gain_5mC <- read.delim("./unique_wt/H3K9me3/IDHmut.unique.5mC", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "fractional", "sample")) %>% 
+	mutate(type = gsub("_.*", "", sample))
+(K9me3_gain_5mC_figure <- ggplot(K9me3_gain_5mC, aes(sample, fractional, fill = type)) + 
+		geom_violin() +
+		scale_fill_manual(values = c("red", "blue")) + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("H3K9me3 gain") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(K9me3_gain_5mC_figure, file = "./unique_wt/H3K9me3/H3K9me3_gain_5mC_figure.pdf", height = 4, width = 5)
+K9me3_loss_5mC <- read.delim("./unique_wt/H3K9me3/IDHwt.unique.5mC", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "fractional", "sample")) %>% 
+	mutate(type = gsub("_.*", "", sample))
+(K9me3_loss_5mC_figure <- ggplot(K9me3_loss_5mC, aes(sample, fractional, fill = type)) + 
+		geom_violin() +
+		scale_fill_manual(values = c("red", "blue")) + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("H3K9me3 loss") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(K9me3_loss_5mC_figure, file = "./unique_wt/H3K9me3/H3K9me3_loss_5mC_figure.pdf", height = 4, width = 5)
+K27me3_gain_5mC <- read.delim("./unique_wt/H3K27me3/IDHmut.unique.5mC", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "fractional", "sample")) %>% 
+	mutate(type = gsub("_.*", "", sample))
+(K27me3_gain_5mC_figure <- ggplot(K27me3_gain_5mC, aes(sample, fractional, fill = type)) + 
+		geom_violin() +
+		scale_fill_manual(values = c("red", "blue")) + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("H3K27me3 gain") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(K27me3_gain_5mC_figure, file = "./unique_wt/H3K27me3/H3K27me3_gain_5mC_figure.pdf", height = 4, width = 5)
+K27me3_loss_5mC <- read.delim("./unique_wt/H3K27me3/IDHwt.unique.5mC", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "fractional", "sample")) %>% 
+	mutate(type = gsub("_.*", "", sample))
+(K27me3_loss_5mC_figure <- ggplot(K27me3_loss_5mC, aes(sample, fractional, fill = type)) + 
+		geom_violin() +
+		scale_fill_manual(values = c("red", "blue")) + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("H3K27me3 loss") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(K27me3_loss_5mC_figure, file = "./unique_wt/H3K27me3/H3K27me3_loss_5mC_figure.pdf", height = 4, width = 5)
+
+## -------- Differentially marked regions glioma vs NPC --------
 ### test: how to set the background coverage cutoff? CEMT_19 vs GE04 H3K27ac
 signal <- read.delim("./unique/test/63.CEMT_19.vs.NPC_GE04.CEMT_19.signal.coverage", as.is = T, head = F, col.names = c("chr", "start", "end", "ID", "cov", "max")) 
 pdf("./unique/test/test.pdf")

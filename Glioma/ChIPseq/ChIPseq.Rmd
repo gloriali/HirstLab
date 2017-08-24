@@ -38,7 +38,21 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (ER_summary_figure)
 ```
 
-## Unique enriched regions 
+## Unique enriched regions: IDHmut vs IDHwt 
+* Pairwise comparisons between glioma samples (S1) and NPC GE04 (S2).   
+* Challenge: S1 and S2 often have quite different sequencing depth, thus direct comparisons between ER are likely biased.     
+* Input: ER in S1, wig in S1, ER in S2, wig in S2.   
+* Method: 
+	+ Calculate S1 ER signal in S2 wig.    
+	+ Randomly generate a set of background regions (not overlapping with S2 ER) with same length as S1 ER.   
+	+ Calculate signal for these background regions in S2 wig, use 90% quantile as cutoff. 
+	+ S1 unique ER: S1 ER with signal < background cutoff in S2.   
+	
+```{r unique_ER_summary, fig.height=5}
+(ER_unique_wt_summary_figure)
+```
+
+## Unique enriched regions: glioma vs NPC
 * Pairwise comparisons between glioma samples (S1) and NPC GE04 (S2).   
 * Challenge: S1 and S2 often have quite different sequencing depth, thus direct comparisons between ER are likely biased.     
 * Input: ER in S1, wig in S1, ER in S2, wig in S2.   
