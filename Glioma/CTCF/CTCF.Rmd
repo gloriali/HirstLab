@@ -70,6 +70,14 @@ libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 (CTCF_short_loss_5mC_K36_figure)
 ```
 
+## RNAseq change at CTCF sites
+* There is a slight gain of transcription at CTCF loss sites compared to retained/gain sites.      
+
+```{r RNAseq}
+(CTCF_short_loss_RNA_figure)
+(CTCF_short_retained_RNA_figure)
+```
+
 ## Transcription deregulation associated with CTCF sites
 * Identify genes with transcription deregulation associated with CTCF sites: 
 	+ TSS and enhancer are on opposite sides of CTCF sites.      

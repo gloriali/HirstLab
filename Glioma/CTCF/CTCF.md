@@ -2,7 +2,7 @@
 Gloria Li  
 Apr, 4, 2017  
 
-Updated: Wed Aug  9 09:00:08 2017
+Updated: Wed Aug 23 01:09:14 2017
 
 
 
@@ -37,6 +37,11 @@ Updated: Wed Aug  9 09:00:08 2017
 * There is a slight gain of H3K36me3 at CTCF loss sites compared to retained/gain sites, coresponds to 5mC gain at these regions.      
 
 ![](CTCF_files/figure-html/H3K36me3-1.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-2.png)<!-- -->![](CTCF_files/figure-html/H3K36me3-3.png)<!-- -->
+
+## RNAseq change at CTCF sites
+* There is a slight gain of transcription at CTCF loss sites compared to retained/gain sites.      
+
+![](CTCF_files/figure-html/RNAseq-1.png)<!-- -->![](CTCF_files/figure-html/RNAseq-2.png)<!-- -->
 
 ## Transcription deregulation associated with CTCF sites
 * Identify genes with transcription deregulation associated with CTCF sites: 
