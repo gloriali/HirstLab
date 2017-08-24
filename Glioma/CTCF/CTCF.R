@@ -196,7 +196,50 @@ CTCF_short_loss_5mC_K36 <- CTCF_short_loss_5mC_K36 %>% mutate(ID = factor(ID, le
 		ylab("") + 
 		theme_bw() +
 		theme(axis.text.x = element_text(size = 0)))
-ggsave(CTCF_short_loss_5mC_K36_figure, file = "CTCF_short_loss_5mC_K36_figure.pdf", height = 6, width = 5)
+ggsave(CTCF_short_loss_5mC_K36_figure, file = "CTCF_short_loss_5mC_K36_figure.pdf", height = 6, width = 7)
+
+## ------- RNAseq at CTCF loss BS -------
+e <- 1e-4
+CTCF_short_loss_RNA <- read.delim("./RNAseq/CTCF_IDHwt_unique_short.RNAseq.bed", as.is = T) %>% 
+	mutate(type = ifelse(sample == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", sample), "IDHmut", "NPC")))
+(CTCF_short_loss_RNA_figure <- ggplot(CTCF_short_loss_RNA, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 RNAseq RPKM") + 
+		ggtitle("CTCF loss - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_loss_RNA_figure, file = "./RNAseq/CTCF_short_loss_RNA_figure.pdf", height = 4, width = 5)
+CTCF_short_gain_RNA <- read.delim("./RNAseq/CTCF_IDHmut_unique_short.RNAseq.bed", as.is = T) %>% 
+	mutate(type = ifelse(sample == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", sample), "IDHmut", "NPC")))
+(CTCF_short_gain_RNA_figure <- ggplot(CTCF_short_gain_RNA, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 RNAseq RPKM") + 
+		ggtitle("CTCF gain - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_gain_RNA_figure, file = "./RNAseq/CTCF_short_gain_RNA_figure.pdf", height = 4, width = 5)
+CTCF_short_retained_RNA <- read.delim("./RNAseq/CTCF_IDHmut_retained_short.RNAseq.bed", as.is = T) %>% 
+	mutate(type = ifelse(sample == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", sample), "IDHmut", "NPC")))
+(CTCF_short_retained_RNA_figure <- ggplot(CTCF_short_retained_RNA, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 RNAseq RPKM") + 
+		ggtitle("CTCF retained - de novo") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_short_retained_RNA_figure, file = "./RNAseq/CTCF_short_retained_RNA_figure.pdf", height = 4, width = 5)
+CTCF_long_retained_RNA <- read.delim("./RNAseq/CTCF_IDHmut_retained_long.RNAseq.bed", as.is = T) %>% 
+	mutate(type = ifelse(sample == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", sample), "IDHmut", "NPC")))
+(CTCF_long_retained_RNA_figure <- ggplot(CTCF_long_retained_RNA, aes(sample, log10(RPKM), fill = type)) + 
+		geom_boxplot() + 
+		xlab("") + 
+		ylab("log10 RNAseq RPKM") + 
+		ggtitle("CTCF retained - known") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_long_retained_RNA_figure, file = "./RNAseq/CTCF_long_retained_RNA_figure.pdf", height = 4, width = 5)
 
 ## ------- H3K27me3 at CTCF loss regions -------
 CTCF_nonresponder_K27 <- read.delim("./H3K27me3/resonpder.H3K27me3.bed", as.is = T, col.names = c("chr", "start", "end", "ID", "mut", "wt", "diff", "N", "sample", "RPKM")) %>% 
