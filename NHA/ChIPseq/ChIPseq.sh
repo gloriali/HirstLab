@@ -85,20 +85,13 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/MACS2/
 mkdir -p $dirOut/
 echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
-cd $dirIn/input/
-for file in *.bam; do
-    sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
-    echo $sample
-    $samtools view -q 5 -F 1028 -b $file > $dirIn/input/input_$sample.q5.F1028.bam
-done
 for mark in H3K27ac H3K4me3; do
     cd $dirIn/$mark
     for file in *.bam; do
         sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
         echo $mark $sample
         mkdir -p $dirOut/$mark/
-        $samtools view -q 5 -F 1028 -b $file > $dirIn/$mark/$mark"_"$sample.q5.F1028.bam
-        macs2 callpeak -f BAMPE -g hs -t $dirIn/$mark/$mark"_"$sample.q5.F1028.bam -c $dirIn/input/input_$sample.q5.F1028.bam -q 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/ --keep-dup all
+        macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam -q 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
         echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
     done
 done
@@ -108,8 +101,7 @@ for mark in H3K27me3 H3K9me3 H3K36me3 H3K4me1; do
         sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
         echo $mark $sample
         mkdir -p $dirOut/$mark/
-        $samtools view -q 5 -F 1028 -b $file > $dirIn/$mark/$mark"_"$sample.q5.F1028.bam
-        macs2 callpeak -f BAMPE -g hs -t $dirIn/$mark/$mark"_"$sample.q5.F1028.bam -c $dirIn/input/input_$sample.q5.F1028.bam --broad --broad-cutoff 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/ --keep-dup all
-        echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
+        macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam --broad --broad-cutoff 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
+        echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.broadPeak | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.broadPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
     done
 done
