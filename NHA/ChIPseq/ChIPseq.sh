@@ -87,8 +87,8 @@ mkdir -p $dirOut/
 echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
 for mark in H3K27ac H3K4me3; do
     cd $dirIn/$mark
-    for file in *.bam; do
-        sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
+    for file in $dirIn/$mark/*.bam; do
+        sample=$(basename $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
         echo $mark $sample
         mkdir -p $dirOut/$mark/
         macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam -q 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
@@ -97,8 +97,8 @@ for mark in H3K27ac H3K4me3; do
 done
 for mark in H3K27me3 H3K9me3 H3K36me3 H3K4me1; do
     cd $dirIn/$mark
-    for file in *.bam; do
-        sample=$(echo $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
+    for file in $dirIn/$mark/*.bam; do
+        sample=$(basename $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
         echo $mark $sample
         mkdir -p $dirOut/$mark/
         macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam --broad --broad-cutoff 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
