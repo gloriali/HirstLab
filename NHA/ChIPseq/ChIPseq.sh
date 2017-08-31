@@ -11,14 +11,25 @@ less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$4"/"
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
 dirQC=/projects/edcc_new/reference_epigenomes/housekeeping/EDCCProd/resources/ChIPQC1/Brads/
+dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hg19/
+mkdir -p $dirBW
+cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/
+echo -e "hub VitC_gliomaHub_HistoneMods
+shortLabel VitC_glioma Hub (Histone)
+longLabel Hub to display VitC glioma data at UCSC (HisoneMods)
+genomesFile genomes.txt
+email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt
+> $dirBW/trackDb.txt
 echo -e "Library\tNumber_Target_Regions" > $dirIn/QC.target_regions.txt
 for bam in $dirIn/*/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     mark=$(echo $name | cut -d'_' -f1)
-    echo $name $mark
+    sample=$(echo $name | sed 's/.*_NHA/NHA/g')
+    echo $name $mark $sample
     mkdir -p $dirIn/$mark/
     mkdir -p $dirWig/$mark/
     $samtools index $bam
@@ -27,28 +38,53 @@ for bam in $dirIn/*/*.bam; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $name $dirIn/$mark/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark/ -F:1028,-q:5,-n:$name,-chr:$chr,-cp
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn/$mark/ 10
-    if [ $mark == "input" ]; then
+    if [ "$mark" == "input" ]; then
         n=0
+        color="0,0,0"
     else
-        if [ "$mark" == "H3K4me3" ] || [ "$mark" == "H3K27ac" ]; then
+        if [ "$mark" == "H3K4me3" ]; then
             region=$dirQC/ensembl_TSS.uniq.sorted.bed.uniq
+            color="255,0,0"
+        fi
+        if [ "$mark" == "H3K27ac" ]; then
+            region=$dirQC/ensembl_TSS.uniq.sorted.bed.uniq
+            color="51,102,255"
         fi
         if [ "$mark" == "H3K4me1" ]; then
             region=$dirQC/encode_ChromHMM_enhancer_state_7.sorted.merged.bed
+            color="255,102,51"
         fi
         if [ "$mark" == "H3K9me3" ]; then
             region=$dirQC/ensembl_Znf.uniq.sorted.bed
+            color="0,0,102"
         fi
         if [ "$mark" == "H3K27me3" ]; then
             region=$dirQC/HOX_clusters.sorted.bed
+            color="102,51,0"
         fi
         if [ "$mark" == "H3K36me3" ]; then
             region=$dirQC/ensembl_genenames.uniq.sorted.bed
+            color="153,0,153"
         fi
-        echo $region
+        echo $region $color
         n=$($samtools view -q 5 -F 1028 -L $region $bam | wc -l)
     fi
     echo -e "$name\t$n" >> $dirIn/QC.target_regions.txt
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$mark/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
+    echo -e "
+track $name
+shortLabel $name
+longLabel $mark  $sample
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl $name.q5.F1028.PET.bw
+color $color
+" >> $dirBW/trackDb.txt
 done
 for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 input; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn/$mark/ $dirIn/$mark/
