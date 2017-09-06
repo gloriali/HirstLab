@@ -11,14 +11,25 @@ less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$4"/"
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
 dirQC=/projects/edcc_new/reference_epigenomes/housekeeping/EDCCProd/resources/ChIPQC1/Brads/
+dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hg19/
+mkdir -p $dirBW
+cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/
+echo -e "hub VitC_gliomaHub_HistoneMods
+shortLabel VitC_glioma Hub (Histone)
+longLabel Hub to display VitC glioma data at UCSC (HisoneMods)
+genomesFile genomes.txt
+email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt
+> $dirBW/trackDb.txt
 echo -e "Library\tNumber_Target_Regions" > $dirIn/QC.target_regions.txt
 for bam in $dirIn/*/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     mark=$(echo $name | cut -d'_' -f1)
-    echo $name $mark
+    sample=$(echo $name | sed 's/.*_NHA/NHA/g')
+    echo $name $mark $sample
     mkdir -p $dirIn/$mark/
     mkdir -p $dirWig/$mark/
     $samtools index $bam
@@ -27,28 +38,53 @@ for bam in $dirIn/*/*.bam; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $name $dirIn/$mark/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark/ -F:1028,-q:5,-n:$name,-chr:$chr,-cp
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn/$mark/ 10
-    if [ $mark == "input" ]; then
+    if [ "$mark" == "input" ]; then
         n=0
+        color="0,0,0"
     else
-        if [ "$mark" == "H3K4me3" ] || [ "$mark" == "H3K27ac" ]; then
+        if [ "$mark" == "H3K4me3" ]; then
             region=$dirQC/ensembl_TSS.uniq.sorted.bed.uniq
+            color="255,0,0"
+        fi
+        if [ "$mark" == "H3K27ac" ]; then
+            region=$dirQC/ensembl_TSS.uniq.sorted.bed.uniq
+            color="51,102,255"
         fi
         if [ "$mark" == "H3K4me1" ]; then
             region=$dirQC/encode_ChromHMM_enhancer_state_7.sorted.merged.bed
+            color="255,102,51"
         fi
         if [ "$mark" == "H3K9me3" ]; then
             region=$dirQC/ensembl_Znf.uniq.sorted.bed
+            color="0,0,102"
         fi
         if [ "$mark" == "H3K27me3" ]; then
             region=$dirQC/HOX_clusters.sorted.bed
+            color="102,51,0"
         fi
         if [ "$mark" == "H3K36me3" ]; then
             region=$dirQC/ensembl_genenames.uniq.sorted.bed
+            color="153,0,153"
         fi
-        echo $region
+        echo $region $color
         n=$($samtools view -q 5 -F 1028 -L $region $bam | wc -l)
     fi
     echo -e "$name\t$n" >> $dirIn/QC.target_regions.txt
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$mark/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
+    echo -e "
+track $name
+shortLabel $name
+longLabel $mark  $sample
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl $name.q5.F1028.PET.bw
+color $color
+" >> $dirBW/trackDb.txt
 done
 for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 input; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn/$mark/ $dirIn/$mark/
@@ -59,11 +95,41 @@ for mark in H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 input; do
     mv $dirIn/a $dirIn/summary.txt
 done
 
+## MACS2
+export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
+export PYTHONPATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/lib/python2.7/site-packages:$PYTHONPATH
+samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/MACS2/
+mkdir -p $dirOut/
+echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
+for mark in H3K27ac H3K4me3; do
+    cd $dirIn/$mark
+    for file in $dirIn/$mark/*.bam; do
+        sample=$(basename $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
+        echo $mark $sample
+        mkdir -p $dirOut/$mark/
+        macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam -q 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
+        echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
+    done
+done
+for mark in H3K27me3 H3K9me3 H3K36me3 H3K4me1; do
+    cd $dirIn/$mark
+    for file in $dirIn/$mark/*.bam; do
+        sample=$(basename $file | sed 's/.bam//g' | cut -d'_' -f2- | sed 's/\t/_/g')
+        echo $mark $sample
+        mkdir -p $dirOut/$mark/
+        macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/input/input_$sample.bam --broad --broad-cutoff 0.01 -n $mark"_"$sample --outdir $dirOut/$mark/
+        echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.broadPeak | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample"_peaks.broadPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
+    done
+done
+
 ## FindER
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
-FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.1e.jar
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+mkdir -p $dirOut/
 echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
 cd $dirIn
 for file in H*/*.bam; do
@@ -75,4 +141,16 @@ for file in H*/*.bam; do
     $JAVA -jar -Xmx12G $FindER -signalBam $dirIn/$mark/$file -inputBam $dirIn/input/input_$sample.bam -out $dirOut/$mark/ > $dirOut/$mark/"$mark"_"$sample".log
     echo -e $mark"\t"$sample"\t"$(less $dirOut/$mark/"$mark"_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$mark/"$mark"_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
 done
-
+### H3K9me3 NHAR_vitC
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+Reg=/home/lli/hg19/hg19.chrlen.autoXY.1KB.bed
+$BEDTOOLS/windowMaker -b <(less ~/hg19/hg19.chrlen.autoXY.bed | awk '{print $0"\t"$1}') -w 1000 -i srcwinnum > /home/lli/hg19/hg19.chrlen.autoXY.1KB.bed
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
+> NHAR.H3K9me3.H3K4me3.bed
+for bam in H3K9me3/H3K9me3_NHAR_vitc.bam H3K9me3/H3K9me3_NHAR_control.bam H3K4me3/H3K4me3_NHAR_vitc.bam; do
+    sample=$(basename $bam | sed 's/.bam//g')
+    echo $sample
+    depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $Reg -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> NHAR.H3K9me3.H3K4me3.bed
+done
