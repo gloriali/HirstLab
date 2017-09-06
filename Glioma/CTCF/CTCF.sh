@@ -11,24 +11,64 @@ cat mgh76_ctcf_19/subfile1.bin mgh76_ctcf_19/subfile2.bin > $dirOut/mgh76_ctcf_1
 cat mgh80_ctcf_21/subfile1.bin mgh80_ctcf_21/subfile2.bin > $dirOut/mgh80_ctcf_21.bam
 cat mgh81_idh1m_ctcf_22/subfile1\ \(1\).bin mgh81_idh1m_ctcf_22/subfile2.bin > $dirOut/mgh81_idh1m_ctcf_22.bam
 
-## FindER
-JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
+## QC
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
+dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/bam/
+dirWig=/projects/epigenomics2/users/lli/glioma/CTCF/wig/
+dirBW=/gsc/www/bcgsc.ca/downloads/mb/CTCF_glioma/hg19/
+mkdir -p $dirWig
+mkdir -p $dirBW
+cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/CTCF_glioma/
+echo -e "hub CTCF_glioma
+shortLabel CTCF_glioma 
+longLabel Hub to display CTCF glioma data at UCSC
+genomesFile genomes.txt
+email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/CTCF_glioma/hub.txt
+> $dirBW/trackDb.txt
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed 's/.bam//g')
+    sample=$(echo $name | cut -d'_' -f1)
+    idh=$(less $dirIn/../sample.info | awk '{if($2=="'$sample'")print $1}' | awk '{if($1~/GBM/){print "IDHwt"}else{print "IDHmut"}}')
+    if [ $idh == "IDHmut" ]; then
+        color=255,0,0
+    else
+        color=0,0,255
+    fi
+    echo $name $sample $idh $color
+    $samtools index $bam
+    $bamstats -g 2864785220 -q 10 -b $bam  > $dirIn/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/ $name $dirIn/$name.bamstats
+    /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn 10
+    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
+    echo -e "
+track $name
+shortLabel $name
+longLabel $idh  $name
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl $name.q5.F1028.PET.bw
+color $color
+" >> $dirBW/trackDb.txt
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
+
+## FindER
+JAVA=/gsc/software/linux-x86_64-centos5/java-1.7.0-u13/bin/java
 reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
 map=/projects/mbilenky/FindER/synthetic/hg19/PET_200/map_old/
 dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/bam/
 dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/FindER/
 mkdir -p $dirOut
 cd $dirIn
-for bam in *.bam; do
-	lib=$(echo $bam | sed -e 's/.bam//g')
-	echo $lib
-	$samtools index $bam
-	$bamstats -g 2864785220 -q 10 -b $bam > $lib.bamstats
-	/home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $lib $lib.bamstats
-done
-/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 for bam in *ctcf*.bam; do
 	echo $bam
 	$JAVA -jar -Xmx10G /home/mbilenky/bin/Solexa_Java/FindER.0.9.3b.jar -i $bam -r $reg -o $dirOut -v -m $map -info -TF > $dirOut/FindER.$bam.log
