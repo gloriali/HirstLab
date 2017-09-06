@@ -1,0 +1,68 @@
+---
+title: "VitC - ChIPseq"
+author: "Gloria Li"
+date: "Sept 6, 2017"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/ChIPseq.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/")
+```
+
+## QC  
+* Sequencing depth are even across samples, and sufficient (50M for narrow marks, 100M for broad marks).     
+* All QC metric looks good.       
+
+```{r QC}
+(QC_summary_reads_figure)
+(QC_summary_percent_figure)
+(QC_summary_domain_figure)
+```
+
+## Enrich regions
+* H3K9me3 NHAR VitC sample has much lower genome coverage than any other H3K9me3 samples.       
+* From [UCSC tracks](http://www.bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt), FindER results make more sense than MACS2.      
+
+```{r ER_summary}
+(ER_summary_FindER_figure)
+(ER_summary_MACS2_figure)
+```
+
+## H3K9me3 NHAR VitC
+* All results suggest that NHAR VitC H3K9me3 sample is actually a H3K4me3 sample, probably due to using the wrong antibody in IP.      
+* NHAR VitC H3K9me3 sample is a technical replicate of NHAR VitC H3K4me3 sample with twice sequencing depth.    
+
+```{r NHAR_VitC_H3K9me3}
+grid.newpage()
+draw.pairwise.venn(area1 = 44496864, area2 = 121812813, cross.area = 41856862, category = c("H3K9me3_NHAR_vitc", "H3K9me3_NHAR_control"), fill = c("red", "blue"))
+(H3K9me3_NHAR_vitC_NTC_figure)
+```
+
+![](./ChIPseq_files/figure-html/H3K9me3_NHAR_vitC.png)
+
+```{r NHAR_VitC_H3K4me3}
+grid.newpage()
+draw.pairwise.venn(area1 = 44496864, area2 = 54317631, cross.area = 41973315, category = c("H3K9me3_NHAR_vitc", "H3K4me3_NHAR_vitc"), fill = c("red", "blue"))
+(NHAR_H3K9me3_H3K4me3_figure)
+```
+
