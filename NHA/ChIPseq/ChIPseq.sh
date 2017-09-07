@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# link bam files
+## link bam files
 dirIn=/projects/analysis/analysis30/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
 less $dirOut/sample_info.txt | awk '{"echo $(ls ""'$dirIn'"$2"/*/"$2"_"$3"/75nt/hg19a/bwa-0.5.7/*.bam)" | getline bam; print $0"\t"bam}' > $dirOut/sample_info1.txt
@@ -153,4 +153,33 @@ for bam in H3K9me3/H3K9me3_NHAR_vitc.bam H3K9me3/H3K9me3_NHAR_control.bam H3K4me
     echo $sample
     depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $Reg -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> NHAR.H3K9me3.H3K4me3.bed
+done
+
+## unique ER
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
+mkdir -p $dirOut
+> $dirOut/ER.unique.log
+echo -e "Sample1\tSample2\tMark\tN1\tlen1\tN2\tlen2\tN_unique1\tlen_unique1\tN_unique2\tlen_unique2" > $dirOut/ER.unique.summary
+s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc")
+s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control")
+for ((i=0; i<4; i++)); do
+    sample1=${s1[i]}; sample2=${s2[i]}; name=$sample1"."$sample2
+    for mark in H3K27ac H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3; do
+        echo $name $mark
+        echo -e "\n\n"$name $mark >> $dirOut/ER.unique.log
+        mkdir -p $dirOut/$name/$mark/
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz -w $dirWig/$mark/$mark"_"$sample2.q5.F1028.PET.wig.gz -excl $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz -o $dirOut/$name/$mark/ -n $mark.$name.$sample1 >> $dirOut/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz -w $dirWig/$mark/$mark"_"$sample1.q5.F1028.PET.wig.gz -r $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz -o $dirOut/$name/$mark/ -n $mark.$name.$sample2 >> $dirOut/ER.unique.log
+        N1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | wc -l)
+        len1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | wc -l)
+        len2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | wc -l)
+        len_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | awk '{s=s+$3-$2}END{print s}')
+        N_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | wc -l)
+        len_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e "$sample1\t$sample2\t$mark\t$N1\t$len1\t$N2\t$len2\t$N_unique1\t$len_unique1\t$N_unique2\t$len_unique2" >> $dirOut/ER.unique.summary
+    done
 done
