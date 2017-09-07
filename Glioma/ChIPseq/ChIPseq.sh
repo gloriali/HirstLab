@@ -36,17 +36,6 @@ for file in H*/*GE04.bam; do
     $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/$mark/$file -inputBam $dirIn/input/A19309.NPC_GE04.bam -out $dirOut/$mark > $dirOut/$mark/$file.log
 done
 
-# Convert pair-end to single-end
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/
-dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam_se/
-samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac input; do
-	mkdir -p $dirOut/$mark/;
-	cd $dirIn/$mark/;
-	 
-done
-
 # FindER 1.0.0b results
 dirIn=/projects/edcc_new/reference_epigenomes/
 dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
