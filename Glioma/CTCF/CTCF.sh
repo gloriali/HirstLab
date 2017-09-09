@@ -127,45 +127,6 @@ for file in CTCF_retained.*.bed; do
 done
 less $dirOut/CTCF_retained.intersect.bed | awk '{print $4}' | sort | uniq -c | awk '{if($1>=4){gsub(":", "\t"); gsub("-", "\t"); print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4}}' > $dirOut/CTCF_IDHmut_retained.bed
 
-## MACS2
-export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
-export PYTHONPATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/lib/python2.7/site-packages:$PYTHONPATH
-samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/bam/
-dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/
-mkdir -p $dirOut/
-echo -e "Sample\tIDH\tN_peak\tTotal_length" > $dirOut/peak_summary.txt
-cd $dirIn
-for file in $dirIn/*.bam; do
-    name=$(basename $file | sed 's/.bam//g')
-    sample=$(echo $name | cut -d'_' -f1)
-    idh=$(less $dirIn/../sample.info | awk '{if($2=="'$sample'")print $1}' | awk '{if($1~/GBM/){print "IDHwt"}else{print "IDHmut"}}')
-    echo $name $sample $idh
-    $samtools view -F 1028 -q 5 -b $file > $dirIn/$name.q5.F1028.bam
-    macs2 callpeak -f BAMPE -g hs -t $dirIn/$name.q5.F1028.bam -q 0.01 -n $idh"_"$name --outdir $dirOut
-    echo -e $name"\t"$idh"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/peak_summary.txt
-done
-### CTCF changes
-export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
-export PYTHONPATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/lib/python2.7/site-packages:$PYTHONPATH
-samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/bam/
-dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/unique/
-mkdir -p $dirOut/
-echo -e "Sample\tIDH\tN_peak\tTotal_length" > $dirOut/unique_peak_summary.txt
-cd $dirIn
-$samtools merge $dirIn/IDHmut_ctcf.bam mgh17m_ctcf_17.q5.F1028.bam mgh18m_ctcf_18.q5.F1028.bam mgh59_idh1m_ctcf_10.q5.F1028.bam mgh7478_idhm_ctcf_12.q5.F1028.bam mgh81_idh1m_ctcf_22.q5.F1028.bam
-$samtools merge $dirIn/IDHwt_ctcf.bam mgh6971_ctcf_11.q5.F1028.bam mgh7530_ctcf_13.q5.F1028.bam mgh76_ctcf_19.q5.F1028.bam mgh7770_ctcf_15.q5.F1028.bam mgh79_ctcf_20.q5.F1028.bam mgh80_ctcf_21.q5.F1028.bam 
-for file in $dirIn/*ctcf*.q5.F1028.bam; do
-    name=$(basename $file | sed 's/.q5.F1028.bam//g')
-    sample=$(echo $name | cut -d'_' -f1)
-    idh=$(less $dirIn/../sample.info | awk '{if($2=="'$sample'")print $1}' | awk '{if($1~/GBM/){print "IDHwt"}else{print "IDHmut"}}')
-    ct=$(echo $idh | awk '{if($1=="IDHmut"){print "IDHwt_ctcf.bam"} else{print "IDHmut_ctcf.bam"}}')
-    echo $name $sample $idh $ct
-    macs2 callpeak -f BAMPE -g hs -t $dirIn/$name.q5.F1028.bam -c $dirIn/$ct -q 0.01 -n $idh"_"$name --outdir $dirOut --keep-dup all
-    echo -e $name"\t"$idh"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/unique_peak_summary.txt
-done
-
 ## 5mC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
@@ -332,3 +293,111 @@ for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/Homer/*.bed; do
     done
 done
 
+## ===================================================================
+## MACS2
+export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
+export PYTHONPATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/lib/python2.7/site-packages:$PYTHONPATH
+samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/
+mkdir -p $dirOut/
+echo -e "Sample\tIDH\tN_peak\tTotal_length" > $dirOut/peak_summary.txt
+cd $dirIn
+for file in $dirIn/*.bam; do
+    name=$(basename $file | sed 's/.bam//g')
+    sample=$(echo $name | cut -d'_' -f1)
+    idh=$(less $dirIn/../sample.info | awk '{if($2=="'$sample'")print $1}' | awk '{if($1~/GBM/){print "IDHwt"}else{print "IDHmut"}}')
+    echo $name $sample $idh
+    $samtools view -F 1028 -q 5 -b $file > $dirIn/$name.q5.F1028.bam
+    macs2 callpeak -f BAMPE -g hs -t $dirIn/$name.q5.F1028.bam -q 0.01 -n $idh"_"$name --outdir $dirOut --call-summits
+    echo -e $name"\t"$idh"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | wc -l)"\t"$(less $dirOut/"$idh"_"$name"_peaks.narrowPeak | awk '{s=s+$3-$2}END{print s}') >> $dirOut/peak_summary.txt
+done
+
+### CTCF changes 
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/unique/
+mkdir -p $dirOut
+cd $dirIn
+cat IDHmut*ctcf*summits.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -d 50 -c 5 -o mean,count > $dirIn/IDHmut_ctcf.summits.bed
+cat IDHwt*ctcf*summits.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -d 50 -c 5 -o mean,count > $dirIn/IDHwt_ctcf.summits.bed
+echo -e "Sample\tIDH\tN_peak\tTotal_length" > $dirOut/unique_peak_summary.txt
+for file in $dirIn/*mgh*ctcf*summits.bed; do
+    name=$(basename $file | sed 's/_summits.bed//g' | sed 's/IDH.*t_//g')
+    idh=$(basename $file | cut -d'_' -f1)
+    ct=$(echo $idh | awk '{if($1=="IDHmut"){print "IDHwt_ctcf.summits.bed"} else{print "IDHmut_ctcf.summits.bed"}}')
+    echo $name $idh $ct
+    $BEDTOOLS/windowBed -a $file -b $dirIn/$ct -w 1000 -v > $dirOut/"$idh"_"$name"_unique.summits.bed
+    echo -e $name"\t"$idh"\t"$(less $dirOut/"$idh"_"$name"_unique.summits.bed | wc -l)"\t"$(less $dirOut/"$idh"_"$name"_unique.summits.bed | awk '{s=s+$3-$2}END{print s}') >> $dirOut/unique_peak_summary.txt
+done
+$BEDTOOLS/windowBed -a $dirIn/IDHmut_ctcf.summits.bed -b $dirIn/IDHwt_ctcf.summits.bed -w 50 -u | awk '$5>1 {mid=int(($2+$3)/2); print $1"\t"mid-50"\t"mid+50"\tchr"$1":"$2"-"$3"\t"$4"\t"$5}' > $dirIn/CTCF_IDHmut_retained.bed
+cat $dirOut/IDHmut*summits.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -d 50 -c 5 -o mean,count | awk '$5>1 {mid=int(($2+$3)/2); print $1"\t"mid-50"\t"mid+50"\tchr"$1":"$2"-"$3"\t"$4"\t"$5}' > $dirIn/CTCF_IDHmut_gain.bed
+cat $dirOut/IDHwt*summits.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -d 50 -c 5 -o mean,count | awk '$5>1 {mid=int(($2+$3)/2); print $1"\t"mid-50"\t"mid+50"\tchr"$1":"$2"-"$3"\t"$4"\t"$5}' > $dirIn/CTCF_IDHmut_loss.bed
+
+### 5mC
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/WGBS/
+mkdir -p $dirOut
+cd $dir5mC
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/MACS2/CTCF*.bed; do
+    name=$(basename $CTCF | sed 's/.bed//g')
+    echo -e "chr\tstart\tend\tID\tsummit\tN\tfractional\tsample" > $dirOut/$name.5mC
+    for file in *.combine.5mC.CpG; do
+        sample=$(echo $file | sed 's/.combine.5mC.CpG//g');
+        echo $name $sample;
+        $BEDTOOLS/intersectBed -a $file -b $CTCF -wa -wb | awk '{t[$10]=t[$10]+$4; c[$10]=c[$10]+$5; chr[$10]=$7; start[$10]=$8; end[$10]=$9; signal[$10]=$11; n[$10]=$12} END{for(i in chr){if(c[i]+t[i]>0){f=c[i]/(c[i]+t[i]); print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"n[i]"\t"f"\t""'$sample'"}}}' | sort -k1,1 -k 2,2n >> $dirOut/$name.5mC
+    done
+done
+
+### H3K36me3
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+dirK36=/projects/epigenomics2/users/lli/glioma/ChIPseq/bam/H3K36me3/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/H3K36me3/
+mkdir -p $dirOut
+cd $dirK36
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/MACS2/CTCF*.bed; do
+    name=$(basename $CTCF | sed 's/.bed//g')
+    echo -e "chr\tstart\tend\tID\tsummit\tN\tN_reads\tsample\tRPKM" > $dirOut/$name.H3K36me3.bed
+    for bam in *.bam; do
+        sample=$(echo $bam | cut -d'.' -f2)
+        echo $name $sample
+        depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
+        $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $CTCF -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$7*10^9/($3-$2)/"'$depth'"}' >> $dirOut/$name.H3K36me3.bed    
+    done
+done
+
+### RNA-seq
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/RNAseq/
+mkdir -p $dirOut
+for CTCF in /projects/epigenomics2/users/lli/glioma/CTCF/MACS2/CTCF*.bed; do
+    name=$(basename $CTCF | sed 's/.bed//g')
+    echo -e "chr\tstart\tend\tID\tsummit\tN\tN_reads\tsample\tRPKM" > $dirOut/$name.RNAseq.bed
+    for dirRNA in /projects/epigenomics2/users/lli/glioma/RNAseq/bam/ /projects/epigenomics/users/lli/FetalBrain/RNAseq/bam/; do
+        cd $dirRNA
+        for bam in *.bam; do
+            sample=$(echo $bam | cut -d'.' -f2)
+            echo $name $sample
+            depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
+            $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $CTCF -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$7*10^9/($3-$2)/"'$depth'"}' >> $dirOut/$name.RNAseq.bed    
+        done
+    done
+done
+
+### Homer 
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/
+dirOut=/projects/epigenomics2/users/lli/glioma/CTCF/MACS2/Homer/
+mkdir -p $dirOut
+cd $dirIn
+for file in CTCF*.bed; do
+    name=$(echo $file | sed 's/.bed//g')
+    echo $name
+    mkdir -p $dirOut/$name/
+    /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/$name/ -size 200 -len 6,10,15,20 
+done
