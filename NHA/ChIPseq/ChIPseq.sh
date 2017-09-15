@@ -183,3 +183,24 @@ for ((i=0; i<4; i++)); do
         echo -e "$sample1\t$sample2\t$mark\t$N1\t$len1\t$N2\t$len2\t$N_unique1\t$len_unique1\t$N_unique2\t$len_unique2" >> $dirOut/ER.unique.summary
     done
 done
+
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/NHAR_vitc.NHAR_control/H3K27ac/
+dirOut=$dirIn/Homer/
+mkdir -p $dirOut
+cd $dirIn
+for file in *.unique; do
+    name=$(echo $file | sed 's/H3K27ac.NHAR_vitc.NHAR_control.//g' | sed 's/.unique//g')
+    echo "Processing "$name
+    mkdir -p $dirOut/$name/
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+done
+dirOut=$dirIn/Homer2/
+mkdir -p $dirOut; mkdir -p $dirOut/NHAR_control/; mkdir -p $dirOut/NHAR_vitc/
+cd $dirIn
+/home/lli/bin/homer/bin/findMotifsGenome.pl H3K27ac.NHAR_vitc.NHAR_control.NHAR_vitc.unique hg19 $dirOut/NHAR_vitc/ -bg H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -size 200 -len 8
+/home/lli/bin/homer/bin/findMotifsGenome.pl H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique hg19 $dirOut/NHAR_control/ -bg H3K27ac.NHAR_vitc.NHAR_control.NHAR_vitc.unique -size 200 -len 8 
+
