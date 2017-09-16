@@ -196,24 +196,53 @@ for ((i=0; i<4; i++)); do
         echo -e "$sample1\t$sample2\t$mark\t$N1\t$len1\t$N2\t$len2\t$N_unique1\t$len_unique1\t$N_unique2\t$len_unique2" >> $dirOut/ER.unique.summary
     done
 done
+### unique ER -- non-overlapping
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+mkdir -p $dirOut
+echo -e "Sample1\tSample2\tMark\tN1\tlen1\tN2\tlen2\tN_unique1\tlen_unique1\tN_unique2\tlen_unique2" > $dirOut/ER.unique.summary
+s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc")
+s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control")
+for ((i=0; i<4; i++)); do
+    sample1=${s1[i]}; sample2=${s2[i]}; name=$sample1"."$sample2
+    for mark in H3K27ac H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3; do
+        echo $name $mark
+        mkdir -p $dirOut/$name/$mark/
+        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz) -b <(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample1.unique
+        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz) -b <(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample2.unique
+        N1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | wc -l)
+        len1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | wc -l)
+        len2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | wc -l)
+        len_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | awk '{s=s+$3-$2}END{print s}')
+        N_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | wc -l)
+        len_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e "$sample1\t$sample2\t$mark\t$N1\t$len1\t$N2\t$len2\t$N_unique1\t$len_unique1\t$N_unique2\t$len_unique2" >> $dirOut/ER.unique.summary
+    done
+done
 
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/NHAR_vitc.NHAR_control/H3K27ac/
-dirOut=$dirIn/Homer/
-mkdir -p $dirOut
-cd $dirIn
-for file in *.unique; do
-    name=$(echo $file | sed 's/H3K27ac.NHAR_vitc.NHAR_control.//g' | sed 's/.unique//g')
-    echo "Processing "$name
-    mkdir -p $dirOut/$name/
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+for mark in H3K27ac H3K4me1; do
+    for compare in NHAR_vitc.NHAR_control NHAR_control.NHA_control NHAR_vitc.NHA_control NHA_vitc.NHA_control; do
+        s1=$(echo $compare | sed 's/\..*//g'); s2=$(echo $compare | sed 's/.*\.//g');
+        echo $mark $compare $s1 $s2
+        dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/$compare/$mark/
+        dirOut=$dirIn/Homer/
+        mkdir -p $dirOut
+        cd $dirIn
+        for file in *.unique; do
+            name=$(echo $file | cut -d'.' -f4)
+            mkdir -p $dirOut/$name/
+            /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+        done
+        dirOut=$dirIn/Homer2/
+        mkdir -p $dirOut; mkdir -p $dirOut/$s1/; mkdir -p $dirOut/$s2/
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $mark.$compare.$s1.unique hg19 $dirOut/$s1/ -bg $mark.$compare.$s2.unique -size 200 -len 8
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $mark.$compare.$s2.unique hg19 $dirOut/$s2/ -bg $mark.$compare.$s1.unique -size 200 -len 8 
+    done
 done
-dirOut=$dirIn/Homer2/
-mkdir -p $dirOut; mkdir -p $dirOut/NHAR_control/; mkdir -p $dirOut/NHAR_vitc/
-cd $dirIn
-/home/lli/bin/homer/bin/findMotifsGenome.pl H3K27ac.NHAR_vitc.NHAR_control.NHAR_vitc.unique hg19 $dirOut/NHAR_vitc/ -bg H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -size 200 -len 8
-/home/lli/bin/homer/bin/findMotifsGenome.pl H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique hg19 $dirOut/NHAR_control/ -bg H3K27ac.NHAR_vitc.NHAR_control.NHAR_vitc.unique -size 200 -len 8 
 
