@@ -55,6 +55,19 @@ for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
         echo -e $mark"\t"$lib"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER.summary.stats
     done
 done
+### K27ac signal for super enhancer
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+dirWig=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/H3K27ac/
+dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
+dirOut=$dirIn/signal/; mkdir -p $dirOut
+cd $dirIn
+for file in *.FindER.bed.gz; do
+    sample=$(echo $file | sed 's/A[0-9]*.//g' | cut -d'.' -f1);
+    echo $sample
+    $JAVA -jar -Xmx15G $RegCov -w $(ls $dirWig/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample.FindER.signal > $dirOut/$sample.log
+done
 
 ########################################################
 
