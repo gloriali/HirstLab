@@ -154,6 +154,19 @@ for bam in H3K9me3/H3K9me3_NHAR_vitc.bam H3K9me3/H3K9me3_NHAR_control.bam H3K4me
     depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $Reg -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> NHAR.H3K9me3.H3K4me3.bed
 done
+### K27ac signal for super enhancer
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/H3K27ac/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
+dirOut=$dirIn/signal/; mkdir -p $dirOut
+cd $dirIn
+for file in *.FindER.bed.gz; do
+    sample=$(echo $file | sed 's/.vs.*//g');
+    echo $sample
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/$sample.q5.F1028.PET.wig.gz -r $file -o $dirOut -c $chr -n $sample.FindER.signal > $dirOut/$sample.log
+done
 
 ## unique ER
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
