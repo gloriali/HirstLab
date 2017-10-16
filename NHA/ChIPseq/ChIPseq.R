@@ -88,6 +88,65 @@ ER_summary_FindER <- read.delim("./FindER/ER_summary.txt", as.is = T)
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(ER_summary_FindER_figure, file = "./FindER/ER_summary_FindER_figure.pdf", height = 6, width = 5)
 
+## ============= unique ER =============
+ER_unique_summary <- read.delim("./unique2/ER.unique.summary", as.is = T) %>% 
+	melt(id = c("Sample1", "Sample2", "Mark")) %>% 
+	mutate(Sample = paste0(Sample1, ".", Sample2), category = ifelse(grepl("len", variable), "Total No. of bases", "Total No. of regions"), unique = ifelse(grepl("unique", variable), T, F), value = ifelse(grepl("1", variable), value, -value))
+(ER_unique_summary_figure <- ggplot(ER_unique_summary %>% filter(unique == T, Sample %in% c("NHAR_vitc.NHAR_control", "NHAR_control.NHA_control")), aes(Mark, value, fill = Sample)) + 
+		geom_bar(stat = "identity", position = position_dodge()) +
+		geom_hline(yintercept = 0) + 
+		facet_grid(category ~., scales = "free_y") + 
+		xlab("") + 
+		ylab("") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(ER_unique_summary_figure, file = "./unique2/ER_unique_summary_figure.pdf", width = 7, height = 5)
+### unique K27ac homer
+homer_unique_enhancer_NHARcontrol_NHARvitc <- read.delim("./unique2/NHAR_vitc.NHAR_control/H3K27ac/Homer2/NHAR_control/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("/.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
+	filter(Percent_enhancer_with_motif >= 15, P.value<= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_enhancer_NHARcontrol_NHARvitc_figure <- ggplot(homer_unique_enhancer_NHARcontrol_NHARvitc, aes(TF, Percent_enhancer_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("NHARvitc_NHARcontrol NHARcontrol unique") + 
+		theme_bw())
+ggsave(homer_unique_enhancer_NHARcontrol_NHARvitc_figure, file = "./unique2/NHAR_vitc.NHAR_control/H3K27ac/Homer2/homer_unique_enhancer_NHARcontrol_NHARvitc_figure.pdf", height = 4, width = 5)
+homer_unique_enhancer_NHARvitc_NHARcontrol <- read.delim("./unique2/NHAR_vitc.NHAR_control/H3K27ac/Homer2/NHAR_vitc/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("/.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
+	filter(Percent_enhancer_with_motif >= 15, P.value<= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_enhancer_NHARvitc_NHARcontrol_figure <- ggplot(homer_unique_enhancer_NHARvitc_NHARcontrol, aes(TF, Percent_enhancer_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("NHARvitc_NHARcontrol NHARvitc unique") + 
+		theme_bw())
+ggsave(homer_unique_enhancer_NHARvitc_NHARcontrol_figure, file = "./unique2/NHAR_vitc.NHAR_control/H3K27ac/Homer2/homer_unique_enhancer_NHARvitc_NHARcontrol_figure.pdf", height = 2, width = 5)
+homer_unique_enhancer_NHARcontrol_NHAcontrol <- read.delim("./unique2/NHAR_control.NHA_control/H3K27ac/Homer2/NHAR_control/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("/.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
+	filter(Percent_enhancer_with_motif >= 15, P.value<= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_enhancer_NHARcontrol_NHAcontrol_figure <- ggplot(homer_unique_enhancer_NHARcontrol_NHAcontrol, aes(TF, Percent_enhancer_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("NHARcontrol_NHAcontrol NHARcontrol unique") + 
+		theme_bw())
+ggsave(homer_unique_enhancer_NHARcontrol_NHAcontrol_figure, file = "./unique2/NHAR_control.NHA_control/H3K27ac/Homer2/homer_unique_enhancer_NHARcontrol_NHAcontrol_figure.pdf", height = 5, width = 5)
+homer_unique_enhancer_NHAcontrol_NHARcontrol <- read.delim("./unique2/NHAR_control.NHA_control/H3K27ac/Homer2/NHA_control/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("/.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
+	filter(Percent_enhancer_with_motif >= 15, P.value<= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_enhancer_NHAcontrol_NHARcontrol_figure <- ggplot(homer_unique_enhancer_NHAcontrol_NHARcontrol, aes(TF, Percent_enhancer_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("NHARcontrol_NHAcontrol NHAcontrol unique") + 
+		theme_bw())
+ggsave(homer_unique_enhancer_NHAcontrol_NHARcontrol_figure, file = "./unique2/NHAR_control.NHA_control/H3K27ac/Homer2/homer_unique_enhancer_NHAcontrol_NHARcontrol_figure.pdf", height = 5, width = 5)
+
 ## ============= save ===========
 save(list = c(ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "DAVID"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
 		 file = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/ChIPseq.Rdata")

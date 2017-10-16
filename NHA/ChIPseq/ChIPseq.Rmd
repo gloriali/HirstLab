@@ -32,6 +32,7 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/use
 ## QC  
 * Sequencing depth are even across samples, and sufficient (50M for narrow marks, 100M for broad marks).     
 * All QC metric looks good.       
+* All results suggest that NHAR VitC H3K9me3 sample is actually a H3K4me3 sample, probably due to using the wrong antibody in IP: remove H3K9me3 from further analysis.          
 
 ```{r QC}
 (QC_summary_reads_figure)
@@ -40,29 +41,32 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/use
 ```
 
 ## Enrich regions
-* H3K9me3 NHAR VitC sample has much lower genome coverage than any other H3K9me3 samples.       
 * From [UCSC tracks](http://www.bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt), FindER results make more sense than MACS2.      
 
 ```{r ER_summary}
 (ER_summary_FindER_figure)
-(ER_summary_MACS2_figure)
 ```
 
-## H3K9me3 NHAR VitC
-* All results suggest that NHAR VitC H3K9me3 sample is actually a H3K4me3 sample, probably due to using the wrong antibody in IP.      
-* NHAR VitC H3K9me3 sample is a technical replicate of NHAR VitC H3K4me3 sample with twice sequencing depth.    
+## Unique enrich regions
+* Unique enrich regions were identified by non-overlapping regions in pairwise comparisons.    
 
-```{r NHAR_VitC_H3K9me3}
-grid.newpage()
-draw.pairwise.venn(area1 = 44496864, area2 = 121812813, cross.area = 41856862, category = c("H3K9me3_NHAR_vitc", "H3K9me3_NHAR_control"), fill = c("red", "blue"))
-(H3K9me3_NHAR_vitC_NTC_figure)
+```{r ER_unique_summary}
+(ER_unique_summary_figure)
 ```
 
-![](./ChIPseq_files/figure-html/H3K9me3_NHAR_vitC.png)
+### Homer for unique H3K27ac 
+* Results correlate those in CEMT glioma.    
 
-```{r NHAR_VitC_H3K4me3}
-grid.newpage()
-draw.pairwise.venn(area1 = 44496864, area2 = 54317631, cross.area = 41973315, category = c("H3K9me3_NHAR_vitc", "H3K4me3_NHAR_vitc"), fill = c("red", "blue"))
-(NHAR_H3K9me3_H3K4me3_figure)
+```{r homer_K27ac1, fig.height=4}
+(homer_unique_enhancer_NHARcontrol_NHARvitc_figure)
+```
+```{r homer_K27ac2, fig.height=2}
+(homer_unique_enhancer_NHARvitc_NHARcontrol_figure)
+```
+```{r homer_K27ac3, fig.height=4}
+(homer_unique_enhancer_NHARcontrol_NHAcontrol_figure)
+```
+```{r homer_K27ac4, fig.height=2}
+(homer_unique_enhancer_NHAcontrol_NHARcontrol_figure)
 ```
 
