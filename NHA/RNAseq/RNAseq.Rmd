@@ -1,0 +1,41 @@
+---
+title: "VitC - RNAseq"
+author: "Gloria Li"
+date: "Oct 16, 2017"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE, eval=F}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RNAseq.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/")
+```
+
+## Differential expression
+* DEfine FDR = 0.01
+
+![](./RNAseq_files/figure-html/Plot2D_NHAR_control_NHA_control_with_GC_correction_with_L_correction.png)
+
+![](./RNAseq_files/figure-html/Plot2D_NHAR_vitc_NHAR_control_with_GC_correction_with_L_correction.png)
+
+![](./RNAseq_files/figure-html/Plot2D_MGG119_control_MGG119_vitc_with_GC_correction_with_L_correction.png)
+
+
