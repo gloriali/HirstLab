@@ -3,9 +3,9 @@
 ## link bam files
 dirIn=/projects/analysis/analysis30/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
-less $dirOut/sample_info.txt | awk '{"echo $(ls ""'$dirIn'"$2"/*/"$2"_"$3"/75nt/hg19a/bwa-0.5.7/*.bam)" | getline bam; print $0"\t"bam}' > $dirOut/sample_info1.txt
+less $dirOut/sample_info.txt | awk '{"echo $(ls ""'$dirIn'"$1"/*/"$1"_"$2"/75nt/hg19a/bwa-0.5.7/*.bam)" | getline bam; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"bam}' > $dirOut/sample_info1.txt
 mv $dirOut/sample_info1.txt $dirOut/sample_info.txt
-less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$4"/"$4"_"$5".bam")}'
+less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$3"/"$3"_"$4".bam")}'
 
 # QC
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
@@ -28,7 +28,7 @@ echo -e "Library\tNumber_Target_Regions" > $dirIn/QC.target_regions.txt
 for bam in $dirIn/*/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     mark=$(echo $name | cut -d'_' -f1)
-    sample=$(echo $name | sed 's/.*_NHA/NHA/g')
+    sample=$(echo $name | sed 's/.*_NHA/NHA/g' | sed 's/.*_MGG/MGG/g')
     echo $name $mark $sample
     mkdir -p $dirIn/$mark/
     mkdir -p $dirWig/$mark/
