@@ -14,6 +14,21 @@ for bam in *.bam; do
     /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $(readlink -f $bam) $name $dirOut $ens S 0 "1,1,1,1,1" /projects/epigenomics/resources/ $JAVA $samtools 
 done
 
+# RPKM matrix
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/
+> /projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/RPKM.long
+echo "ENSG" > vitc.RPKM
+less MGG119_control/coverage/MGG119_control.G.A.rpkm.pc | awk '{print $1}' >> vitc.RPKM
+for file in */coverage/*.G.A.rpkm.pc; do
+    lib=$(echo $file | sed 's/\/.*//g')
+    echo -e "ENSG\t$lib" > x
+    less $file | awk '{print $1"\t"$3}' >> x
+    join vitc.RPKM x | sed 's/ /\t/g' >y
+    mv y vitc.RPKM
+    less $file | awk '{print "'$lib'""\t"$1"\t"$3}' >> /projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/RPKM.long
+done
+rm x
+
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/
@@ -21,8 +36,8 @@ dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/DEfine/
 mkdir -p $dirOut
 echo -e "%/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab
 addpath /home/mbilenky/matlab -end" > $dirOut/DEfine.vitc.m
-s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc" "MGG119_control")
-s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control" "MGG119_vitc")
+s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc" "MGG119_vitc")
+s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control" "MGG119_control")
 for ((i=0; i<5; i++)); do
     sample1=${s1[i]}; sample2=${s2[i]};
     name1=$sample1; name2=$sample2
