@@ -12,7 +12,7 @@ output:
 
 Updated: `r date()`
 
-```{r setup, include = FALSE, eval=F}
+```{r setup, include = FALSE}
 library(ggplot2)
 library(plyr)
 library(VennDiagram)
@@ -29,6 +29,13 @@ knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FA
 knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/")
 ```
 
+## QC
+
+```{r QC}
+(QC_summary_reads_figure)
+(QC_summary_percent_figure)
+```
+
 ## Differential expression
 * DEfine FDR = 0.01
 
@@ -38,4 +45,29 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/use
 
 ![](./RNAseq_files/figure-html/Plot2D_MGG119_control_MGG119_vitc_with_GC_correction_with_L_correction.png)
 
+### Intersect
+* Significant intersect between mutant DN and VitC UP genes.   
+* Significant intersect between MGG119 and NHAR.     
+
+```{r venn, fig.height=3, fig.width=4}
+grid.newpage()
+grid.draw(vitc_control_UP_venn)
+grid.newpage()
+grid.draw(vitc_control_DN_venn)
+grid.newpage()
+grid.draw(vitc_UP_mut_DN_venn)
+grid.newpage()
+grid.draw(vitc_DN_mut_UP_venn)
+```
+
+### DAVID functional enrichment
+
+```{r DAVID}
+(enrich_NHAR_NHA_control_UP)
+(enrich_NHAR_NHA_control_DN)
+(enrich_NHAR_vitc_control_UP)
+(enrich_NHAR_vitc_control_DN)
+(enrich_MGG119_vitc_control_UP)
+(enrich_MGG119_vitc_control_DN)
+```
 
