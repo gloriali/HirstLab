@@ -169,6 +169,7 @@ for file in *.FindER.bed.gz; do
 done
 
 ## unique ER
+### unique ER -- strict
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
@@ -202,11 +203,11 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
 mkdir -p $dirOut
 echo -e "Sample1\tSample2\tMark\tN1\tlen1\tN2\tlen2\tN_unique1\tlen_unique1\tN_unique2\tlen_unique2" > $dirOut/ER.unique.summary
-s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc")
-s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control")
-for ((i=0; i<4; i++)); do
+s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc" "MGG_vitc")
+s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control" "MGG119_control")
+for ((i=0; i<5; i++)); do
     sample1=${s1[i]}; sample2=${s2[i]}; name=$sample1"."$sample2
-    for mark in H3K27ac H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3; do
+    for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
         echo $name $mark
         mkdir -p $dirOut/$name/$mark/
         $BEDTOOLS/intersectBed -a <(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz) -b <(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample1.unique
@@ -227,7 +228,7 @@ done
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 for mark in H3K27ac H3K4me1; do
-    for compare in NHAR_vitc.NHAR_control NHAR_control.NHA_control NHAR_vitc.NHA_control NHA_vitc.NHA_control; do
+    for compare in NHAR_vitc.NHAR_control NHAR_control.NHA_control NHAR_vitc.NHA_control NHA_vitc.NHA_control MGG_vitc.MGG119_control; do
         s1=$(echo $compare | sed 's/\..*//g'); s2=$(echo $compare | sed 's/.*\.//g');
         echo $mark $compare $s1 $s2
         dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/$compare/$mark/
