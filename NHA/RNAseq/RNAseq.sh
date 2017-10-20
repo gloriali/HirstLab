@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## QC and RPKM
+# QC and RPKM
 samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/bam/
@@ -13,6 +13,18 @@ for bam in *.bam; do
     rm -rf $dirOut/$name/
     /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $(readlink -f $bam) $name $dirOut $ens S 0 "1,1,1,1,1" /projects/epigenomics/resources/ $JAVA $samtools 
 done
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/bam/
+cd $dirIn
+for bam in *.bam; do
+    name=$(echo $bam | cut -d'.' -f1)
+    echo $name
+    $samtools index $bam
+    $bamstats -g 2864785220 -q 10 -b $bam  > $name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $name.bamstats
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 
 # RPKM matrix
 cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/
