@@ -247,3 +247,24 @@ for mark in H3K27ac H3K4me1; do
     done
 done
 
+### vitc reversed regions
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
+    echo $mark
+    $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHAR_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_control.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_gain.vitc_loss.bed
+    $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHA_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_vitc.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_loss.vitc_gain.bed
+done
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+mkdir -p $dirOut/homer/
+cd $dirOut
+for mark in H3K27ac H3K4me1; do
+    for file in $mark.*.bed; do
+        name=$(echo $file | sed 's/.bed//g')
+        echo $mark $name
+        mkdir -p $dirOut/homer/$name/
+        /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
+    done
+done
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut
