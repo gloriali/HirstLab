@@ -36,7 +36,7 @@ CGI_shore=/home/lli/hg19/CGI.2000shores.BED
 dirOut=$dirIn/intersect/
 mkdir -p $dirOut
 cd $dirIn
-echo -e "Processing all DMR.<name>.bed files in the input directory. Reference: hg19, Ensembl hg19v69. 
+echo -e "Processing all <name>.bed files in the input directory. Reference: hg19, Ensembl hg19v69. 
 Output files:
 $dirOut/genomic.breakdown.summary (fold enrichment for plotting): Name\tTotal length\tIntergenic\tIntron\tExon\tGene\tPromoter\tCGI_promoter\tCGI_genebody\tCGI_intergenic\tCGI_shore\t$region_name
 $dirOut/<name>.gene.bed: chr\tstart\tend\tDMR_ID\tEnsembl
