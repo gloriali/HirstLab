@@ -78,16 +78,16 @@ for dmr in *.bed; do
     $BEDTOOLS/intersectBed -a $dmr.tmp -b $CGI_shore -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $dirOut/$name.CGI_shore.bed
     less $dirOut/$name.gene.bed | awk '/protein_coding/ {gsub("_protein_coding", "", $5); print $1"\t"$2"\t"$3"\t"$4"\t"$5}' > $dirOut/$name.gene_pc.bed
     dmr_total=$(less $dmr | awk '{s=s+$3-$2}END{print s}')
-    dmr_gene=$(less $dirOut/$name.gene.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_exon=$(less $dirOut/$name.exon.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_promoter=$(less $dirOut/$name.promoter.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_CGI_promoter=$(less $dirOut/$name.CGI_promoter.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_CGI_genebody=$(less $dirOut/$name.CGI_genebody.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_CGI_intergenic=$(less $dirOut/$name.CGI_intergenic.bed | awk '{s=0; s=s+$3-$2}END{print s}')
-    dmr_CGI_shore=$(less $dirOut/$name.CGI_shore.bed | awk '{s=0; s=s+$3-$2}END{print s}')
+    dmr_gene=$(less $dirOut/$name.gene.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_exon=$(less $dirOut/$name.exon.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_promoter=$(less $dirOut/$name.promoter.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_CGI_promoter=$(less $dirOut/$name.CGI_promoter.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_CGI_genebody=$(less $dirOut/$name.CGI_genebody.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_CGI_intergenic=$(less $dirOut/$name.CGI_intergenic.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
+    dmr_CGI_shore=$(less $dirOut/$name.CGI_shore.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
     if [ -f "$region" ]; then
         less $region | sed 's/chr//g'| $BEDTOOLS/intersectBed -a $dmr.tmp -b stdin -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5":"$6"-"$7}' > $dirOut/$name.$region_name.bed
-        DMR_region=$(less $dirOut/$name.$region_name.bed | awk '{s=0; s=s+$3-$2}END{print s}')
+        DMR_region=$(less $dirOut/$name.$region_name.bed | awk 'BEGIN{s=0}{s=s+$3-$2}END{print s}')
         echo -e "$name\t$dmr_total\t$dmr_gene\t$dmr_exon\t$dmr_promoter\t$dmr_CGI_promoter\t$dmr_CGI_genebody\t$dmr_CGI_intergenic\t$dmr_CGI_shore\t$DMR_region\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI_promoter\t$all_CGI_genebody\t$all_CGI_intergenic\t$all_CGI_shore\t$all_region" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($11-$12)/$11)"\t"(($3-$4)/$2)/(($12-$13)/$11)"\t"($4/$2)/($13/$11)"\t"($3/$2)/($12/$11)"\t"($5/$2)/($14/$11)"\t"($6/$2)/($15/$11)"\t"($7/$2)/($16/$11)"\t"($8/$2)/($17/$11)"\t"($9/$2)/($18/$11)"\t"($10/$2)/($19/$11)}' >> $dirOut/genomic.breakdown.summary
     else
         echo -e "$name\t$dmr_total\t$dmr_gene\t$dmr_exon\t$dmr_promoter\t$dmr_CGI_promoter\t$dmr_CGI_genebody\t$dmr_CGI_intergenic\t$dmr_CGI_shore\t$all_total\t$all_gene\t$all_exon\t$all_promoter\t$all_CGI_promoter\t$all_CGI_genebody\t$all_CGI_intergenic\t$all_CGI_shore" | awk '{print $1"\t"$2"\t"(($2-$3)/$2)/(($10-$11)/$10)"\t"(($3-$4)/$2)/(($11-$12)/$10)"\t"($4/$2)/($12/$10)"\t"($3/$2)/($11/$10)"\t"($5/$2)/($13/$10)"\t"($6/$2)/($14/$10)"\t"($7/$2)/($15/$10)"\t"($8/$2)/($16/$10)"\t"($9/$2)/($17/$10)}' >> $dirOut/genomic.breakdown.summary        
