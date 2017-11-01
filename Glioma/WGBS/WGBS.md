@@ -2,7 +2,7 @@
 Gloria Li  
 May 24, 2016  
 
-Updated: Wed Aug  9 02:41:12 2017
+Updated: Tue Oct 31 14:47:50 2017
 
 
 
@@ -33,7 +33,7 @@ Updated: Wed Aug  9 02:41:12 2017
 * Expression levels of the closest genes are not significantly affected by 5mC at these bivalent enhancers     
 * Genes associated with each profile group are significantly overlapped across the three IDH mutant gliomas        
 
-![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- -->![](WGBS_files/figure-html/enhancer-3.png)<!-- -->![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- --><table>
+![](WGBS_files/figure-html/enhancer-1.png)<!-- -->![](WGBS_files/figure-html/enhancer-2.png)<!-- --><table>
  <thead>
   <tr>
    <th style="text-align:center;"> DE </th>
@@ -47,11 +47,35 @@ Updated: Wed Aug  9 02:41:12 2017
 <tbody>
   <tr>
    <td style="text-align:center;"> DN </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 7 </td>
+   <td style="text-align:center;"> 9 </td>
+   <td style="text-align:center;"> 18 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> DN </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 14 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> DN </td>
    <td style="text-align:center;"> hyper-hypo </td>
    <td style="text-align:center;"> T-T </td>
    <td style="text-align:center;"> 16 </td>
    <td style="text-align:center;"> 14 </td>
    <td style="text-align:center;"> 12 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> DN </td>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 9 </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 7 </td>
   </tr>
   <tr>
    <td style="text-align:center;"> ST </td>
@@ -111,11 +135,115 @@ Updated: Wed Aug  9 02:41:12 2017
   </tr>
   <tr>
    <td style="text-align:center;"> UP </td>
+   <td style="text-align:center;"> hyper-hyper </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 9 </td>
+   <td style="text-align:center;"> 4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UP </td>
+   <td style="text-align:center;"> hyper-hypo </td>
+   <td style="text-align:center;"> T-F </td>
+   <td style="text-align:center;"> 17 </td>
+   <td style="text-align:center;"> 9 </td>
+   <td style="text-align:center;"> 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UP </td>
    <td style="text-align:center;"> hyper-median </td>
    <td style="text-align:center;"> T-F </td>
    <td style="text-align:center;"> 20 </td>
    <td style="text-align:center;"> 12 </td>
    <td style="text-align:center;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UP </td>
+   <td style="text-align:center;"> hyper-median </td>
+   <td style="text-align:center;"> T-T </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 2 </td>
+  </tr>
+</tbody>
+</table>
+
+![](WGBS_files/figure-html/enhancer-3.png)<!-- --><table>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ENSG00000017483 </td>
+   <td style="text-align:left;"> SLC38A5 </td>
+   <td style="text-align:left;"> solute_carrier_family_38,_member_5_[Source:HGNC_Symbol;Acc:18070] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000048540 </td>
+   <td style="text-align:left;"> LMO3 </td>
+   <td style="text-align:left;"> LIM_domain_only_3_(rhombotin-like_2)_[Source:HGNC_Symbol;Acc:6643] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000109107 </td>
+   <td style="text-align:left;"> ALDOC </td>
+   <td style="text-align:left;"> aldolase_C,_fructose-bisphosphate_[Source:HGNC_Symbol;Acc:418] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000117115 </td>
+   <td style="text-align:left;"> PADI2 </td>
+   <td style="text-align:left;"> peptidyl_arginine_deiminase,_type_II_[Source:HGNC_Symbol;Acc:18341] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000120645 </td>
+   <td style="text-align:left;"> IQSEC3 </td>
+   <td style="text-align:left;"> IQ_motif_and_Sec7_domain_3_[Source:HGNC_Symbol;Acc:29193] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000136535 </td>
+   <td style="text-align:left;"> TBR1 </td>
+   <td style="text-align:left;"> T-box,_brain,_1_[Source:HGNC_Symbol;Acc:11590] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000147234 </td>
+   <td style="text-align:left;"> FRMPD3 </td>
+   <td style="text-align:left;"> FERM_and_PDZ_domain_containing_3_[Source:HGNC_Symbol;Acc:29382] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000148671 </td>
+   <td style="text-align:left;"> C10orf116 </td>
+   <td style="text-align:left;"> chromosome_10_open_reading_frame_116_[Source:HGNC_Symbol;Acc:24043] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000152137 </td>
+   <td style="text-align:left;"> HSPB8 </td>
+   <td style="text-align:left;"> heat_shock_22kDa_protein_8_[Source:HGNC_Symbol;Acc:30171] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000154133 </td>
+   <td style="text-align:left;"> ROBO4 </td>
+   <td style="text-align:left;"> roundabout,_axon_guidance_receptor,_homolog_4_(Drosophila)_[Source:HGNC_Symbol;Acc:17985] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000166006 </td>
+   <td style="text-align:left;"> KCNC2 </td>
+   <td style="text-align:left;"> potassium_voltage-gated_channel,_Shaw-related_subfamily,_member_2_[Source:HGNC_Symbol;Acc:6234] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000173210 </td>
+   <td style="text-align:left;"> ABLIM3 </td>
+   <td style="text-align:left;"> actin_binding_LIM_protein_family,_member_3_[Source:HGNC_Symbol;Acc:29132] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000183542 </td>
+   <td style="text-align:left;"> KLRC4 </td>
+   <td style="text-align:left;"> killer_cell_lectin-like_receptor_subfamily_C,_member_4_[Source:HGNC_Symbol;Acc:6377] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000197971 </td>
+   <td style="text-align:left;"> MBP </td>
+   <td style="text-align:left;"> myelin_basic_protein_[Source:HGNC_Symbol;Acc:6925] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000255819 </td>
+   <td style="text-align:left;"> KLRC4-KLRK1 </td>
+   <td style="text-align:left;"> NKG2-D_type_II_integral_membrane_protein__[Source:RefSeq_peptide;Acc:NP_031386] </td>
   </tr>
 </tbody>
 </table>
@@ -407,7 +535,7 @@ Updated: Wed Aug  9 02:41:12 2017
 </tbody>
 </table>
 
-![](WGBS_files/figure-html/enhancer-6.png)<!-- -->![](WGBS_files/figure-html/enhancer-7.png)<!-- -->![](WGBS_files/figure-html/enhancer-8.png)<!-- -->![](WGBS_files/figure-html/enhancer-9.png)<!-- -->
+![](WGBS_files/figure-html/enhancer-4.png)<!-- -->![](WGBS_files/figure-html/enhancer-5.png)<!-- -->![](WGBS_files/figure-html/enhancer-6.png)<!-- -->
 
 ## DNA methylation changes around CGI edges
 * CGIs are hypermethylated in IDH mutant gliomas.     
