@@ -255,6 +255,7 @@ for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHAR_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_control.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_gain.vitc_loss.bed
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHA_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_vitc.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_loss.vitc_gain.bed
 done
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
@@ -267,4 +268,13 @@ for mark in H3K27ac H3K4me1; do
         /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
     done
 done
-/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known11.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.GATA3.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.GATA3.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known26.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.Foxo1.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.Foxo1.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known29.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.BMYB.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.BMYB.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_loss.vitc_gain.bed hg19 -m $dirOut/homer/H3K27ac.mut_loss.vitc_gain/knownResults/known28.motif -nmotifs -mbed $dirOut/H3K27ac.mut_loss.vitc_gain.Bcl6.BS.bed > $dirOut/H3K27ac.mut_loss.vitc_gain.Bcl6.annotate
+for file in *.BS.bed; do
+    name=$(echo $file | sed 's/.BS.bed//g'); echo $name
+    echo -e "chr\tstart\tend\tID\tENSG\tdistance" > $dirOut/$name.closest.gene
+    less $file | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -D a | awk '{if($9>=-20000 && $9<=20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8"\t"$9}}' | sort -k5,5 >> $dirOut/$name.closest.gene
+    join $dirOut/$name.closest.gene $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.closest.gene.RPKM
+done
