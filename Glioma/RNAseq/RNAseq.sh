@@ -120,6 +120,7 @@ for file in */coverage/*.G.A.rpkm.pc; do
     less $file | awk '{print "NPC_""'$lib'""."$1"\t"$3}' >> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
 done
 rm x
+join /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/glioma.RPKM /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/NPC.RPKM | sed 's/ /\t/g' > /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.matrix
 
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
