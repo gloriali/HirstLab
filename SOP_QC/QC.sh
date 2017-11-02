@@ -20,7 +20,7 @@ samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
 picard=/home/pubseq/BioSw/picard/picard-tools-1.52/
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
 dirIn=/projects/epigenomics3/UBC_miseq/meDIPQC_01NOV2017/
-dirOut=/projects/epigenomics3/bams/UBC_meDIPQC_01NOV2017/
+dirOut=/projects/epigenomics3/bams/hg19/UBC_meDIPQC_01NOV2017/
 mkdir -p $dirOut
 cd $dirIn
 for f1 in IP*3X*R1*fastq.gz; do
@@ -38,4 +38,21 @@ for file in *.bamstats; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirOut/$file
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
+rm *.sam report* *sorted.bam
+
+# coverage vs GC content
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+dirOut=/projects/epigenomics3/bams/hg19/UBC_meDIPQC_01NOV2017/
+region=/home/lli/hg19/hg19.chrlen.autoXY.1KB.bed
+$BEDTOOLS/nucBed -fi /home/lli/hg19/GRCh37-lite.fa -bed $region | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$4"\t"$6}' > $region.GC
+cd $dirOut
+echo -e "chr\tstart\tend\tID\tGC\tcoverage\tsample" > $dirOut/GCcontent.coverage
+echo -e "GC\ttotal\tcount\taverage\tsample" > $dirOut/GCcontent.coverage.summary
+for bam in *.sorted.dupsFlagged.bam; do
+    sample=$(echo $bam | sed 's/.sorted.dupsFlagged.bam//g')
+    echo $sample
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $region.GC -b stdin -counts | awk '{print $0"\t""'$sample'"}' >> $dirOut/GCcontent.coverage
+    $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $region.GC -b stdin -counts | awk '{s[int($5*10)]=s[int($5*10)]+$6; c[int($5*10)]++}END{for(i in s){print i/10"\t"s[i]"\t"c[i]"\t"s[i]/c[i]"\t""'$sample'"}}' | sort -k1,1n >> $dirOut/GCcontent.coverage.summary
+done
 
