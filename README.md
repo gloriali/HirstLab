@@ -11,6 +11,7 @@ Code and summary results in Hirst Lab
 * [Others](./Others): General analysis related to thesis or commands for others
 * [Sam](./Sam): Script from Sam, mostly for glioma project.
 * [SpikeIn](./SpikeIn): Normalize RNA-seq RPKM to Spike-in and RNA yield for Nicolette's project.
+* [SOP_QC](./SOP_QC): QC for optimizing MeDIP and hMeDIP SOP.      
 * [MN1ND13](./MN1ND13): Humphries CB65_MN1ND13_DP and CB_MN1ND13_DN project.    
 
 Directory on xhost: /home/lli/HirstLab/    

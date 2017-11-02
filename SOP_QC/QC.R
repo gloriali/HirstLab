@@ -1,16 +1,6 @@
-#!/bin/sh
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/H3K27ac/others/
-cd /projects/epigenomics2/users/lli/
-echo -e "chr\tstart\tend\tID\tfractional\tn\tsample" > meDIP_qPCR_primers_hg19.5mC.bed
-for file in $dir5mC/CEMT*.5mC.CpG; do
-    sample=$(basename $file | sed 's/.5mC.CpG//g')
-    echo $sample
-    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$2+1"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a meDIP_qPCR_primers_hg19.bed -b stdin -wa -wb | awk '{if($8+$9 >= 3){n[$4]=n[$4]+1; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9; chr[$4]=$1; start[$4]=$2; end[$4]=$3}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"c[i]/(c[i]+t[i])"\t"n[i]"\t""'$sample'"}}}' >> meDIP_qPCR_primers_hg19.5mC.bed
-done
-$BEDTOOLS/intersectBed -a meDIP_qPCR_primers_hg19.bed -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$5/($3-$2)*100}' > meDIP_qPCR_primers_hg19.CpGdensity.bed
+# QC for optimizing MeDIP and hMeDIP SOP
 
-/gsc/software/linux-x86_64-centos6/R-3.3.1/bin/R
+## QC for MeDIP positive and negative qPCR primers
 library(dplyr)
 library(ggplot2)
 setwd("/projects/epigenomics2/users/lli/")
@@ -32,4 +22,3 @@ meDIP_qPCR_CGdensity <- read.delim("meDIP_qPCR_primers_hg19.CpGdensity.bed", as.
     ylab("CpG density - #CpG per 100bp") +
     theme_bw())
 ggsave(meDIP_qPCR_CGdensity_figure, file = "meDIP_qPCR_CGdensity_figure.pdf", height = 4, width = 5)
-
