@@ -14,7 +14,10 @@ $BEDTOOLS/intersectBed -a meDIP_qPCR_primers_hg19.bed -b /home/lli/hg19/CG.BED -
 
 # alignment
 java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
-genome=/home/lli/hg19/GRCh37-lite.fa
+human=/home/lli/hg19/GRCh37-lite.fa
+Lambda=/projects/epigenomics/users/mbilenky/T7_Phage/NC_001416.1.genome.fasta
+T7=/projects/epigenomics/users/mbilenky/T7_Phage/NC_001604.1.genome.fasta
+M13=/projects/epigenomics/users/mbilenky/T7_Phage/NC_003287.2.genome.fasta
 bwa=/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa
 samtools=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
 picard=/home/pubseq/BioSw/picard/picard-tools-1.52/
@@ -23,22 +26,39 @@ dirIn=/projects/epigenomics3/UBC_miseq/meDIPQC_01NOV2017/
 dirOut=/projects/epigenomics3/bams/hg19/UBC_meDIPQC_01NOV2017/
 mkdir -p $dirOut
 cd $dirIn
-for f1 in IP*3X*R1*fastq.gz; do
+for f1 in IP*R1*fastq.gz; do
     f2=$(echo $f1 | sed 's/_R1_/_R2_/g'); name=$(echo $f1 | sed 's/_L001.*//g');
     echo $name
-    $bwa mem -M -t 12 $genome $dirIn/$f1 $dirIn/$f2 > $dirOut/$name.sam
+    $bwa mem -M -t 12 $human $dirIn/$f1 $dirIn/$f2 > $dirOut/$name.sam
     $samtools view -Sb $dirOut/$name.sam > $dirOut/$name.bam
     $samtools sort $dirOut/$name.bam $dirOut/$name.sorted
     $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirOut/$name.sorted.bam O=$dirOut/$name.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
     $bamstats -g 2864785220 -q 10 -b $dirOut/$name.sorted.dupsFlagged.bam > $dirOut/$name.bamstats
-done 
+done
+## align spike-ins
+echo -e "Library\tGenome\tCoverage" > $dirOut/spike_in.coverage
+bwa=/home/pubseq/BioSw/bwa/bwa-0.5.6/bwa
+for genome in $Lambda $T7 $M13; do
+    for f1 in IP*R1*fastq.gz; do
+        f2=$(echo $f1 | sed 's/_R1_/_R2_/g'); name=$(echo $f1 | sed 's/_L001.*//g')'__'$(basename $genome | sed 's/.genome.fasta//g');
+        echo $name
+        $bwa aln -t 12 $genome $f1 > $dirOut/$name.R1.sai
+        $bwa aln -t 12 $genome $f2 > $dirOut/$name.R2.sai
+        $bwa sampe $genome $dirOut/$name.R1.sai $dirOut/$name.R2.sai $f1 $f2 > $dirOut/$name.sam
+        $samtools view -Sb $dirOut/$name.sam > $dirOut/$name.bam
+        $samtools sort $dirOut/$name.bam $dirOut/$name.sorted
+        $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirOut/$name.sorted.bam O=$dirOut/$name.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
+        mv $dirOut/$name.sorted.dupsFlagged.bam $dirOut/$name.bam
+        echo -e $name"\t"$($samtools view -q5 -F1028 $dirOut/$name.bam | wc -l) | sed 's/__/\t/' >> $dirOut/spike_in.coverage
+    done
+done
 cd $dirOut
 for file in *.bamstats; do
     name=$(echo $file | sed 's/.bamstats//g')
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirOut $name $dirOut/$file
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirOut $dirOut
-rm *.sam report* *sorted.bam
+rm *.sam *sai report* *sorted.bam
 
 # coverage vs GC content
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
