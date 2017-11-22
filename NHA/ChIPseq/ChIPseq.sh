@@ -255,7 +255,7 @@ for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHAR_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_control.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_gain.vitc_loss.bed
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHA_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_vitc.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_loss.vitc_gain.bed
 done
-/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed -n LTR
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
