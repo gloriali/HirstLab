@@ -142,6 +142,7 @@ done
 cat CEMT_19.enhancer.5mC.promoter.hyper.states CEMT_22.enhancer.5mC.promoter.hyper.states CEMT_47.enhancer.5mC.promoter.hyper.states > IDHmut.enhancer.5mC.promoter.hyper.states
 less IDHmut.enhancer.5mC.promoter.hyper.states | awk '$12 !~ /ST/ {if($10!="hyper"){print $0}}' | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$6"\t"$9"\t"$11"\t"$13"\t"$14}' > IDHmut.enhancer.5mC.promoter.hyper.states.DE.DM
 less IDHmut.enhancer.5mC.promoter.hyper.states.DE.DM | awk '{print $7}' | sort | uniq -c | awk '$1>1{print $2}' | sort | join - /projects/epigenomics2/resources/Ensembl/hg37v69/hg37v69_genes | awk '{print $1"\t"$7"\t"$8}' > IDHmut.enhancer.5mC.promoter.hyper.states.DE.DM.multi.gene
+$BEDTOOLS/intersectBed -a ../IDHwt_CEMT_23.combine.5mC.CpG -b IDHmut.enhancer.5mC.promoter.hyper.states.DE.DM -wa -wb | awk '{t[$10]=t[$10]+$4;c[$10]=c[$10]+$5}END{for(i in t){print i"\t"c[i]/(c[i]+t[i])}}' | sort -k1,1 > IDHmut.enhancer.5mC.promoter.hyper.states.DE.DM.CEMT_23.5mC
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
