@@ -178,4 +178,40 @@ cd $dirOut
 cat UP.CEMT_19_NPC.FDR_0.01.rmin_0.005.Nmin_25 UP.CEMT_22_NPC.FDR_0.01.rmin_0.005.Nmin_25 UP.CEMT_47_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $1}' | sort | uniq -d > UP.IDHmut.NPC
 cat DN.CEMT_19_NPC.FDR_0.01.rmin_0.005.Nmin_25 DN.CEMT_22_NPC.FDR_0.01.rmin_0.005.Nmin_25 DN.CEMT_47_NPC.FDR_0.01.rmin_0.005.Nmin_25 | awk '{print $1}' | sort | uniq -d > DN.IDHmut.NPC
 
+## gene fusion detection
+### bam to fastq
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.19/samtools
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/bam/
+dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
+mkdir -p $dirOut
+cd $dirIn
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed 's/.bam//g')
+    echo $name
+    $samtools sort -n -@ 8 $bam $dirIn/$name.nsort
+done
+ls *.nsort.bam > $dirIn/BamList.txt
+function bam2fq {
+    BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+    dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
+    file=$1
+    name=$(echo $file | sed -e 's/.nsort.bam//g')
+    echo $name
+    $BEDTOOLS/bamToFastq -i $dirIn/$file -fq $dirOut/$name.1.fq -fq2 $dirOut/$name.2.fq
+}
+export -f bam2fq
+cat BamList.txt | parallel --gnu bam2fq 
+cat <(ls *.fq) | parallel --gnu gzip
+### deFuse
+export PATH="/home/rislam/anaconda2/bin"
+dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
+dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fusion/
+mkdir -p $dirOut
+cd dirIn
+for fq1 in *.1.fq; do
+    name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$name.2.fq
+    echo $name
+    run_defuse.pl -d $dirIn -1 $fq1 -2 $fq2 -o $dirOut
+done
 
