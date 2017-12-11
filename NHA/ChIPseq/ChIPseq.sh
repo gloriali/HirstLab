@@ -278,3 +278,17 @@ for file in *.BS.bed; do
     less $file | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -D a | awk '{if($9>=-20000 && $9<=20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8"\t"$9}}' | sort -k5,5 >> $dirOut/$name.closest.gene
     join $dirOut/$name.closest.gene $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.closest.gene.RPKM
 done
+
+### use NPC as an outgroup
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+file1=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/A19308.NPC_GE04.vs.A19309.NPC_GE04.FDR_0.05.FindER.bed.gz
+for sample in MGG119_control NHAR_control MGG_vitc NHAR_vitc; do
+    name=$sample.NPC_GE04
+    echo $name
+    mkdir -p $dirOut/$name/H3K27ac/
+    $BEDTOOLS/intersectBed -a <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -b $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.$sample.unique
+    $BEDTOOLS/intersectBed -b <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -a $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.NPC_GE04.unique
+done
+
