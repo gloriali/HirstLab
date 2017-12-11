@@ -1,1 +1,1 @@
-Sample	NPC_GE04	# in Sample	# unique in Sample	# unique in NPC_GE04MGG_control	56396	26989	5599	35166NHAR_control	56396	52143	34657	38624Overlap			1225	30264
+Sample	NPC_GE04	# in Sample	# unique in Sample	# unique in NPC_GE04	Common	MGG_control	56396	26989	5599	35166	23005	NHAR_control	56396	52143	34657	38624	19433	Overlap			1225	30264	14218							Overlap with MGG vitc loss			857	0	793	Overlap with MGG vitc gain			0	3281	0	5063Overlap with NHAR vitc loss			10300	0	1543	Overlap with NHAR vitc gain			0	537	0	4367
