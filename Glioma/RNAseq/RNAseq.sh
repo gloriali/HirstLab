@@ -191,27 +191,22 @@ for bam in $dirIn/*.bam; do
     echo $name
     $samtools sort -n -@ 8 $bam $dirIn/$name.nsort
 done
-ls *.nsort.bam > $dirIn/BamList.txt
-function bam2fq {
-    BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-    dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
-    file=$1
+for file in *.nsort.bam; do
     name=$(echo $file | sed -e 's/.nsort.bam//g')
     echo $name
     $BEDTOOLS/bamToFastq -i $dirIn/$file -fq $dirOut/$name.1.fq -fq2 $dirOut/$name.2.fq
-}
-export -f bam2fq
-cat BamList.txt | parallel --gnu bam2fq 
-cat <(ls *.fq) | parallel --gnu gzip
+done
 ### deFuse
-export PATH="/home/rislam/anaconda2/bin"
+export PATH=$PATH":/home/rislam/anaconda2/bin/"
 dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
 dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fusion/
 mkdir -p $dirOut
-cd dirIn
+cd $dirIn
+/home/lli/bin/dranew-defuse-0f198c242b82/scripts/defuse_create_ref.pl -d $dirIn
 for fq1 in *.1.fq; do
     name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$name.2.fq
-    echo $name
-    run_defuse.pl -d $dirIn -1 $fq1 -2 $fq2 -o $dirOut
+    echo $name 
+    mkdir -p $dirOut/$name/
+    /home/lli/bin/dranew-defuse-0f198c242b82/scripts/defuse_run.pl -d $dirIn -1 $fq1 -2 $fq2 -o $dirOut/$name/ -p 10 -n $name
 done
 
