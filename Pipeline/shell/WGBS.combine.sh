@@ -16,6 +16,7 @@ fi
 
 strand=/home/lli/hg19/CG.strand 
 # mm10: /home/acarles/qcb/mm10.CpG.strand
+# hg38: /projects/epigenomics3/epigenomics3_results/users/rislam/CLL/hg38/genome_feature/hg38.CpG.strand
 cov=3
 format="novomethyl"
 while [ $# -gt 0 ]
