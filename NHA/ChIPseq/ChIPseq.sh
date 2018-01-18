@@ -278,6 +278,12 @@ for file in *.BS.bed; do
     less $file | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -D a | awk '{if($9>=-20000 && $9<=20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8"\t"$9}}' | sort -k5,5 >> $dirOut/$name.closest.gene
     join $dirOut/$name.closest.gene $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.closest.gene.RPKM
 done
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+file=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac_NHAR_control.vs.input_NHAR_control.FDR_0.05.FindER.bed.gz
+$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tMGGintersect"}' > H3K27ac_NHAR_control.category.1
+$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -v | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tVitCresponse"}' > H3K27ac_NHAR_control.category.2
+$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -v | awk '{print $0"\tnon-response"}' > H3K27ac_NHAR_control.category.3
+cat H3K27ac_NHAR_control.category.1 H3K27ac_NHAR_control.category.2 H3K27ac_NHAR_control.category.3 > H3K27ac_NHAR_control.category
 
 ### use NPC as an outgroup
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
