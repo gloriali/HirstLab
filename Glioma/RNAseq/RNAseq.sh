@@ -183,30 +183,28 @@ cat DN.CEMT_19_NPC.FDR_0.01.rmin_0.005.Nmin_25 DN.CEMT_22_NPC.FDR_0.01.rmin_0.00
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.19/samtools
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/bam/
-dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/fq/
 mkdir -p $dirOut
 cd $dirIn
 for bam in $dirIn/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     echo $name
     $samtools sort -n -@ 8 $bam $dirIn/$name.nsort
-done
-for file in *.nsort.bam; do
-    name=$(echo $file | sed -e 's/.nsort.bam//g')
-    echo $name
-    $BEDTOOLS/bamToFastq -i $dirIn/$file -fq $dirOut/$name.1.fq -fq2 $dirOut/$name.2.fq
+    $BEDTOOLS/bamToFastq -i $dirIn/$name.nsort.bam -fq $dirOut/$name.1.fq -fq2 $dirOut/$name.2.fq
 done
 ### deFuse
 export PATH=$PATH":/home/rislam/anaconda2/bin/"
-dirIn=/projects/epigenomics2/users/lli/glioma/RNAseq/fq/
-dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/fusion/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/fq/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/fusion/
+dirRef=/projects/epigenomics3/epigenomics3_results/users/lli/defuse_ref/hg19v69/
 mkdir -p $dirOut
+mkdir -p $dirRef
+defuse_create_ref.pl -d $dirRef
 cd $dirIn
-/home/lli/bin/dranew-defuse-0f198c242b82/scripts/defuse_create_ref.pl -d $dirIn
 for fq1 in *.1.fq; do
     name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$name.2.fq
     echo $name 
     mkdir -p $dirOut/$name/
-    /home/lli/bin/dranew-defuse-0f198c242b82/scripts/defuse_run.pl -d $dirIn -1 $fq1 -2 $fq2 -o $dirOut/$name/ -p 10 -n $name
+    defuse_run.pl -d $dirRef -1 $fq1 -2 $fq2 -o $dirOut/$name/ -p 15 -n $name
 done
 
