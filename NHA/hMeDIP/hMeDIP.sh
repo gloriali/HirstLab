@@ -80,56 +80,42 @@ join $dirWig/hg19.chrlen.autoXY.1KB.bed.MGG_vitc1.coverage $dirWig/hg19.chrlen.a
 join $dirWig/hg19.chrlen.autoXY.1KB.bed.MGG_control1.coverage $dirWig/hg19.chrlen.autoXY.1KB.bed.MGG_vitc1.coverage -1 4 -2 4 | awk -F' ' '{if($2=="chr1"){print $1"\t"$5"\t"$10}}' > $dirWig/hg19.chrlen.autoXY.1KB.bed.MGG_control1_vitc1.coverage
 $samtools merge $dirIn/MGG_control.bam $dirIn/MGG_control1.bam $dirIn/MGG_control2.bam 
 $samtools merge $dirIn/MGG_vitc.bam $dirIn/MGG_vitc1.bam $dirIn/MGG_vitc2.bam 
-for bam in $dirIn/MGG_control.bam $dirIn/MGG_vitc.bam; do
-    name=$(basename $bam | sed 's/.bam//g')
-    echo $name 
-    $samtools index $bam
-    $samtools flagstat $bam > $dirIn/$name.flagstat
-    $bamstats -g 2864785220 -q 10 -b $bam > $dirIn/$name.bamstats
-    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
-    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig -F:1028,-q:5,-n:$name,-chr:$chr,-cp
-    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
-    /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn 10
-    if [[ "$name" =~ "control" ]]; then
-        color="255,0,0"
-    else
-        color="0,0,255"
-    fi
-    echo -e "
-track $name
-shortLabel $name
-longLabel hMeDIP $name
-type bigWig
-visibility full
-maxHeightPixels 70:70:32
-configurable on
-autoScale on
-alwaysZero on
-priority 0.1
-bigDataUrl $name.q5.F1028.PET.bw
-color $color
-" >> $dirBW/trackDb.txt
-done
-/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
-## mappability problem
+## mappability problem: trim adapter and low quality end and re-align
+java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+trim_galore=/projects/epigenomics/software/trim_galore/trim_galore
+cutadapt=/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/cutadapt
+bwa=/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa
+picard=/home/pubseq/BioSw/picard/picard-tools-1.52/
+genome=/home/lli/hg19/GRCh37-lite.fa
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/fq/
 mkdir -p $dirOut
-for bam in $dirIn/*.bam; do
-    name=$(basename $bam | sed 's/.bam//g')
-    echo $name 
-    $samtools view -b -f 4 $bam > $dirIn/$name.unmapped.bam
-    $samtools view $dirIn/$name.unmapped.bam | awk '{print ">"$1"\n"$10}' > $dirIn/$name.unmapped.fa
-done
-for bam in $dirIn/*.bam; do
-    /projects/epigenomics/software/FastQC/fastqc -j $java -o $dirIn -t 6 $bam 
-done
 for file in $dirIn/*control.bam $dirIn/*vitc.bam; do
     sample=$(basename $file | sed 's/.bam//g')
     echo $sample
     $samtools sort $file $dirIn/$sample.nsorted -n
     $BEDTOOLS/bamToFastq -i $dirIn/$sample.nsorted.bam -fq $dirOut/$sample.1.fq -fq2 $dirOut/$sample.2.fq
 done
+rm $dirIn/*.nsorted.bam
+for file in $dirIn/*.bam $dirOut/*.fq; do
+    /projects/epigenomics/software/FastQC/fastqc -j $java -o $dirOut -t 6 $file 
+done
+for fq1 in $dirOut/*.1.fq; do
+    name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$dirOut/$name.2.fq
+    echo $name $fq1 $fq2
+    $trim_galore $fq1 $fq2 -q 30 -o $dirOut --paired --path_to_cutadapt $cutadapt > $dirOut/$name.trim.log
+    $bwa mem -M -t 10 $genome $dirOut/$name.1_val_1.fq $dirOut/$name.2_val_2.fq > $dirIn/$name.trim.sam
+    $samtools view -Sb $dirIn/$name.trim.sam > $dirIn/$name.trim.bam
+    $samtools sort $dirIn/$name.trim.bam $dirIn/$name.trim.sorted
+    $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirIn/$name.trim.sorted.bam O=$dirIn/$name.trim.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
+    rm $dirIn/$name.trim.sam $dirIn/$name.trim.bam $dirIn/$name.trim.sorted.bam
+    mv $dirIn/$name.trim.sorted.dupsFlagged.bam $dirIn/$name.trim.bam
+done
+for bam in $dirIn/*trim.bam; do
+    qc $bam
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 
 # MACS2
 export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
@@ -138,14 +124,14 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
 mkdir -p $dirOut
 echo -e "Sample\tN_region\tTotal_length" > $dirOut/ER_summary.txt
-for file in $dirIn/*control.bam $dirIn/*vitc.bam; do
+for file in $dirIn/*trim.bam; do
     sample=$(basename $file | sed 's/.bam//g')
     echo $sample
     macs2 callpeak -f BAMPE -g hs -t $file -q 0.01 -n $sample --outdir $dirOut
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_summary.txt
 done
 echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length" > $dirOut/ER_unique_summary.txt
-for file in $dirIn/*control.bam; do
+for file in $dirIn/*control.trim.bam; do
     sample1=$(basename $file | sed 's/.bam//g')
     sample2=$(echo $sample1 | sed 's/control/vitc/g')
     echo $sample1 $sample2
