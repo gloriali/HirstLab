@@ -9,11 +9,6 @@ mv $dirOut/sample_info1.txt $dirOut/sample_info.txt
 less $dirOut/sample_info.txt | awk '{system("ln -s "$4" ""'$dirOut'""/bam/"$1".bam")}'
 
 # QC
-java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
-samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
-bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
-chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
-chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/wig/
 dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
@@ -26,7 +21,16 @@ longLabel Hub to display VitC glioma data at UCSC (hMeDIP)
 genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hub.txt
 > $dirBW/trackDb.txt
-for bam in $dirIn/*.bam; do
+function qc {
+    java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+    samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
+    bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+    chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+    chrsize=/home/lli/hg19/hg19.chrom.sizes
+    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
+    dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/wig/
+    dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
+    bam=$1
     name=$(basename $bam | sed 's/.bam//g')
     echo $name 
     $samtools index $bam
@@ -55,9 +59,15 @@ priority 0.1
 bigDataUrl $name.q5.F1028.PET.bw
 color $color
 " >> $dirBW/trackDb.txt
+}
+export -f qc
+for bam in $dirIn/*.bam; do
+    qc $bam
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 ## correlation of MGG replicates
+java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 chrom=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
 reg=/home/lli/hg19/hg19.chrlen.autoXY.1KB.bed
 for wig in $dirWig/MGG*.wig.gz; do
