@@ -84,6 +84,7 @@ $samtools merge $dirIn/MGG_vitc.bam $dirIn/MGG_vitc1.bam $dirIn/MGG_vitc2.bam
 java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+skewer=/projects/epigenomics/software/skewer/skewer-0.1.127-linux-x86_64
 trim_galore=/projects/epigenomics/software/trim_galore/trim_galore
 cutadapt=/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/cutadapt
 bwa=/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa
@@ -104,8 +105,9 @@ done
 for fq1 in $dirOut/*.1.fq; do
     name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$dirOut/$name.2.fq
     echo $name $fq1 $fq2
-    $trim_galore $fq1 $fq2 -q 30 -o $dirOut --paired --path_to_cutadapt $cutadapt > $dirOut/$name.trim.log
-    $bwa mem -M -t 10 $genome $dirOut/$name.1_val_1.fq $dirOut/$name.2_val_2.fq > $dirIn/$name.trim.sam
+#   $trim_galore $fq1 $fq2 -q 30 -o $dirOut --paired --path_to_cutadapt $cutadapt > $dirOut/$name.trim.log
+    $skewer $fq1 $fq2 -o $dirOut/$name -x 'AGATCGGAAGAGCGGTTCAGCAGGAAT' -y 'AGATCGGAAGAGCGTCGTGTAGGGAAA' -l 80 -q 30 -t 8
+    $bwa mem -M -t 10 $genome $dirOut/$name-trimmed-pair1.fastq $dirOut/$name-trimmed-pair2.fastq > $dirIn/$name.trim.sam
     $samtools view -Sb $dirIn/$name.trim.sam > $dirIn/$name.trim.bam
     $samtools sort $dirIn/$name.trim.bam $dirIn/$name.trim.sorted
     $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirIn/$name.trim.sorted.bam O=$dirIn/$name.trim.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
