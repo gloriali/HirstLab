@@ -84,7 +84,7 @@ $samtools merge $dirIn/MGG_vitc.bam $dirIn/MGG_vitc1.bam $dirIn/MGG_vitc2.bam
 java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-skewer=/projects/epigenomics/software/skewer/skewer-0.1.127-linux-x86_64
+#skewer=/projects/epigenomics/software/skewer/skewer-0.1.127-linux-x86_64
 trim_galore=/projects/epigenomics/software/trim_galore/trim_galore
 cutadapt=/gsc/software/linux-x86_64-centos5/python-2.7.5/bin/cutadapt
 bwa=/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa
@@ -105,8 +105,8 @@ done
 for fq1 in $dirOut/*.1.fq; do
     name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$dirOut/$name.2.fq
     echo $name $fq1 $fq2
-#   $trim_galore $fq1 $fq2 -q 30 -o $dirOut --paired --path_to_cutadapt $cutadapt > $dirOut/$name.trim.log
-    $skewer $fq1 $fq2 -o $dirOut/$name -x 'AGATCGGAAGAGCGGTTCAGCAGGAAT' -y 'AGATCGGAAGAGCGTCGTGTAGGGAAA' -l 80 -q 30 -t 8
+    $trim_galore $fq1 $fq2 -q 30 -o $dirOut --paired --path_to_cutadapt $cutadapt > $dirOut/$name.trim.log
+#   $skewer $fq1 $fq2 -o $dirOut/$name -x 'AGATCGGAAGAGCGGTTCAGCAGGAAT' -y 'AGATCGGAAGAGCGTCGTGTAGGGAAA' -l 80 -q 30 -t 8
     $bwa mem -M -t 10 $genome $dirOut/$name-trimmed-pair1.fastq $dirOut/$name-trimmed-pair2.fastq > $dirIn/$name.trim.sam
     $samtools view -Sb $dirIn/$name.trim.sam > $dirIn/$name.trim.bam
     $samtools sort $dirIn/$name.trim.bam $dirIn/$name.trim.sorted
@@ -143,4 +143,38 @@ for file in $dirIn/*control.trim.bam; do
     echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
 done
 
+## unique ERs
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique/
+mkdir -p $dirOut
+echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length" > $dirOut/ER_unique_summary.txt
+for file in $dirIn/*vitc.trim_peaks.narrowPeak; do
+    sample1=$(basename $file | sed 's/.trim_peaks.narrowPeak//g')
+    sample2=$(echo $sample1 | sed 's/vitc/control/g')
+    echo $sample1 $sample2
+    $BEDTOOLS/intersectBed -a $file -b $dirIn/$sample2.trim_peaks.narrowPeak -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
+    echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+    $BEDTOOLS/intersectBed -a $dirIn/$sample2.trim_peaks.narrowPeak -b $file -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
+    echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+done
+sample1=NHAR_control; sample2=NHA_control
+$BEDTOOLS/intersectBed -a $file -b $dirIn/$sample2.trim_peaks.narrowPeak -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
+echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+$BEDTOOLS/intersectBed -a $dirIn/$sample2.trim_peaks.narrowPeak -b $file -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
+echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique/
+dirOut=$dirIn/homer/
+mkdir -p $dirOut
+for file in $dirIn/*.bed; do
+     name=$(basename $file | sed 's/.unique.bed//g')
+     echo $name
+     mkdir -p $dirOut/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+done
 
