@@ -37,8 +37,7 @@ function qc {
     $samtools flagstat $bam > $dirIn/$name.flagstat
     $bamstats -g 2864785220 -q 10 -b $bam > $dirIn/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
-    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig -F:1028,-q:5,-n:$name,-chr:$chr,-cp
-    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
+    /home/jyzhu/anaconda2/bin/bamCoverage -b $bam -o $dirBW/$name.bw ÐnormalizeUsingRPKM ÐsamFlagExclude 4 ÐminMappingQuality 5 ÐbinSize 10 ÐextendReads ÐignoreDuplicates
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn 10
     if [[ "$name" =~ "control" ]]; then
         color="255,0,0"
@@ -56,7 +55,7 @@ configurable on
 autoScale on
 alwaysZero on
 priority 0.1
-bigDataUrl $name.q5.F1028.PET.bw
+bigDataUrl $name.bw
 color $color
 " >> $dirBW/trackDb.txt
 }
@@ -115,6 +114,20 @@ for fq1 in $dirOut/*.1.fq; do
     mv $dirIn/$name.trim.sorted.dupsFlagged.bam $dirIn/$name.trim.bam
 done
 for bam in $dirIn/*trim.bam; do
+    qc $bam
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
+for fq1 in $dirOut/*.1.fq; do
+    name=$(basename $fq1 | sed 's/.1.fq//g'); fq2=$dirOut/$name.2.fq
+    echo $name $fq1 $fq2
+    $bwa mem -M -t 10 $genome $fq1 $fq2 > $dirIn/$name.realign.sam
+    $samtools view -Sb $dirIn/$name.realign.sam > $dirIn/$name.realign.bam
+    $samtools sort $dirIn/$name.realign.bam $dirIn/$name.realign.sorted
+    $java -jar -Xmx10G $picard/MarkDuplicates.jar I=$dirIn/$name.realign.sorted.bam O=$dirIn/$name.realign.sorted.dupsFlagged.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
+    rm $dirIn/$name.realign.sam $dirIn/$name.realign.bam $dirIn/$name.realign.sorted.bam
+    mv $dirIn/$name.realign.sorted.dupsFlagged.bam $dirIn/$name.realign.bam
+done
+for bam in $dirIn/*realign.bam; do
     qc $bam
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
