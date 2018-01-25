@@ -8,8 +8,10 @@ mv $dirOut/sample_info1.txt $dirOut/sample_info.txt
 less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$3"/"$3"_"$4".bam")}'
 
 # QC
-samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
-bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
 chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
@@ -24,19 +26,18 @@ longLabel Hub to display VitC glioma data at UCSC (HisoneMods)
 genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt
 > $dirBW/trackDb.txt
-echo -e "Library\tNumber_Target_Regions" > $dirIn/QC.target_regions.txt
+echo -e "Library\tNumber_Target_Regions\tNumber_total\tPercent_Target_Regions" > $dirIn/QC.target_regions.txt
 for bam in $dirIn/*/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     mark=$(echo $name | cut -d'_' -f1)
     sample=$(echo $name | sed 's/.*_NHA/NHA/g' | sed 's/.*_MGG/MGG/g')
     echo $name $mark $sample
     mkdir -p $dirIn/$mark/
-    mkdir -p $dirWig/$mark/
-    $samtools index $bam
-    $samtools flagstat $bam > $dirIn/$mark/$name.flagstat
-    $bamstats -g 2864785220 -q 10 -b $bam  > $dirIn/$mark/$name.bamstats
+    $sambamba index $bam -t 8
+    $sambamba flagstat $bam -t 8 > $dirIn/$mark/$name.flagstat
+    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$mark/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $name $dirIn/$mark/$name.bamstats
-    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark/ -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    bamCoverage -b $bam -o $dirBW/$name.q5.F1028.PET.bw --normalizeUsingRPKM --samFlagExclude 1028 --minMappingQuality 5 --binSize 10 --extendReads
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn/$mark/ 10
     if [ "$mark" == "input" ]; then
         n=0
@@ -67,14 +68,14 @@ for bam in $dirIn/*/*.bam; do
             color="153,0,153"
         fi
         echo $region $color
-        n=$($samtools view -q 5 -F 1028 -L $region $bam | wc -l)
+        n_all=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+        n_region=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $region)
     fi
-    echo -e "$name\t$n" >> $dirIn/QC.target_regions.txt
-    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$mark/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
+    echo -e "$name\t$n_region\t$n_all" | awk '{print $0"\t"$2/$3}' >> $dirIn/QC.target_regions.txt
     echo -e "
 track $name
 shortLabel $name
-longLabel $mark  $sample
+longLabel $mark $sample
 type bigWig
 visibility full
 maxHeightPixels 70:70:32
