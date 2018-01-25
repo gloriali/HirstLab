@@ -129,21 +129,25 @@ for file in $dirIn/*realign.bam; do
     n_peak=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample"_peaks.narrowPeak")
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
-echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_unique_summary.txt
+echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_unique_summary.txt
 for file in $dirIn/*vitc.realign.bam; do
     sample1=$(basename $file | sed 's/.realign.bam//g')
     sample2=$(echo $sample1 | sed 's/vitc/control/g')
     echo $sample1 $sample2
-    macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/$sample2.realign.bam -q 0.01 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
+    macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/$sample2.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
     echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
-    macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $file -q 0.01 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
+    macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $file -q 0.05 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
     echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
 done
 sample1=NHAR_control; sample2=NHA_control
-macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample1.realign.bam -c $dirIn/$sample2.realign.bam -q 0.01 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
-echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
-macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $dirIn/$sample1.realign.bam -q 0.01 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
-echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
+macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample1.realign.bam -c $dirIn/$sample2.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
+n_all=$($sambamba view $dirIn/$sample1.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+n_peak=$($sambamba view $dirIn/$sample1.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak")
+echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
+macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $dirIn/$sample1.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
+n_all=$($sambamba view $dirIn/$sample2.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+n_peak=$($sambamba view $dirIn/$sample2.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak")
+echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
 
 ## unique ERs
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
