@@ -10,16 +10,16 @@ less $dirOut/sample_info.txt | awk '{system("ln -s "$4" ""'$dirOut'""/bam/"$1".b
 
 # QC
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
-dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
+dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
 mkdir -p $dirWig
-mkdir -p $dirBW
+mkdir -p $dirHub
 cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/
 echo -e "hub VitC_gliomaHub_hMeDIP
 shortLabel VitC_glioma Hub (hMeDIP)
 longLabel Hub to display VitC glioma data at UCSC (hMeDIP)
 genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hub.txt
-> $dirBW/trackDb.txt
+> $dirHub/trackDb.txt
 function qc {
     export PATH=/home/rislam/anaconda2/bin/:$PATH
     export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
@@ -28,7 +28,10 @@ function qc {
     chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
     chrsize=/home/lli/hg19/hg19.chrom.sizes
     dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
-    dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
+    dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+    dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/wig/
+    dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
+    mkdir -p $dirBW; mkdir -p $dirWig; mkdir -p $dirHub
     bam=$1
     name=$(basename $bam | sed 's/.bam//g')
     echo $name 
@@ -36,8 +39,10 @@ function qc {
     $sambamba flagstat $bam -t 8 > $dirIn/$name.flagstat
     $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
-    bamCoverage -b $bam -o $dirBW/$name.q5.F1028.PET.bw --normalizeUsingRPKM --samFlagExclude 1028 --minMappingQuality 5 --binSize 10 --extendReads
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn 10
+    bamCoverage -b $bam -o $dirBW/$name.bw --normalizeUsingRPKM --ignoreDuplicates --samFlagExclude 1028 --minMappingQuality 5 --binSize 20 --extendReads
+    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$name.q5.F1028.PET.wig.gz $chrsize $dirHub/$name.q5.F1028.PET.bw
     if [[ "$name" =~ "control" ]]; then
         color="255,0,0"
     else
@@ -56,7 +61,7 @@ alwaysZero on
 priority 0.1
 bigDataUrl $name.q5.F1028.PET.bw
 color $color
-" >> $dirBW/trackDb.txt
+" >> $dirHub/trackDb.txt
 }
 export -f qc
 for bam in $dirIn/*.bam; do
@@ -107,7 +112,7 @@ for fq1 in $dirOut/*.1.fq; do
     rm $dirIn/$name.realign.sam $dirIn/$name.realign.bam $dirIn/$name.realign.sorted.bam
     mv $dirIn/$name.realign.sorted.dupsFlagged.bam $dirIn/$name.realign.bam
 done
-> $dirBW/trackDb.txt
+> $dirHub/trackDb.txt
 for bam in $dirIn/*realign.bam; do
     qc $bam
 done
