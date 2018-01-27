@@ -97,7 +97,7 @@ for file in $dirIn/IP-*.sorted.dupsFlagged.bam $dirIn/meDIP*.sorted.dupsFlagged.
     name=$(basename $file | sed 's/.sorted.dupsFlagged.bam//g' | sed 's/meDIP-HL60-B05_S27/IP-5mC-3X.2_S5/g')
     echo $name
     $sambamba index $file -t 8
-    bamCoverage -b $file -o $dirBW/$name.q5.F1028.PET.bw --normalizeUsingRPKM --samFlagExclude 1028 --minMappingQuality 5 --binSize 10 --extendReads
+    bamCoverage -b $file -o $dirBW/$name.bw --normalizeUsingRPKM --ignoreDuplicates --binSize 20 --extendReads
     if [[ "$name" =~ "5hmC" ]]; then
         color="255,0,0"
     else
@@ -114,7 +114,7 @@ configurable on
 autoScale on
 alwaysZero on
 priority 0.1
-bigDataUrl $name.q5.F1028.PET.bw
+bigDataUrl $name.bw
 color $color
 " >> $dirBW/trackDb.txt
 done
