@@ -15,30 +15,33 @@ bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
 chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
-dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
 dirQC=/projects/edcc_new/reference_epigenomes/housekeeping/EDCCProd/resources/ChIPQC1/Brads/
-dirBW=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hg19/
-mkdir -p $dirBW
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/BW/
+dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hg19/
+mkdir -p $dirBW; mkdir -p $dirWig; mkdir -p $dirHub
 cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/
 echo -e "hub VitC_gliomaHub_HistoneMods
 shortLabel VitC_glioma Hub (Histone)
 longLabel Hub to display VitC glioma data at UCSC (HisoneMods)
 genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt
-> $dirBW/trackDb.txt
+> $dirHub/trackDb.txt
 echo -e "Library\tNumber_Target_Regions\tNumber_total\tPercent_Target_Regions" > $dirIn/QC.target_regions.txt
 for bam in $dirIn/*/*.bam; do
     name=$(basename $bam | sed 's/.bam//g')
     mark=$(echo $name | cut -d'_' -f1)
-    sample=$(echo $name | sed 's/.*_NHA/NHA/g' | sed 's/.*_MGG/MGG/g')
+    sample=$(echo $name | sed 's/.*_NHA/NHA/g' | sed 's/.*_MGG/MGG/g' | sed 's/MGG119/MGG/g')
     echo $name $mark $sample
-    mkdir -p $dirIn/$mark/
+    mkdir -p $dirIn/$mark/; mkdir -p $dirWig/$mark/; mkdir -p $dirBW/$mark/; 
     $sambamba index $bam -t 8
     $sambamba flagstat $bam -t 8 > $dirIn/$mark/$name.flagstat
     $bamstats -g 2864785220 -t 8 $bam > $dirIn/$mark/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $name $dirIn/$mark/$name.bamstats
-    bamCoverage -b $bam -o $dirBW/$name.q5.F1028.PET.bw --normalizeUsingRPKM --samFlagExclude 1028 --minMappingQuality 5 --binSize 10 --extendReads
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn/$mark/ 10
+    bamCoverage -b $bam -o $dirBW/$mark/$name.bw --normalizeUsingRPKM --ignoreDuplicates --samFlagExclude 1028 --minMappingQuality 5 --binSize 20 --extendReads
+    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig/$mark -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$mark/$name.q5.F1028.PET.wig.gz $chrsize $dirHub/$name.q5.F1028.PET.bw
     if [ "$mark" == "input" ]; then
         n=0
         color="0,0,0"
@@ -85,7 +88,7 @@ alwaysZero on
 priority 0.1
 bigDataUrl $name.q5.F1028.PET.bw
 color $color
-" >> $dirBW/trackDb.txt
+" >> $dirHub/trackDb.txt
 done
 for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 input; do
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn/$mark/ $dirIn/$mark/
