@@ -80,10 +80,10 @@ for bam in *.sorted.dupsFlagged.bam; do
 done
 
 # generate BW hub
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
-sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
 dirIn=/projects/epigenomics3/bams/hg19/UBC_meDIPQC_01NOV2017/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/SOP_QC/
 dirBW=/gsc/www/bcgsc.ca/downloads/mb/SOP_QC/hg19/
 mkdir -p $dirBW
 cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/SOP_QC/
@@ -96,8 +96,8 @@ email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/SOP_QC/hub.txt
 for file in $dirIn/IP-*.sorted.dupsFlagged.bam $dirIn/meDIP*.sorted.dupsFlagged.bam; do
     name=$(basename $file | sed 's/.sorted.dupsFlagged.bam//g' | sed 's/meDIP-HL60-B05_S27/IP-5mC-3X.2_S5/g')
     echo $name
-    $sambamba index $file -t 8
-    bamCoverage -b $file -o $dirBW/$name.bw --normalizeUsingRPKM --ignoreDuplicates --binSize 20 --extendReads
+    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $file $dirOut -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirOut/$name.q5.F1028.PET.wig.gz $chrsize $dirBW/$name.q5.F1028.PET.bw
     if [[ "$name" =~ "5hmC" ]]; then
         color="255,0,0"
     else
@@ -114,7 +114,7 @@ configurable on
 autoScale on
 alwaysZero on
 priority 0.1
-bigDataUrl $name.bw
+bigDataUrl $name.q5.F1028.PET.bw
 color $color
 " >> $dirBW/trackDb.txt
 done
