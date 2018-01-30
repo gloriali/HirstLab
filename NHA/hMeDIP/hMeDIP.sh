@@ -117,6 +117,46 @@ for bam in $dirIn/*realign.bam; do
     qc $bam
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+computeMatrix scale-regions -S MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw -R /home/lli/hg19/hg19.chrlen.autoXY.200.bed -out hMeDIP.200.matrix.txt --outFileNameMatrix hMeDIP.200.matrix.txt --regionBodyLength 200 --binSize 200 --sortRegions keep --skipZeros
+
+# FindER
+java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.0.9.3b.jar
+reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
+map=/projects/mbilenky/FindER/synthetic/hg19/PET_200/75bp/map/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/FindER/
+mkdir -p $dirOut
+echo -e "Sample\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_summary.txt
+for bam in $dirIn/*realign.bam; do
+    sample=$(basename $bam | sed 's/.realign.bam//g')
+    echo $sample
+    $java -jar -Xmx10G $FindER -i $bam -r $reg -o $dirOut -v -m $map -minER 200 -info -cp > $dirOut/FindER_scan.$sample.log
+    n_all=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+    n_peak=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L <(less $dirOut/FindER_scan.$sample.realign.pctl_0.1.FDR_0.05.bed | sed 's/chr//g'))
+    echo -e $sample"\t"$(less $dirOut/FindER_scan.$sample.realign.pctl_0.1.FDR_0.05.bed | wc -l)"\t"$(less $dirOut/FindER_scan.$sample.realign.pctl_0.1.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
+done
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar
+echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_unique_summary.txt
+for file in $dirIn/*vitc.realign.bam; do
+    sample1=$(basename $file | sed 's/.realign.bam//g')
+    sample2=$(echo $sample1 | sed 's/vitc/control/g')
+    echo $sample1 $sample2
+    $java -jar -Xmx12G $FindER -signalBam $dirIn/$sample1.realign.bam -inputBam $dirIn/$sample2.realign.bam -out $dirOut > $dirOut/"$sample1"_"$sample2".log
+    echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1.realign.vs.$sample2.realign.FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$sample1.realign.vs.$sample2.realign.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"int($5/$4)}' >> $dirOut/ER_unique_summary.txt
+    $java -jar -Xmx12G $FindER -signalBam $dirIn/$sample2.realign.bam -inputBam $dirIn/$sample1.realign.bam -out $dirOut > $dirOut/"$sample2"_"$sample1".log
+    echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample2.realign.vs.$sample1.realign.FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$sample2.realign.vs.$sample1.realign.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"int($5/$4)}' >> $dirOut/ER_unique_summary.txt
+done
+sample1=NHAR_control; sample2=NHA_control
+echo $sample1 $sample2
+$java -jar -Xmx12G $FindER -signalBam $dirIn/$sample1.realign.bam -inputBam $dirIn/$sample2.realign.bam -out $dirOut > $dirOut/"$sample1"_"$sample2".log
+echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1.realign.vs.$sample2.realign.FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$sample1.realign.vs.$sample2.realign.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"int($5/$4)}' >> $dirOut/ER_unique_summary.txt
+$java -jar -Xmx12G $FindER -signalBam $dirIn/$sample2.realign.bam -inputBam $dirIn/$sample1.realign.bam -out $dirOut > $dirOut/"$sample2"_"$sample1".log
+echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample2.realign.vs.$sample1.realign.FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/$sample2.realign.vs.$sample1.realign.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"int($5/$4)}' >> $dirOut/ER_unique_summary.txt
 
 # MACS2
 export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bin:$PATH
