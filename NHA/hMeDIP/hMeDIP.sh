@@ -174,7 +174,7 @@ for file in $dirIn/*realign.bam; do
     n_peak=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample"_peaks.narrowPeak")
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
-echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_unique_summary.txt
+echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_unique_summary.txt
 for file in $dirIn/*vitc.realign.bam; do
     sample1=$(basename $file | sed 's/.realign.bam//g')
     sample2=$(echo $sample1 | sed 's/vitc/control/g')
@@ -186,12 +186,8 @@ for file in $dirIn/*vitc.realign.bam; do
 done
 sample1=NHAR_control; sample2=NHA_control
 macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample1.realign.bam -c $dirIn/$sample2.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
-n_all=$($sambamba view $dirIn/$sample1.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
-n_peak=$($sambamba view $dirIn/$sample1.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak")
 echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
 macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $dirIn/$sample1.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
-n_all=$($sambamba view $dirIn/$sample2.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
-n_peak=$($sambamba view $dirIn/$sample2.realign.bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak")
 echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
 
 ## unique ERs
@@ -201,19 +197,19 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique/
 mkdir -p $dirOut
 echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length" > $dirOut/ER_unique_summary.txt
-for file in $dirIn/*vitc.trim_peaks.narrowPeak; do
-    sample1=$(basename $file | sed 's/.trim_peaks.narrowPeak//g')
+for file in $dirIn/*vitc_peaks.narrowPeak; do
+    sample1=$(basename $file | sed 's/_peaks.narrowPeak//g')
     sample2=$(echo $sample1 | sed 's/vitc/control/g')
     echo $sample1 $sample2
-    $BEDTOOLS/intersectBed -a $file -b $dirIn/$sample2.trim_peaks.narrowPeak -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
+    $BEDTOOLS/intersectBed -a $file -b $dirIn/$sample2'_peaks.narrowPeak' -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
     echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
-    $BEDTOOLS/intersectBed -a $dirIn/$sample2.trim_peaks.narrowPeak -b $file -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
+    $BEDTOOLS/intersectBed -a $dirIn/$sample2'_peaks.narrowPeak' -b $file -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
     echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
 done
 sample1=NHAR_control; sample2=NHA_control
-$BEDTOOLS/intersectBed -a $file -b $dirIn/$sample2.trim_peaks.narrowPeak -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
+$BEDTOOLS/intersectBed -a $dirIn/$sample1'_peaks.narrowPeak' -b $dirIn/$sample2'_peaks.narrowPeak' -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample1".unique.bed"
 echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
-$BEDTOOLS/intersectBed -a $dirIn/$sample2.trim_peaks.narrowPeak -b $file -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
+$BEDTOOLS/intersectBed -a $dirIn/$sample2'_peaks.narrowPeak' -b $dirIn/$sample1'_peaks.narrowPeak' -v | awk '{print "chr"$0}' > $dirOut/$sample1"_"$sample2"."$sample2".unique.bed"
 echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
 ### Homer
@@ -228,4 +224,31 @@ for file in $dirIn/*.bed; do
      mkdir -p $dirOut/$name/
      /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
 done
+### intersect with enhancer
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique/
+dirK27ac=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
+dirOut=$dirIn/enhancer/
+mkdir -p $dirOut
+echo -e "Name\tN_total\tlength_total\tN_enhancer\tlength_enhancer\tpercent" > $dirOut/ER_enhancer_summary.txt
+for file in $dirIn/*.bed; do
+    name=$(basename $file | sed 's/.unique.bed//g')
+    sample=$(basename $file | sed 's/.unique.bed//g' | sed 's/.*\.//g' | sed 's/MGG_control/MGG119_control/')
+    echo $name $sample
+    less $dirK27ac/H3K27ac_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/$name.enhancer.bed
+    echo -e $name"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$name.enhancer.bed | wc -l)"\t"$(less $dirOut/$name.enhancer.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$3}' >> $dirOut/ER_enhancer_summary.txt
+done
+#### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique/enhancer/
+dirOut=$dirIn/homer/
+mkdir -p $dirOut
+for file in $dirIn/*.bed; do
+     name=$(basename $file | sed 's/.enhancer.bed//g')
+     echo $name
+     mkdir -p $dirOut/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+done
+
 
