@@ -251,4 +251,69 @@ for file in $dirIn/*.bed; do
      /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
 done
 
+## unique ER 2: include magnitude change: pairwise union of ERs -> 2-FC in RPKM & higher one RPKM >20
+function uniqueER {
+    export PATH=/home/rislam/anaconda2/bin/:$PATH
+    export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+    BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+    dirER=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
+    dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+    sample1=$1; sample2=$2; name=$sample1'_'$sample2
+    echo $sample1 $sample2 $name
+    cat $dirER/$sample1'_peaks.narrowPeak' $dirER/$sample2'_peaks.narrowPeak' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 4 -o collapse > $dirER/$name'.union.narrowPeak'
+    multiBigwigSummary BED-file -b $dirBW/$sample1.realign.bw $dirBW/$sample2.realign.bw --BED $dirER/$name'.union.narrowPeak' --labels $sample1 $sample2 -out $dirOut/$name'.union.npz' --outRawCounts $dirOut/$name'.union.RPKM'
+    less $dirOut/$name'.union.RPKM' | awk 'NR>1 && $1 !~ /GL/ {fc=($4+0.001)/($5+0.001); if(fc>2&&$4>20){print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$4"\t"$5"\t"fc}}' | sort -k1,1 -k2,2n > $dirOut/$name"."$sample1".unique.bed"
+    echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirER/$sample1'_peaks.narrowPeak' | wc -l)"\t"$(less $dirER/$sample2'_peaks.narrowPeak' | wc -l)"\t"$(less $dirOut/$name"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$name"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+    less $dirOut/$name'.union.RPKM' | awk 'NR>1 && $1 !~ /GL/ {fc=($5+0.001)/($4+0.001); if(fc>2&&$5>20){print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$4"\t"$5"\t"fc}}' | sort -k1,1 -k2,2n > $dirOut/$name"."$sample2".unique.bed"
+    echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirER/$sample1'_peaks.narrowPeak' | wc -l)"\t"$(less $dirER/$sample2'_peaks.narrowPeak' | wc -l)"\t"$(less $dirOut/$name"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$name"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
+}
+export uniqueER
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+mkdir -p $dirOut
+echo -e "Sample1\tSample2\tunique\tN_ER1\tN_ER2\tN_unique\tlength_unique" > $dirOut/ER_unique_summary.txt
+uniqueER MGG_vitc MGG_control
+uniqueER NHAR_control NHA_control
+uniqueER NHAR_vitc NHAR_control
+uniqueER NHA_vitc NHA_control
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+dirOut=$dirIn/homer/
+mkdir -p $dirOut
+for file in $dirIn/*.bed; do
+     name=$(basename $file | sed 's/.unique.bed//g')
+     echo $name
+     mkdir -p $dirOut/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+done
+### intersect with enhancer
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+dirK27ac=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
+dirOut=$dirIn/enhancer/
+mkdir -p $dirOut
+echo -e "Name\tN_total\tlength_total\tN_enhancer\tlength_enhancer\tpercent" > $dirOut/ER_enhancer_summary.txt
+for file in $dirIn/*.bed; do
+    name=$(basename $file | sed 's/.unique.bed//g')
+    sample=$(basename $file | sed 's/.unique.bed//g' | sed 's/.*\.//g' | sed 's/MGG_control/MGG119_control/')
+    echo $name $sample
+    less $dirK27ac/H3K27ac_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/$name.enhancer.bed
+    echo -e $name"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$name.enhancer.bed | wc -l)"\t"$(less $dirOut/$name.enhancer.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$3}' >> $dirOut/ER_enhancer_summary.txt
+done
+#### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/enhancer/
+dirOut=$dirIn/homer/
+mkdir -p $dirOut
+for file in $dirIn/*.bed; do
+     name=$(basename $file | sed 's/.enhancer.bed//g')
+     echo $name
+     mkdir -p $dirOut/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+done
 
