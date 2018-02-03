@@ -65,7 +65,7 @@ dirOut=$dirIn/DMR/
 mkdir -p $dirOut/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR.summary.stats
-pth=0.005; delta=0.6; m=0.75; cov=3; size=500; cut=3
+pth=0.01; delta=0.5; m=0.75; cov=3; size=500; cut=3
 cd $dirIn
 for file1 in *vitc.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed 's/.combine.5mC.CpG//g')
