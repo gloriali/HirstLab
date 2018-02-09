@@ -65,7 +65,7 @@ dirOut=$dirIn/DMR/
 mkdir -p $dirOut/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR.summary.stats
-pth=0.01; delta=0.5; m=0.75; cov=3; size=500; cut=3
+pth=0.01; delta=0.25; m=0.5; cov=3; size=500; cut=3
 cd $dirIn
 for file1 in *vitc.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed 's/.combine.5mC.CpG//g')
@@ -75,10 +75,10 @@ for file1 in *vitc.combine.5mC.CpG; do
     /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
 done
-lib1=NHA_control; lib2=NHAR_control
+lib1=NHAR_control; lib2=NHA_control
 name=$lib1'_'$lib2
 echo $name
 /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
 /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
-/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
 
