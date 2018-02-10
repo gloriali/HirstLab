@@ -29,3 +29,16 @@ for bam in *.bam; do
     rm -rf $dirOut/$name/
     /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $bam $name $dirOut $ens S 0 "1,1,1,1,1" /project/epigenomics/resources/
 done
+
+function JRalign {
+    ens=hg19_ens65
+    dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
+    name=$1
+    rm -rf $dirOut/$name/
+    /home/mbilenky/bin/Solexa_Shell/RunJR.sh $dirOut/$name".sortedByName.bam" $dirOut/$name $ens &> $dirOut/run/$name.j.log
+}
+export -f JRalign
+dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
+cd $dirOut
+ls *.sortedByName.bam | awk '{gsub(".sortedByName.bam", ""); print $0}' > $dirOut/List.txt
+cat List.txt | parallel --gnu JRalign 
