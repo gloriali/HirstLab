@@ -16,20 +16,6 @@ for f1 in *_R1.fastq.gz; do
     echo $name
     /home/lli/HirstLab/Pipeline/shell/jaguar.sh -i $dirIn -o $dirOut -f1 $f1 -f2 $f2 -n $name -r $ref -v $ens
 done
-## QC and RPKM
-samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
-JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
-dirIn=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
-dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/RPKM/
-ens=hg19v65
-mkdir -p $dirOut
-cd $dirIn
-for bam in *.bam; do
-    name=A03473.Cortex01
-    rm -rf $dirOut/$name/
-    /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $bam $name $dirOut $ens S 0 "1,1,1,1,1" /project/epigenomics/resources/
-done
-
 function JRalign {
     ens=hg19_ens65
     dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
@@ -42,3 +28,18 @@ dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
 cd $dirOut
 ls *.sortedByName.bam | awk '{gsub(".sortedByName.bam", ""); print $0}' > $dirOut/List.txt
 cat List.txt | parallel --gnu JRalign 
+## QC and RPKM
+samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+dirIn=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
+dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/RPKM/
+ens=hg19v65
+mkdir -p $dirOut
+cd $dirIn
+for bam in *_withJunctionsOnGenome_dupsFlagged.bam; do
+    name=$(echo $bam | sed 's/_withJunctionsOnGenome_dupsFlagged.bam//g')
+    echo $name
+    rm -rf $dirOut/$name/
+    /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $bam $name $dirOut $ens S 0 "1,1,1,1,1" /project/epigenomics/resources/
+done
+
