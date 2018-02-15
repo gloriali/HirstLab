@@ -35,11 +35,10 @@ dirIn=/projects/epigenomics3/users/lli/Claudia/RNAseq/bam/
 dirOut=/projects/epigenomics3/users/lli/Claudia/RNAseq/RPKM/
 ens=hg19v65
 mkdir -p $dirOut
-cd $dirIn
-for bam in *_withJunctionsOnGenome_dupsFlagged.bam; do
-    name=$(echo $bam | sed 's/_withJunctionsOnGenome_dupsFlagged.bam//g')
+for bam in $dirIn/*_withJunctionsOnGenome_dupsFlagged.bam; do
+    name=$(basename $bam | sed 's/_withJunctionsOnGenome_dupsFlagged.bam//g')
     echo $name
     rm -rf $dirOut/$name/
-    /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $bam $name $dirOut $ens S 0 "1,1,1,1,1" /project/epigenomics/resources/
+    /home/lli/bin/Solexa_Shell/src/RNAseqMaster.sh $bam $name $dirOut $ens S 0 "1,1,1,1,1" /projects/epigenomics/resources/ $JAVA
 done
 
