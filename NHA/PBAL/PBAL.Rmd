@@ -1,0 +1,91 @@
+---
+title: "VitC - PBAL"
+author: "Gloria Li"
+date: "Feb 18, 2018"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/PBAL.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/")
+```
+
+## QC
+* Duplicate rate are higher than expected.      
+* Coverage at CpG sites are lower than other libraries.     
+
+```{r QC, fig.height=8}
+(QC_summary_reads_figure)
+(QC_summary_percent_figure)
+(qc_5mC_coverage_figure)
+```
+
+## Clustering
+* Very high correlation between samples within the same cell lines.    
+
+```{r cluster}
+op <- par(mar = c(5, 4, 4, 8))
+plot(pearson_genome_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
+plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
+par(op)
+```
+
+## 5mC distribution
+* No CIMP phenotype in NHAR samples, even though IDH mutant were expressed.   
+
+```{r distribution}
+(qc_5mC_violin_figure)
+mut_rate <- read.delim("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/IDH.mutant.rate.txt") %>% filter(Assay == "RNAseq")
+kable(mut_rate, format = "html", align = "l", row.names = F)
+```
+
+## DMRs
+### Methods
+* DM CpGs      
+	+ Methyl_diff p-value < 0.1       
+	+ delta 5mC > 0.25       
+	+ hyper 5mC > 0.5     
+* DMR dynamic growth     
+	+ distance to adjacent DM CpG < 500bp      
+	+ No. of CpGs > 3       
+
+### Summary
+
+```{r summary1}
+DMR_summary <- read.delim("DMR/DMR.summary.stats") %>% arrange(Sample1, Sample2)
+kable(DMR_summary, format = "html", align = "l", row.names = F)
+```
+
+* Remove differentially 5hmC regions from DMRs    
+
+```{r summary2}
+DMR_summary2 <- read.delim("DMR/DMR-DhMR.summary.stats") %>% arrange(Sample1, Sample2)
+kable(DMR_summary2, format = "html", align = "l", row.names = F)
+```
+
+### Enrichment in genomic regions 
+
+```{r genomeBreak}
+(genomic_breakdown_figure)
+```
+
+
