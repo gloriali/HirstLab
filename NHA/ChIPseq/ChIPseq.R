@@ -20,6 +20,18 @@ marks <- c("H3K27me3", "H3K9me3", "H3K27ac", "H3K4me1", "H3K4me3", "H3K36me3")
 RPKM <- read.delim("../RNAseq/RPKM/vitc.RPKM", as.is = T)
 rownames(RPKM) <- RPKM$ENSG
 
+## ============= 5hmC stain ===========
+stain_5hmC <- read.delim("../5hmC.stain", as.is = T) %>% melt(id = "Sample") %>% mutate(Sample = gsub("_", "\n", Sample))
+(stain_5hmC_figure <- ggplot(stain_5hmC, aes(Sample, value, fill = variable)) + 
+		geom_bar(stat = "identity", position = position_dodge()) + 
+		scale_fill_manual(values = c("blue", "red"), name = "") + 
+		xlab("") + 
+		ylab("Mean intensity") + 
+		ggtitle("5hmC positive staining") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(size = 12)))
+ggsave(stain_5hmC_figure, file = "../stain_5hmC_figure.pdf", height = 3, width = 4)
+
 ## ============= QC =============
 QC_summary <- read.delim("./bam/QC_summary.txt", as.is = T) %>% mutate(Mark = gsub("_.*", "", Library), Sample = gsub(".*_NHA", "NHA", Library), Sample = gsub(".*_MGG.*_", "MGG119_", Sample))
 QC_summary_reads <- QC_summary %>% select(Mark, Sample, Total_Number_Of_Reads, Number_Reads_Aligned, Number_Uniquely_Aligned_Reads_After_Filter) %>% melt(id.var = c("Mark", "Sample"))
