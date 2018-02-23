@@ -11,7 +11,6 @@ less $dirOut/sample_info.txt | awk '{system("ln -s "$4" ""'$dirOut'""/bam/"$1".b
 # QC
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
 dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hg19/
-mkdir -p $dirWig
 mkdir -p $dirHub
 cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/
 echo -e "hub VitC_gliomaHub_hMeDIP
