@@ -19,8 +19,8 @@ done
 
 # confirm IDH mutant status: chr2:209113112 C->T (is a CpG)
 cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/
-echo -e "Sample\tAssay\tT\tC\trate"> IDH.mutant.rate.txt
-for bam in PBAL/bam/*.bam RNAseq/bam/*.bam; do
+echo -e "Sample\tAssay\tT\tC\trate" > IDH.mutant.rate.txt
+for bam in PBAL/bam/*.bam RNAseq/bam/*.bam ChIPseq/bam/H3K36me3/*.bam; do
     sample=$(basename $bam | cut -d'.' -f1)
     assay=$(echo $bam | sed 's/\/bam.*//')
     echo $sample $assay
@@ -41,7 +41,7 @@ genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/PBAL/hub.txt
 > $dirHub/trackDb.txt
 less $dirOut/SampleInfo.txt | awk '{system("cp /projects/analysis/analysis30/"$2"_"$3"/merge*/150nt/hg19a/"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam")}'
-less $dirOut/SampleInfo.txt | awk '{system("ln -s "'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirOut'""/bam/"$1".6_lanes_dupsFlagged.bam")}'
+less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirOut'""/bam/"$1".6_lanes_dupsFlagged.bam")}'
 less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.Cmethyl.cons.bed.CpG.txt.gz"" ""'$dirOut'"$1".Cmethyl.cons.bed.CpG.txt.gz")}'
 less $dirOut/SampleInfo.txt | awk '{system("cp ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.coverage.bw"" ""'$dirHub'"$1".coverage.bw")}'
 less $dirOut/SampleInfo.txt | awk '{system("cp ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.fractional.bw"" ""'$dirHub'"$1".fractional.bw")}'

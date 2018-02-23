@@ -1,11 +1,29 @@
 #!/bin/sh
 
-## link bam files
+# link bam files
 dirIn=/projects/analysis/analysis30/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
 less $dirOut/sample_info.txt | awk '{"echo $(ls ""'$dirIn'"$1"/*/"$1"_"$2"/75nt/hg19a/bwa-0.5.7/*.bam)" | getline bam; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"bam}' > $dirOut/sample_info1.txt
 mv $dirOut/sample_info1.txt $dirOut/sample_info.txt
 less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$3"/"$3"_"$4".bam")}'
+# recover bams
+function recover {
+    file=$1
+    dirOut=/projects/epigenomics3/bams/hg19/
+    PX=$(echo $file | sed 's/.*Hirst\///' | sed 's/\/Analyzed.*//')
+    idx=$(basename $file | cut -d'_' -f3)
+    mkdir -p $dirOut/$PX/
+    /gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 2 --in $file --out $dirOut/$PX/$PX"_"$idx.bam --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref
+}
+export -f recover
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
+less sample_info.txt | awk '{system("echo $(ls /home/aldente/private/Projects/Martin_Hirst/"$1"/AnalyzedData/"$1"*/Solexa/Data/current/BaseCalls/BWA_*/compressed_bams/*_"$2"_*.sorted.bam.spec)")}' > List.txt
+cat List.txt | parallel --gnu -j 8 recover
+dirIn=/projects/epigenomics3/bams/hg19/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
+rm $dirOut/bam/*/*.bam
+less $dirOut/sample_info.txt | awk '{system("ln -s ""'$dirIn'"$1"/"$1"_"$2".bam ""'$dirOut'""bam/"$3"/"$3"_"$4".bam")}'
+ls $dirOut/bam/*/*.bam | parallel --gnu -j 5 $sambamba index -t 6
 
 # QC
 export PATH=/home/rislam/anaconda2/bin/:$PATH
