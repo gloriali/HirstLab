@@ -150,7 +150,7 @@ dirOut=$dirIn/DMR/
 mkdir -p $dirOut/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR.summary.stats
-pth=0.05; delta=0.25; m=0.5; cov=3; size=500; cut=3
+pth=0.1; delta=0.25; m=0.5; cov=3; size=500; cut=3
 cd $dirIn
 for file1 in *vitc.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed 's/.combine.5mC.CpG//g')
@@ -165,5 +165,26 @@ name=$lib1'_'$lib2
 echo $name
 /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
 /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
-/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+## substract DhMR
+dirDhMR=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/
+echo -e "Sample1\tSample2\tDM\tN_region\tlength" > DMR.summary.stats
+echo -e "Sample1\tSample2\tDM\tN_region\tlength" > DMR-DhMR.summary.stats
+for file in DMR.*.hyper.bed; do
+    sample1=$(echo $file | cut -d'.' -f2 | cut -d'_' -f1,2)
+    sample2=$(echo $file | cut -d'.' -f2 | cut -d'_' -f3,4)
+    echo $sample1 $sample2
+    $BEDTOOLS/intersectBed -a $file -b $dirDhMR/$sample1"_"$sample2.$sample1.unique.bed -v > DMR-DhMR.$sample1"_"$sample2.hyper.bed
+    echo -e $sample1"\t"$sample2"\thyper\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> DMR.summary.stats
+    echo -e $sample1"\t"$sample2"\thyper\t"$(less DMR-DhMR.$sample1"_"$sample2.hyper.bed | wc -l)"\t"$(less DMR-DhMR.$sample1"_"$sample2.hyper.bed | awk '{s=s+$3-$2}END{print s}') >> DMR-DhMR.summary.stats
+done
+for file in DMR.*.hypo.bed; do
+    sample1=$(echo $file | cut -d'.' -f2 | cut -d'_' -f1,2)
+    sample2=$(echo $file | cut -d'.' -f2 | cut -d'_' -f3,4)
+    echo $sample1 $sample2
+    $BEDTOOLS/intersectBed -a $file -b $dirDhMR/$sample1"_"$sample2.$sample2.unique.bed -v > DMR-DhMR.$sample1"_"$sample2.hypo.bed
+    echo -e $sample1"\t"$sample2"\thypo\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> DMR.summary.stats
+    echo -e $sample1"\t"$sample2"\thypo\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | wc -l)"\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | awk '{s=s+$3-$2}END{print s}') >> DMR-DhMR.summary.stats
+done
+/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
 

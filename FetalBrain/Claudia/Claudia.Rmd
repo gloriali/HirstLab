@@ -1,0 +1,53 @@
+---
+title: "Fetal Brain - data from Claudia"
+author: "Gloria Li"
+date: "Feb 18, 2018"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/Claudia.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 4, fig.width = 4) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/")
+```
+
+## Figure 4 DMRs between GW13 and GW17
+
+```{r DMR}
+(GW_hyper_450K_figure)
+(GW_hypo_450K_figure)
+(GW_450K_figure)
+```
+
+## Figure 5 Olig2 promoter hypo and UP in GW17
+
+```{r Olig2}
+(Olig2_450K_figure)
+(Olig2_RPKM_figure)
+```
+
+## Figure 6 DE between GW
+
+```{r GW}
+(GW_17_13_UP_figure)
+(GW_17_13_DN_figure)
+```
+
