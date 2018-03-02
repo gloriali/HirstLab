@@ -187,4 +187,9 @@ for file in DMR.*.hypo.bed; do
     echo -e $sample1"\t"$sample2"\thypo\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | wc -l)"\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | awk '{s=s+$3-$2}END{print s}') >> DMR-DhMR.summary.stats
 done
 /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
-
+for file in DM.*.bed; do
+    name=$(echo $file | sed 's/.bed//')
+    echo $name
+    less $file | awk '{if($4==1){print $1"\t"$2"\t"$3+1"\t"$4"\t"$5"\t"$6}}' > $name.hyper.bed
+    less $file | awk '{if($4==-1){print $1"\t"$2"\t"$3+1"\t"$4"\t"$5"\t"$6}}' > $name.hypo.bed
+done
