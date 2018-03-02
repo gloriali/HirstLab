@@ -116,10 +116,6 @@ for bam in $dirIn/*realign.bam; do
     qc $bam
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
-cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
-computeMatrix scale-regions -S MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw -R /home/lli/hg19/hg19.chrlen.autoXY.200.bed -out hMeDIP.200.matrix.txt --outFileNameMatrix hMeDIP.200.matrix.txt --regionBodyLength 200 --binSize 200 --sortRegions keep --skipZeros
 
 # FindER
 java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
@@ -173,23 +169,8 @@ for file in $dirIn/*realign.bam; do
     n_peak=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample"_peaks.narrowPeak")
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
-echo -e "Sample1\tSample2\tunique\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_unique_summary.txt
-for file in $dirIn/*vitc.realign.bam; do
-    sample1=$(basename $file | sed 's/.realign.bam//g')
-    sample2=$(echo $sample1 | sed 's/vitc/control/g')
-    echo $sample1 $sample2
-    macs2 callpeak -f BAMPE -g hs -t $file -c $dirIn/$sample2.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
-    echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
-    macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $file -q 0.05 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
-    echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$4}' >> $dirOut/ER_unique_summary.txt
-done
-sample1=NHAR_control; sample2=NHA_control
-macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample1.realign.bam -c $dirIn/$sample2.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample1"_unique" --outdir $dirOut
-echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample1"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
-macs2 callpeak -f BAMPE -g hs -t $dirIn/$sample2.realign.bam -c $dirIn/$sample1.realign.bam -q 0.05 -n $sample1"_"$sample2"."$sample2"_unique" --outdir $dirOut
-echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample1"_"$sample2"."$sample2"_unique_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($5/$4)"\t"$7/$6}' >> $dirOut/ER_unique_summary.txt
 
-## unique ERs
+## unique ERs: not good - too many false negative ERs
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
@@ -250,44 +231,58 @@ for file in $dirIn/*.bed; do
      /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
 done
 
-## unique ER 2: include magnitude change: pairwise union of ERs -> 2-FC in RPKM & higher one RPKM >20
-function uniqueER {
-    export PATH=/home/rislam/anaconda2/bin/:$PATH
-    export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
-    BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-    dirER=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
-    dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
-    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
-    sample1=$1; sample2=$2; name=$sample1'_'$sample2
-    echo $sample1 $sample2 $name
-    cat $dirER/$sample1'_peaks.narrowPeak' $dirER/$sample2'_peaks.narrowPeak' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 4 -o collapse > $dirER/$name'.union.narrowPeak'
-    multiBigwigSummary BED-file -b $dirBW/$sample1.realign.bw $dirBW/$sample2.realign.bw --BED $dirER/$name'.union.narrowPeak' --labels $sample1 $sample2 -out $dirOut/$name'.union.npz' --outRawCounts $dirOut/$name'.union.RPKM'
-    less $dirOut/$name'.union.RPKM' | awk 'NR>1 && $1 !~ /GL/ {fc=($4+0.001)/($5+0.001); if(fc>2&&$4>20){print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$4"\t"$5"\t"fc}}' | sort -k1,1 -k2,2n > $dirOut/$name"."$sample1".unique.bed"
-    echo -e $sample1"\t"$sample2"\t"$sample1"\t"$(less $dirER/$sample1'_peaks.narrowPeak' | wc -l)"\t"$(less $dirER/$sample2'_peaks.narrowPeak' | wc -l)"\t"$(less $dirOut/$name"."$sample1".unique.bed" | wc -l)"\t"$(less $dirOut/$name"."$sample1".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
-    less $dirOut/$name'.union.RPKM' | awk 'NR>1 && $1 !~ /GL/ {fc=($5+0.001)/($4+0.001); if(fc>2&&$5>20){print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$4"\t"$5"\t"fc}}' | sort -k1,1 -k2,2n > $dirOut/$name"."$sample2".unique.bed"
-    echo -e $sample1"\t"$sample2"\t"$sample2"\t"$(less $dirER/$sample1'_peaks.narrowPeak' | wc -l)"\t"$(less $dirER/$sample2'_peaks.narrowPeak' | wc -l)"\t"$(less $dirOut/$name"."$sample2".unique.bed" | wc -l)"\t"$(less $dirOut/$name"."$sample2".unique.bed" | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER_unique_summary.txt
-}
-export uniqueER
-enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
+## unique ER 2: union of ERs (MACS2 & FindER, all samples) -> 2-FC in RPKM & higher one RPKM >5
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
 mkdir -p $dirOut
-echo -e "Sample1\tSample2\tunique\tN_ER1\tN_ER2\tN_unique\tlength_unique" > $dirOut/ER_unique_summary.txt
-uniqueER MGG_vitc MGG_control
-uniqueER NHAR_control NHA_control
-uniqueER NHAR_vitc NHAR_control
-uniqueER NHA_vitc NHA_control
+cat /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/*.narrowPeak /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/FindER/*.bed | awk '{gsub("chr",""); print $1"\t"$2"\t"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/ER.union.bed
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+multiBigwigSummary BED-file -b MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw --BED $dirOut/ER.union.bed --labels MGG_control MGG_vitc NHA_control NHAR_control NHAR_vitc NHA_vitc -out $dirOut/ER.union.matrix.npz --outRawCounts $dirOut/ER.union.matrix.RPKM
+cd $dirOut
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($6+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($7+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($8+0.0001)/($7+0.0001); if($8>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($8+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($9+0.0001)/($6+0.0001); if($9>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($9+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_control.unique.bed
+echo -e "Compare\tUnique\tN_region\tLength\tN_CpG\tAverage_NCpG" > $dirOut/ER_unique_summary.txt
+for file in $dirOut/*.unique.bed; do
+    compare=$(basename $file | cut -d'.' -f1); unique=$(basename $file | cut -d'.' -f2)
+    echo $compare $unique
+    echo -e $compare"\t"$unique"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $file | awk '{s=s+$7;c++}END{print s"\t"s/c}') >> $dirOut/ER_unique_summary.txt
+done
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+### intersect with CpGs
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+dirOut=$dirIn/CpG/
+mkdir -p $dirOut
+echo -e "Comparison\tunique\tN_CpG\tPercent_region" > $dirIn/NCpG.summary.stats
+for file in $dirIn/*.unique.bed; do
+    name=$(basename $file | sed 's/.bed//g'); compare=$(echo $name | cut -d'.' -f1); unique=$(echo $name | cut -d'.' -f2)
+    echo $name $compare $unique
+    $BEDTOOLS/intersectBed -a $CG -b $file -u > $dirOut/$name.CpG.bed
+    Nregion=$(less $file | wc -l)
+    less $file | awk '{c[$7]=c[$7]+1}END{for(i in c){print "'$compare'""\t""'$unique'""\t"i"\t"c[i]/"'$Nregion'"}}' >> $dirIn/NCpG.summary.stats
+done
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
 dirOut=$dirIn/homer/
 mkdir -p $dirOut
-for file in $dirIn/*.bed; do
+for file in $dirIn/*unique.bed; do
      name=$(basename $file | sed 's/.unique.bed//g')
      echo $name
      mkdir -p $dirOut/$name/
-     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/$name/ -size 200 -len 8 
 done
 ### intersect with enhancer
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -296,11 +291,11 @@ dirK27ac=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindE
 dirOut=$dirIn/enhancer/
 mkdir -p $dirOut
 echo -e "Name\tN_total\tlength_total\tN_enhancer\tlength_enhancer\tpercent" > $dirOut/ER_enhancer_summary.txt
-for file in $dirIn/*.bed; do
+for file in $dirIn/*unique.bed; do
     name=$(basename $file | sed 's/.unique.bed//g')
     sample=$(basename $file | sed 's/.unique.bed//g' | sed 's/.*\.//g' | sed 's/MGG_control/MGG119_control/')
     echo $name $sample
-    less $dirK27ac/H3K27ac_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/$name.enhancer.bed
+    less $dirK27ac/H3K27ac_"$sample".vs.input_"$sample".FDR_0.05.FindER.bed.gz |  $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/$name.enhancer.bed
     echo -e $name"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$name.enhancer.bed | wc -l)"\t"$(less $dirOut/$name.enhancer.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$3}' >> $dirOut/ER_enhancer_summary.txt
 done
 #### Homer
@@ -313,6 +308,56 @@ for file in $dirIn/*.bed; do
      name=$(basename $file | sed 's/.enhancer.bed//g')
      echo $name
      mkdir -p $dirOut/$name/
-     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/$name/ -size 200 -len 8 
+     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/$name/ -size 200 -len 8 
+done
+
+## unique 3: CpG +/- 25bp -> 2-FC in RPKM & higher one RPKM > 10
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique3/
+mkdir -p $dirOut
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+multiBigwigSummary BED-file -b MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw --BED /home/lli/hg19/CG.25bp.BED --labels MGG_control MGG_vitc NHA_control NHAR_control NHAR_vitc NHA_vitc -out $dirOut/hMeDIP.CG25.matrix.npz --outRawCounts $dirOut/hMeDIP.CG25.matrix.RPKM
+cd $dirOut
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' > $dirOut/MGG_vitc_MGG_control.MGG_control.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' > $dirOut/MGG_vitc_MGG_control.MGG_vitc.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($6+0.0001); if($7>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' > $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($7+0.0001); if($6>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' > $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($8+0.0001)/($7+0.0001); if($8>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' > $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($8+0.0001); if($7>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' > $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($9+0.0001)/($6+0.0001); if($9>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' > $dirOut/NHA_vitc_NHA_control.NHA_vitc.unique.bed
+less $dirOut/hMeDIP.CG25.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($9+0.0001); if($6>=10&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' > $dirOut/NHA_vitc_NHA_control.NHA_control.unique.bed
+echo -e "Compare\tUnique\tN_CpG" > $dirOut/ER_unique_summary.txt
+for file in $dirOut/*.unique.bed; do
+    compare=$(basename $file | cut -d'.' -f1); unique=$(basename $file | cut -d'.' -f2)
+    echo $compare $unique
+    echo -e $compare"\t"$unique"\t"$(less $file | wc -l) >> $dirOut/ER_unique_summary.txt
+done
+
+## unique 4: 200bp bins -> 2-FC in RPKM & higher one RPKM > 5
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique4/
+mkdir -p $dirOut
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+multiBigwigSummary BED-file -b MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw --BED /home/lli/hg19/hg19.chrlen.autoXY.200.bed --labels MGG_control MGG_vitc NHA_control NHAR_control NHAR_vitc NHA_vitc -out $dirOut/hMeDIP.200.matrix.npz --outRawCounts $dirOut/hMeDIP.200.matrix.RPKM
+cd $dirOut
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_control.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_vitc.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($6+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($7+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($8+0.0001)/($7+0.0001); if($8>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($8+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($9+0.0001)/($6+0.0001); if($9>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_vitc.unique.bed
+less $dirOut/hMeDIP.200.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($9+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_control.unique.bed
+echo -e "Compare\tUnique\tN_bins\tN_CpG\tAverage_NCpG" > $dirOut/ER_unique_summary.txt
+for file in $dirOut/*.unique.bed; do
+    compare=$(basename $file | cut -d'.' -f1); unique=$(basename $file | cut -d'.' -f2)
+    echo $compare $unique
+    echo -e $compare"\t"$unique"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$7;c++}END{print s"\t"s/c}') >> $dirOut/ER_unique_summary.txt
 done
 
