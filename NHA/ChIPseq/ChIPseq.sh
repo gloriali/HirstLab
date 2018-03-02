@@ -320,3 +320,33 @@ for sample in MGG119_control NHAR_control MGG_vitc NHAR_vitc; do
     $BEDTOOLS/intersectBed -b <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -a $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.NPC_GE04.unique
 done
 
+### categorize promoters and enhancers
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K4me3_K27me3/
+mkdir -p $dirOut
+echo -e "Sample\tBivalent\tH3K4me3\tH3K27me3\tUnmarked" > $dirOut/promoter.K4me3_K27me3.summary
+for file in $dirIn/H3K4me3/*.FindER.bed.gz; do
+    sample=$(basename $file | cut -d'.' -f1 | sed 's/H3K4me3_//g' | sed 's/MGG119/MGG/g'); file2=$(echo $file | sed 's/H3K4me3/H3K27me3/g')
+    echo $sample
+    $BEDTOOLS/intersectBed -a $file -b $file2 | $BEDTOOLS/intersectBed -a $promoter -b stdin -u | awk '{print $0"\tbivalent"}' > $dirOut/$sample.promoter.K4me3_K27me3.bed
+    bivalent=$($BEDTOOLS/intersectBed -a $file -b $file2 | $BEDTOOLS/intersectBed -a $promoter -b stdin -u | wc -l)
+    $BEDTOOLS/intersectBed -a $promoter -b $file -u | $BEDTOOLS/intersectBed -a stdin -b $dirOut/$sample.promoter.K4me3_K27me3.bed -v -f 1 | awk '{print $0"\tH3K4me3"}' >> $dirOut/$sample.promoter.K4me3_K27me3.bed
+    H3K4me3=$(expr $(less $dirOut/$sample.promoter.K4me3_K27me3.bed | wc -l) - $bivalent)
+    $BEDTOOLS/intersectBed -a $promoter -b $file2 -u | $BEDTOOLS/intersectBed -a stdin -b $dirOut/$sample.promoter.K4me3_K27me3.bed -v -f 1 | awk '{print $0"\tH3K27me3"}' >> $dirOut/$sample.promoter.K4me3_K27me3.bed
+    H3K27me3=$(expr $(less $dirOut/$sample.promoter.K4me3_K27me3.bed | wc -l) - $((bivalent+H3K4me3)))
+    $BEDTOOLS/intersectBed -a $promoter -b $dirOut/$sample.promoter.K4me3_K27me3.bed -v -f 1 | awk '{print $0"\tUnmarked"}' >> $dirOut/$sample.promoter.K4me3_K27me3.bed
+    unmarked=$(expr $(less $dirOut/$sample.promoter.K4me3_K27me3.bed | wc -l) - $((bivalent+H3K4me3+H3K27me3)))
+    echo -e "$sample\t$bivalent\t$H3K4me3\t$H3K27me3\t$unmarked" >> $dirOut/promoter.K4me3_K27me3.summary
+done
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K27ac_K4me1/
+mkdir -p $dirOut
+echo -e "Sample\tH3K27ac\tH3K4me1\tActive\tWeak\tLength_active\tLength_weak" > $dirOut/enhancer.K27ac_K4me1.summary
+for file in $dirIn/H3K27ac/*.FindER.bed.gz; do
+    sample=$(basename $file | cut -d'.' -f1 | sed 's/H3K27ac_//g' | sed 's/MGG119/MGG/g'); file2=$(echo $file | sed 's/H3K27ac/H3K4me1/g')
+    echo $sample
+    $BEDTOOLS/intersectBed -a $file -b $file2 -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.active.enhancer.bed
+    $BEDTOOLS/intersectBed -a $file2 -b $file -v | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.weak.enhancer.bed
+    echo -e $sample"\t"$(less $file | wc -l)"\t"$(less $file2 | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.weak.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$sample.weak.enhancer.bed | awk '{s=s+$3-$2}END{print s}') >> $dirOut/enhancer.K27ac_K4me1.summary
+done
