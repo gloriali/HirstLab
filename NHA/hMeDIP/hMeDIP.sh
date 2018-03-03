@@ -158,13 +158,13 @@ export PATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/bi
 export PYTHONPATH=/projects/edcc_new/reference_epigenomes/housekeeping/bin/anaconda/lib/python2.7/site-packages:$PYTHONPATH
 sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/q0.05/
 mkdir -p $dirOut
 echo -e "Sample\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_summary.txt
 for file in $dirIn/*realign.bam; do
     sample=$(basename $file | sed 's/.realign.bam//g')
     echo $sample
-    macs2 callpeak -f BAMPE -g hs -t $file -q 0.01 -n $sample --outdir $dirOut
+    macs2 callpeak -f BAMPE -g hs -t $file -q 0.05 -n $sample --outdir $dirOut
     n_all=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
     n_peak=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample"_peaks.narrowPeak")
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
@@ -238,18 +238,18 @@ BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 CG=/home/lli/hg19/CG.BED
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
 mkdir -p $dirOut
-cat /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/*.narrowPeak /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/FindER/*.bed | awk '{gsub("chr",""); print $1"\t"$2"\t"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/ER.union.bed
+cat /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/MACS2/q0.05/*.narrowPeak | awk '{gsub("chr",""); print $1"\t"$2"\t"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/ER.union.bed
 cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
 multiBigwigSummary BED-file -b MGG_control.realign.bw MGG_vitc.realign.bw NHA_control.realign.bw NHAR_control.realign.bw NHAR_vitc.realign.bw NHA_vitc.realign.bw --BED $dirOut/ER.union.bed --labels MGG_control MGG_vitc NHA_control NHAR_control NHAR_vitc NHA_vitc -out $dirOut/ER.union.matrix.npz --outRawCounts $dirOut/ER.union.matrix.RPKM
 cd $dirOut
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_control.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_vitc.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($6+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($7+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($8+0.0001)/($7+0.0001); if($8>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($8+0.0001); if($7>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($9+0.0001)/($6+0.0001); if($9>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_vitc.unique.bed
-less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($9+0.0001); if($6>=5&&fc>=2){print $1"\t"$2+25"\t"$3-25"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$5"\t"$4"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/MGG_vitc_MGG_control.MGG_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($6+0.0001); if($7>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($7+0.0001); if($6>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$7"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($8+0.0001)/($7+0.0001); if($8>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($7+0.0001)/($8+0.0001); if($7>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$8"\t"$7"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($9+0.0001)/($6+0.0001); if($9>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_vitc.unique.bed
+less $dirOut/ER.union.matrix.RPKM | awk 'NR>1{fc=($6+0.0001)/($9+0.0001); if($6>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$9"\t"$6"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/NHA_vitc_NHA_control.NHA_control.unique.bed
 echo -e "Compare\tUnique\tN_region\tLength\tN_CpG\tAverage_NCpG" > $dirOut/ER_unique_summary.txt
 for file in $dirOut/*.unique.bed; do
     compare=$(basename $file | cut -d'.' -f1); unique=$(basename $file | cut -d'.' -f2)
