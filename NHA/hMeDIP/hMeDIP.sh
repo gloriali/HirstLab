@@ -258,6 +258,15 @@ for file in $dirOut/*.unique.bed; do
 done
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+less $dirOut/NHAR_control_NHA_control.NHA_control.unique.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/wt_mut.wt.unique.bed
+less $dirOut/NHAR_control_NHA_control.NHAR_control.unique.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/wt_mut.mut.unique.bed
+computeMatrix scale-regions -R $dirOut/wt_mut.wt.unique.bed $dirOut/wt_mut.mut.unique.bed -S NHA_control.realign.bw NHAR_control.realign.bw -out $dirOut/NHA_control_NHAR_control.unique.gz -bs 20
+plotHeatmap -m $dirOut/NHA_control_NHAR_control.unique.gz -out $dirOut/NHA_control_NHAR_control.unique.png --colorMap coolwarm --xAxisLabel "unique ER (bp)" --startLabel start --endLabel end --samplesLabel wt mut --regionsLabel wt_unique mut_unique
+less $dirOut/NHAR_vitc_NHAR_control.NHAR_control.unique.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/vitc_mut.mut.unique.bed
+less $dirOut/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/vitc_mut.vitc.unique.bed
+computeMatrix scale-regions -R $dirOut/vitc_mut.vitc.unique.bed $dirOut/vitc_mut.mut.unique.bed -S NHAR_vitc.realign.bw NHAR_control.realign.bw -out $dirOut/NHAR_vitc_NHAR_control.unique.gz -bs 20
+plotHeatmap -m $dirOut/NHAR_vitc_NHAR_control.unique.gz -out $dirOut/NHAR_vitc_NHAR_control.unique.png --colorMap coolwarm --xAxisLabel "unique ER (bp)" --startLabel start --endLabel end --samplesLabel vitc mut --regionsLabel vitc_unique mut_unique
 ### intersect with CpGs
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 CG=/home/lli/hg19/CG.BED
