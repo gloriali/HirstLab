@@ -1,0 +1,62 @@
+---
+title: "VitC - wt-mut-vitC"
+author: "Gloria Li"
+date: "Mar 4, 2018"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+Updated: `r date()`
+
+```{r setup, include = FALSE}
+library(ggplot2)
+library(plyr)
+library(VennDiagram)
+library(gridExtra)
+library(gplots)
+library(dendextend)
+library(reshape)
+library(wq)
+library(dplyr)
+library(RCircos)
+library(knitr)
+load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/wt_mut_vitc.Rdata")
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/")
+```
+
+## PBAL and hMeDIP
+* PBAL DMRs:      
+	+ Methyl_diff p-value < 0.1        
+	+ delta methylation > 0.25        
+	+ hyper > 0.5       
+	+ distance to adjacent DM CpG < 500bp        
+	+ No. of CpGs >=3      
+* hMeDIP DMRs:       
+	+ calculate normalized signal for union of MACS2 ERs (q-value < 0.05)      
+	+ Fold change of the signal > 2
+	+ hyper signal > 5
+* Combine PBAL with hMeDIP
+
+```{r methylation}
+PBAL_hMeDIP <- read.delim("./methylation/PBAL_hMeDIP.txt", as.is = T)
+kable(PBAL_hMeDIP, format = "html", align = "c", row.names = F)
+kable(DMR_DhMR_summary, format = "html", align = "c", row.names = F)
+```
+
+## H3K27ac 
+	+ calculate normalized signal for union of FindER ERs    
+	+ Fold change of the signal > 2
+	+ hyper signal > 5
+
+```{r H3K27ac}
+kable(H3K27ac_DMR_summary, format = "html", align = "c", row.names = F)
+```
+
+![](./H3K27ac.wt-mut-vitc.png)
+
+
