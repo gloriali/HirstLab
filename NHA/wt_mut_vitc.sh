@@ -8,9 +8,14 @@ dirPromoter=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/Fi
 dirEnhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K27ac_K4me1/
 dirK27ac=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
 dir5mC=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/
-dir5hmC=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique3/
+dir5hmC=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/
 mkdir -p $dirOut
+
+## RPKM of 5mC modifiers
+regulator=/projects/epigenomics2/users/lli/glioma/WGBS/DNAme_regulators.txt 
+RPKM=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/vitc.RPKM
+join <(less $regulator | sort -k2,2) $RPKM -1 2 -2 1 | sed -e 's/ /\t/g' > $dirOut/DNAme_regulators.RPKM
 
 ## DE
 mkdir -p $dirOut/DE/
@@ -71,3 +76,45 @@ computeMatrix scale-regions -R $dirOut/H3K27ac/group.*.bed -S $dirBW/H3K27ac_NHA
 plotHeatmap -m $dirOut/H3K27ac/H3K27ac.wt-mut-vitc.gz -out $dirOut/H3K27ac/H3K27ac.wt-mut-vitc.png --colorMap coolwarm --xAxisLabel "H3K27ac ER (bp)" --startLabel start --endLabel end -max 50 --samplesLabel wt mut VitC --regionsLabel DN_DN DN_ST DN_UP ST_DN ST_UP UP_DN UP_ST UP_UP
 computeMatrix scale-regions -R $dirOut/H3K27ac/group.UP_DN.bed $dirOut/H3K27ac/group.DN_UP.bed -S $dirBW/H3K27ac_NHA_control.bw $dirBW/H3K27ac_NHAR_control.bw $dirBW/H3K27ac_NHAR_vitc.bw -out $dirOut/H3K27ac/H3K27ac.wt-mut-vitc.reverse.gz --startLabel start --endLabel end -bs 20
 plotHeatmap -m $dirOut/H3K27ac/H3K27ac.wt-mut-vitc.reverse.gz -out $dirOut/H3K27ac/H3K27ac.wt-mut-vitc.reverse.png --colorMap coolwarm --xAxisLabel "H3K27ac ER (bp)" --startLabel start --endLabel end --samplesLabel wt mut VitC --regionsLabel UP_DN DN_UP
+echo -e "Comparison\tH3K27ac\tN_region\tlength" > $dirOut/H3K27ac/DMR.summary.stats
+for file in $dirOut/H3K27ac/group.*.bed; do
+    DM=$(basename $file | cut -d'.' -f2)
+    echo -e "wt-mut-vitc\t"$DM"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> $dirOut/H3K27ac/DMR.summary.stats
+done
+
+## PBAL & hMeDIP
+mkdir -p $dirOut/methylation/
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+multiBigwigSummary BED-file -b NHA_control.realign.bw NHAR_control.realign.bw --BED $dir5mC/DMR.NHAR_control_NHA_control.s500.c3.hyper --labels NHA_control NHAR_control -out $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.npz --outRawCounts $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM
+multiBigwigSummary BED-file -b NHA_control.realign.bw NHAR_control.realign.bw --BED $dir5mC/DMR.NHAR_control_NHA_control.s500.c3.hypo --labels NHA_control NHAR_control -out $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.npz --outRawCounts $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM
+multiBigwigSummary BED-file -b NHAR_vitc.realign.bw NHAR_control.realign.bw --BED $dir5mC/DMR.NHAR_vitc_NHAR_control.s500.c3.hyper --labels NHAR_vitc NHAR_control -out $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.npz --outRawCounts $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM
+multiBigwigSummary BED-file -b NHAR_vitc.realign.bw NHAR_control.realign.bw --BED $dir5mC/DMR.NHAR_vitc_NHAR_control.s500.c3.hypo --labels NHAR_vitc NHAR_control -out $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.npz --outRawCounts $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM
+cd $dirOut/methylation/
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.wt-mut.hyper.hypo.bed
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.wt-mut.hyper.hyper.bed
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM | awk 'NR>1{print $0}' | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hyper.hyper.bed -v -f 1 | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hyper.hypo.bed -v -f 1 > $dirOut/methylation/DMR.wt-mut.hyper.ST.bed
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.wt-mut.hypo.hypo.bed
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.wt-mut.hypo.hyper.bed
+less $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM | awk 'NR>1{print $0}' | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hypo.hyper.bed -v -f 1 | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hypo.hypo.bed -v -f 1 > $dirOut/methylation/DMR.wt-mut.hypo.ST.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.vitc-mut.hypo.hyper.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM | awk 'NR>1{print $0}' | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hypo.hyper.bed -v -f 1 | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed -v -f 1 > $dirOut/methylation/DMR.vitc-mut.hypo.ST.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.vitc-mut.hyper.hyper.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/methylation/DMR.vitc-mut.hyper.hypo.bed
+less $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM | awk 'NR>1{print $0}' | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.wt-mut.hyper.hyper.bed -v -f 1 | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.vitc-mut.hyper.hypo.bed -v -f 1 > $dirOut/methylation/DMR.vitc-mut.hyper.ST.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/NHAR_control_NHA_control.NHA_control.unique.bed -b $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM -v | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM -v > $dirOut/methylation/DMR.wt-mut.ST.hypo.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/NHAR_control_NHA_control.NHAR_control.unique.bed -b $dirOut/methylation/DMR.NHAR_control_NHA_control.hyper.RPKM -v | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.NHAR_control_NHA_control.hypo.RPKM -v > $dirOut/methylation/DMR.wt-mut.ST.hyper.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed -b $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM -v | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM -v > $dirOut/methylation/DMR.vitc-mut.ST.hypo.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/NHAR_vitc_NHAR_control.NHAR_control.unique.bed -b $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hyper.RPKM -v | $BEDTOOLS/intersectBed -a stdin -b $dirOut/methylation/DMR.NHAR_vitc_NHAR_control.hypo.RPKM -v > $dirOut/methylation/DMR.vitc-mut.ST.hyper.bed
+echo -e "Comparison\tPBAL\thMeDIP\tN_region\tlength" > $dirOut/methylation/DMR.DhMR.summary.stats
+for file in $dirOut/methylation/DMR.*.bed; do
+    compare=$(basename $file | cut -d'.' -f2); PBAL=$(basename $file | cut -d'.' -f3); hMeDIP=$(basename $file | cut -d'.' -f4)
+    echo -e $compare"\t"$PBAL"\t"$hMeDIP"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> $dirOut/methylation/DMR.DhMR.summary.stats
+done
+$BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hyper.hyper.bed -b $dir5mC/../NHAR_vitc.combine.5mC.CpG -wa -wb | awk '{id=$1":"$2"-"$3; fc[id]=$6; t[id]=t[id]+$11; c[id]=c[id]+$12}END{for(id in fc){print id"\t"fc[id]"\t"c[id]/(c[id]+t[id])}}' | sort -k1,1 > $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.vitc.bed
+$BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hyper.hyper.bed -b $dir5mC/../NHAR_control.combine.5mC.CpG -wa -wb | awk '{id=$1":"$2"-"$3; fc[id]=$6; t[id]=t[id]+$11; c[id]=c[id]+$12}END{for(id in fc){print id"\t"fc[id]"\t"c[id]/(c[id]+t[id])}}' | sort -k1,1 > $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.mut.bed
+join $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.vitc.bed $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.mut.bed | awk -F' ' '{print $1"\t"$2"\t"$5-$3}' > $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.bed
+$BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed -b $dir5mC/../NHAR_vitc.combine.5mC.CpG -wa -wb | awk '{id=$1":"$2"-"$3; fc[id]=$6; t[id]=t[id]+$11; c[id]=c[id]+$12}END{for(id in fc){print id"\t"fc[id]"\t"c[id]/(c[id]+t[id])}}' | sort -k1,1 > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.vitc.bed
+$BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed -b $dir5mC/../NHAR_control.combine.5mC.CpG -wa -wb | awk '{id=$1":"$2"-"$3; fc[id]=$6; t[id]=t[id]+$11; c[id]=c[id]+$12}END{for(id in fc){print id"\t"fc[id]"\t"c[id]/(c[id]+t[id])}}' | sort -k1,1 > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.mut.bed
+join $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.vitc.bed $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.mut.bed | awk -F' ' '{print $1"\t"1/$2"\t"$5-$3}' > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.bed
+cat $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.bed $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.bed > $dirOut/methylation/DMR.vitc-mut.cor
