@@ -71,3 +71,19 @@ sample2='$sample2'; name2='$name2';
 " >> $dirOut/DEfine.vitc.m
 done
 
+# Call SNPs
+genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/SNP/
+mkdir -p $dirOut
+for file in $dirIn/*.bam; do
+    name=$(basename $file | cut -d'.' -f1)
+    echo $name
+    $SAMTOOLS mpileup -C50 -uf $genome $file | $BCFTOOLS/bcftools view -bvcg - > $dirOut/$name.bcf
+    $BCFTOOLS/bcftools view $dirOut/$name.bcf | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+    less $dirOut/$name.vcf | awk '$1 ~ /#/ {print $0}' > $dirOut/$name.header.vcf
+    less $dirOut/$name.vcf | awk '$1 !~ /#/ {print $0}' > $dirOut/$name.main.vcf
+done
+
