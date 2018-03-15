@@ -16,7 +16,7 @@ File paths on xhost
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * Homer: `/home/acarles/homer/bin/`
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
-* SnpEff: `/gsc/software/linux-x86_64-centos5/snpEff-3.2/snpEff/`    
+* SnpEff: `/projects/wtsspipeline/programs/external_programs/snpEff3.3/snpEff.jar`    
 * methyl_diff: `/home/mbilenky/methyl_diff-methyl_diff/methyl_diff`   
 * Misha's java scripts: `/home/mbilenky/bin/Solexa_Java/`   
 * Misha's matlab scripts: `/home/mbilenky/matlab/`  
@@ -37,7 +37,9 @@ File paths on xhost
 * GWAS: `/projects/epigenomics/resources/UCSC_hg19/GWAS/` (bed `/home/lli/hg19/gwasCatalog_July2014.bed`)
 * Mappability: `/projects/epigenomics/resources/UCSC_hg19/mappability/mappability_lt_1`
 * CpG +/- 25bp bins: `/projects/epigenomics/users/mbilenky/CpG/hg19/CG_25_around_chr/`  
-* Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`
+* Consortium 15 states model: `/home/lli/Consortium15states/model_15_coreMarks.txt`   
+* COSMIC: `/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf`   
+* dbSNP: `/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf`   
 
 ## REMC project
 * WGBS fractional calls: `/projects/edcc_prj2/bs-seq/`
