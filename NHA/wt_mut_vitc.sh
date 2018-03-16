@@ -9,6 +9,7 @@ dirEnhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/Fi
 dirK27ac=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
 dir5mC=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/
 dir5hmC=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
+dirChan=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/
 mkdir -p $dirOut
 
@@ -118,3 +119,28 @@ $BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed -b $dir
 $BEDTOOLS/intersectBed -a $dirOut/methylation/DMR.vitc-mut.hypo.hypo.bed -b $dir5mC/../NHAR_control.combine.5mC.CpG -wa -wb | awk '{id=$1":"$2"-"$3; fc[id]=$6; t[id]=t[id]+$11; c[id]=c[id]+$12}END{for(id in fc){print id"\t"fc[id]"\t"c[id]/(c[id]+t[id])}}' | sort -k1,1 > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.mut.bed
 join $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.vitc.bed $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.mut.bed | awk -F' ' '{print $1"\t"1/$2"\t"$5-$3}' > $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.bed
 cat $dirOut/methylation/DMR.vitc-mut.hyper.hyper.5mC.bed $dirOut/methylation/DMR.vitc-mut.hypo.hypo.5mC.bed > $dirOut/methylation/DMR.vitc-mut.cor
+### intersect with Chan's data
+hyper=$dirChan/DMR_hyper.bed; hypo=$dirChan/DMR_hypo.bed
+for file in $dirOut/methylation/DMR.wt-mut.*.bed; do
+    name=$(basename $file | cut -d'.' -f3,4)
+    echo $name
+    $BEDTOOLS/intersectBed -a $hyper -b $file -u | wc -l
+done
+$BEDTOOLS/intersectBed -a $hyper -b $dir5hmC/../MACS2/q0.05/NHA_control_peaks.narrowPeak -u | wc -l
+$BEDTOOLS/intersectBed -a $hyper -b $dir5hmC/../MACS2/q0.05/NHAR_control_peaks.narrowPeak -u | wc -l
+$BEDTOOLS/intersectBed -a $hyper -b $dir5mC/../NHA_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$6-$5"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b $dir5mC/../NHAR_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$12-$6}' > $dirChan/DMR_hyper.PBAL_mut-wt.bed
+for file in $dirOut/methylation/DMR.wt-mut.*.bed; do
+    name=$(basename $file | cut -d'.' -f3,4)
+    echo $name
+    $BEDTOOLS/intersectBed -a $hypo -b $file -u | wc -l
+done
+$BEDTOOLS/intersectBed -a $hypo -b $dir5hmC/../MACS2/q0.05/NHA_control_peaks.narrowPeak -u | wc -l
+$BEDTOOLS/intersectBed -a $hypo -b $dir5hmC/../MACS2/q0.05/NHAR_control_peaks.narrowPeak -u | wc -l
+$BEDTOOLS/intersectBed -a $hypo -b $dir5mC/../NHA_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$6-$5"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b $dir5mC/../NHAR_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$12-$6}' > $dirChan/DMR_hypo.PBAL_mut-wt.bed
+cat $dirChan/DMR_hyper.PBAL_mut-wt.bed $dirChan/DMR_hypo.PBAL_mut-wt.bed > $dirChan/DMR.PBAL_mut-wt.bed
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+less $hyper | awk '{print $1"\t"$2-100"\t"$3+100"\t"$4}' | sort -k1,1 -k2,2n > $dirChan/DMR_hyper.100.bed
+less $hypo | awk '{print $1"\t"$2-100"\t"$3+100"\t"$4}' | sort -k1,1 -k2,2n > $dirChan/DMR_hypo.100.bed
+computeMatrix scale-regions -R $dirChan/DMR_hyper.100.bed $dirChan/DMR_hypo.100.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw -out $dirChan/DMR.wt-mut.hMeDIP.gz --startLabel start --endLabel end -bs 20
+plotHeatmap -m $dirChan/DMR.wt-mut.hMeDIP.gz -out $dirChan/DMR.wt-mut.hMeDIP.png --colorMap coolwarm --xAxisLabel "450K DM CpG" --startLabel -100 --endLabel 100 --samplesLabel wt mut --regionsLabel 450K_hyper 450K_hypo
+
