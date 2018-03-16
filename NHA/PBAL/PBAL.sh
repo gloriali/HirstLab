@@ -27,6 +27,44 @@ for bam in PBAL/bam/*.bam RNAseq/bam/*.bam ChIPseq/bam/H3K36me3/*.bam; do
     /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209113112-209113112 $bam | awk '{s=toupper($5); print "'$sample'""\t""'$assay'""\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$3/($3+$4)}' >> IDH.mutant.rate.txt
 done
 
+# CNV with control-FREEC
+freec=/projects/wtsspipeline/programs/external_programs/Control_FreeC_v7.0/freec
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/CNV/
+mkdir -p $dirOut
+for file in $dirIn/*.bam; do
+    name=$(basename $file | cut -d'.' -f1)
+    echo $name
+    echo -e "[general]
+chrFiles= /projects/wtsspipeline/resources/Homo_sapiens/bfa_NCBI-37-TCGA/hg19a_per_chr_fastas/
+BedGraphOutput = TRUE
+chrLenFile = /projects/wtsspipeline/programs/code/Control-FREEC_1.0.0/resources/hg19_control_FreeC_chr_length.txt
+coefficientOfVariation = 0.062
+gemMappabilityFile= /projects/wtsspipeline/resources/Homo_sapiens/bfa_NCBI-37-TCGA/out100m1_hg19.gem
+ploidy = 2
+breakPointThreshold = 0.8
+breakPointType=2
+window = 1500
+step = 375
+contamination =0
+contaminationAdjustment=FALSE
+degree=5
+intercept = 1
+samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.19/samtools
+maxThreads=8
+readCountThreshold=10
+forceGCcontentNormalization=0
+minCNAlength=1
+minMappabilityPerWindow=0.85
+outputDir = $dirOut
+
+[sample]
+mateFile = $file
+inputFormat = BAM
+mateOrientation = FR" > $dirOut/$name.controlFREEC.config
+    $freec -conf $dirOut/$name.controlFREEC.config
+done
+
 # QC
 dirIn=/projects/edcc_prj2/bs-seq/PX0682/
 dirBam=/projects/epigenomics3/bams/hg19/PX0682/
