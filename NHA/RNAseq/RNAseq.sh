@@ -75,6 +75,8 @@ done
 genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
 SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
 BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+snpEff=/projects/wtsspipeline/programs/external_programs/snpEff3.3/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/SNP/
 mkdir -p $dirOut
@@ -83,7 +85,8 @@ for file in $dirIn/*.bam; do
     echo $name
     $SAMTOOLS mpileup -C50 -uf $genome $file | $BCFTOOLS/bcftools view -bvcg - > $dirOut/$name.bcf
     $BCFTOOLS/bcftools view $dirOut/$name.bcf | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
-    less $dirOut/$name.vcf | awk '$1 ~ /#/ {print $0}' > $dirOut/$name.header.vcf
-    less $dirOut/$name.vcf | awk '$1 !~ /#/ {print $0}' > $dirOut/$name.main.vcf
+    $JAVA -jar $snpEff/snpEff.jar GRCh37.69 $dirOut/$name.vcf -c $snpEff/snpEff.config > $dirOut/$name.snpEff.vcf
+    $JAVA -jar $snpEff/SnpSift.jar annotate -id $snpEff/cosmic_v64.vcf $dirOut/$name.snpEff.vcf > $dirOut/$name.snpEff.COSMIC.vcf
+    less $dirOut/$name.snpEff.COSMIC.vcf | awk '$1 !~ /#/ {chr=$1; pos=$2; $1=$2=""; print chr"\t"pos"\t"pos+1"\t"$0}' > $dirOut/$name.snpEff.COSMIC.bed
 done
 
