@@ -47,8 +47,21 @@ H3K27ac_DMR_summary <- read.delim("./H3K27ac/DMR.summary.stats", as.is = T)
 
 ## ============= DMR ============
 DMR_DhMR_summary <- read.delim("./methylation/DMR.DhMR.summary.stats", as.is = T)
-
-
+PBAL_delta_hMeDIP_FC <- read.delim("./methylation/DMR.vitc-mut.cor", as.is = T, head = F, col.names = c("id", "FC", "delta"))
+(PBAL_delta_hMeDIP_FC_figure <- ggplot(PBAL_delta_hMeDIP_FC, aes(log2(FC), delta)) + 
+		geom_point() + 
+		coord_cartesian(xlim = c(-8, 8)) + 
+		ggtitle("PBAL delta vs hMeDIP FC - vitC vs mut") + 
+		theme_bw())
+ggsave(PBAL_delta_hMeDIP_FC_figure, file = "./methylation/PBAL_delta_hMeDIP_FC_figure.pdf")
+PBAL_450K_DMR <- read.delim("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/DMR.PBAL_mut-wt.bed", head = F, as.is = T, col.names = c("chr", "start", "end", "id", "450K", "PBAL"))
+(PBAL_450K_DMR_figure <- ggplot(PBAL_450K_DMR, aes(X450K, PBAL)) + 
+		geom_point(size = 0.5, alpha = 0.2) + 
+		xlab("450K") + 
+		ylab("PBAL") + 
+		ggtitle("delta 5mC mut-wt") + 
+		theme_bw())
+ggsave(PBAL_450K_DMR_figure, file = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/DMR.PBAL_mut-wt.pdf")
 
 ## ============= save ===========
 save(list = c(ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "enrich"), ls(pattern = "DAVID"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
