@@ -25,29 +25,38 @@ library(dplyr)
 library(RCircos)
 library(knitr)
 load("/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/Claudia.Rdata")
-knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 4, fig.width = 4) 
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 10, fig.width = 10) 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/")
 ```
 
 ## Figure 4 DMRs between GW13 and GW17
 
 ```{r DMR}
-(GW_hyper_450K_figure)
 (GW_hypo_450K_figure)
-(GW_450K_figure)
+(GW_hyper_450K_figure)
 ```
 
 ## Figure 5 Olig2 promoter hypo and UP in GW17
 
-```{r Olig2}
+```{r Olig2, fig.height=4, fig.width=4}
 (Olig2_450K_figure)
 (Olig2_RPKM_figure)
 ```
 
 ## Figure 6 DE between GW
 
-```{r GW}
-(GW_17_13_UP_figure)
+```{r GW_DN}
 (GW_17_13_DN_figure)
 ```
+```{r GW_UP, fig.height=4, fig.width=4}
+(GW_17_13_UP_figure)
+```
+
+### BrainSpan
+
+```{r BrainSpan}
+(BrainSpan_GW_17_13_DN_figure)
+(BrainSpan_GW_17_13_UP_figure)
+```
+
 
