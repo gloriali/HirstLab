@@ -19,6 +19,17 @@ load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/wt_m
 RPKM <- read.delim("../RNAseq/RPKM/vitc.RPKM", as.is = T)
 rownames(RPKM) <- RPKM$ENSG
 
+## ========= 5mC modifiers RPKM =========
+DNAme_regulators_RPKM <- read.delim("DNAme_regulators.RPKM", as.is = T) %>% select(-Name) %>% melt(id = c("ENSG", "gene")) 
+(DNAme_regulators_RPKM_figure <- ggplot(DNAme_regulators_RPKM, aes(gene, log10(value), color = variable)) + 
+		geom_point(position = position_jitter(width = 0.2)) + 
+		coord_flip() + 
+		guides(color = guide_legend(title = NULL)) + 
+		xlab("") + 
+		ylab("log10 RPKM") + 
+		theme_bw())
+ggsave(DNAme_regulators_RPKM_figure, file = "DNAme_regulators_RPKM_figure.pdf", height = 5, width = 6)
+
 ## ============= H3K27ac ==========
 e <- 1e-4
 H3K27ac_ER_union_RPKM <- read.delim("./H3K27ac/H3K27ac.ER.union.RPKM", as.is = T)
