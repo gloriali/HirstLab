@@ -2,7 +2,7 @@
 Gloria Li  
 Feb 18, 2018  
 
-Updated: Wed Feb 21 01:48:15 2018
+Updated: Mon Mar 19 06:46:18 2018
 
 
 
@@ -20,7 +20,12 @@ Updated: Wed Feb 21 01:48:15 2018
 ## 5mC distribution
 * No CIMP phenotype in NHAR samples, even though IDH mutant were expressed.   
 
-![](PBAL_files/figure-html/distribution-1.png)<!-- --><table>
+![](PBAL_files/figure-html/distribution-1.png)<!-- -->
+
+### Why no CIMP in NHAR? 
+* Hypothesis 1: IDH1 mutation unsuccefully induced -> NO     
+
+<table>
  <thead>
   <tr>
    <th style="text-align:left;"> Sample </th>
@@ -75,6 +80,54 @@ Updated: Wed Feb 21 01:48:15 2018
   </tr>
 </tbody>
 </table>
+
+* Hypothesis 2: TET mutation resulting in insensitive to 2HG -> Not likely       
+	+ The only non-neutral variance in TETs identified in NHA lines is TET1 K1019E. It is outside TET1's 2HG, metal or DNA-binding domains, and is never annotated in cancer before.        
+	+ 5hmC changes still occured as expected, suggessting TET is functioning.      
+
+* Hypothesis 3: cells blocked at hmC, and can not transition to a CpG state -> not enough evidence        
+	+ There are more regions lose 5hmC than gain from wt to mut, with no change in PBAL.      
+	+ However, no evidence of 5hmC was found around hyper CpGs (+/- 100bp) identified in the Nature Genetics paper.    
+
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> Comparison </th>
+   <th style="text-align:right;"> PBAL </th>
+   <th style="text-align:right;"> hMeDIP </th>
+   <th style="text-align:right;"> N_region </th>
+   <th style="text-align:right;"> length </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> wt-mut </td>
+   <td style="text-align:right;"> ST </td>
+   <td style="text-align:right;"> hyper </td>
+   <td style="text-align:right;"> 228121 </td>
+   <td style="text-align:right;"> 456242 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> wt-mut </td>
+   <td style="text-align:right;"> ST </td>
+   <td style="text-align:right;"> hypo </td>
+   <td style="text-align:right;"> 506180 </td>
+   <td style="text-align:right;"> 1012360 </td>
+  </tr>
+</tbody>
+</table>
+
+![](./PBAL_files/figure-html/DMR.wt-mut.hMeDIP.png)      
+
+* Hypotheis 4: CNVs (from PBAL -> depth too low)     
+	+ MGG119     
+![](./PBAL_files/figure-html/MGG_control.6_lanes_dupsFlagged.bam_ratio.txt.png)   
+
+	+ NHA       
+![](./PBAL_files/figure-html/NHA_control.6_lanes_dupsFlagged.bam_ratio.txt.png)   
+
+	+ NHAR      
+![](./PBAL_files/figure-html/NHAR_control.6_lanes_dupsFlagged.bam_ratio.txt.png)   
 
 ## DMRs
 ### Methods
