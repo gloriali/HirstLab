@@ -2,7 +2,7 @@
 Gloria Li  
 Feb 18, 2018  
 
-Updated: Mon Mar 19 06:46:18 2018
+Updated: Mon Mar 19 07:06:34 2018
 
 
 
@@ -81,11 +81,15 @@ Updated: Mon Mar 19 06:46:18 2018
 </tbody>
 </table>
 
-* Hypothesis 2: TET mutation resulting in insensitive to 2HG -> Not likely       
+* Hypotheis 2: abnormal expression of DNA methylation modifiers -> NO      
+
+![](PBAL_files/figure-html/DNAme_regulators_RPKM-1.png)<!-- -->
+
+* Hypothesis 3: TET mutation resulting in insensitive to 2HG -> Not likely       
 	+ The only non-neutral variance in TETs identified in NHA lines is TET1 K1019E. It is outside TET1's 2HG, metal or DNA-binding domains, and is never annotated in cancer before.        
 	+ 5hmC changes still occured as expected, suggessting TET is functioning.      
 
-* Hypothesis 3: cells blocked at hmC, and can not transition to a CpG state -> not enough evidence        
+* Hypothesis 4: cells blocked at hmC, and can not transition to a CpG state -> not enough evidence        
 	+ There are more regions lose 5hmC than gain from wt to mut, with no change in PBAL.      
 	+ However, no evidence of 5hmC was found around hyper CpGs (+/- 100bp) identified in the Nature Genetics paper.    
 
@@ -119,7 +123,7 @@ Updated: Mon Mar 19 06:46:18 2018
 
 ![](./PBAL_files/figure-html/DMR.wt-mut.hMeDIP.png)      
 
-* Hypotheis 4: CNVs (from PBAL -> depth too low)     
+* Hypotheis 5: CNVs (from PBAL -> depth too low)     
 	+ MGG119     
 ![](./PBAL_files/figure-html/MGG_control.6_lanes_dupsFlagged.bam_ratio.txt.png)   
 
