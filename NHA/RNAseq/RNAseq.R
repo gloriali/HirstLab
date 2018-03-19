@@ -71,6 +71,7 @@ vitc_DN_mut_UP_venn <- venn.diagram(vitc_DN_mut_UP, filename = NULL, category.na
 pdf("./DEfine/vitc_DN_mut_UP_venn.pdf", height = 3, width = 4)
 grid.draw(vitc_DN_mut_UP_venn)
 dev.off()
+write.table(merge(NHARvitc_NHARcontrol_UP, NHARcontrol_NHAcontrol_DN, by = "ENSG"), file = "./DEfine/vitc_UP_mut_DN.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 ### DAVID
 (enrich_NHAR_NHA_control_UP <- enrich(name = "UP.NHAR_control_NHA_control", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 7, width = 8))
 (enrich_NHAR_NHA_control_DN <- enrich(name = "DN.NHAR_control_NHA_control", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 10, width = 8))
@@ -78,6 +79,7 @@ dev.off()
 (enrich_NHAR_vitc_control_DN <- enrich(name = "DN.NHAR_vitc_NHAR_control", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 4, width = 8))
 (enrich_MGG119_vitc_control_UP <- enrich(name = "UP.MGG119_vitc_MGG119_control", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 7, width = 8))
 (enrich_MGG119_vitc_control_DN <- enrich(name = "DN.MGG119_vitc_MGG119_control", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 2, width = 8))
+(enrich_vitc_UP_mut_DN <- enrich(name = "vitc_UP_mut_DN", dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", fdr = 0.01, p = "FDR", erminej = F, height = 7, width = 8))
 
 ## ============= save ===========
 save(list = c("RPKM", ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "enrich"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
