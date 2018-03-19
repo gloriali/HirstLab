@@ -63,4 +63,4 @@ cd /projects/epigenomics3/epigenomics3_results/users/lli/Claudia/DNAme/
 less DNAme450K.txt | awk '$4 ~ /cg/ {print "chr"$0}' | sort -k1,1 -k2,2n > DNAme450K.id
 $BEDTOOLS/intersectBed -a DNAme450K.id -b $dirDMR/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hyper.bed -u > DMR.HuFNSC02_HuFNSC04.450K.hyper.bed
 $BEDTOOLS/intersectBed -a DNAme450K.id -b $dirDMR/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -u > DMR.HuFNSC02_HuFNSC04.450K.hypo.bed
-$BEDTOOLS/intersectBed -a DNAme450K.id -b <(echo -e "chr21\t34396154\t34400153\tENSG00000205927") -u > Olig2.promoter.450K.bed
+$BEDTOOLS/intersectBed -a DNAme450K.id -b <(echo -e "chr21\t34396154\t34400153\tENSG00000205927") -u | $BEDTOOLS/intersectBed -a stdin -b $dirDMR/DMR.HuFNSC02_HuFNSC04.m0.75.p0.005.d0.5.s300.c3.hypo.bed -u > Olig2.promoter.450K.bed
