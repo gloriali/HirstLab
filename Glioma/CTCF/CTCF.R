@@ -275,6 +275,35 @@ H3K27ac_TSS_CTCF_gain <- read.delim("./H3K27ac/H3K27ac.TSS.CTCF_IDHmut_unique.be
 	mutate(IDHmut = (CEMT_19 + CEMT_22 + CEMT_47)/3, logFC = log2((IDHmut + e)/(CEMT_23 + e)), Gene = gene[ENSG, "V2"]) %>% filter(logFC <= -1) %>% 
 	select(ENSG, Gene, CTCF, enhancer, d, IDHmut, CEMT_23, logFC) %>% filter(d <= 50000) %>% arrange(logFC)
 
+## ----------- MACS2 WGBS ------------
+CTCF_loss_5mC_MACS2 <- read.delim("./MACS2/WGBS/CTCF_IDHmut_loss.5mC", as.is = T) %>% mutate(type = gsub("_.*", "", sample))
+(CTCF_loss_5mC_MACS2_figure <- ggplot(CTCF_loss_5mC_MACS2, aes(sample, fractional, fill = type)) + 
+		geom_violin() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT loss") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_loss_5mC_MACS2_figure, file = "./MACS2/WGBS/CTCF_loss_5mC_figure.pdf", height = 4, width = 5)
+CTCF_gain_5mC_MACS2 <- read.delim("./MACS2/WGBS/CTCF_IDHmut_gain.5mC", as.is = T) %>% mutate(type = gsub("_.*", "", sample))
+(CTCF_gain_5mC_MACS2_figure <- ggplot(CTCF_gain_5mC_MACS2, aes(sample, fractional, fill = type)) + 
+		geom_violin() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT gain") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_gain_5mC_MACS2_figure, file = "./MACS2/WGBS/CTCF_gain_5mC_figure.pdf", height = 4, width = 5)
+CTCF_retained_5mC_MACS2 <- read.delim("./MACS2/WGBS/CTCF_IDHmut_retained.5mC", as.is = T) %>% mutate(type = gsub("_.*", "", sample))
+(CTCF_retained_5mC_MACS2_figure <- ggplot(CTCF_retained_5mC_MACS2, aes(sample, fractional, fill = type)) + 
+		geom_violin() + 
+		xlab("") + 
+		ylab("Fractional methylation") + 
+		ggtitle("CFCT retained") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(angle = 90)))
+ggsave(CTCF_retained_5mC_MACS2_figure, file = "./MACS2/WGBS/CTCF_retained_5mC_figure.pdf", height = 4, width = 5)
+
 
 save(list = c(ls(pattern = "figure"), "CTCF_loss_5mC_wide", "responder", "nonresponder", "H3K27ac_TSS_CTCF_gain", "H3K27ac_TSS_CTCF_loss"), 
 		 file = "/projects/epigenomics2/users/lli/glioma/CTCF/CTCF.Rdata")
