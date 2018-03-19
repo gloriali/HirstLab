@@ -68,9 +68,21 @@ ER_summary <- read.delim("./MACS2/ER_summary.txt", as.is = T) %>% mutate(Sample 
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(ER_summary_figure, file = "./MACS2/ER_summary_figure.pdf", height = 4, width = 5)
 
-### unique ERs
+## ============ unique ERs ===========
+### unique ER2
+ER_union_RPKM <- read.delim("./unique2/ER.union.matrix.RPKM", as.is = T)
+pdf("./unique2/ER.union.pdf", height = 5, width = 5)
+plot(ecdf(ER_union_RPKM$X.MGG_control.), xlim=c(0,50), main = "RPKM for union of ERs", xlab = "RPKM", ylab = "ecdf")
+lines(ecdf(ER_union_RPKM$X.MGG_vitc.), col="red")
+lines(ecdf(ER_union_RPKM$X.NHA_control.), col="blue")
+lines(ecdf(ER_union_RPKM$X.NHAR_control.), col="green")
+lines(ecdf(ER_union_RPKM$X.NHAR_vitc.), col="yellow")
+lines(ecdf(ER_union_RPKM$X.NHA_vitc.), col="purple")
+abline(v = 5)
+legend("bottomright", c("MGG_control", "MGG_vitc", "NHA_control", "NHAR_control", "NHAR_vitc", "NHA_vitc"), col = c("black", "red", "blue", "green", "yellow", "purple"), lty = 1, lwd = 4, cex = 0.8)
+dev.off()
 ER_unique_summary <- read.delim("./unique2/ER_unique_summary.txt", as.is = T) 
-#### enrichment in genomic features
+### enrichment in genomic features
 ER_unique_genomic_breakdown <- read.delim("./unique2/intersect/genomic.breakdown.summary", as.is = T) %>% mutate(Comparison = gsub("\\..*", "", Name), Name = str_replace(Name, "[A-Za-z_]+\\.", ""), NCpG = NULL)
 ER_unique_genomic_breakdown_tall <- melt(ER_unique_genomic_breakdown, id = c("Comparison", "Name")) 
 (ER_unique_genomic_breakdown_figure <- ggplot(ER_unique_genomic_breakdown_tall, aes(variable, log2(value), fill = Name)) + 
@@ -81,7 +93,7 @@ ER_unique_genomic_breakdown_tall <- melt(ER_unique_genomic_breakdown, id = c("Co
 		coord_flip() + 
 		theme_bw())
 ggsave(ER_unique_genomic_breakdown_figure, file = "./unique2/ER_unique_genomic_breakdown_figure.pdf", height = 6, width = 10)
-#### vitc reversed
+### vitc reversed
 NHAR_wt_unique <- as.numeric(system("less ./unique2/NHAR_control_NHA_control.NHA_control.unique.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
 NHAR_vitc_unique <- as.numeric(system("less ./unique2/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
 NHAR_wt_vitc <- as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/intersectBed -a ./unique2/NHAR_control_NHA_control.NHA_control.unique.bed -b ./unique2/NHAR_vitc_NHAR_control.NHAR_vitc.unique.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
@@ -96,7 +108,7 @@ NHAR_MGG_vitc_venn <- draw.pairwise.venn(area1 = MGG_vitc_unique, area2 = NHAR_v
 pdf("./unique2/NHAR_MGG_vitc_venn.pdf", height = 3, width = 4)
 grid.draw(NHAR_MGG_vitc_venn)
 dev.off()
-#### homer
+### homer
 homer_unique_MGG119vitc_MGG119control <- read.delim("./unique2/homer/MGG_vitc_MGG_control.MGG_vitc/knownResults.txt", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
 	filter(Percent_enhancer_with_motif >= 15, P.value<= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF)) 
@@ -130,7 +142,7 @@ homer_unique_NHAcontrol_NHARcontrol <- read.delim("./unique2/homer/NHAR_control_
 		ggtitle("NHAcontrol_NHARcontrol NHAcontrol unique") + 
 		theme_bw())
 ggsave(homer_unique_NHAcontrol_NHARcontrol_figure, file = "./unique2/homer/homer_unique_NHAcontrol_NHARcontrol_figure.pdf", height = 5, width = 5)
-#### enhancer
+### enhancer
 ER_unique_enhancer_summary <- read.delim("./unique2/enhancer/ER_enhancer_summary.txt", as.is = T) 
 homer_unique_enhancer_MGG119vitc_MGG119control <- read.delim("./unique2/enhancer/homer/MGG_vitc_MGG_control.MGG_vitc/knownResults.txt", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
@@ -166,11 +178,31 @@ homer_unique_enhancer_NHAcontrol_NHARcontrol <- read.delim("./unique2/enhancer/h
 		theme_bw())
 ggsave(homer_unique_enhancer_NHAcontrol_NHARcontrol_figure, file = "./unique2/enhancer/homer/homer_unique_enhancer_NHAcontrol_NHARcontrol_figure.pdf", height = 5, width = 5)
 
-### unique ER2
-signal <- read.delim("./unique2/MGG_vitc_MGG_control.union.RPKM", as.is = T, head = F, skip = 1, col.names = c("chr", "start", "end", "MGG_vitc", "MGG_conrtrol"))
-plot(density(signal$MGG_vitc), xlim = c(0,1000))
-lines(density(signal$MGG_conrtrol), col = "red")
-plot(density(log2((signal$MGG_vitc+10^-4)/(signal$MGG_conrtrol+10^-4))), xlim = c(-3,3))
+### unique ER3: CpG +/- 25bp -> 2-FC in RPKM & higher one RPKM > 10
+CG25_RPKM <- read.delim("./unique3/hMeDIP.CG25.matrix.RPKM", as.is = T)
+pdf("./unique3/hMeDIP.CG25.pdf", height = 5, width = 5)
+plot(ecdf(CG25_RPKM$X.MGG_control.), xlim=c(0,20), main = "RPKM for CpG +/- 25bp", xlab = "RPKM", ylab = "ecdf")
+lines(ecdf(CG25_RPKM$X.MGG_vitc.), col="red")
+lines(ecdf(CG25_RPKM$X.NHA_control.), col="blue")
+lines(ecdf(CG25_RPKM$X.NHAR_control.), col="green")
+lines(ecdf(CG25_RPKM$X.NHAR_vitc.), col="yellow")
+lines(ecdf(CG25_RPKM$X.NHA_vitc.), col="purple")
+abline(v = 5)
+legend("bottomright", c("MGG_control", "MGG_vitc", "NHA_control", "NHAR_control", "NHAR_vitc", "NHA_vitc"), col = c("black", "red", "blue", "green", "yellow", "purple"), lty = 1, lwd = 4, cex = 0.8)
+dev.off()
+plot(density(log2((CG25_RPKM$X.NHAR_control.+e)/(CG25_RPKM$X.NHA_control.+e))), main = "log2 FC", xlim = c(-3,3))
+
+### unique ER4: 200bp bins -> 2-FC in RPKM & higher one RPKM > 5
+union_RPKM <- read.delim("./unique4/hMeDIP.200.matrix.RPKM", as.is = T)
+pdf("./unique4/hMeDIP.200.pdf", height = 5, width = 5)
+plot(ecdf(union_RPKM$X.MGG_control.), xlim=c(0,20), main = "RPKM for 200bp bins", xlab = "RPKM", ylab = "ecdf")
+lines(ecdf(union_RPKM$X.MGG_vitc.), col="red")
+lines(ecdf(union_RPKM$X.NHA_control.), col="blue")
+lines(ecdf(union_RPKM$X.NHAR_control.), col="green")
+lines(ecdf(union_RPKM$X.NHAR_vitc.), col="yellow")
+lines(ecdf(union_RPKM$X.NHA_vitc.), col="purple")
+legend("bottomright", c("MGG_control", "MGG_vitc", "NHA_control", "NHAR_control", "NHAR_vitc", "NHA_vitc"), col = c("black", "red", "blue", "green", "yellow", "purple"), lty = 1, lwd = 4, cex = 0.8)
+dev.off()
 
 ## ============= save ===========
 save(list = c(ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "enrich"), ls(pattern = "DAVID"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
