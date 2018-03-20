@@ -63,6 +63,7 @@ mateFile = $file
 inputFormat = BAM
 mateOrientation = FR" > $dirOut/$name.controlFREEC.config
     $freec -conf $dirOut/$name.controlFREEC.config
+    cat $dirOut/makeGraph.R | /gsc/software/linux-x86_64-centos6/R-3.4.1/bin/R --slave --args 2 $dirOut/$(basename $file)_ratio.txt
 done
 
 # QC
