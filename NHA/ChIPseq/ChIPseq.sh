@@ -350,3 +350,29 @@ for file in $dirIn/H3K27ac/*.FindER.bed.gz; do
     $BEDTOOLS/intersectBed -a $file2 -b $file -v | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.weak.enhancer.bed
     echo -e $sample"\t"$(less $file | wc -l)"\t"$(less $file2 | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.weak.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$sample.weak.enhancer.bed | awk '{s=s+$3-$2}END{print s}') >> $dirOut/enhancer.K27ac_K4me1.summary
 done
+
+## FindER 2
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
+mkdir -p $dirOut
+for inp in $dirIn/input/*.bam; do
+    sample=$(basename $inp | cut -d'.' -f1 | sed 's/input_//');
+    echo $sample
+    sig1=$(echo $dirIn/H3K27me3/H3K27me3_$sample.bam)
+    sig2=$(echo $dirIn/H3K4me3/H3K4me3_$sample.bam)
+    sig3=$(echo $dirIn/H3K4me1/H3K4me1_$sample.bam)
+    sig4=$(echo $dirIn/H3K27ac/H3K27ac_$sample.bam)
+    sig5=$(echo $dirIn/H3K36me3/H3K36me3_$sample.bam)
+    sig=${sig1},${sig2},${sig3},${sig4},${sig5}
+    $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
+done
+echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_summary.txt
+for file in $dirOut/*.bed; do
+    mark=$(basename $file | cut -d'.' -f1 | cut -d'_' -f1)
+    sample=$(basename $file | cut -d'.' -f1 | cut -d'_' -f2,3)
+    echo $mark $sample
+    echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
+done
+
