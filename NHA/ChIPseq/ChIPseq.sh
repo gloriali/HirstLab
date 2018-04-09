@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# link bam files
+## link bam files
 dirIn=/projects/analysis/analysis30/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/
 less $dirOut/sample_info.txt | awk '{"echo $(ls ""'$dirIn'"$1"/*/"$1"_"$2"/75nt/hg19a/bwa-0.5.7/*.bam)" | getline bam; print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"bam}' > $dirOut/sample_info1.txt
 mv $dirOut/sample_info1.txt $dirOut/sample_info.txt
 less $dirOut/sample_info.txt | awk '{system("ln -s "$6" ""'$dirOut'""/bam/"$3"/"$3"_"$4".bam")}'
-# recover bams
+## recover bams
 function recover {
     file=$1
     dirOut=/projects/epigenomics3/bams/hg19/
@@ -25,7 +25,7 @@ rm $dirOut/bam/*/*.bam
 less $dirOut/sample_info.txt | awk '{system("ln -s ""'$dirIn'"$1"/"$1"_"$2".bam ""'$dirOut'""bam/"$3"/"$3"_"$4".bam")}'
 ls $dirOut/bam/*/*.bam | parallel --gnu -j 5 $sambamba index -t 6
 
-# QC
+## QC
 export PATH=/home/rislam/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
 sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
