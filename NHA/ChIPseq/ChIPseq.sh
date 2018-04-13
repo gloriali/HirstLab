@@ -176,42 +176,66 @@ for bam in H3K9me3/H3K9me3_NHAR_vitc.bam H3K9me3/H3K9me3_NHAR_control.bam H3K4me
     depth=$($samtools view -q 5 -F 1028 $bam | wc -l)
     $samtools view -q 5 -F 1028 -b $bam | $BEDTOOLS/coverageBed -a $Reg -b stdin -counts | awk '{print $0"\t""'$sample'""\t"$5*10^9/($3-$2)/"'$depth'"}' >> NHAR.H3K9me3.H3K4me3.bed
 done
+
+## FindER 2
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
+mkdir -p $dirOut
+for inp in $dirIn/input/*.bam; do
+    sample=$(basename $inp | cut -d'.' -f1 | sed 's/input_//');
+    echo $sample
+    sig1=$(echo $dirIn/H3K27me3/H3K27me3_$sample.bam)
+    sig2=$(echo $dirIn/H3K4me3/H3K4me3_$sample.bam)
+    sig3=$(echo $dirIn/H3K4me1/H3K4me1_$sample.bam)
+    sig4=$(echo $dirIn/H3K27ac/H3K27ac_$sample.bam)
+    sig5=$(echo $dirIn/H3K36me3/H3K36me3_$sample.bam)
+    sig=${sig1},${sig2},${sig3},${sig4},${sig5}
+    $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
+done
+echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_summary.txt
+for file in $dirOut/*.bed; do
+    mark=$(basename $file | cut -d'.' -f1 | cut -d'_' -f1)
+    sample=$(basename $file | cut -d'.' -f1 | cut -d'_' -f2,3)
+    echo $mark $sample
+    echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
+done
 ### K27ac signal for super enhancer
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/H3K27ac/
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
-dirOut=$dirIn/signal/; mkdir -p $dirOut
-cd $dirIn
-for file in *.FindER.bed.gz; do
-    sample=$(echo $file | sed 's/.vs.*//g');
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
+dirOut=$dirIn/SE/; mkdir -p $dirOut
+for file in $dirIn/H3K27ac*.FindER2.bed; do
+    sample=$(basename $file | cut -d'.' -f1);
     echo $sample
-    $JAVA -jar -Xmx15G $RegCov -w $dirWig/$sample.q5.F1028.PET.wig.gz -r $file -o $dirOut -c $chr -n $sample.FindER.signal > $dirOut/$sample.log
+    $JAVA -jar -Xmx15G $RegCov -w $dirWig/$sample.q5.F1028.PET.wig.gz -r $file -o $dirOut -c $chr -n $sample.FindER2.signal > $dirOut/$sample.log
 done
 
 ## unique ER
 ### unique ER -- strict
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/wig/
 mkdir -p $dirOut
 > $dirOut/ER.unique.log
 echo -e "Sample1\tSample2\tMark\tN1\tlen1\tN2\tlen2\tN_unique1\tlen_unique1\tN_unique2\tlen_unique2" > $dirOut/ER.unique.summary
-s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc")
-s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control")
-for ((i=0; i<4; i++)); do
+s1=("NHAR_vitc" "NHAR_control" "NHA_vitc" "NHAR_vitc" "MGG_vitc" "NHAR_control")
+s2=("NHAR_control" "NHA_control" "NHA_control" "NHA_control" "MGG119_control" "MGG119_control")
+for ((i=0; i<6; i++)); do
     sample1=${s1[i]}; sample2=${s2[i]}; name=$sample1"."$sample2
-    for mark in H3K27ac H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3; do
+    for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
         echo $name $mark
         echo -e "\n\n"$name $mark >> $dirOut/ER.unique.log
         mkdir -p $dirOut/$name/$mark/
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz -w $dirWig/$mark/$mark"_"$sample2.q5.F1028.PET.wig.gz -excl $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz -o $dirOut/$name/$mark/ -n $mark.$name.$sample1 >> $dirOut/ER.unique.log
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz -w $dirWig/$mark/$mark"_"$sample1.q5.F1028.PET.wig.gz -r $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz -o $dirOut/$name/$mark/ -n $mark.$name.$sample2 >> $dirOut/ER.unique.log
-        N1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | wc -l)
-        len1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | wc -l)
-        len2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark"_"$sample1.FindER2.bed -w $dirWig/$mark/$mark"_"$sample2.q5.F1028.PET.wig.gz -excl $dirIn/$mark"_"$sample2.FindER2.bed -o $dirOut/$name/$mark/ -n $mark.$name.$sample1 >> $dirOut/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/$mark"_"$sample1.FindER2.bed -w $dirWig/$mark/$mark"_"$sample1.q5.F1028.PET.wig.gz -r $dirIn/$mark"_"$sample2.FindER2.bed -o $dirOut/$name/$mark/ -n $mark.$name.$sample2 >> $dirOut/ER.unique.log
+        N1=$(less $dirIn/$mark"_"$sample1.FindER2.bed | wc -l)
+        len1=$(less $dirIn/$mark"_"$sample1.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
+        N2=$(less $dirIn/$mark"_"$sample2.FindER2.bed | wc -l)
+        len2=$(less $dirIn/$mark"_"$sample2.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
         N_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | wc -l)
         len_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | awk '{s=s+$3-$2}END{print s}')
         N_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | wc -l)
@@ -232,12 +256,12 @@ for ((i=0; i<5; i++)); do
     for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
         echo $name $mark
         mkdir -p $dirOut/$name/$mark/
-        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz) -b <(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample1.unique
-        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz) -b <(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample2.unique
-        N1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | wc -l)
-        len1=$(less $dirIn/$mark/$mark"_"$sample1.vs.input_$sample1.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | wc -l)
-        len2=$(less $dirIn/$mark/$mark"_"$sample2.vs.input_$sample2.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark"_"$sample1.FindER2.bed) -b <(less $dirIn/$mark"_"$sample2.FindER2.bed) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample1.unique
+        $BEDTOOLS/intersectBed -a <(less $dirIn/$mark"_"$sample2.FindER2.bed) -b <(less $dirIn/$mark"_"$sample1.FindER2.bed) -v | awk '{print "chr"$0}' > $dirOut/$name/$mark/$mark.$name.$sample2.unique
+        N1=$(less $dirIn/$mark"_"$sample1.FindER2.bed | wc -l)
+        len1=$(less $dirIn/$mark"_"$sample1.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
+        N2=$(less $dirIn/$mark"_"$sample2.FindER2.bed | wc -l)
+        len2=$(less $dirIn/$mark"_"$sample2.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
         N_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | wc -l)
         len_unique1=$(less $dirOut/$name/$mark/$mark.$name.$sample1.unique | awk '{s=s+$3-$2}END{print s}')
         N_unique2=$(less $dirOut/$name/$mark/$mark.$name.$sample2.unique | wc -l)
@@ -253,7 +277,7 @@ for mark in H3K27ac H3K4me1; do
     for compare in NHAR_vitc.NHAR_control NHAR_control.NHA_control NHAR_vitc.NHA_control NHA_vitc.NHA_control MGG_vitc.MGG119_control; do
         s1=$(echo $compare | sed 's/\..*//g'); s2=$(echo $compare | sed 's/.*\.//g');
         echo $mark $compare $s1 $s2
-        dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/$compare/$mark/
+        dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/$compare/$mark/
         dirOut=$dirIn/Homer/
         mkdir -p $dirOut
         cd $dirIn
@@ -271,13 +295,13 @@ done
 
 ### vitc reversed regions
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique/
 for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
     echo $mark
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHAR_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_control.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_gain.vitc_loss.bed
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHA_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_vitc.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_loss.vitc_gain.bed
 done
-/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed -n LTR
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r <(less /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed | awk '$1 !~ /gl/ {print $0}') -n LTR
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
@@ -349,30 +373,5 @@ for file in $dirIn/H3K27ac/*.FindER.bed.gz; do
     $BEDTOOLS/intersectBed -a $file -b $file2 -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.active.enhancer.bed
     $BEDTOOLS/intersectBed -a $file2 -b $file -v | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.weak.enhancer.bed
     echo -e $sample"\t"$(less $file | wc -l)"\t"$(less $file2 | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.weak.enhancer.bed | wc -l)"\t"$(less $dirOut/$sample.active.enhancer.bed | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/$sample.weak.enhancer.bed | awk '{s=s+$3-$2}END{print s}') >> $dirOut/enhancer.K27ac_K4me1.summary
-done
-
-## FindER 2
-java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
-finder2=/home/mbilenky/bin/FindER2/finder2.jar
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/bam/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
-mkdir -p $dirOut
-for inp in $dirIn/input/*.bam; do
-    sample=$(basename $inp | cut -d'.' -f1 | sed 's/input_//');
-    echo $sample
-    sig1=$(echo $dirIn/H3K27me3/H3K27me3_$sample.bam)
-    sig2=$(echo $dirIn/H3K4me3/H3K4me3_$sample.bam)
-    sig3=$(echo $dirIn/H3K4me1/H3K4me1_$sample.bam)
-    sig4=$(echo $dirIn/H3K27ac/H3K27ac_$sample.bam)
-    sig5=$(echo $dirIn/H3K36me3/H3K36me3_$sample.bam)
-    sig=${sig1},${sig2},${sig3},${sig4},${sig5}
-    $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
-done
-echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_summary.txt
-for file in $dirOut/*.bed; do
-    mark=$(basename $file | cut -d'.' -f1 | cut -d'_' -f1)
-    sample=$(basename $file | cut -d'.' -f1 | cut -d'_' -f2,3)
-    echo $mark $sample
-    echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
 done
 
