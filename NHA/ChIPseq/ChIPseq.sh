@@ -301,7 +301,7 @@ for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3; do
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHAR_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_control.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_gain.vitc_loss.bed
     $BEDTOOLS/intersectBed -a $dirOut/NHAR_control.NHA_control/$mark/$mark.NHAR_control.NHA_control.NHA_control.unique -b $dirOut/NHAR_vitc.NHAR_control/$mark/$mark.NHAR_vitc.NHAR_control.NHAR_vitc.unique | awk '$1 !~ /GL/ {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.mut_loss.vitc_gain.bed
 done
-/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r <(less /projects/epigenomics/resources/UCSC_hg19/rmsk/LTR.bed | awk '$1 !~ /gl/ {print $0}') -n LTR
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut -r <(less /projects/epigenomics2/resources/UCSC/hg19/rmsk/LTR.bed | awk '$1 !~ /gl/ {print $0}') -n LTR
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
@@ -314,44 +314,48 @@ for mark in H3K27ac H3K4me1; do
         /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -len 8 
     done
 done
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known11.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.GATA3.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.GATA3.annotate
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known26.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.Foxo1.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.Foxo1.annotate
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known29.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.BMYB.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.BMYB.annotate
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_loss.vitc_gain.bed hg19 -m $dirOut/homer/H3K27ac.mut_loss.vitc_gain/knownResults/known28.motif -nmotifs -mbed $dirOut/H3K27ac.mut_loss.vitc_gain.Bcl6.BS.bed > $dirOut/H3K27ac.mut_loss.vitc_gain.Bcl6.annotate
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/H3K27ac.mut_gain.vitc_loss.bed hg19 -m $dirOut/homer/H3K27ac.mut_gain.vitc_loss/knownResults/known36.motif -nmotifs -mbed $dirOut/H3K27ac.mut_gain.vitc_loss.FoxL2.BS.bed > $dirOut/H3K27ac.mut_gain.vitc_loss.FoxL2.annotate
 for file in *.BS.bed; do
     name=$(echo $file | sed 's/.BS.bed//g'); echo $name
     echo -e "chr\tstart\tend\tID\tENSG\tdistance" > $dirOut/$name.closest.gene
     less $file | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -D a | awk '{if($9>=-20000 && $9<=20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8"\t"$9}}' | sort -k5,5 >> $dirOut/$name.closest.gene
     join $dirOut/$name.closest.gene $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.closest.gene.RPKM
 done
-cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
-file=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac_NHAR_control.vs.input_NHAR_control.FDR_0.05.FindER.bed.gz
-$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tMGGintersect"}' > H3K27ac_NHAR_control.category.1
-$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -v | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tVitCresponse"}' > H3K27ac_NHAR_control.category.2
-$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -v | awk '{print $0"\tnon-response"}' > H3K27ac_NHAR_control.category.3
-cat H3K27ac_NHAR_control.category.1 H3K27ac_NHAR_control.category.2 H3K27ac_NHAR_control.category.3 > H3K27ac_NHAR_control.category
+export PATH=/home/rislam/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+less $dirOut/H3K27ac.mut_gain.vitc_loss.bed | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3}' > $dirOut/H3K27ac.mut_gain.vitc_loss1.bed
+computeMatrix scale-regions -R $dirOut/H3K27ac.mut_gain.vitc_loss1.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw $dirBW/NHAR_vitc.realign.bw -out $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.gz --startLabel start --endLabel end -bs 20
+plotHeatmap -m $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.gz -out $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.png --colorMap coolwarm --xAxisLabel "H3K27ac.mut_gain.vitc_loss" --startLabel start --endLabel end -max 50 --samplesLabel wt mut VitC 
+
+#cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+#file=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac_NHAR_control.vs.input_NHAR_control.FDR_0.05.FindER.bed.gz
+#$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tMGGintersect"}' > H3K27ac_NHAR_control.category.1
+#$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a stdin -b MGG_vitc.MGG119_control/H3K27ac/H3K27ac.MGG_vitc.MGG119_control.MGG119_control.unique -v | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -u | awk '{print $0"\tVitCresponse"}' > H3K27ac_NHAR_control.category.2
+#$BEDTOOLS/intersectBed -a NHAR_control.NHA_control/H3K27ac/H3K27ac.NHAR_control.NHA_control.NHAR_control.unique -b NHAR_vitc.NHAR_control/H3K27ac/H3K27ac.NHAR_vitc.NHAR_control.NHAR_control.unique -u | $BEDTOOLS/intersectBed -a <(less $file | awk '{print "chr"$0}') -b stdin -v | awk '{print $0"\tnon-response"}' > H3K27ac_NHAR_control.category.3
+#cat H3K27ac_NHAR_control.category.1 H3K27ac_NHAR_control.category.2 H3K27ac_NHAR_control.category.3 > H3K27ac_NHAR_control.category
 
 ### use NPC as an outgroup
-BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
-file1=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/A19308.NPC_GE04.vs.A19309.NPC_GE04.FDR_0.05.FindER.bed.gz
-for sample in MGG119_control NHAR_control MGG_vitc NHAR_vitc; do
-    name=$sample.NPC_GE04
-    echo $name
-    mkdir -p $dirOut/$name/H3K27ac/
-    $BEDTOOLS/intersectBed -a <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -b $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.$sample.unique
-    $BEDTOOLS/intersectBed -b <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -a $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.NPC_GE04.unique
-done
+#BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+#dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/
+#dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
+#file1=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/A19308.NPC_GE04.vs.A19309.NPC_GE04.FDR_0.05.FindER.bed.gz
+#for sample in MGG119_control NHAR_control MGG_vitc NHAR_vitc; do
+#    name=$sample.NPC_GE04
+#    echo $name
+#    mkdir -p $dirOut/$name/H3K27ac/
+#    $BEDTOOLS/intersectBed -a <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -b $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.$sample.unique
+#    $BEDTOOLS/intersectBed -b <(less $dirIn/H3K27ac_$sample.vs.input_$sample.FDR_0.05.FindER.bed.gz | awk '{print "chr"$0}') -a $file1 -v > $dirOut/$name/H3K27ac/H3K27ac.$name.NPC_GE04.unique
+#done
 
 ### categorize promoters and enhancers
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K4me3_K27me3/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/K4me3_K27me3/
 mkdir -p $dirOut
 echo -e "Sample\tBivalent\tH3K4me3\tH3K27me3\tUnmarked" > $dirOut/promoter.K4me3_K27me3.summary
-for file in $dirIn/H3K4me3/*.FindER.bed.gz; do
+for file in $dirIn/H3K4me3*.FindER2.bed; do
     sample=$(basename $file | cut -d'.' -f1 | sed 's/H3K4me3_//g' | sed 's/MGG119/MGG/g'); file2=$(echo $file | sed 's/H3K4me3/H3K27me3/g')
     echo $sample
     $BEDTOOLS/intersectBed -a $file -b $file2 | $BEDTOOLS/intersectBed -a $promoter -b stdin -u | awk '{print $0"\tbivalent"}' > $dirOut/$sample.promoter.K4me3_K27me3.bed
@@ -364,10 +368,10 @@ for file in $dirIn/H3K4me3/*.FindER.bed.gz; do
     unmarked=$(expr $(less $dirOut/$sample.promoter.K4me3_K27me3.bed | wc -l) - $((bivalent+H3K4me3+H3K27me3)))
     echo -e "$sample\t$bivalent\t$H3K4me3\t$H3K27me3\t$unmarked" >> $dirOut/promoter.K4me3_K27me3.summary
 done
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K27ac_K4me1/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER2/K27ac_K4me1/
 mkdir -p $dirOut
 echo -e "Sample\tH3K27ac\tH3K4me1\tActive\tWeak\tLength_active\tLength_weak" > $dirOut/enhancer.K27ac_K4me1.summary
-for file in $dirIn/H3K27ac/*.FindER.bed.gz; do
+for file in $dirIn/H3K27ac*.FindER2.bed; do
     sample=$(basename $file | cut -d'.' -f1 | sed 's/H3K27ac_//g' | sed 's/MGG119/MGG/g'); file2=$(echo $file | sed 's/H3K27ac/H3K4me1/g')
     echo $sample
     $BEDTOOLS/intersectBed -a $file -b $file2 -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -v > $dirOut/$sample.active.enhancer.bed
