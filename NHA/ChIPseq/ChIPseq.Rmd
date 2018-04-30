@@ -25,7 +25,7 @@ library(dplyr)
 library(RCircos)
 library(knitr)
 load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/ChIPseq.Rdata")
-knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 6) 
+knitr::opts_chunk$set(message=FALSE, echo = FALSE, warning = FALSE, results = FALSE, fig.height = 6, fig.width = 8) 
 knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/")
 ```
 
@@ -41,101 +41,142 @@ knitr::opts_knit$set(root.dir = "/projects/epigenomics3/epigenomics3_results/use
 
 ## Enrich regions
 * From [UCSC tracks](http://www.bcgsc.ca/downloads/mb/VitC_glioma/HistoneHub/hub.txt), FindER results make more sense than MACS2.      
+* FindER2 results showed much more ERs in addition to FindER ERs. Most of the additional ERs seems real from UCSC tracks.        
 
 ```{r ER_summary}
 (ER_summary_FindER_figure)
 ```
 
 ## Unique enrich regions
-* Unique enrich regions were identified by non-overlapping regions in pairwise comparisons.    
 
 ```{r ER_unique_summary}
 (ER_unique_summary_figure)
+```
+
+### H3K27ac homer
+
+```{r K27ac_homer, fig.height=5}
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_NHARcontrol_NHARvitc_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_NHARcontrol_NHARvitc_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_NHARvitc_NHARcontrol_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_NHARvitc_NHARcontrol_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_NHARcontrol_NHAcontrol_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_NHARcontrol_NHAcontrol_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_NHAcontrol_NHARcontrol_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_NHAcontrol_NHARcontrol_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_MGG119control_MGG119vitc_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_MGG119control_MGG119vitc_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_unique_enhancer_MGG119vitc_MGG119control_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_unique_enhancer_MGG119vitc_MGG119control_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 ```
 
 ### VitC reversed histone modification regions
 * mut_gain.vitc_loss: regions marked in NHAR but not in NHA overlapped with regions present in NHAR_control but not in NHAR_vitc.     
 * mut_loss.vitc_gain: regions marked in NHA but not in NHAR overlapped with regions present in NHAR_vitc but not in NHAR_control.     
 
-#### H3K27ac
-* mut_gain.vitc_loss: `r system("less ./unique2/H3K27ac.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
-* mut_loss.vitc_gain: `r system("less ./unique2/H3K27ac.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+```{r reversed_genomic_breakdown}
+(vitc_reversed_genomic_breakdown_figure)
+```
 
-```{r K27ac_venn, fig.height = 3}
+#### H3K27ac
+* mut_gain.vitc_loss: `r system("less ./unique/H3K27ac.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
+* mut_loss.vitc_gain: `r system("less ./unique/H3K27ac.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+
+```{r reversed_K27ac_venn, fig.height = 6, fig.width=4}
 grid.newpage()
 grid.draw(K27ac_NHA_mut_control_venn)
 grid.newpage()
 grid.draw(K27ac_NHA_wt_vitc_venn)
 ```
-```{r K27ac_GREAT, fig.height = 10}
-(GREAT_K27ac_mutGain_vitcLoss_figure)
-(GREAT_K27ac_mutLoss_vitcGain_figure)
-```
-```{r K27ac_homer, fig.height = 3}
+```{r reversed_K27ac_homer, fig.height = 3}
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(1, 2)))
 print(homer_K27ac_mutGain_vitcLoss_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(homer_K27ac_mutGain_vitcLoss_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
-grid.newpage()
-pushViewport(viewport(layout = grid.layout(1, 2)))
-print(homer_K27ac_mutLoss_vitcGain_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(homer_K27ac_mutLoss_vitcGain_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 ```
-```{r K27ac_TF, fig.height = 3}
-(enrich_K27ac_mutGain_vitcLoss_GATA3)
-(enrich_K27ac_mutGain_vitcLoss_Foxo1)
-kable(K27ac_mutGain_vitcLoss_GATA3_DE %>% select(ENSG, Name, DE, Sample), format = "html", align = "l", row.names = F)
-kable(K27ac_mutGain_vitcLoss_Foxo1_DE %>% select(ENSG, Name, DE, Sample), format = "html", align = "l", row.names = F)
+```{r reversed_K27ac_FoxL2, fig.height = 3}
+(enrich_K27ac_mutGain_vitcLoss_FoxL2)
+```
+```{r reversed_K27ac_FoxL2RPKM, fig.height = 8}
+(K27ac_mutGain_vitcLoss_FoxL2_figure)
 ```
 
 #### H3K4me1
-* mut_gain.vitc_loss: `r system("less ./unique2/H3K4me1.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
-* mut_loss.vitc_gain: `r system("less ./unique2/H3K4me1.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+* mut_gain.vitc_loss: `r system("less ./unique/H3K4me1.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
+* mut_loss.vitc_gain: `r system("less ./unique/H3K4me1.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
 
-```{r K4me1_venn, fig.height = 3}
+```{r reversed_K4me1_venn, fig.height = 3}
 grid.newpage()
 grid.draw(K4me1_NHA_mut_control_venn)
 grid.newpage()
 grid.draw(K4me1_NHA_wt_vitc_venn)
 ```
-```{r K4me1_GREAT, fig.height = 8}
-(GREAT_K4me1_mutGain_vitcLoss_figure)
-(GREAT_K4me1_mutLoss_vitcGain_figure)
+```{r reversed_K4me1_homer}
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_K4me1_mutGain_vitcLoss_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_K4me1_mutGain_vitcLoss_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_K4me1_mutLoss_vitcGain_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_K4me1_mutLoss_vitcGain_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 ```
 
 #### H3K4me3
-* mut_gain.vitc_loss: `r system("less ./unique2/H3K4me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
-* mut_loss.vitc_gain: `r system("less ./unique2/H3K4me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+* mut_gain.vitc_loss: `r system("less ./unique/H3K4me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
+* mut_loss.vitc_gain: `r system("less ./unique/H3K4me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
 
-```{r K4me3_venn, fig.height = 3}
+```{r reversed_K4me3_venn, fig.height = 3}
 grid.newpage()
 grid.draw(K4me3_NHA_mut_control_venn)
 grid.newpage()
 grid.draw(K4me3_NHA_wt_vitc_venn)
 ```
-```{r K4me3_GREAT, fig.height = 8}
-(GREAT_K4me3_mutGain_vitcLoss_figure)
-(GREAT_K4me3_mutLoss_vitcGain_figure)
-```
 
 #### H3K27me3
-* mut_gain.vitc_loss: `r system("less ./unique2/H3K27me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
-* mut_loss.vitc_gain: `r system("less ./unique2/H3K27me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+* mut_gain.vitc_loss: `r system("less ./unique/H3K27me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
+* mut_loss.vitc_gain: `r system("less ./unique/H3K27me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
 
-```{r K27me3_venn, fig.height = 3}
+```{r reversed_K27me3_venn, fig.height = 5}
 grid.newpage()
 grid.draw(K27me3_NHA_mut_control_venn)
 grid.newpage()
 grid.draw(K27me3_NHA_wt_vitc_venn)
 ```
+```{r reversed_K27me3_RPKM, fig.height=5, fig.width=6}
+(K27me3_mutGain_vitcLoss_exon_figure)
+(K27me3_mutGain_vitcLoss_promoter_figure)
+```
+```{r reversed_K27me3_enrich, fig.height=10}
+(enrich_K27me3_mutGain_vitcLoss_exons)
+(enrich_K27me3_mutGain_vitcLoss_promoters)
+```
 
 #### H3K36me3
-* mut_gain.vitc_loss: `r system("less ./unique2/H3K36me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
-* mut_loss.vitc_gain: `r system("less ./unique2/H3K36me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
+* mut_gain.vitc_loss: `r system("less ./unique/H3K36me3.mut_gain.vitc_loss.bed | wc -l", intern = T)` regions.     
+* mut_loss.vitc_gain: `r system("less ./unique/H3K36me3.mut_loss.vitc_gain.bed | wc -l", intern = T)` regions.     
 
-```{r K36me3_venn, fig.height = 3}
+```{r reversed_K36me3_venn, fig.height = 5}
 grid.newpage()
 grid.draw(K36me3_NHA_mut_control_venn)
 grid.newpage()
 grid.draw(K36me3_NHA_wt_vitc_venn)
+```
+```{r reversed_K36me3_RPKM, fig.height=5, fig.width=6}
+(K36me3_mutGain_vitcLoss_exon_figure)
+```
+```{r reversed_K36me3_enrich, fig.height=7}
+(enrich_K36me3_mutGain_vitcLoss_exons)
 ```
