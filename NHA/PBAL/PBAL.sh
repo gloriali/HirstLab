@@ -160,6 +160,16 @@ for file in *.combine.5mC.CpG; do
     less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
 done
+$BEDTOOLS/intersectBed -a ../Chan/DMR_hyper.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$13"\thyper"}' > Chan.NHA_NHAR.5mC
+$BEDTOOLS/intersectBed -a ../Chan/DMR_hypo.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$13"\thypo"}' >> Chan.NHA_NHAR.5mC
+$BEDTOOLS/intersectBed -a /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hyper.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$10}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $6"\t"$7"\t"$8"\t"$6":"$7"-"$8"\t"$5"\t"$11"\thyper"}' > CEMT.NHA_NHAR.5mC
+$BEDTOOLS/intersectBed -a /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hypo.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$10}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $6"\t"$7"\t"$8"\t"$6":"$7"-"$8"\t"$5"\t"$11"\thypo"}' >> CEMT.NHA_NHAR.5mC
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC -b /home/lli/hg19/CGI.forProfiles.BED -u | awk '{print $0"\tCGI"}' > CEMT.NHA_NHAR.5mC.CGI
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC -b /home/lli/hg19/CGI.forProfiles.BED -v | awk '{print $0"\tnonCGI"}' >> CEMT.NHA_NHAR.5mC.CGI
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC.CGI -b /home/lli/hg19/hg19v69_genes_TSS_2000.bed -u | awk '{print $0"\tpromoter"}' > CEMT.NHA_NHAR.5mC.CGI.promoter
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC.CGI -b /home/lli/hg19/hg19v69_genes_TSS_2000.bed -v | awk '{print $0"\tnon-promoter"}' >> CEMT.NHA_NHAR.5mC.CGI.promoter
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC.CGI.promoter -b <(less $enhancer | sed 's/chr//g') -u | awk '{print $0"\tenhancer"}' > CEMT.NHA_NHAR.5mC.CGI.promoter.enhancer
+$BEDTOOLS/intersectBed -a CEMT.NHA_NHAR.5mC.CGI.promoter -b <(less $enhancer | sed 's/chr//g') -v | awk '{print $0"\tnon-enhancer"}' >> CEMT.NHA_NHAR.5mC.CGI.promoter.enhancer
 
 # clustering
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
