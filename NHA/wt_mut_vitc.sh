@@ -16,7 +16,7 @@ mkdir -p $dirOut
 ## RPKM of 5mC modifiers
 regulator=/projects/epigenomics2/users/lli/glioma/WGBS/DNAme_regulators.txt 
 RPKM=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/vitc.RPKM
-join <(less $regulator | sort -k2,2) $RPKM -1 2 -2 1 | sed -e 's/ /\t/g' > $dirOut/DNAme_regulators.RPKM
+join <(less $regulator | sort -k2,2) $RPKM -1 2 -2 1 | join - /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.matrix -j 1 | sed -e 's/ /\t/g' > /projects/epigenomics3/epigenomics3_results/users/lli/NHA/DNAme_regulators.RPKM
 
 ## DE
 mkdir -p $dirOut/DE/
