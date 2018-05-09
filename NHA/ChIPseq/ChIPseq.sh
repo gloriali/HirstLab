@@ -327,6 +327,15 @@ dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
 less $dirOut/H3K27ac.mut_gain.vitc_loss.bed | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3}' > $dirOut/H3K27ac.mut_gain.vitc_loss1.bed
 computeMatrix scale-regions -R $dirOut/H3K27ac.mut_gain.vitc_loss1.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw $dirBW/NHAR_vitc.realign.bw -out $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.gz --startLabel start --endLabel end -bs 20
 plotHeatmap -m $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.gz -out $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.png --colorMap coolwarm --xAxisLabel "H3K27ac.mut_gain.vitc_loss" --startLabel start --endLabel end -max 50 --samplesLabel wt mut VitC 
+for file in H3K27me3*.bed H3K36me3*.bed; do
+    name=$(echo $file | sed 's/.bed//g'); echo $name
+    echo -e "chr\tstart\tend\tID\tENSG" > $dirOut/$name.exons
+    less $file | awk 'NR>1{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/hg19v69_exons_for_genes.bed -wa -wb | awk '{gsub("_.*", ""); print $1"\t"$2"\t"$3"\t"$4"\t"$8}' | sort -k5,5 >> $dirOut/$name.exons
+    join $dirOut/$name.exons $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.exons.RPKM
+    echo -e "chr\tstart\tend\tID\tENSG" > $dirOut/$name.promoters
+    less $file | awk 'NR>1{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/hg19v69_genes_TSS_2000.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' | sort -k5,5 >> $dirOut/$name.promoters
+    join $dirOut/$name.promoters $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.promoters.RPKM
+done
 
 #cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/unique2/
 #file=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac_NHAR_control.vs.input_NHAR_control.FDR_0.05.FindER.bed.gz
