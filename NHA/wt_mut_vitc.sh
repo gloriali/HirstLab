@@ -138,9 +138,10 @@ $BEDTOOLS/intersectBed -a $hypo -b $dir5hmC/../MACS2/q0.05/NHA_control_peaks.nar
 $BEDTOOLS/intersectBed -a $hypo -b $dir5hmC/../MACS2/q0.05/NHAR_control_peaks.narrowPeak -u | wc -l
 $BEDTOOLS/intersectBed -a $hypo -b $dir5mC/../NHA_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$6-$5"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b $dir5mC/../NHAR_control.combine.5mC.CpG -f 1 -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$12-$6}' > $dirChan/DMR_hypo.PBAL_mut-wt.bed
 cat $dirChan/DMR_hyper.PBAL_mut-wt.bed $dirChan/DMR_hypo.PBAL_mut-wt.bed > $dirChan/DMR.PBAL_mut-wt.bed
-dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
 less $hyper | awk '{print $1"\t"$2-100"\t"$3+100"\t"$4}' | sort -k1,1 -k2,2n > $dirChan/DMR_hyper.100.bed
 less $hypo | awk '{print $1"\t"$2-100"\t"$3+100"\t"$4}' | sort -k1,1 -k2,2n > $dirChan/DMR_hypo.100.bed
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
 computeMatrix scale-regions -R $dirChan/DMR_hyper.100.bed $dirChan/DMR_hypo.100.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw -out $dirChan/DMR.wt-mut.hMeDIP.gz --startLabel start --endLabel end -bs 20
 plotHeatmap -m $dirChan/DMR.wt-mut.hMeDIP.gz -out $dirChan/DMR.wt-mut.hMeDIP.png --colorMap coolwarm --xAxisLabel "450K DM CpG" --startLabel -100 --endLabel 100 --samplesLabel wt mut --regionsLabel 450K_hyper 450K_hypo
-
+computeMatrix scale-regions -R /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hyper.bed /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hypo.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw -out $dirOut/DMR.CEMT.wt-mut.hMeDIP.gz --startLabel start --endLabel end -bs 20
+plotHeatmap -m $dirOut/DMR.CEMT.wt-mut.hMeDIP.gz -out $dirOut/DMR.CEMT.wt-mut.hMeDIP.png --colorMap coolwarm --xAxisLabel "CEMT DMRs" --startLabel -100 --endLabel 100 --samplesLabel wt mut --regionsLabel CEMT_hyper CEMT_hypo
