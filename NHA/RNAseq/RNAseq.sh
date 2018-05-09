@@ -90,3 +90,14 @@ for file in $dirIn/*.bam; do
     less $dirOut/$name.snpEff.COSMIC.vcf | awk '$1 !~ /#/ {chr=$1; pos=$2; $1=$2=""; print chr"\t"pos"\t"pos+1"\t"$0}' > $dirOut/$name.snpEff.COSMIC.bed
 done
 
+# compare to Chan's data
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/
+RPKM=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/RPKM/vitc.RPKM
+FPKM=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/FPKM.wt.mut.txt
+cd $dirOut
+join <(less $RPKM | sort -k1,1) <(less $FPKM | sort -k1,1) -j 1 | awk 'NR>1 {print $1"\t"$2"\t"$5"\t"$9}' | sort -k3,3n | awk '{c++; print $0"\t"c}' | sort -k4,4n | awk '{c++; print $0"\t"c"\t"$5-c}' > wt.NHA_Chan.RPKM
+join <(less $RPKM | sort -k1,1) <(less $FPKM | sort -k1,1) -j 1 | awk 'NR>1 {print $1"\t"$2"\t"$6"\t"$10}' | sort -k3,3n | awk '{c++; print $0"\t"c}' | sort -k4,4n | awk '{c++; print $0"\t"c"\t"$5-c}' > mut.NHA_Chan.RPKM
+less wt.NHA_Chan.RPKM | awk '{if($7>5000){print $0}}' > wt.NHA_Chan.RPKM.UP
+less wt.NHA_Chan.RPKM | awk '{if($7<-5000){print $0}}' > wt.NHA_Chan.RPKM.DN
+less mut.NHA_Chan.RPKM | awk '{if($7>5000){print $0}}' > mut.NHA_Chan.RPKM.UP
+less mut.NHA_Chan.RPKM | awk '{if($7<-5000){print $0}}' > mut.NHA_Chan.RPKM.DN
