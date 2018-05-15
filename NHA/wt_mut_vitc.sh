@@ -145,3 +145,36 @@ computeMatrix scale-regions -R $dirChan/DMR_hyper.100.bed $dirChan/DMR_hypo.100.
 plotHeatmap -m $dirChan/DMR.wt-mut.hMeDIP.gz -out $dirChan/DMR.wt-mut.hMeDIP.png --colorMap coolwarm --xAxisLabel "450K DM CpG" --startLabel -100 --endLabel 100 --samplesLabel wt mut --regionsLabel 450K_hyper 450K_hypo
 computeMatrix scale-regions -R /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hyper.bed /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hypo.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw -out $dirOut/DMR.CEMT.wt-mut.hMeDIP.gz --startLabel start --endLabel end -bs 20
 plotHeatmap -m $dirOut/DMR.CEMT.wt-mut.hMeDIP.gz -out $dirOut/DMR.CEMT.wt-mut.hMeDIP.png --colorMap coolwarm --xAxisLabel "CEMT DMRs" --startLabel -100 --endLabel 100 --samplesLabel wt mut --regionsLabel CEMT_hyper CEMT_hypo
+
+## hMeDIP
+mkdir -p $dirOut/hMeDIP/
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.mut.unique.bed -b $dir5hmC/vitc_mut.vitc.unique.bed | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tUP_UP"}' > $dirOut/hMeDIP/group.wt-mut-vitc.UP-UP.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.mut.unique.bed -b $dir5hmC/vitc_mut.mut.unique.bed | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tUP_DN"}' > $dirOut/hMeDIP/group.wt-mut-vitc.UP-DN.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.mut.unique.bed -b $dir5hmC/vitc_mut.vitc.unique.bed -v | $BEDTOOLS/intersectBed -a stdin -b $dir5hmC/vitc_mut.mut.unique.bed -v | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tUP_ST"}' > $dirOut/hMeDIP/group.wt-mut-vitc.UP-ST.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.wt.unique.bed -b $dir5hmC/vitc_mut.vitc.unique.bed | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tDN_UP"}' > $dirOut/hMeDIP/group.wt-mut-vitc.DN-UP.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.wt.unique.bed -b $dir5hmC/vitc_mut.mut.unique.bed | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tDN_DN"}' > $dirOut/hMeDIP/group.wt-mut-vitc.DN-DN.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/wt_mut.wt.unique.bed -b $dir5hmC/vitc_mut.vitc.unique.bed -v | $BEDTOOLS/intersectBed -a stdin -b $dir5hmC/vitc_mut.mut.unique.bed -v | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tDN_ST"}' > $dirOut/hMeDIP/group.wt-mut-vitc.DN-ST.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/vitc_mut.vitc.unique.bed -b $dir5hmC/wt_mut.mut.unique.bed -v | $BEDTOOLS/intersectBed -a stdin -b $dir5hmC/wt_mut.wt.unique.bed -v | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tST_UP"}' > $dirOut/hMeDIP/group.wt-mut-vitc.ST-UP.bed
+$BEDTOOLS/intersectBed -a $dir5hmC/vitc_mut.mut.unique.bed -b $dir5hmC/wt_mut.mut.unique.bed -v | $BEDTOOLS/intersectBed -a stdin -b $dir5hmC/wt_mut.wt.unique.bed -v | awk '$1 !~ /GL/{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\tST_DN"}' > $dirOut/hMeDIP/group.wt-mut-vitc.ST-DN.bed
+echo -e "Group\tN_region\tTotal_length" > $dirOut/hMeDIP/group.summary
+for file in $dirOut/hMeDIP/group.*.bed; do
+    name=$(basename $file | cut -d'.' -f3)
+    echo -e "$name\t$(less $file | wc -l)\t$(less $file | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/hMeDIP/group.summary
+done
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
+computeMatrix scale-regions -R $dirOut/hMeDIP/group.*.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw $dirBW/NHAR_vitc.realign.bw -out $dirOut/hMeDIP/hMeDIP.wt-mut-vitc.gz --startLabel start --endLabel end -bs 20
+plotHeatmap -m $dirOut/hMeDIP/hMeDIP.wt-mut-vitc.gz -out $dirOut/hMeDIP/hMeDIP.wt-mut-vitc.png --colorMap coolwarm --xAxisLabel "5hmC unique" --startLabel start --endLabel end --samplesLabel wt mut vitc --regionsLabel DN-DN DN-ST DN-UP ST-DN DT-UP UP-DN UP-ST UP-UP
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/hMeDIP/ -r $enhancer -n "enhancer"
+$BEDTOOLS/intersectBed -a $dirOut/hMeDIP/group.wt-mut-vitc.DN-UP.bed -b $enhancer -u > $dirOut/hMeDIP/group.wt-mut-vitc.DN-UP_enhancer.bed
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+mkdir -p $dirOut/hMeDIP/homer/
+for file in $dirOut/hMeDIP/group.*.bed; do
+     name=$(basename $file | cut -d'.' -f3)
+     echo $name
+     mkdir -p $dirOut/hMeDIP/homer/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/homer/$name/ -size given -len 8 
+done
+
+
