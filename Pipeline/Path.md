@@ -24,7 +24,7 @@ File paths on xhost
 * R functions: `/home/lli/HirstLab/Pipeline/R/`
 * Shell scripts: `/home/lli/HirstLab/Pipeline/shell/`   
 * Python scripts: `/home/lli/HirstLab/Pipeline/python/`  
-* UCSC scripts: `/home/lli/HirstLab/Pipeline/UCSC/`  
+* UCSC tools: `/gsc/software/linux-x86_64/ucsc_tools/`  
 
 ## Rescources
 * Self processed hg19: `/home/lli/hg19/`
