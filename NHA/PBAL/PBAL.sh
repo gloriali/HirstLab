@@ -67,7 +67,7 @@ mateOrientation = FR" > $dirOut/$name.controlFREEC.config
 done
 
 # QC
-dirIn=/projects/edcc_prj2/bs-seq/PX0682/
+dirIn=/projects/edcc_prj2/bs-seq/PX0682/May2018/
 dirBam=/projects/epigenomics3/bams/hg19/PX0682/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/
 dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/PBAL/hg19/
@@ -80,8 +80,9 @@ genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/PBAL/hub.txt
 > $dirHub/trackDb.txt
 less $dirOut/SampleInfo.txt | awk '{system("cp /projects/analysis/analysis30/"$2"_"$3"/merge*/150nt/hg19a/"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam")}'
-less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirOut'""/bam/"$1".6_lanes_dupsFlagged.bam")}'
-less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.Cmethyl.cons.bed.CpG.txt.gz"" ""'$dirOut'"$1".Cmethyl.cons.bed.CpG.txt.gz")}'
+#less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirBam'"$2"_"$3"_6_lanes_dupsFlagged.bam"" ""'$dirOut'""/bam/"$1".6_lanes_dupsFlagged.bam")}'
+less $dirOut/SampleInfo.txt | awk '{system("ln -s /projects/analysis/analysis30/"$2"_"$3"/merge*_novo-3.04.06-k17-s2/150bp/hg19a/"$2"_"$3"_11_lanes_dupsFlagged.bam"" ""'$dirOut'""/bam/"$1".11_lanes_dupsFlagged.bam")}'
+less $dirOut/SampleInfo.txt | awk '{system("ln -s ""'$dirIn'"$2"_"$3"_11_lanes_dupsFlagged.Cmethyl.cons.bed.CpG.txt.gz"" ""'$dirOut'"$1".Cmethyl.cons.bed.CpG.txt.gz")}'
 less $dirOut/SampleInfo.txt | awk '{system("cp ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.coverage.bw"" ""'$dirHub'"$1".coverage.bw")}'
 less $dirOut/SampleInfo.txt | awk '{system("cp ""'$dirIn'"$2"_"$3"_6_lanes_dupsFlagged.fractional.bw"" ""'$dirHub'"$1".fractional.bw")}'
 function qc {
@@ -90,45 +91,46 @@ function qc {
     dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/bam/
     dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/PBAL/hg19/
     bam=$1
-    name=$(basename $bam | cut -d'.' -f1)
+    #name=$(basename $bam | cut -d'.' -f1)
+    name=$(basename $bam | sed 's/_dupsFlagged.bam//')
     echo $name 
     $sambamba index $bam -t 8
     $sambamba flagstat $bam -t 8 > $dirIn/$name.flagstat
     $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
     /home/mbilenky/bin/PETLengthDist.sh $bam 5 $dirIn 10
-    echo -e "
-track $name coverage
-shortLabel $name cov
-longLabel PBAL $name coverage
-type bigWig
-visibility full
-maxHeightPixels 70:70:32
-configurable on
-autoScale on
-alwaysZero on
-priority 0.1
-bigDataUrl $name.coverage.bw
-color 0,0,0
-
-track $name fractional
-shortLabel $name 5mC
-longLabel PBAL $name fractional
-type bigWig
-visibility full
-maxHeightPixels 70:70:32
-configurable on
-autoScale on
-alwaysZero on
-priority 0.1
-bigDataUrl $name.fractional.bw
-color 0,255,0
-" >> $dirHub/trackDb.txt
+#    echo -e "
+#track $name coverage
+#shortLabel $name cov
+#longLabel PBAL $name coverage
+#type bigWig
+#visibility full
+#maxHeightPixels 70:70:32
+#configurable on
+#autoScale on
+#alwaysZero on
+#priority 0.1
+#bigDataUrl $name.coverage.bw
+#color 0,0,0
+#
+#track $name fractional
+#shortLabel $name 5mC
+#longLabel PBAL $name fractional
+#type bigWig
+#visibility full
+#maxHeightPixels 70:70:32
+#configurable on
+#autoScale on
+#alwaysZero on
+#priority 0.1
+#bigDataUrl $name.fractional.bw
+#color 0,255,0
+#" >> $dirHub/trackDb.txt
 }
 export -f qc
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/bam/
 cd $dirIn
-ls *.bam > List.txt
+ls *11_lanes*.bam > List.txt
 cat List.txt | parallel --gnu qc 
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 
