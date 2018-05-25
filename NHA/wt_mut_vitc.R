@@ -63,6 +63,54 @@ PBAL_450K_DMR <- read.delim("/projects/epigenomics3/epigenomics3_results/users/l
 		theme_bw())
 ggsave(PBAL_450K_DMR_figure, file = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Chan/DMR.PBAL_mut-wt.pdf")
 
+## ============= hMeDIP =========
+### -------- enrichment in genomic regions ------
+genomic_breakdown <- read.delim("./hMeDIP/intersect/genomic.breakdown.summary", as.is = T) %>% 
+	mutate(group = gsub("group.wt-mut-vitc.", "", Name), NCpG = NULL, Name = NULL)
+genomic_breakdown_tall <- melt(genomic_breakdown, id = "group") 
+(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, log2(value), fill = group)) + 
+		geom_bar(stat = "identity", position = position_dodge(), width = 0.8) + 
+		geom_hline(yintercept = c(-1, 1)) + 
+		facet_wrap(~ group) + 
+		guides(fill = "none") + 
+		xlab("") + 
+		ylab("Fold enrichment") + 
+		coord_flip() + 
+		theme_bw())
+ggsave(genomic_breakdown_figure, file = "./hMeDIP/genomic_breakdown_figure.pdf", height = 7, width = 7)
+### ------------ intersect with enhancer ---------------
+(DN_UP_enhancer_enrich <- enrich_GREAT("DN-UP_enhancer", "DN-UP_enhancer", top = 10, dirIn = "./hMeDIP/enrich/", dirOut = "./hMeDIP/enrich/", height = 6, width = 7))
+TF_ENSG <- read.delim("/home/lli/hg19/TF.ENSG", as.is = T) %>% merge(RPKM)
+homer_DN_UP_enhancer <- read.delim("./hMeDIP/homer/DN-UP_enhancer/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_enhancer_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>%
+	filter(Percent_enhancer_with_motif >= 20, q.value..Benjamini. <= 0.05) %>% arrange(Percent_enhancer_with_motif) %>% mutate(TF = factor(TF, levels = TF)) %>% merge(TF_ENSG)
+(homer_DN_UP_enhancer_figure <- ggplot(homer_DN_UP_enhancer, aes(TF, Percent_enhancer_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("5hmC DN-UP enhancere") + 
+		theme_bw())
+ggsave(homer_DN_UP_enhancer_figure, file = "./hMeDIP/homer/homer_DN_UP_enhancer_figure.pdf", height = 5, width = 5)
+homer_DN_UP_enhancer_RPKM <- homer_DN_UP_enhancer %>% select(TF, MGG119_control:NHA_vitc) %>% melt(id = "TF") %>% mutate(TF = factor(TF, levels = levels(homer_DN_UP_enhancer$TF)))
+(homer_DN_UP_enhancer_RPKM_figure <- ggplot(homer_DN_UP_enhancer_RPKM, aes(TF, log10(value), color = variable)) + 
+		geom_point(size = 2, position = position_jitter(width = 0.1)) + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("log10 RPKM") + 
+		ggtitle("NHARvitc_NHARcontrol NHARcontrol unique") + 
+		guides(color = guide_legend(title = "")) + 
+		theme_bw() + 
+		theme(axis.text.y = element_text(size = 0), plot.background = element_rect(fill = "transparent")))
+ggsave(homer_DN_UP_enhancer_RPKM_figure, file = "./hMeDIP/homer/homer_DN_UP_enhancer_RPKM_figure.pdf", height = 5, width = 5)
+pdf("./hMeDIP/homer/homer_DN_UP_enhancer_figure.pdf", height = 5, width = 8)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(homer_DN_UP_enhancer_figure + theme(plot.margin = unit(c(1,0,1,1), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(homer_DN_UP_enhancer_RPKM_figure + ggtitle("") + theme(plot.margin = unit(c(1,1,1,-0.5), "cm")), vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+dev.off()
+
+
 ## ============= save ===========
 save(list = c(ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "enrich"), ls(pattern = "DAVID"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
 		 file = "/projects/epigenomics3/epigenomics3_results/users/lli/NHA/wt_mut_vitc/wt_mut_vitc.Rdata")
