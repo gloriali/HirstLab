@@ -13,6 +13,7 @@ library(RCircos)
 library(stringr)
 library(scales)
 library(preprocessCore)
+source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 setwd("/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/")
 load("/projects/epigenomics3/epigenomics3_results/users/lli/Claudia/Claudia.Rdata")
 
@@ -21,7 +22,26 @@ DNAme <- read.csv("DNAme/180212-FB-betas-@lli.csv", row.names = 1)
 DNAme_norm <- DNAme %>% as.matrix() %>% normalize.quantiles() %>% as.data.frame()
 colnames(DNAme_norm) <- colnames(DNAme)
 DNAme_norm$ID <- row.names(DNAme)
-DNAme_long <- DNAme_norm %>% select(ID, starts_with("GW")) %>% melt(id = "ID") %>% mutate(GW = factor(gsub("\\..*", "", variable), levels = c("GW8", "GW9", "GW10", "GW11", "GW12", "GW13", "GW14", "GW17")))
+DNAme_norm$diff.M291 <- DNAme_norm$GW17.M594 - DNAme_norm$GW13.M291
+DNAme_norm$diff.M318 <- DNAme_norm$GW17.M594 - DNAme_norm$GW13.M318
+DNAme_norm$diff.M446 <- DNAme_norm$GW17.M594 - DNAme_norm$GW13.M446
+DNAme_norm$diff.M498 <- DNAme_norm$GW17.M594 - DNAme_norm$GW13.M498
+cut <- 0.15 
+DM_sum <- data.frame(GW13 = c("M291", "M318", "M446", "M498"), 
+										 hyper = c(sum(DNAme_norm$diff.M291 > cut), sum(DNAme_norm$diff.M318 > cut), sum(DNAme_norm$diff.M446 > cut), sum(DNAme_norm$diff.M498 > cut)), 
+										 hypo = c(sum(DNAme_norm$diff.M291 < -cut), sum(DNAme_norm$diff.M318 < -cut), sum(DNAme_norm$diff.M446 < -cut), sum(DNAme_norm$diff.M498 < -cut)))
+(DM_sum_figure <- ggplot(DM_sum %>% melt(id = "GW13"), aes(GW13, value, fill = variable)) + 
+		geom_bar(stat = "identity", position = position_dodge()) + 
+		scale_fill_manual(values = c("hyper" = "red", "hypo" = "blue"), name = "DM in GW17") + 
+		ylab("No. of probes") + 
+		theme_bw())
+ggsave(DM_sum_figure, file = "DM_sum_figure.pdf", height = 4, width = 4)
+DNAme_ave <- data.frame(ID = DNAme_norm$ID)
+for(GW in c("GW8", "GW9", "GW10", "GW11", "GW12", "GW13", "GW14", "GW17")){
+	DNAme_ave[, GW] <- rowMeans(DNAme_norm %>% select(starts_with(GW)))
+}
+DNAme_ave$diff <- DNAme_ave$GW17 - DNAme_ave$GW13
+DNAme_long <- DNAme_ave %>% select(ID, starts_with("GW")) %>% melt(id = "ID") %>% mutate(GW = factor(variable, levels = c("GW8", "GW9", "GW10", "GW11", "GW12", "GW13", "GW14", "GW17")))
 Olig2_450K <- read.delim("DNAme/Olig2.promoter.450K.bed", head = F, as.is = T)
 (Olig2_450K_figure <- ggplot(DNAme_long %>% filter(ID %in% Olig2_450K$V4), aes(GW, as.numeric(value), color = variable)) + 
 		geom_point() + 
@@ -45,9 +65,13 @@ GW_hyper_450K <- read.delim("DNAme/DMR.HuFNSC02_HuFNSC04.450K.hyper.bed", head =
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(GW_hyper_450K_figure, file = "GW_hyper_450K_figure.pdf", height = 8, width = 8)
 GW_hypo_450K <- read.delim("DNAme/DMR.HuFNSC02_HuFNSC04.450K.hypo.bed", head = F, as.is = T)
-(GW_hypo_450K_figure <- ggplot(DNAme_long %>% filter(ID %in% intersect(GW_hypo_450K$V4, DNAme_norm[DNAme_norm$GW17.M594-DNAme_norm$GW13.M291 < -0.05, "ID"])), aes(GW, value, color = variable)) + 
-		geom_point() + 
-		facet_wrap(~ID) +
+cut <- 0.05
+GW_hypo_450K_validate <- GW_hypo_450K %>% filter(V4 %in% DNAme_norm[DNAme_norm$diff.M291 < -cut | DNAme_norm$diff.M318 < -cut | DNAme_norm$diff.M446 < -cut | DNAme_norm$diff.M498 < -cut, "ID"])
+write.table(GW_hypo_450K_validate, file = "GW_hypo_450K_validate.bed", sep = "\t", row.names = F, col.names = F, quote = F)
+(GW_hypo_450K_validate_enrich <- enrich_GREAT("GW_hypo_450K_validate", "GW_hypo_450K_validate", dirIn = "./", dirOut = "./", width = 6))
+(GW_hypo_450K_figure <- ggplot(DNAme_long %>% filter(ID %in% intersect(GW_hypo_450K$V4, DNAme_ave[DNAme_ave$diff < -0.01, "ID"])), aes(GW, value, color = ID)) + 
+		geom_smooth(aes(group = ID), se = F) + 
+		#facet_wrap(~ID) +
 		guides(color = "none") + 
 		xlab("") + 
 		ylab("beta value") + 
