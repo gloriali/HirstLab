@@ -19,6 +19,18 @@ load("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/PBAL.Rdata"
 RPKM <- read.delim("../RNAseq/RPKM/vitc.RPKM", as.is = T)
 rownames(RPKM) <- RPKM$ENSG
 
+## ------- 5mC regulators expression --------
+DNAme_regulators_RPKM <- read.delim("/projects/epigenomics3/epigenomics3_results/users/lli/NHA/DNAme_regulators.RPKM", as.is = T) %>% select(-Name) %>% melt(id = c("ENSG", "gene")) %>% mutate(category = gsub("_.*", "", variable))
+(DNAme_regulators_RPKM_figure <- ggplot(DNAme_regulators_RPKM, aes(gene, log10(value), color = category, group = variable)) + 
+		geom_point(position = position_jitter(width = 0.2)) + 
+		scale_color_manual(values = c("AML_IDHmut" = "darkblue", "AML_IDHwt" = "skyblue", "IDHmut" = "darkgreen", "IDHwt" = "lightgreen", "MGG119" = "orange", "NHAR" = "darkred", "NHA" = "pink", "NPC" = "yellow")) + 
+		coord_flip() + 
+		guides(color = guide_legend(title = NULL)) + 
+		xlab("") + 
+		ylab("log10 RPKM") + 
+		theme_bw())
+ggsave(DNAme_regulators_RPKM_figure, file = "DNAme_regulators_RPKM_figure.pdf", height = 5, width = 5)
+
 ## ------- QC -------
 QC_summary <- read.delim("./bam/summary.xls", as.is = T, row.names = 2, head = F) %>% select(-V1) %>% t() %>% as.data.frame() %>% mutate(Sample = Library)
 QC_summary_reads <- QC_summary %>% select(Sample, Total_Number_Of_Reads, Number_Reads_Aligned, Number_Uniquely_Aligned_Reads_After_Filter) %>% melt(id.var = "Sample")
@@ -56,8 +68,10 @@ pearson_genome_5mC <- cor(genome_5mC, method = "pearson")
 write.table(spearman_genome_5mC, file = "cluster_spearman_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 write.table(pearson_genome_5mC, file = "cluster_pearson_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 CGI_5mC <- read.table("matrix_CGI.5mC", sep = " ", row.names = 1, head = T)
-spearman_CGI_5mC <- cor(CGI_5mC, method = "spearman")
-pearson_CGI_5mC <- cor(CGI_5mC, method = "pearson")
+CGI_5mC_CEMT <- read.table("/projects/epigenomics2/users/lli/glioma/WGBS/matrix_CGI.5mC", sep = " ", head = F, row.names = 1, col.names = c("ID", "IDHmut_CEMT_19", "IDHmut_CEMT_21", "IDHmut_CEMT_22", "IDHmut_CEMT_47", "IDHmut_TCGA060128", "IDHmut_TCGA161460", "IDHmut_TCGA191788", "IDHwt_CEMT_23", "IDHwt_TCGA141401", "IDHwt_TCGA141454", "IDHwt_TCGA143477", "NPC_Cortex02", "NPC_Cortex04", "NPC_GE02", "NPC_GE04"))
+CGI_5mC <- merge(CGI_5mC, CGI_5mC_CEMT, by = "row.names")
+spearman_CGI_5mC <- cor(CGI_5mC %>% select(-Row.names), method = "spearman")
+pearson_CGI_5mC <- cor(CGI_5mC %>% select(-Row.names), method = "pearson")
 write.table(spearman_CGI_5mC, file = "cluster_spearman_CGI_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 write.table(pearson_CGI_5mC, file = "cluster_pearson_CGI_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 op <- par(mar = c(5, 4, 4, 8))
@@ -74,7 +88,7 @@ pearson_CGI_5mC <- read.delim("cluster_pearson_CGI_5mC.cor", as.is = T)
 pearson_CGI_5mC_dend <-  hclust(1 - pearson_CGI_5mC %>% as.dist, method = "ward.D2") %>% as.dendrogram
 plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
 par(op)
-pdf("cluster.pdf", height = 5, width = 5)
+pdf("cluster.pdf", height = 7, width = 5)
 op <- par(mar = c(5, 4, 4, 8))
 plot(spearman_genome_5mC_dend, main = "genome-wide spearman", horiz = TRUE)
 plot(pearson_genome_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
@@ -100,9 +114,12 @@ qc_5mC_violin <- rbind(melt(genome_5mC) %>% mutate(type = "genome"), melt(CGI_5m
 		coord_flip() + 
 		theme_bw())
 ggsave(qc_5mC_violin_figure, file = "qc_5mC_violin_figure.pdf", height = 7, width = 6)
-qc_5mC_profile <- read.delim("qc_5mC_profile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), N = ifelse(type == "genome", N/1e6, N/1e3)) 
-(qc_5mC_profile_figure <- ggplot(qc_5mC_profile, aes(fractional, N, color = sample)) + 
-		geom_smooth(se = F, span = 0.1, size = 0.5) + 
+qc_5mC_profile <- rbind(read.delim("qc_5mC_profile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), N = ifelse(type == "genome", N/1e6, N/1e3)),
+												#read.delim("/projects/epigenomics3/epigenomics3_results/users/lli/AML/qc_5mC_profile.txt", as.is = T) %>% mutate(category = ifelse(grepl("IDHwt", sample), "AML_IDHwt", "AML_IDHmut"), N = ifelse(type == "genome", N/1e6, N/1e3)),
+												read.delim("/projects/epigenomics2/users/lli/glioma/WGBS/qc_5mC_profile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), N = ifelse(type == "genome", N/1e6, N/1e3)))
+(qc_5mC_profile_figure <- ggplot(qc_5mC_profile, aes(fractional, N, color = category, group = sample)) + 
+		geom_smooth(method = "loess", se = F, span = 0.1, size = 0.5) + 
+		scale_color_manual(values = c("AML_IDHmut" = "darkblue", "AML_IDHwt" = "skyblue", "IDHmut" = "darkgreen", "IDHwt" = "lightgreen", "MGG" = "orange", "NHAR" = "darkred", "NHA" = "pink", "NPC" = "yellow")) + 
 		facet_grid(type ~ ., scales = "free_y") + 
 		guides(color = guide_legend(title = NULL), override.aes = list(size = 5)) + 
 		coord_cartesian(ylim = c(0, 6)) + 
@@ -110,16 +127,45 @@ qc_5mC_profile <- read.delim("qc_5mC_profile.txt", as.is = T) %>% mutate(categor
 		ylab("No. of million CpGs                    No. of thousand CGIs") + 
 		theme_bw())
 ggsave(qc_5mC_profile_figure, file = "qc_5mC_profile_figure.pdf", height = 5, width = 6)
-qc_5mC_quantile <- read.delim("qc_5mC_quantile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample)) %>% filter(sample != "IDHmut_CEMT_21")
+qc_5mC_quantile <- rbind(read.delim("qc_5mC_quantile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample)),
+												read.delim("/projects/epigenomics3/epigenomics3_results/users/lli/AML/qc_5mC_quantile.txt", as.is = T) %>% mutate(category = ifelse(grepl("IDHwt", sample), "AML_IDHwt", "AML_IDHmut")),
+												read.delim("/projects/epigenomics2/users/lli/glioma/WGBS/qc_5mC_quantile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample))) %>% filter(sample != "IDHmut_CEMT_21")
 (qc_5mC_quantile_figure <- ggplot(qc_5mC_quantile, aes(x = sample, lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax, fill = category)) + 
 		geom_boxplot(stat = "identity", color = "grey") + 
+		scale_fill_manual(values = c("AML_IDHmut" = "darkblue", "AML_IDHwt" = "skyblue", "IDHmut" = "darkgreen", "IDHwt" = "lightgreen", "MGG" = "orange", "NHAR" = "darkred", "NHA" = "pink", "NPC" = "yellow")) + 
 		facet_grid(type ~ .) + 
 		guides(color = guide_legend(title = NULL)) + 
 		xlab("") + 
 		ylab("Fractional methylation") + 
 		coord_flip() + 
 		theme_bw())
-ggsave(qc_5mC_quantile_figure, file = "qc_5mC_quantile_figure.pdf", height = 7, width = 6)
+ggsave(qc_5mC_quantile_figure, file = "qc_5mC_quantile_figure.pdf", height = 7, width = 7)
+
+## ----------- compare to other DMRs ----------
+Chan_5mC <- read.delim("./Chan.NHA_NHAR.5mC", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "Chan_wt", "Chan_mut", "NHA", "NHAR", "DM")) 
+Chan_5mC_long <- Chan_5mC %>% mutate(ID = factor(ID, levels = rev(ID))) %>% select(ID, DM, Chan_wt, Chan_mut, NHA, NHAR) %>% melt(id = c("ID", "DM"))
+(Chan_5mC_figure <- ggplot(Chan_5mC_long, aes(x = variable, y = ID, fill = value)) + 
+		geom_tile() + 
+		scale_fill_gradient(name = " Fractional\nmethylation", low = "skyblue", high = "black") + 
+		xlab("") + 
+		ylab("") + 
+		theme_bw() + 
+		theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 0), plot.background = element_rect(fill = "transparent")))
+ggsave(Chan_5mC_figure, file = "Chan_5mC_figure.pdf", height = 7, width = 6)
+(Chan_5mC_density_figure <- ggplot(Chan_5mC_long, aes(value, color = variable)) + 
+		geom_density() + 
+		facet_wrap(~ DM, nrow = 2) + 
+		xlab("Fractional methylation") + 
+		theme_bw())
+ggsave(Chan_5mC_density_figure, file = "Chan_5mC_density_figure.pdf", height = 4, width = 4)
+CEMT_5mC <- read.delim("./CEMT.NHA_NHAR.5mC.CGI.promoter.enhancer", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "NHA", "NHAR", "DM", "CGI", "promoter", "enhancer")) %>% mutate(category = paste0(promoter, ".", CGI), category = ifelse(CGI == "nonCGI", "nonCGI", category))
+CEMT_5mC_long <- CEMT_5mC %>% select(ID, DM, category, enhancer, NHA, NHAR) %>% melt(id = c("ID", "DM", "category", "enhancer"))
+(CEMT_5mC_density_figure <- ggplot(CEMT_5mC_long, aes(value, color = variable)) + 
+		geom_density() + 
+		facet_grid(DM ~ enhancer, scales = "free_y") + 
+		xlab("Fractional methylation") + 
+		theme_bw())
+ggsave(CEMT_5mC_density_figure, file = "CEMT_5mC_density_enhancer_figure.pdf", height = 4, width = 5)
 
 ## ----------- DMRs -------------
 ### -------- enrichment in genomic regions ------
