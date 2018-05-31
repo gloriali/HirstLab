@@ -32,7 +32,7 @@ freec=/projects/wtsspipeline/programs/external_programs/Control_FreeC_v7.0/freec
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/CNV/
 mkdir -p $dirOut
-for file in $dirIn/*.bam; do
+for file in $dirIn/*11_lanes*.bam; do
     name=$(basename $file | cut -d'.' -f1)
     echo $name
     echo -e "[general]
@@ -162,6 +162,7 @@ for file in *.combine.5mC.CpG; do
     less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
 done
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/H3K27ac/H3K27ac.union.bed
 $BEDTOOLS/intersectBed -a ../Chan/DMR_hyper.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$13"\thyper"}' > Chan.NHA_NHAR.5mC
 $BEDTOOLS/intersectBed -a ../Chan/DMR_hypo.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$12}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$13"\thypo"}' >> Chan.NHA_NHAR.5mC
 $BEDTOOLS/intersectBed -a /projects/epigenomics2/users/lli/glioma/WGBS/DMR/DMR.IDHmut_CEMT.hyper.bed -b NHA_control.combine.5mC.CpG -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$10}' | $BEDTOOLS/intersectBed -a stdin -b NHAR_control.combine.5mC.CpG -wa -wb | awk '{print $6"\t"$7"\t"$8"\t"$6":"$7"-"$8"\t"$5"\t"$11"\thyper"}' > CEMT.NHA_NHAR.5mC
@@ -242,7 +243,7 @@ dirOut=$dirIn/DMR/
 mkdir -p $dirOut/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR.summary.stats
-pth=0.1; delta=0.25; m=0.5; cov=3; size=500; cut=3
+pth=0.05; delta=0.25; m=0.5; cov=3; size=500; cut=3
 cd $dirIn
 for file1 in *vitc.combine.5mC.CpG; do
     lib1=$(echo $file1 | sed 's/.combine.5mC.CpG//g')
@@ -262,7 +263,7 @@ dirDhMR=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2
 cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/
 echo -e "Sample1\tSample2\tDM\tN_region\tlength" > DMR.summary.stats
 echo -e "Sample1\tSample2\tDM\tN_region\tlength" > DMR-DhMR.summary.stats
-for file in DMR.*.hyper.bed; do
+for file in DMR.*.hyper; do
     sample1=$(echo $file | cut -d'.' -f2 | cut -d'_' -f1,2)
     sample2=$(echo $file | cut -d'.' -f2 | cut -d'_' -f3,4)
     echo $sample1 $sample2
@@ -270,7 +271,7 @@ for file in DMR.*.hyper.bed; do
     echo -e $sample1"\t"$sample2"\thyper\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> DMR.summary.stats
     echo -e $sample1"\t"$sample2"\thyper\t"$(less DMR-DhMR.$sample1"_"$sample2.hyper.bed | wc -l)"\t"$(less DMR-DhMR.$sample1"_"$sample2.hyper.bed | awk '{s=s+$3-$2}END{print s}') >> DMR-DhMR.summary.stats
 done
-for file in DMR.*.hypo.bed; do
+for file in DMR.*.hypo; do
     sample1=$(echo $file | cut -d'.' -f2 | cut -d'_' -f1,2)
     sample2=$(echo $file | cut -d'.' -f2 | cut -d'_' -f3,4)
     echo $sample1 $sample2
@@ -278,7 +279,7 @@ for file in DMR.*.hypo.bed; do
     echo -e $sample1"\t"$sample2"\thypo\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> DMR.summary.stats
     echo -e $sample1"\t"$sample2"\thypo\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | wc -l)"\t"$(less DMR-DhMR.$sample1"_"$sample2.hypo.bed | awk '{s=s+$3-$2}END{print s}') >> DMR-DhMR.summary.stats
 done
-/projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/DMR/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n "enhancer"
 for file in DM.*.bed; do
     name=$(echo $file | sed 's/.bed//')
     echo $name
