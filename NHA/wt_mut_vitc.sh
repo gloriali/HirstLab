@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirDE=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/DEfine/
 dirPromoter=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/ChIPseq/FindER/K4me3_K27me3/

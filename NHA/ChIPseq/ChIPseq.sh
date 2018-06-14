@@ -26,8 +26,8 @@ less $dirOut/sample_info.txt | awk '{system("ln -s ""'$dirIn'"$1"/"$1"_"$2".bam 
 ls $dirOut/bam/*/*.bam | parallel --gnu -j 5 $sambamba index -t 6
 
 ## QC
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
 chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
@@ -321,8 +321,8 @@ for file in *.BS.bed; do
     less $file | awk 'NR>1{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -D a | awk '{if($9>=-20000 && $9<=20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8"\t"$9}}' | sort -k5,5 >> $dirOut/$name.closest.gene
     join $dirOut/$name.closest.gene $dirOut/../../RNAseq/RPKM/vitc.RPKM -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/$name.closest.gene.RPKM
 done
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
 less $dirOut/H3K27ac.mut_gain.vitc_loss.bed | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3}' > $dirOut/H3K27ac.mut_gain.vitc_loss1.bed
 computeMatrix scale-regions -R $dirOut/H3K27ac.mut_gain.vitc_loss1.bed -S $dirBW/NHA_control.realign.bw $dirBW/NHAR_control.realign.bw $dirBW/NHAR_vitc.realign.bw -out $dirOut/H3K27ac.mut_gain.vitc_loss.hMeDIP.gz --startLabel start --endLabel end -bs 20

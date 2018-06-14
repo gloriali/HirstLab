@@ -193,7 +193,7 @@ for bam in $dirIn/*.bam; do
     $BEDTOOLS/bamToFastq -i $dirIn/$name.nsort.bam -fq $dirOut/$name.1.fq -fq2 $dirOut/$name.2.fq
 done
 ### deFuse
-export PATH=$PATH":/home/rislam/anaconda2/bin/"
+export PATH=$PATH":/home/lli/anaconda2/bin/"
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/fq/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/fusion/
 dirRef=/projects/epigenomics3/epigenomics3_results/users/lli/defuse_ref/hg19v69/

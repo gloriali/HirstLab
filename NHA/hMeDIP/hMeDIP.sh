@@ -20,8 +20,8 @@ genomesFile genomes.txt
 email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/hMeDIP/hub.txt
 > $dirHub/trackDb.txt
 function qc {
-    export PATH=/home/rislam/anaconda2/bin/:$PATH
-    export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+    export PATH=/home/lli/anaconda2/bin/:$PATH
+    export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
     sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
     bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
     chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
@@ -232,8 +232,8 @@ for file in $dirIn/*.bed; do
 done
 
 ## unique ER 2: union of ERs (MACS2 & FindER, all samples) -> 2-FC in RPKM & higher one RPKM >5
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 CG=/home/lli/hg19/CG.BED
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique2/
@@ -321,8 +321,8 @@ for file in $dirIn/*.bed; do
 done
 
 ## unique 3: CpG +/- 25bp -> 2-FC in RPKM & higher one RPKM > 10
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 CG=/home/lli/hg19/CG.BED
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique3/
@@ -346,8 +346,8 @@ for file in $dirOut/*.unique.bed; do
 done
 
 ## unique 4: 200bp bins -> 2-FC in RPKM & higher one RPKM > 5
-export PATH=/home/rislam/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/rislam/anaconda2/lib/python2.7/site-packages
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 CG=/home/lli/hg19/CG.BED
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/unique4/
