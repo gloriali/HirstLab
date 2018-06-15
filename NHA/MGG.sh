@@ -40,9 +40,12 @@ for file in $dirOut/ChIPseq/FindER2/*.bed; do
     mark=$(basename $file | cut -d'.' -f1)
     sample=$(basename $file | cut -d'.' -f2)
     echo $mark $sample
+    less $file | cut -f1-3 > $file.1; mv $file.1 $file
     echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ChIPseq/FindER2/ER_summary.txt
 done
-
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3; do
+    intervene upset -i $dirOut/ChIPseq/FindER2/$mark.*.bed --project $mark -o $dirOut/ChIPseq/FindER2/
+done
 
 ## 5mC
 mkdir -p $dirOut/WGBS/
