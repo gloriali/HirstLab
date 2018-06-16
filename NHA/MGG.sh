@@ -24,6 +24,21 @@ for file in $dirNPC/ChIPseq/bam/*/*NPC*.bam $dirHM/bam/*/*MGG*.bam; do
     ln -s $file $dirIn/$mark/$mark"."$sample.bam
     ln -s $file.bai $dirIn/$mark/$mark"."$sample.bam.bai
 done
+### FindER
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.1e.jar
+mkdir -p $dirOut/ChIPseq/FindER/
+echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ChIPseq/FindER/ER_summary.txt
+for file in $dirIn/H*/*.bam; do
+    mark=$(basename $file | cut -d'.' -f1)
+    sample=$(basename $file | cut -d'.' -f2)
+    echo $mark $sample
+    mkdir -p $dirOut/ChIPseq/FindER/$mark/
+    $java -jar -Xmx12G $FindER -signalBam $file -inputBam $dirIn/input/input.$sample.bam -out $dirOut/ChIPseq/FindER/$mark/ > $dirOut/ChIPseq/FindER/$mark/$mark.$sample.log
+    echo -e $mark"\t"$sample"\t"$(less $dirOut/ChIPseq/FindER/$mark/$mark.$sample.vs.input.$sample.FDR_0.05.FindER.bed.gz | wc -l)"\t"$(less $dirOut/ChIPseq/FindER/$mark/$mark.$sample.vs.input.$sample.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ChIPseq/FindER/ER_summary.txt
+done
+### FindER2
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+mkdir -p $dirOut/ChIPseq/FindER2/
 for inp in $dirIn/input/*.bam; do
     sample=$(basename $inp | cut -d'.' -f2);
     echo $sample
