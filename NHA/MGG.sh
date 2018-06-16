@@ -91,6 +91,32 @@ for lib2 in MGG_vitc NPC_GE04; do
 done
 
 ## hMeDIP
+mkdir -p $dirOut/hMeDIP/bam/
+for file in $dir5hmC/bam/MGG*realign*.bam; do
+    ln -s $file $dirOut/hMeDIP/bam/
+    ln -s $file.bai $dirOut/hMeDIP/bam/
+done
+mkdir -p $dirOut/hMeDIP/bw/
+for file in $dir5hmC/bw/MGG*.bw; do
+    ln -s $file $dirOut/hMeDIP/bw/
+done
+### FindER2
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+mkdir -p $dirOut/hMeDIP/FindER2/
+echo -e "Sample\tN_region\tTotal_length\tAverage_length" > $dirOut/ChIPseq/FindER2/ER_summary.txt
+for bam in $dirOut/hMeDIP/bam/*.bam; do
+    sample=$(basename $bam | cut -d'.' -f1);
+    echo $sample
+    $java -jar -Xmx25G $finder2 inputBam:$dirOut/ChIPseq/bam/input/input.$sample.bam signalBam:$bam outDir:$dirOut/hMeDIP/FindER2/ acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
+    echo -e $sample"\t"$(less $dirOut/hMeDIP/FindER2/$sample.realign.FindER2.bed | wc -l)"\t"$(less $dirOut/hMeDIP/FindER2/$sample.realign.FindER2.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$3/$2}' >> $dirOut/hMeDIP/FindER2/ER_summary.txt
+done
+### unique: FC >= 2 & RPKM >= 5
+CG=/home/lli/hg19/CG.BED
+cat $dirOut/hMeDIP/FindER2/*.realign.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/hMeDIP/FindER2/ER.union.bed
+multiBigwigSummary BED-file -b $dirOut/hMeDIP/bw/MGG_control.realign.bw $dirOut/hMeDIP/bw/MGG_vitc.realign.bw --BED $dirOut/hMeDIP/FindER2/ER.union.bed --labels MGG_control MGG_vitc -out $dirOut/hMeDIP/FindER2/ER.union.matrix.npz --outRawCounts $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM
+less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_control.unique.bed
+less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed
+
 
 ## RNAseq
 mkdir -p $dirOut/RNAseq/DEfine/
