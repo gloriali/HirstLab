@@ -2,6 +2,7 @@
 
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirNPC=/projects/epigenomics2/users/lli/glioma/
 dirRNA=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/
@@ -12,10 +13,7 @@ dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/
 mkdir -p $dirOut
 
 ## ChIPseq
-java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
-finder2=/home/mbilenky/bin/FindER2/finder2.jar
 dirIn=$dirOut/ChIPseq/bam/
-mkdir -p $dirOut/ChIPseq/FindER2/
 for file in $dirNPC/ChIPseq/bam/*/*NPC*.bam $dirHM/bam/*/*MGG*.bam; do
     mark=$(echo $file | sed 's/.*bam\///' | sed 's/\/.*//')
     sample=$(basename $file | sed 's/.bam//' | sed 's/\./_/' | cut -d'_' -f2,3 | sed 's/119//')
@@ -51,12 +49,15 @@ for inp in $dirIn/input/*.bam; do
     $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut/ChIPseq/FindER2/ acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
 done
 echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ChIPseq/FindER2/ER_summary.txt
-for file in $dirOut/ChIPseq/FindER2/*.bed; do
+echo -e "chr\tstart\tend\tdis\tlen\tmark\tsample\tcategory" > $dirOut/ChIPseq/FindER2/ER.nearest.dis.bed
+for file in $dirOut/ChIPseq/FindER2/*FindER2.bed; do
     mark=$(basename $file | cut -d'.' -f1)
     sample=$(basename $file | cut -d'.' -f2)
     echo $mark $sample
-    less $file | cut -f1-3 > $file.1; mv $file.1 $file
-    echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ChIPseq/FindER2/ER_summary.txt
+    $BEDTOOLS/closestBed -a $file -b $file -io -d | awk '{print $1"\t"$2"\t"$3"\t"$7"\t"$3-$2"\t""'$mark'""\t""'$sample'""\toriginal"}' >> $dirOut/ChIPseq/FindER2/ER.nearest.dis.bed
+    $BEDTOOLS/mergeBed -i $file -d 500 | awk '$1 !~ /GL/ {if($3-$2>=200){print}}' > $dirOut/ChIPseq/FindER2/$mark.$sample.FindER2.merge.bed
+    $BEDTOOLS/closestBed -a $dirOut/ChIPseq/FindER2/$mark.$sample.FindER2.merge.bed -b $dirOut/ChIPseq/FindER2/$mark.$sample.FindER2.merge.bed -io -d | awk '{print $1"\t"$2"\t"$3"\t"$7"\t"$3-$2"\t""'$mark'""\t""'$sample'""\tmerge"}' >> $dirOut/ChIPseq/FindER2/ER.nearest.dis.bed
+    echo -e $mark"\t"$sample"\t"$(less $dirOut/ChIPseq/FindER2/$mark.$sample.FindER2.merge.bed | wc -l)"\t"$(less $dirOut/ChIPseq/FindER2/$mark.$sample.FindER2.merge.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ChIPseq/FindER2/ER_summary.txt
 done
 for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3; do
     intervene upset -i $dirOut/ChIPseq/FindER2/$mark.*.bed --project $mark -o $dirOut/ChIPseq/FindER2/
@@ -80,10 +81,11 @@ for file in *.combine.5mC.CpG; do
     less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirOut/WGBS/qc_5mC_quantile.txt
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirOut/WGBS/qc_5mC_quantile.txt
 done
+### DMR
 mkdir -p $dirOut/WGBS/DMR/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DMR.summary.stats
-pth=0.01; delta=0.5; m=0.7; cov=3; size=500; cut=3; lib1=MGG_control
+pth=0.0005; delta=0.6; m=0.75; cov=3; size=500; cut=3; lib1=MGG_control
 for lib2 in MGG_vitc NPC_GE04; do
     name=$lib1'_'$lib2; echo $name
     /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut/WGBS/ -o $dirOut/WGBS/DMR/ -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
