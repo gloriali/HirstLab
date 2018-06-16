@@ -65,7 +65,7 @@ done
 
 ## 5mC
 mkdir -p $dirOut/WGBS/
-for file in $dir5mC/MGG*.combine.5mC.CpG $dirNPC/WGBS/NPC_GE04.combine.5mC.CpG; do
+for file in $dir5mC/MGG*.combine.5mC.CpG $dirNPC/WGBS/NPC*.combine.5mC.CpG; do
     ln -s $file $dirOut/WGBS/
 done
 echo -e "sample\tcoverage\tN" > $dirOut/WGBS/qc_5mC_coverage.txt
@@ -86,7 +86,7 @@ mkdir -p $dirOut/WGBS/DMR/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DMR.summary.stats
 pth=0.0005; delta=0.6; m=0.75; cov=3; size=500; cut=3; lib1=MGG_control
-for lib2 in MGG_vitc NPC_GE04; do
+for lib2 in MGG_vitc NPC_Cortex02 NPC_Cortex04 NPC_GE02 NPC_GE04; do
     name=$lib1'_'$lib2; echo $name
     /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut/WGBS/ -o $dirOut/WGBS/DMR/ -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/WGBS/DMR/ -o $dirOut/WGBS/DMR/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
