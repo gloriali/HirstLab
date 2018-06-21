@@ -119,6 +119,14 @@ multiBigwigSummary BED-file -b $dirOut/hMeDIP/bw/MGG_control.realign.bw $dirOut/
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_control.unique.bed
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed
 
+mkdir -p $dirOut/hMeDIP/FindER2/homer/MGG_control.MGG_vitc/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/MGG_control.unique.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/MGG_control.MGG_vitc/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed | awk '{print "chr"$0}')
+mkdir -p $dirOut/hMeDIP/FindER2/homer/MGG_vitc.MGG_control/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/MGG_vitc.MGG_control/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/MGG_control.unique.bed | awk '{print "chr"$0}')
+mkdir -p $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_control.MGG_vitc/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_control.unique.enhancer.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_control.MGG_vitc/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_vitc.unique.enhancer.bed | awk '{print "chr"$0}')
+mkdir -p $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_vitc.MGG_control/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_vitc.unique.enhancer.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_vitc.MGG_control/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_control.unique.enhancer.bed | awk '{print "chr"$0}')
 
 ## RNAseq
 mkdir -p $dirOut/RNAseq/DEfine/
