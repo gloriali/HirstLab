@@ -22,6 +22,13 @@ for file in $dirNPC/ChIPseq/bam/*/*NPC*.bam $dirHM/bam/*/*MGG*.bam; do
     ln -s $file $dirIn/$mark/$mark"."$sample.bam
     ln -s $file.bai $dirIn/$mark/$mark"."$sample.bam.bai
 done
+for file in $dirNPC/ChIPseq/wig/*/*NPC*.PET.wig.gz $dirHM/wig/*/*MGG*.wig.gz; do
+    mark=$(echo $file | sed 's/.*wig\///' | sed 's/\/.*//')
+    sample=$(basename $file | sed 's/.q5.F1028.PET.wig.gz//' | sed 's/H.*_MGG/MGG/' | sed 's/119//' | sed 's/input_//')
+    echo $mark $sample
+    mkdir -p $dirOut/ChIPseq/wig/$mark/
+    ln -s $file $dirOut/ChIPseq/wig/$mark/$mark"."$sample.wig.gz
+done
 ### FindER
 FindER=/home/mbilenky/bin/Solexa_Java/FindER.1.0.1e.jar
 mkdir -p $dirOut/ChIPseq/FindER/
