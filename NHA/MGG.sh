@@ -119,8 +119,12 @@ less $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed | sed 's/chr//g' > $d
 $BEDTOOLS/intersectBed -a $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex02.s500.c3.hypo.bed -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex04.s500.c3.hypo.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE02.s500.c3.hypo.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE04.s500.c3.hypo.bed > $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed
 enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/WGBS/DMR/ -r $enhancer -n "enhancer"
-intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hyper.bed --project hyper -o $dirOut/WGBS/DMR/
-intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hypo.bed --project hypo -o $dirOut/WGBS/DMR/
+for file in $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hyper.bed $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hypo.bed; do
+    ln -s $file $dirOut/WGBS/DMR/
+done
+rm $dirOut/WGBS/DMR/*CEMT_21*
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hyper.bed --project hyper -o $dirOut/WGBS/DMR/
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hypo.bed --project hypo -o $dirOut/WGBS/DMR/
 
 ## hMeDIP
 mkdir -p $dirOut/hMeDIP/bam/
@@ -148,9 +152,14 @@ cat $dirOut/hMeDIP/FindER2/*.realign.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS
 multiBigwigSummary BED-file -b $dirOut/hMeDIP/bw/MGG_control.realign.bw $dirOut/hMeDIP/bw/MGG_vitc.realign.bw --BED $dirOut/hMeDIP/FindER2/ER.union.bed --labels MGG_control MGG_vitc -out $dirOut/hMeDIP/FindER2/ER.union.matrix.npz --outRawCounts $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_control.unique.bed
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed
+for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
+    less $file | awk '{print "chr"$0}' > $file.bed
+done
 enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/hMeDIP/FindER2/ -r $enhancer -n "enhancer"
 intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.hyp*.bed $dirOut/hMeDIP/FindER2/*unique.bed --project DMR.DhMR -o $dirOut/hMeDIP/FindER2/
+intervene upset -i $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*hyper.bed $dirOut/hMeDIP/FindER2/*unique.bed.bed --project CEMT_hyper.DhMR -o $dirOut/hMeDIP/FindER2/
+intervene upset -i $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*hypo.bed $dirOut/hMeDIP/FindER2/*unique.bed.bed --project CEMT_hypo.DhMR -o $dirOut/hMeDIP/FindER2/
 ### Homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
@@ -174,6 +183,7 @@ for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
     $BEDTOOLS/intersectBed -a $file -b $enhancer -u > $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed
     echo -e $name"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed | wc -l)"\t"$(less $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$3}' >> $dirOut/hMeDIP/FindER2/enhancer/ER_enhancer_summary.txt
 done
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.hyper.bed $dirOut/hMeDIP/FindER2/enhancer/*.bed --project DMR.DhMR_enhancer -o $dirOut/hMeDIP/FindER2/
 #### Homer
 for file in $dirOut/hMeDIP/FindER2/enhancer/*.bed; do
      name=$(basename $file | sed 's/.enhancer.bed//g')
