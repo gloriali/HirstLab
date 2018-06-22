@@ -160,6 +160,10 @@ for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
      mkdir -p $dirOut/hMeDIP/FindER2/homer/$name/
      /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/$name/ -size 200 -len 8 
 done
+mkdir -p $dirOut/hMeDIP/FindER2/homer/MGG_control.MGG_vitc/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/MGG_control.unique.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/MGG_control.MGG_vitc/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed | awk '{print "chr"$0}')
+mkdir -p $dirOut/hMeDIP/FindER2/homer/MGG_vitc.MGG_control/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/MGG_vitc.MGG_control/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/MGG_control.unique.bed | awk '{print "chr"$0}')
 ### intersect with enhancer
 mkdir -p $dirOut/hMeDIP/FindER2/enhancer/
 echo -e "Name\tN_total\tlength_total\tN_enhancer\tlength_enhancer\tpercent" > $dirOut/hMeDIP/FindER2/enhancer/ER_enhancer_summary.txt
@@ -177,7 +181,10 @@ for file in $dirOut/hMeDIP/FindER2/enhancer/*.bed; do
      mkdir -p $dirOut/hMeDIP/FindER2/enhancer/$name/
      /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/$name/ -size 200 -len 8 
 done
-
+mkdir -p $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_control.MGG_vitc/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_control.unique.enhancer.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_control.MGG_vitc/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_vitc.unique.enhancer.bed | awk '{print "chr"$0}')
+mkdir -p $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_vitc.MGG_control/
+/home/lli/bin/homer/bin/findMotifsGenome.pl <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_vitc.unique.enhancer.bed | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/homer/MGG_vitc.MGG_control/ -size 200 -len 8 -bg <(less $dirOut/hMeDIP/FindER2/enhancer/MGG_control.unique.enhancer.bed | awk '{print "chr"$0}')
 
 ## RNAseq
 mkdir -p $dirOut/RNAseq/DEfine/
