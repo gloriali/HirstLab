@@ -148,6 +148,35 @@ cat $dirOut/hMeDIP/FindER2/*.realign.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS
 multiBigwigSummary BED-file -b $dirOut/hMeDIP/bw/MGG_control.realign.bw $dirOut/hMeDIP/bw/MGG_vitc.realign.bw --BED $dirOut/hMeDIP/FindER2/ER.union.bed --labels MGG_control MGG_vitc -out $dirOut/hMeDIP/FindER2/ER.union.matrix.npz --outRawCounts $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+0.0001); if($4>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_control.unique.bed
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed
+enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/hMeDIP/FindER2/ -r $enhancer -n "enhancer"
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.hyp*.bed $dirOut/hMeDIP/FindER2/*unique.bed --project DMR.DhMR -o $dirOut/hMeDIP/FindER2/
+### Homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
+     name=$(basename $file | sed 's/.bed//g')
+     echo $name
+     mkdir -p $dirOut/hMeDIP/FindER2/homer/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/homer/$name/ -size 200 -len 8 
+done
+### intersect with enhancer
+mkdir -p $dirOut/hMeDIP/FindER2/enhancer/
+echo -e "Name\tN_total\tlength_total\tN_enhancer\tlength_enhancer\tpercent" > $dirOut/hMeDIP/FindER2/enhancer/ER_enhancer_summary.txt
+for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
+    name=$(basename $file | sed 's/.bed//g')
+    sample=$(basename $file | cut -d'.' -f1)
+    echo $name $sample
+    $BEDTOOLS/intersectBed -a $file -b $enhancer -u > $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed
+    echo -e $name"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}')"\t"$(less $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed | wc -l)"\t"$(less $dirOut/hMeDIP/FindER2/enhancer/$name.enhancer.bed | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$5/$3}' >> $dirOut/hMeDIP/FindER2/enhancer/ER_enhancer_summary.txt
+done
+#### Homer
+for file in $dirOut/hMeDIP/FindER2/enhancer/*.bed; do
+     name=$(basename $file | sed 's/.enhancer.bed//g')
+     echo $name
+     mkdir -p $dirOut/hMeDIP/FindER2/enhancer/$name/
+     /home/lli/bin/homer/bin/findMotifsGenome.pl <(less $file | awk '{print "chr"$0}') hg19 $dirOut/hMeDIP/FindER2/enhancer/$name/ -size 200 -len 8 
+done
 
 
 ## RNAseq
