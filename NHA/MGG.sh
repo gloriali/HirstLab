@@ -69,10 +69,11 @@ done
 for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3; do
     intervene upset -i $dirOut/ChIPseq/FindER2/$mark.*.bed --project $mark -o $dirOut/ChIPseq/FindER2/
 done
+cat $dirOut/ChIPseq/FindER2/H3K27ac.MGG*.FindER2.merge.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
 
 ## 5mC
 mkdir -p $dirOut/WGBS/
-for file in $dir5mC/MGG*.combine.5mC.CpG $dirNPC/WGBS/NPC*.combine.5mC.CpG; do
+for file in $dir5mC/MGG*.combine.5mC.CpG $dirNPC/WGBS/NPC*.combine.5mC.CpG $dirNPC/WGBS/IDHwt_CEMT_23.combine.5mC.CpG; do
     ln -s $file $dirOut/WGBS/
 done
 echo -e "sample\tcoverage\tN" > $dirOut/WGBS/qc_5mC_coverage.txt
@@ -88,16 +89,38 @@ for file in *.combine.5mC.CpG; do
     less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirOut/WGBS/qc_5mC_quantile.txt
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirOut/WGBS/qc_5mC_quantile.txt
 done
+### promoter enhancer 5mC
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+gene=/home/lli/hg19/hg19v69_genes.bed
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+mkdir -p $dirOut/WGBS/enhancer/
+for file in $dirOut/ChIPseq/FindER/H3K27ac/*.bed.gz; do
+    sample=$(basename $file | cut -d'.' -f2)
+    echo $sample
+    $BEDTOOLS/intersectBed -a $file -b $promoter -u -f 0.5 | awk '{print $0"\t"$1":"$2"-"$3"_promoter"}' > $dirOut/WGBS/enhancer/$sample.promoter.enhancer
+    $java -jar -Xmx15G /home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar -w $dirOut/ChIPseq/wig/H3K27ac/H3K27ac.$sample.wig.gz -r $dirOut/WGBS/enhancer/$sample.promoter.enhancer -o $dirOut/WGBS/enhancer/ -c $chr -n $sample > $dirOut/WGBS/enhancer/$sample.coverage.log
+    less $dirOut/WGBS/enhancer/$sample.promoter.enhancer.$sample.coverage | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/$sample.combine.5mC.CpG -wa -wb | awk '{if($11+$12 >= 3){t[$5]=t[$5]+$11; c[$5]=c[$5]+$12; chr[$5]=$1; start[$5]=$2; end[$5]=$3; signal[$5]=$6}} END{for(i in chr){if(t[i]+c[i]>0){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"signal[i]"\t"c[i]/(c[i]+t[i])"\t""'$sample'"}}}' | sort -k1,1 -k2,2n > $dirOut/WGBS/enhancer/$sample.promoter.enhancer.5mC
+done
+cat $dirOut/WGBS/enhancer/*.promoter.enhancer.5mC > $dirOut/WGBS/enhancer/promoter.enhancer.5mC
+$BEDTOOLS/intersectBed -a $dirOut/WGBS/enhancer/promoter.enhancer.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/WGBS/enhancer/promoter.enhancer.5mC.CpG
 ### DMR
 mkdir -p $dirOut/WGBS/DMR/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DMR.summary.stats
 pth=0.0005; delta=0.6; m=0.75; cov=3; size=500; cut=3; lib1=MGG_control
-for lib2 in MGG_vitc NPC_Cortex02 NPC_Cortex04 NPC_GE02 NPC_GE04; do
+for lib2 in MGG_vitc NPC_Cortex02 NPC_Cortex04 NPC_GE02 NPC_GE04 IDHwt_CEMT_23; do
     name=$lib1'_'$lib2; echo $name
     /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut/WGBS/ -o $dirOut/WGBS/DMR/ -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/WGBS/DMR/ -o $dirOut/WGBS/DMR/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
 done
+$BEDTOOLS/intersectBed -a $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex02.s500.c3.hyper.bed -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex04.s500.c3.hyper.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE02.s500.c3.hyper.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE04.s500.c3.hyper.bed > $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed
+less $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed | sed 's/chr//g' > $dirOut/WGBS/DMR/DMR.MGG_control_NPC.hyper.bed
+less $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed | sed 's/chr//g' > $dirOut/WGBS/DMR/DMR.MGG_control_NPC.hypo.bed
+$BEDTOOLS/intersectBed -a $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex02.s500.c3.hypo.bed -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_Cortex04.s500.c3.hypo.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE02.s500.c3.hypo.bed | $BEDTOOLS/intersectBed -a stdin -b $dirOut/WGBS/DMR/DMR.MGG_control_NPC_GE04.s500.c3.hypo.bed > $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed
+enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/WGBS/DMR/ -r $enhancer -n "enhancer"
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hyper.bed --project hyper -o $dirOut/WGBS/DMR/
+intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed $dirNPC/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hypo.bed --project hypo -o $dirOut/WGBS/DMR/
 
 ## hMeDIP
 mkdir -p $dirOut/hMeDIP/bam/
