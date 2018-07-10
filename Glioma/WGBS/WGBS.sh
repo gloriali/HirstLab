@@ -6,12 +6,18 @@ dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
 join <(less $dir5mC/DNAme_regulators.txt | sort -k2,2) $dirRPKM/RPKM/glioma.RPKM -1 2 -2 1 | join - $dirRPKM/NPC_RPKM/NPC.RPKM | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
 
 # combine strands 5mC for CEMT and NPC
-dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
+dir5mC=/projects/edcc_prj2/bs-seq/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
 cd $dirIn
+less $dirIn/samples.txt | awk '{system("ln -s ""'$dir5mC'"$3"/*.5mC.CpG.gz"" ""'$dirIn'"$2"."$1".5mC.CpG.gz")}'
 for file in *.5mC.CpG.gz; do
     lib=$(echo $file | sed -e 's/.5mC.CpG.gz//g')
     echo "Combining strand for" $lib
     /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -n $lib -format novo5mC
+done
+for file in /projects/epigenomics2/users/lli/glioma/WGBS/NPC*combine*; do
+    name=$(basename $file | sed 's/_/./g')
+    ln -s $file $dirIn/$name
 done
 
 # Formatting TCGA WGBS
