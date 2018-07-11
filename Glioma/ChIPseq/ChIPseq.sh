@@ -36,14 +36,26 @@ for file in H*/*GE04.bam; do
     $JAVA -jar -Xmx12G /home/mbilenky/bin/Solexa_Java/FindER.1.0.0b.jar -signalBam $dirIn/$mark/$file -inputBam $dirIn/input/A19309.NPC_GE04.bam -out $dirOut/$mark > $dirOut/$mark/$file.log
 done
 
-# FindER 1.0.0b results
+# link files
 dirIn=/projects/edcc_new/reference_epigenomes/
-dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/
-for lib in 19 21 22 23 47; do
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+    IDH=$(less $dirOut/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
-        echo $lib $mark
-        mkdir -p $dirOut/$mark/
-        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER.1.0.0b/*.FDR_0.05.FindER.bed.gz $dirOut/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz
+        echo $IDH $lib $mark
+        mkdir -p $dirOut/bam/$mark/
+        mkdir -p $dirOut/wig/$mark/
+        mkdir -p $dirOut/FindER/$mark/
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*.bam $dirOut/bam/$mark/$IDH.CEMT_$lib.bam
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*.bam.bai $dirOut/bam/$mark/$IDH.CEMT_$lib.bam.bai
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*.flagstats $dirOut/bam/$mark/$IDH.CEMT_$lib.flagstats
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*.wig.gz $dirOut/wig/$mark/$IDH.CEMT_$lib.wig.gz
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER*/*.FDR_0.05.FindER.bed.gz $dirOut/FindER/$mark/$IDH.CEMT_$lib.FDR_0.05.FindER.bed.gz
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*lanes*.bam $dirOut/bam/$mark/$IDH.CEMT_$lib.bam
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*lanes*.bam.bai $dirOut/bam/$mark/$IDH.CEMT_$lib.bam.bai
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/*lanes*.flagstats $dirOut/bam/$mark/$IDH.CEMT_$lib.flagstats
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*lanes*.wig.gz $dirOut/wig/$mark/$IDH.CEMT_$lib.wig.gz
+        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER*lanes*/*.FDR_0.05.FindER.bed.gz $dirOut/FindER/$mark/$IDH.CEMT_$lib.FDR_0.05.FindER.bed.gz
     done
 done
 
