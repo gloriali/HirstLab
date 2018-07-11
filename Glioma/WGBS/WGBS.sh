@@ -67,6 +67,32 @@ echo -e $header | cat - x > matrix_genome.5mC
 echo -e $header | cat - a > matrix_CGI.5mC
 rm x a
 
+# DMR from limma
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
+less $dirIn/DM.limma.txt | awk 'NR>1 {gsub(":", "\t", $1); gsub("-", "\t", $1); if($2>0){print $1"\t1"}else{print $1"\t-1"}}' | sort -k1,1 -k2,2n > $dirIn/DM.limma.bed
+less $dirIn/DM.limma.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print c"\t"hyper"\t"hypo}'
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.limma.bed -n limma -s 500 -c 3
+## genomic enrichment
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed
+> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+for file in /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/*CEMT*.bed.gz; do
+    less $file | sed 's/chr//g' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+done
+less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $enhancer
+/home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn -r $enhancer -n enhancer
+## intersect with enhancers - homer
+PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/acarles/weblogo/
+mkdir -p $dirIn/homer/
+for file in $dirIn/DMR.*.bed; do
+    name=$(basename $file | cut -d'.' -f5)
+    echo $name
+    mkdir -p $dirIn/homer/$name/
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.limma.$name.enhancer.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.limma.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
+done
+
 # methylation profile around CGI edges
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
