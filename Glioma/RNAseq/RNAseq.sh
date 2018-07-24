@@ -8,6 +8,17 @@ for lib in 19 21 22 23 47; do
     echo $lib;
     ln -s $dirIn/CEMT_$lib/bams/RNA-Seq/qca/*/coverage/*.G.A.rpkm.pc $dirOut/CEMT_$lib.G.A.rpkm.pc
 done
+dirIn=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+    IDH=$(less $dirOut/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
+    echo $IDH $lib 
+    mkdir -p $dirOut/bam/
+    mkdir -p $dirOut/RPKM/
+    ln -s $dirIn/CEMT_$lib/bams/RNA-Seq/*.bam $dirOut/bam/$IDH.CEMT_$lib.bam
+    ln -s $dirIn/CEMT_$lib/bams/RNA-Seq/*.bam.bai $dirOut/bam/$IDH.CEMT_$lib.bam.bai
+    ln -s $dirIn/CEMT_$lib/bams/RNA-Seq/qca*/*/coverage/*.G.A.rpkm.pc $dirOut/RPKM/$IDH.CEMT_$lib.G.A.rpkm.pc
+done
 
 # IDH1/2 expression
 dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/

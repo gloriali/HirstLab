@@ -1,18 +1,40 @@
 #!/bin/sh
 
+# link files
+dirIn=/projects/edcc_new/reference_epigenomes/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+    IDH=$(less $dirOut/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
+    echo $IDH $lib 
+    mkdir -p $dirOut/bam/
+    mkdir -p $dirOut/VCF/
+    mkdir -p $dirOut/CNV/
+    ln -s $dirIn/CEMT_$lib/bams/WGS/*.bam $dirOut/bam/$IDH.CEMT_$lib.bam
+    ln -s $dirIn/CEMT_$lib/bams/WGS/*.eff.dbSNP_v137.COSMIC_v64.annotations.vcf $dirOut/VCF/$IDH.CEMT_$lib.eff.dbSNP_v137.COSMIC_v64.annotations.vcf
+    ln -s $dirIn/CEMT_$lib/bams/WGS/CNVs/*.bam_CNVs.corr.*list*.sorted $dirOut/CNV/$IDH.CEMT_$lib.CNVs.corr.blacklistFiltered.sorted
+done
+ln -s /projects/edcc_prj2/upstream_data/P00015_8_lanes_dupsFlagged.bam $dirOut/bam/IDHmut.CEMT_47.bam
+
 # Confirm IDH1 R132H heterozygous mutation (chr2:209113112 C->T)
-cd /projects/epigenomics2/users/lli/glioma/WGS/bam/
-for file in *.bam; do
-    echo $file
-    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools index $file
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+for bam in $dirIn/*.bam; do
+    echo $(basename $bam)
+    $sambamba index $bam -t 8
+    $bamstats -g 2864785220 -t 8 $bam > $(echo $bam | sed 's/\.bam//').bamstats
 done
-> /projects/epigenomics2/users/lli/glioma/WGS/IDH.txt
-for file in *.bam; do
-    echo $file >> /projects/epigenomics2/users/lli/glioma/WGS/IDH.txt
-    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209100951-209130798 $file >> /projects/epigenomics2/users/lli/glioma/WGS/IDH.txt
+> $dirIn/IDH.txt
+for file in $dirIn/*.bam; do
+    sample=$(basename $file | sed 's/\.bam//'); echo $sample
+    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tWGS\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$3/($3+$4)}' >> $dirIn/IDH.txt
 done
-cd /projects/edcc_new/reference_epigenomes/
-for V in ./CEMT_19/bams/WGS/*varFilter.eff.snvs.vcf ./CEMT_2[1-3]/bams/WGS/*varFilter.eff.snvs.vcf ./CEMT_47/bams/WGS/*varFilter.eff.snvs.vcf; do 
+dirRNA=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/bam/
+for file in $dirRNA/*.bam; do
+    sample=$(basename $file | sed 's/\.bam//'); echo $sample
+    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tRNAseq\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$3/($3+$4)}' >> $dirIn/IDH.txt
+done
+for V in $dirIn/../VCF/*.vcf; do 
     echo $V;
     cat $V | grep -E 'IDH1' 
 done

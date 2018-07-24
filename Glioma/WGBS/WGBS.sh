@@ -70,16 +70,20 @@ rm x a
 # DMR from limma
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
-less $dirIn/DM.limma.txt | awk 'NR>1 {gsub(":", "\t", $1); gsub("-", "\t", $1); if($2>0){print $1"\t1"}else{print $1"\t-1"}}' | sort -k1,1 -k2,2n > $dirIn/DM.limma.bed
-less $dirIn/DM.limma.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print c"\t"hyper"\t"hypo}'
-/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.limma.bed -n limma -s 500 -c 3
-## genomic enrichment
-enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer.bed
-> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
-for file in /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/*CEMT*.bed.gz; do
-    less $file | sed 's/chr//g' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed
+echo -e "Name\ttotal\thyper\thypo" > $dirIn/DM.summary.stats
+for file in $dirIn/DM.*.limma.txt; do
+    name=$(basename $file | sed 's/.txt//' | sed 's/DM.//'); echo $name
+    less $file | awk 'NR>1 {gsub(":", "\t", $1); gsub("-", "\t", $1); if($2>0){print $1"\t1"}else{print $1"\t-1"}}' | sort -k1,1 -k2,2n > $dirIn/DM.$name.bed
+    less $dirIn/DM.$name.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print "'$name'"c"\t"hyper"\t"hypo}' >> $dirIn/DM.summary.stats
+    /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.$name.bed -n $name -s 500 -c 3
 done
-less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/glioma_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $enhancer
+## genomic enrichment
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
+> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed
+for file in /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut.CEMT*.bed.gz; do
+    less $file | sed 's/chr//g' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed
+done
+less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $enhancer
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn -r $enhancer -n enhancer
 ## intersect with enhancers - homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/

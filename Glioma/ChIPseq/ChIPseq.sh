@@ -58,12 +58,19 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
         ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER*lanes*/*.FDR_0.05.FindER.bed.gz $dirOut/FindER/$mark/$IDH.CEMT_$lib.FDR_0.05.FindER.bed.gz
     done
 done
-
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.bam $dirOut/bam/$mark/NPC.GE04.bam
+	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.bam.bai $dirOut/bam/$mark/NPC.GE04.bam.bai
+	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.flagstats $dirOut/bam/$mark/NPC.GE04.flagstats
+	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/$mark/*NPC_GE04*.FindER.bed.gz $dirOut/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz
+	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/wig/$mark/*NPC_GE04*.PET.wig.gz $dirOut/wig/$mark/NPC.GE04.wig.gz
+done
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/
 echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER.summary.stats
 for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
     cd $dirOut/$mark/
     for file in *.bed.gz; do
-        lib=$(echo $file | sed -e 's/.FDR_0.05.FindER.bed.gz//g' | sed -e 's/.*A19309.//g')
+        lib=$(echo $file | sed -e 's/.FDR_0.05.FindER.bed.gz//g')
         echo -e $mark"\t"$lib"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER.summary.stats
     done
 done
@@ -71,12 +78,12 @@ done
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
-dirWig=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/H3K27ac/
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/H3K27ac/
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/wig/H3K27ac/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/
 dirOut=$dirIn/signal/; mkdir -p $dirOut
 cd $dirIn
 for file in *.FindER.bed.gz; do
-    sample=$(echo $file | sed 's/A[0-9]*.//g' | cut -d'.' -f1);
+    sample=$(echo $file | sed 's/.FDR_0.05.FindER.bed.gz//g');
     echo $sample
     $JAVA -jar -Xmx15G $RegCov -w $(ls $dirWig/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample.FindER.signal > $dirOut/$sample.log
 done
@@ -166,17 +173,6 @@ done
 ########################################################
 
 # Differentially marked regions
-## signal files
-dirIn=/projects/edcc_new/reference_epigenomes/
-dirOut=/projects/epigenomics2/users/lli/glioma/ChIPseq/wig/
-for lib in 19 21 22 23 47; do
-    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
-        echo $lib $mark
-        mkdir -p $dirOut/$mark/
-        ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/wig/*.wig.gz $dirOut/$mark/CEMT_$lib.wig.gz
-    done
-done
-
 ## differentially marked regions from FindER peaks and wig singal files
 ### test: how to set the background coverage cutoff?
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
@@ -203,25 +199,26 @@ done
 
 ### glioma vs NPC
 #### method1: ER and signal files
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
 echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique/ER.unique.summary
-for lib in 19 21 22 23 47; do
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+	IDH=$(less $dirIn/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
-        echo "CEMT_"$lib $mark
-        echo -e "\n\nCEMT_"$lib $mark >> $dirIn/unique/ER.unique.log
+        echo $IDH".CEMT_"$lib $mark
+        echo -e "\n\n"$IDH".CEMT_"$lib $mark >> $dirIn/unique/ER.unique.log
         dirOut=$dirIn/unique/$mark/
         mkdir -p $dirOut/
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/NPC_GE04.q5.F1028.wig.gz -excl $(ls $dirIn/FindER/$mark/*GE04.*.FDR_0.05.FindER.bed.gz) -o $dirOut/ -n CEMT_$lib.vs.NPC_GE04.CEMT_$lib >> $dirIn/unique/ER.unique.log
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_$lib.wig.gz -r $(ls $dirIn/FindER/$mark/*GE04.*.FDR_0.05.FindER.bed.gz) -o $dirOut/ -n CEMT_$lib.vs.NPC_GE04.NPC_GE04 >> $dirIn/unique/ER.unique.log
-        N_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | wc -l)
-        len_glioma=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N_NPC=$(less $dirIn/FindER/$mark/*GE04.*.FDR_0.05.FindER.bed.gz | wc -l)
-        len_NPC=$(less $dirIn/FindER/$mark/*GE04.*.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)
-        len_glioma_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | awk '{s=s+$3-$2}END{print s}')
-        N_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)
-        len_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | awk '{s=s+$3-$2}END{print s}')
-        echo -e "$lib\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/NPC.GE04.wig.gz -excl $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib >> $dirIn/unique/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/$IDH".CEMT_"$lib.wig.gz -r $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04 >> $dirIn/unique/ER.unique.log
+        N_glioma=$(less $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz | wc -l)
+        len_glioma=$(less $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_NPC=$(less $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz | wc -l)
+        len_NPC=$(less $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
+        N_glioma_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib.unique | wc -l)
+        len_glioma_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib.unique | awk '{s=s+$3-$2}END{print s}')
+        N_NPC_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04.unique | wc -l)
+        len_NPC_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04.unique | awk '{s=s+$3-$2}END{print s}')
+        echo -e $IDH".CEMT_"$lib"\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
     done
 done
 less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
