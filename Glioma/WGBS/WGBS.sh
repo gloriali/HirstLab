@@ -71,10 +71,11 @@ rm x a
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
 echo -e "Name\ttotal\thyper\thypo" > $dirIn/DM.summary.stats
-for file in $dirIn/DM.*.limma.txt; do
-    name=$(basename $file | sed 's/.txt//' | sed 's/DM.//'); echo $name
+echo -e "Name\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirIn/DMR.summary.stats
+for file in $dirIn/DM.*limma.txt; do
+    name=$(basename $file | sed 's/_limma.txt//' | sed 's/DM.//'); echo $name
     less $file | awk 'NR>1 {gsub(":", "\t", $1); gsub("-", "\t", $1); if($2>0){print $1"\t1"}else{print $1"\t-1"}}' | sort -k1,1 -k2,2n > $dirIn/DM.$name.bed
-    less $dirIn/DM.$name.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print "'$name'"c"\t"hyper"\t"hypo}' >> $dirIn/DM.summary.stats
+    less $dirIn/DM.$name.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print "'$name'""\t"c"\t"hyper"\t"hypo}' >> $dirIn/DM.summary.stats
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.$name.bed -n $name -s 500 -c 3
 done
 ## genomic enrichment
@@ -90,12 +91,17 @@ PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirIn/homer/
 for file in $dirIn/DMR.*.bed; do
-    name=$(basename $file | cut -d'.' -f5)
-    echo $name
+    name=$(basename $file | cut -d'.' -f2,5); echo $name
     mkdir -p $dirIn/homer/$name/
-    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.limma.$name.enhancer.bed
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.limma.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.$name.enhancer.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
 done
+## intersect with vitC 5hmC
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirMGG=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/
+intervene upset -i $dirIn/DMR.*.s500.c3.*.bed $dirMGG/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirIn
+intervene upset -i $dirIn/DMR.*.s500.c3.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.bed --project DMR_CEMT.DhMR_MGG -o $dirIn
 
 # methylation profile around CGI edges
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
