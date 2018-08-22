@@ -154,6 +154,7 @@ less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($4+0.0001)/($5+
 less $dirOut/hMeDIP/FindER2/ER.union.matrix.RPKM | awk 'NR>1{fc=($5+0.0001)/($4+0.0001); if($5>=5&&fc>=2){print $0"\t"fc}}' | $BEDTOOLS/intersectBed -a stdin -b $CG -c > $dirOut/hMeDIP/FindER2/MGG_vitc.unique.bed
 for file in $dirOut/hMeDIP/FindER2/*unique.bed; do
     less $file | awk '{print "chr"$0}' > $file.bed
+    less $file | awk '{if($7>=5){print "chr"$0}}' > $file.c5.bed
 done
 enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
 /home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/hMeDIP/FindER2/ -r $enhancer -n "enhancer"
