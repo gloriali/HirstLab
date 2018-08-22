@@ -13,3 +13,4 @@ Pipeline shell scripts
 * [bamstats2report.combine.sh](./bamstats2report.combine.sh): shell script to combine multiple QC summary report into a single table.
 * [RunB2W.sh](./RunB2W.sh): shell script to generate wig from bam. Run on apollo.
 * [RunW2BW.sh](./RunW2BW.sh): shell script to generate BigWig from wig. Run on apollo.
+* [snp_apollo.sh](./snp_apollo.sh): shell script to generate VCF files. Run on apollo.

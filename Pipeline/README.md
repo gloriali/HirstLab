@@ -25,6 +25,7 @@ Analysis pipeline
     * [bamstats2report.combine.sh](./shell/bamstats2report.combine.sh): shell script to combine multiple QC summary report into a single table.
     * [RunB2W.sh](./shell/RunB2W.sh): shell script to generate wig from bam. Run on apollo.
     * [RunW2BW.sh](./shell/RunW2BW.sh): shell script to generate BigWig from wig. Run on apollo.
+    * [snp_apollo.sh](./shell/snp_apollo.sh): shell script to generate VCF files. Run on apollo.
 + [R](./R): R functions
     * [DMR.figures.R](./R/DMR.figures.R): `DMR_figures` R function for DMR analysis and visualization.
     * [DMR_DE.R](./R/DMR_DE.R): `DMR_DE` R function for identify DE genes for gene-associated DMRs.  
