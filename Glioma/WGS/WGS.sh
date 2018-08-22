@@ -89,3 +89,15 @@ for file in *.CNV; do
     rm $file.gene.tmp
 done
 
+# VCF
+SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
+dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/VCF/
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed 's/.bam//'); echo $name
+    $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+done
