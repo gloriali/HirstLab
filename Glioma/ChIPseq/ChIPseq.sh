@@ -221,7 +221,7 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
         echo -e $IDH".CEMT_"$lib"\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
     done
 done
-less ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
+less $dirIn/unique/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
 ##### outgroup for H3K36me3
 mark=H3K36me3;
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
@@ -708,6 +708,30 @@ for bam in $dirIn/*.bam; do
 	mkdir -p $dirOut/$mark/;
 	/home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirIn/wigs/ -F:1028,-q:5,-n:$name,-cs,-x:$fl,-chr:$chr;
 	$JAVA -jar -Xmx10G $RegCov -w $(ls $dirIn/wigs/$name.*.wig.gz) -o $dirOut/$mark/ -s hg19 -n $name -bin 500 -step 500;
+done
+dirIn=/projects/epigenomics3/bams/hg19/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
+for file in /projects/analysis/analysis10/IX1456/C24PMACXX_3/A28*/75nt/hg19a/bwa-0.5.7/*.spec; do
+	lib=$(echo $file | sed 's/\/projects\/analysis\/analysis10\/IX1456\/C24PMACXX_3\///' | sed 's/\/.*//');
+	echo $lib;
+	mkdir -p $dirIn/$lib/;
+	/gsc/software/linux-x86_64-centos6/spec-1.3.2/spec2bam --threads 8 --in $file --ref /projects/sbs_archive2/spec_ref/9606/hg19/1000genomes/GRCh37-lite.fa.spec.ref --out $dirIn/$lib/$lib.bam
+done
+mkdir -p $dirOut/Input/
+ln -s $dirIn/A28469/A28469.bam $dirOut/H3K27ac/Normal.NB141.bam 
+ln -s $dirIn/A28467/A28467.bam $dirOut/H3K27me3/Normal.NB141.bam 
+ln -s $dirIn/A28468/A28468.bam $dirOut/H3K36me3/Normal.NB141.bam 
+ln -s $dirIn/A28464/A28464.bam $dirOut/H3K4me1/Normal.NB141.bam 
+ln -s $dirIn/A28465/A28465.bam $dirOut/H3K4me3/Normal.NB141.bam 
+ln -s $dirIn/A28466/A28466.bam $dirOut/H3K9me3/Normal.NB141.bam 
+ln -s $dirIn/A28470/A28470.bam $dirOut/Input/Normal.NB141.bam
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+for bam in $dirOut/*/Normal.NB141.bam; do
+	name=$(echo $bam | sed 's/\.bam//'); echo $name
+	$sambamba index $bam -t 8
+    $sambamba flagstat $bam -t 8 > $name.flagstat
+    $bamstats -g 2864785220 -t 8 $bam > $name.bamstats
 done
 ### Other CEMT
 for wig in /projects/edcc_new/reference_epigenomes/CEMT_*/bams/ChIP-Seq/*/wig/*.wig.gz; do
