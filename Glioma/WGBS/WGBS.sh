@@ -1,5 +1,25 @@
 #!/bin/sh
 
+# bam files
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/VCF/
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
+dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
+mkdir -p $dirIn; mkdir -p $dirOut;
+less $dirIn/../samples.txt | awk '{system("ln -s "$4"/*.bam ""'$dirIn'"$2"."$1".bam")}'
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed 's/.bam//'); echo $name
+    $sambamba index $bam -t 8
+    $sambamba flagstat $bam -t 8 > $dirIn/$name.flagstat
+    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
+    $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+done
+
 # RPKM of 5mC modifiers
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
@@ -102,6 +122,7 @@ export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirMGG=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/
 intervene upset -i $dirIn/DMR.*.s500.c3.*.bed $dirMGG/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirIn
 intervene upset -i $dirIn/DMR.*.s500.c3.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.bed --project DMR_CEMT.DhMR_MGG -o $dirIn
+intervene upset -i $dirIn/DMR.*.s500.c3.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.c5.bed --project DMR_CEMT.DhMR_MGG.c5 -o $dirIn
 
 # methylation profile around CGI edges
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
