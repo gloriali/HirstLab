@@ -3,22 +3,28 @@
 # bam files
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/VCF/
-sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
-bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
-SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
-genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
-COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
-dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
 mkdir -p $dirIn; mkdir -p $dirOut;
 less $dirIn/../samples.txt | awk '{system("ln -s "$4"/*.bam ""'$dirIn'"$2"."$1".bam")}'
-for bam in $dirIn/*.bam; do
+function vcf {
+    bam=$1
     name=$(basename $bam | sed 's/.bam//'); echo $name
+    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/
+    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/VCF/
+    sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+    bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+    SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+    BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+    genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+    COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
+    dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
     $sambamba index $bam -t 8
     $sambamba flagstat $bam -t 8 > $dirIn/$name.flagstat
     $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
     $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
-done
+}
+export -f vcf
+ls $dirIn/*.bam > $dirIn/bamList.txt
+cat $dirIn/bamList.txt | parallel --gnu vcf
 
 # RPKM of 5mC modifiers
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
