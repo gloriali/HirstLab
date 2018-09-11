@@ -103,7 +103,7 @@ for file in $dirOut/ChIPseq/FindER/H3K27ac/*.bed.gz; do
 done
 cat $dirOut/WGBS/enhancer/*.promoter.enhancer.5mC > $dirOut/WGBS/enhancer/promoter.enhancer.5mC
 $BEDTOOLS/intersectBed -a $dirOut/WGBS/enhancer/promoter.enhancer.5mC -b /home/lli/hg19/CG.BED -c | awk '{print $0"\t"$8/($3-$2)*1000}' > $dirOut/WGBS/enhancer/promoter.enhancer.5mC.CpG
-### DMR
+### DMR against NPC
 mkdir -p $dirOut/WGBS/DMR/
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/WGBS/DMR/DMR.summary.stats
@@ -125,6 +125,17 @@ done
 rm $dirOut/WGBS/DMR/*CEMT_21*
 intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hyper.bed $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hyper.bed --project hyper -o $dirOut/WGBS/DMR/
 intervene upset -i $dirOut/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.hypo.bed $dirOut/WGBS/DMR/DMR.IDHmut_CEMT_*_NPC.hypo.bed --project hypo -o $dirOut/WGBS/DMR/
+### DMR against NB141
+mkdir -p $dirOut/WGBS/NB141/
+ln -s /projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/Normal.NB141.combine.5mC.CpG $dirOut/WGBS/Normal.NB141.combine.5mC.CpG
+echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/WGBS/NB141/DM.summary.stats
+echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/WGBS/NB141/DMR.summary.stats
+pth=0.0005; delta=0.6; m=0.75; cov=3; size=500; cut=3
+lib1=MGG_control; lib2=Normal.NB141; name=$lib1'_'$lib2; echo $name
+/home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirOut/WGBS/ -o $dirOut/WGBS/NB141/ -f1 $lib1.combine.5mC.CpG -f2 $lib2.combine.5mC.CpG -n $name -p $pth -d $delta -m $m -c $cov
+/home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut/WGBS/NB141/ -o $dirOut/WGBS/NB141/ -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+enhancer=$dirOut/ChIPseq/FindER2/H3K27ac.MGG.union.bed
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirOut/WGBS/NB141/ -r $enhancer -n "enhancer"
 
 ## hMeDIP
 mkdir -p $dirOut/hMeDIP/bam/
