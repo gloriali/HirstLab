@@ -25,6 +25,15 @@ function vcf {
 export -f vcf
 ls $dirIn/*.bam > $dirIn/bamList.txt
 cat $dirIn/bamList.txt | parallel --gnu vcf
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+CG=/home/lli/hg19/CG.BED
+for vcf in $dirOut/*.vcf $dirOut/../../WGS/VCF/*CEMT_[0-9][0-9].vcf; do
+    echo $vcf
+    less $vcf | awk '$1 !~ /#/ {print $1"\t"$2"\t"$2+1}' | $BEDTOOLS/intersectBed -a stdin -b $CG -v | awk '{print $0"\t"$1":"$2"-"$3}' > $vcf.bed
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/../../WGS/VCF/IDHmut.CEMT_75.vcf.bed $dirOut/../../WGS/VCF/IDHwt.CEMT_81.vcf.bed $dirOut/IDHmut.CEMT_75.vcf.bed $dirOut/IDHwt.CEMT_81.vcf.bed --project VCF -o $dirOut
 
 # RPKM of 5mC modifiers
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
