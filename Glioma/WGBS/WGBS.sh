@@ -33,7 +33,7 @@ for vcf in $dirOut/*.vcf $dirOut/../../WGS/VCF/*CEMT_[0-9][0-9].vcf; do
 done
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-intervene upset -i $dirOut/../../WGS/VCF/IDHmut.CEMT_75.vcf.bed $dirOut/../../WGS/VCF/IDHwt.CEMT_81.vcf.bed $dirOut/IDHmut.CEMT_75.vcf.bed $dirOut/IDHwt.CEMT_81.vcf.bed --project VCF -o $dirOut
+intervene upset -i $dirOut/../../WGS/VCF/IDHmut.CEMT_75.vcf.bed $dirOut/../../WGS/VCF/IDHwt.CEMT_81.vcf.bed $dirOut/IDHmut.CEMT_75.vcf.bed $dirOut/IDHwt.CEMT_81.vcf.bed --names=WGS.CEMT_75,WGS.CEMT_81,WGBS.CEMT_75,WGBS.CEMT_81 --project VCF -o $dirOut
 
 # RPKM of 5mC modifiers
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
@@ -159,6 +159,7 @@ done
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 cat $dirOut/DMR.*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.IDHmut_Normal.NB141.hyper.bed
 cat $dirOut/DMR.*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.IDHmut_Normal.NB141.hypo.bed
+$BEDTOOLS/intersectBed -a $dirOut/DMR.IDHmut_Normal.NB141.hyper.bed -b /projects/epigenomics3/epigenomics3_results/users/lli/MGG//hMeDIP/FindER2/MGG_vitc.unique.bed.bed -u > $dirOut/DMR.IDHmut_Normal.NB141.hyper.vitc_hMeDIP.bed
 ## genomic enrichment
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -177,12 +178,14 @@ enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/Fi
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
-for file in $dirOut/DMR.*.bed; do
+for file in $dirOut/DMR.*hyper.bed $dirOut/DMR.*hypo.bed; do
     name=$(basename $file | sed 's/DMR\.//' | sed 's/\.bed//'| sed 's/_Normal\.NB141//' | sed 's/\.s500\.c3//'); echo $name
     mkdir -p $dirOut/homer/$name/
     less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/DMR.$name.enhancer.bed
     /home/lli/bin/homer/bin/findMotifsGenome.pl $dirOut/DMR.$name.enhancer.bed hg19 $dirOut/homer/$name/ -size 200 -len 8
 done
+mkdir -p $dirOut/homer/IDHmut.hyper.vitc_hMeDIP/
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirOut/DMR.IDHmut_Normal.NB141.hyper.vitc_hMeDIP.bed hg19 $dirOut/homer/IDHmut.hyper.vitc_hMeDIP/ -size 200 -len 8
 
 # methylation profile around CGI edges
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
