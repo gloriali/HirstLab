@@ -156,6 +156,9 @@ for file1 in IDHmut*.combine.5mC.CpG; do
     /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
 done
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+cat $dirOut/DMR.*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.IDHmut_Normal.NB141.hyper.bed
+cat $dirOut/DMR.*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.IDHmut_Normal.NB141.hypo.bed
 ## genomic enrichment
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -166,15 +169,16 @@ export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirMGG=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/
 intervene upset -i $dirOut/DMR.*.s500.c3.hyper.bed --project DMR_hyper -o $dirOut
 intervene upset -i $dirOut/DMR.*.s500.c3.hypo.bed --project DMR_hypo -o $dirOut
-intervene upset -i $dirOut/DMR.*.s500.c3.*.bed $dirMGG/WGBS/DMR/DMR.MGG_control_NPC.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirOut
-intervene upset -i $dirOut/DMR.*.s500.c3.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.bed --project DMR_CEMT.DhMR_MGG -o $dirOut
-intervene upset -i $dirOut/DMR.*.s500.c3.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.c5.bed --project DMR_CEMT.DhMR_MGG.c5 -o $dirOut
+intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/WGBS/NB141/DMR.MGG_control_Normal.NB141.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirOut
+intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.bed --project DMR_CEMT.DhMR_MGG -o $dirOut
+intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.c5.bed --project DMR_CEMT.DhMR_MGG.c5 -o $dirOut
 ## intersect with enhancers - homer
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
 for file in $dirOut/DMR.*.bed; do
-    name=$(basename $file | sed 's/DMR\.//' | sed 's/\.bed//'| sed 's/\.s500\.c3//'); echo $name
+    name=$(basename $file | sed 's/DMR\.//' | sed 's/\.bed//'| sed 's/_Normal\.NB141//' | sed 's/\.s500\.c3//'); echo $name
     mkdir -p $dirOut/homer/$name/
     less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirOut/DMR.$name.enhancer.bed
     /home/lli/bin/homer/bin/findMotifsGenome.pl $dirOut/DMR.$name.enhancer.bed hg19 $dirOut/homer/$name/ -size 200 -len 8
