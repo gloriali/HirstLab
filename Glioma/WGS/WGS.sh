@@ -10,34 +10,71 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
     mkdir -p $dirOut/VCF/
     mkdir -p $dirOut/CNV/
     ln -s $dirIn/CEMT_$lib/bams/WGS/*.bam $dirOut/bam/$IDH.CEMT_$lib.bam
-    ln -s $dirIn/CEMT_$lib/bams/WGS/*.eff.dbSNP_v137.COSMIC_v64.annotations.vcf $dirOut/VCF/$IDH.CEMT_$lib.eff.dbSNP_v137.COSMIC_v64.annotations.vcf
     ln -s $dirIn/CEMT_$lib/bams/WGS/CNVs/*.bam_CNVs.corr.*list*.sorted $dirOut/CNV/$IDH.CEMT_$lib.CNVs.corr.blacklistFiltered.sorted
 done
 ln -s /projects/edcc_prj2/upstream_data/P00015_8_lanes_dupsFlagged.bam $dirOut/bam/IDHmut.CEMT_47.bam
-
-# Confirm IDH1 R132H heterozygous mutation (chr2:209113112 C->T)
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
 sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
 for bam in $dirIn/*.bam; do
-    echo $(basename $bam)
+    name=$(basename $bam | sed 's/\.bam//'); echo $name
     $sambamba index $bam -t 8
-    $bamstats -g 2864785220 -t 8 $bam > $(echo $bam | sed 's/\.bam//').bamstats
+    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
 done
-> $dirIn/IDH.txt
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
+
+# VCF
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/VCF/
+function vcf {
+    bam=$1
+    name=$(basename $bam | sed 's/.bam//'); echo $name
+    SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+    BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
+    genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
+    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/VCF/
+    $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
+}
+export -f vcf
+ls $dirIn/*.bam > $dirIn/bamList.txt
+cat $dirIn/bamList.txt | parallel --gnu vcf
+java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+snpEff=/projects/wtsspipeline/programs/external_programs/snpEff3.3/
+config=/projects/wtsspipeline/programs/external_programs/snpEff3.3/snpEff.config
+COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
+for vcf in $dirOut/*CEMT_[0-9][0-9].vcf; do
+    name=$(basename $vcf | sed 's/.vcf//'); echo $name
+    $java -jar $snpEff/snpEff.jar eff GRCh37.69 $vcf -c $config > $dirOut/$name.snpEff.vcf
+    $java -jar $snpEff/SnpSift.jar annotate $COSMIC $dirOut/$name.snpEff.vcf > $dirOut/$name.snpEff.cosmic64.vcf
+done
+for V in dirOut/*cosmic64.vcf; do 
+    echo $V;
+    cat $V | grep 'NON_SYNONYMOUS_CODING' | grep 'IDH1' 
+    cat $V | grep 'NON_SYNONYMOUS_CODING' | grep 'IDH2' 
+done
+
+# Confirm IDH1 R132H (chr2:209113112 C->T) and IDH2 R172 (chr15:90631838)
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
+dirRNA=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/bam/
+SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
+ref=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
+echo -e "sample\tIDH\tAssay\tmut\tref\trate" > $dirIn/IDH.txt
 for file in $dirIn/*.bam; do
     sample=$(basename $file | sed 's/\.bam//'); echo $sample
-    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tWGS\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$3/($3+$4)}' >> $dirIn/IDH.txt
+    $SAMTOOLS mpileup -f $ref -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tIDH1\tWGS\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
 done
-dirRNA=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/bam/
+$SAMTOOLS mpileup -f $ref -r 15:90631838-90631838 $dirIn/NormalAdjacent.CEMT_78.bam | awk '{s=toupper($5); print "NormalAdjacent.CEMT_78\tIDH2\tWGS\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
+$SAMTOOLS mpileup -f $ref -r 15:90631838-90631838 $dirIn/IDHmut.CEMT_81.bam | awk '{s=toupper($5); print "IDHmut.CEMT_81\tIDH2\tWGS\t"gsub("A", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
 for file in $dirRNA/*.bam; do
     sample=$(basename $file | sed 's/\.bam//'); echo $sample
-    /gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools mpileup -f /home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tRNAseq\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$3/($3+$4)}' >> $dirIn/IDH.txt
+    $SAMTOOLS mpileup -f $ref -r 2:209113112-209113112 $file | awk '{s=toupper($5); print "'$sample'""\tIDH1\tRNAseq\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
 done
-for V in $dirIn/../VCF/*.vcf; do 
-    echo $V;
-    cat $V | grep -E 'IDH1' 
-done
+$SAMTOOLS mpileup -f $ref -r 15:90631838-90631838 $dirRNA/NormalAdjacent.CEMT_78.bam | awk '{s=toupper($5); print "NormalAdjacent.CEMT_78\tIDH2\tRNAseq\t"gsub("T", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
+$SAMTOOLS mpileup -f $ref -r 15:90631838-90631838 $dirRNA/IDHmut.CEMT_81.bam | awk '{s=toupper($5); print "IDHmut.CEMT_81\tIDH2\tRNAseq\t"gsub("A", "",s)"\t"gsub(",", "", s)+gsub(".", "", s)}' | awk '{print $0"\t"$4/($4+$5)}' >> $dirIn/IDH.txt
+
+########################################################
 
 # Confirm common mutations in gliomas
 dirVCF='/projects/edcc_new/reference_epigenomes/'
@@ -89,19 +126,3 @@ for file in *.CNV; do
     rm $file.gene.tmp
 done
 
-# VCF -- apollo
-function vcf {
-    bam=$1
-    name=$(basename $bam | sed 's/.bam//'); echo $name
-    SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-    BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
-    genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
-    COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
-    dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
-    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/bam/
-    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/VCF/
-    $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
-}
-export -f vcf
-ls $dirIn/*.bam > $dirIn/bamList.txt
-cat $dirIn/bamList.txt | parallel --gnu vcf
