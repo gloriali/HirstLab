@@ -41,7 +41,7 @@ dirIn=/projects/edcc_new/reference_epigenomes/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
 for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
     IDH=$(less $dirOut/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
-    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
         echo $IDH $lib $mark
         mkdir -p $dirOut/bam/$mark/
         mkdir -p $dirOut/wig/$mark/
@@ -58,12 +58,33 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
         ln -s $dirIn/CEMT_$lib/bams/ChIP-Seq/$mark/FindER*lanes*/*.FDR_0.05.FindER.bed.gz $dirOut/FindER/$mark/$IDH.CEMT_$lib.FDR_0.05.FindER.bed.gz
     done
 done
-for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
 	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.bam $dirOut/bam/$mark/NPC.GE04.bam
 	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.bam.bai $dirOut/bam/$mark/NPC.GE04.bam.bai
-	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/bam/$mark/*NPC_GE04*.flagstats $dirOut/bam/$mark/NPC.GE04.flagstats
 	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/FindER/$mark/*NPC_GE04*.FindER.bed.gz $dirOut/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz
 	ln -s /projects/epigenomics2/users/lli/glioma/ChIPseq/wig/$mark/*NPC_GE04*.PET.wig.gz $dirOut/wig/$mark/NPC.GE04.wig.gz
+done
+
+# summary
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/; mkdir -p $dirBW
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+for bam in $dirIn/*/*.bam; do
+    name=$(basename $bam | sed 's/\.bam//'); mark=$(echo $bam | cut -d'/' -f11); echo $mark $name
+	mkdir -p $dirBW/$mark/
+    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$mark/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $mark.$name $dirIn/$mark/$name.bamstats
+    bamCoverage -b $bam -o $dirBW/$mark/$name.bw --normalizeUsing RPKM --ignoreDuplicates --samFlagExclude 1028 --minMappingQuality 5 --binSize 10 --extendReads -p 4
+done
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 Input; do
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn/$mark/ $dirIn/$mark/
+done
+cut -f2- $dirIn/H3K27ac/summary.xls > $dirIn/summary.txt
+for mark in H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3 Input; do
+    join $dirIn/summary.txt <(cut -f2- $dirIn/$mark/summary.xls) > $dirIn/a
+    mv $dirIn/a $dirIn/summary.txt
 done
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/
 echo -e "Mark\tSample\tN_region\tTotal_length" > $dirOut/ER.summary.stats
