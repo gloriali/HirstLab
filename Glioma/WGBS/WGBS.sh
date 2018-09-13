@@ -1,40 +1,5 @@
 #!/bin/sh
 
-# bam files
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/VCF/
-mkdir -p $dirIn; mkdir -p $dirOut;
-less $dirIn/../samples.txt | awk '{system("ln -s "$4"/*.bam ""'$dirIn'"$2"."$1".bam")}'
-function vcf {
-    bam=$1
-    name=$(basename $bam | sed 's/.bam//'); echo $name
-    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/
-    dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/VCF/
-    sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
-    bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
-    SAMTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/samtools
-    BCFTOOLS=/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/
-    genome=/home/pubseq/genomes/Homo_sapiens/hg19a/bwa_ind/genome/GRCh37-lite.fa
-    COSMIC=/projects/wtsspipeline/programs/external_programs/snpEff3.3/cosmic_v64.vcf
-    dbSNP=/projects/wtsspipeline/programs/external_programs/snpEff3.3/dbSNP_v137.vcf
-    $sambamba index $bam -t 8
-    $sambamba flagstat $bam -t 8 > $dirIn/$name.flagstat
-    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
-    $SAMTOOLS mpileup -C50 -uf $genome $bam | $BCFTOOLS/bcftools view -vcg - | $BCFTOOLS/vcfutils.pl varFilter -D100 > $dirOut/$name.vcf
-}
-export -f vcf
-ls $dirIn/*.bam > $dirIn/bamList.txt
-cat $dirIn/bamList.txt | parallel --gnu vcf
-BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-CG=/home/lli/hg19/CG.BED
-for vcf in $dirOut/*.vcf $dirOut/../../WGS/VCF/*CEMT_[0-9][0-9].vcf; do
-    echo $vcf
-    less $vcf | awk '$1 !~ /#/ {print $1"\t"$2"\t"$2+1}' | $BEDTOOLS/intersectBed -a stdin -b $CG -v | awk '{print $0"\t"$1":"$2"-"$3}' > $vcf.bed
-done
-export PATH=/home/lli/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-intervene upset -i $dirOut/../../WGS/VCF/IDHmut.CEMT_75.vcf.bed $dirOut/../../WGS/VCF/IDHwt.CEMT_81.vcf.bed $dirOut/IDHmut.CEMT_75.vcf.bed $dirOut/IDHwt.CEMT_81.vcf.bed --names=WGS.CEMT_75,WGS.CEMT_81,WGBS.CEMT_75,WGBS.CEMT_81 --project VCF -o $dirOut
-
 # RPKM of 5mC modifiers
 dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
 dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
@@ -49,6 +14,19 @@ for file in *TCGA*.bed; do
     less $file | awk 'NR>1{gsub("chr", ""); if($8>=3){printf "%s\t%d\t%d\t%.0f\t%.0f\t%.4f\n", $1, $2, $3+1, $8-$8*$7/100, $8*$7/100, $7/100}}' | sort -k1,1 -k2,2n > $dirIn/$lib.combine.5mC.CpG
 done
 rm *TCGA*.bed
+
+# bam files
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/bam/; mkdir -p $dirIn
+less $dirIn/../samples.txt | awk '{system("ln -s "$4"/*.bam ""'$dirIn'"$2"."$1".bam")}'
+for bam in $dirIn/*.bam; do
+    name=$(basename $bam | sed 's/\.bam//'); echo $name
+    $sambamba index $bam -t 8
+    $bamstats -g 2864785220 -t 8 $bam > $dirIn/$name.bamstats
+    /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn $name $dirIn/$name.bamstats
+done
+/home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 
 # combine strands 5mC for CEMT and NPC
 dir5mC=/projects/edcc_prj2/bs-seq/
@@ -170,7 +148,7 @@ export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirMGG=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/
 intervene upset -i $dirOut/DMR.*.s500.c3.hyper.bed --project DMR_hyper -o $dirOut
 intervene upset -i $dirOut/DMR.*.s500.c3.hypo.bed --project DMR_hypo -o $dirOut
-intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/WGBS/NB141/DMR.MGG_control_Normal.NB141.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirOut
+intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirIn/DMR.IDHmut_NPC.s500.c3.hyp*.bed $dirMGG/WGBS/NB141/DMR.MGG_control_Normal.NB141.s500.c3.*.bed --project DMR_CEMT.DMR_MGG -o $dirOut
 intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.bed --project DMR_CEMT.DhMR_MGG -o $dirOut
 intervene upset -i $dirOut/DMR.IDHmut_Normal.NB141.*.bed $dirMGG/hMeDIP/FindER2/*.unique.bed.c5.bed --project DMR_CEMT.DhMR_MGG.c5 -o $dirOut
 ## intersect with enhancers - homer
