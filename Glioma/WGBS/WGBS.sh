@@ -44,6 +44,12 @@ for file in /projects/epigenomics2/users/lli/glioma/WGBS/NPC*combine*; do
 done
 ln -s $dir5mC/a27715/A27715_5_lanes_dupsFlagged.read.sorted.bedGraph.gz $dirIn/Normal.NB141.bedGraph.gz
 /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f Normal.NB141.bedGraph.gz -n Normal.NB141 -format bismark
+ln -s $dir5mC/a27721/A27721_5_lanes_dupsFlagged.read.sorted.bedGraph.gz $dirIn/Normal.NHA.bedGraph.gz
+/home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f Normal.NHA.bedGraph.gz -n Normal.NHA -format bismark
+ln -s /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/MGG_control.combine.5mC.CpG $dirIn/MGG.control.combine.5mC.CpG
+ln -s /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/MGG_vitc.combine.5mC.CpG $dirIn/MGG.vitc.combine.5mC.CpG
+ln -s /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/NHAR_control.combine.5mC.CpG $dirIn/NHAR.control.combine.5mC.CpG
+ln -s /projects/epigenomics3/epigenomics3_results/users/lli/NHA/PBAL/NHAR_vitc.combine.5mC.CpG $dirIn/NHAR.vitc.combine.5mC.CpG
 
 # check coverage profile and 5mC profile
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
@@ -84,7 +90,7 @@ rm x a
 
 # DMR from limma
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/; mkdir -p $dirIn
 echo -e "Name\ttotal\thyper\thypo" > $dirIn/DM.summary.stats
 echo -e "Name\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirIn/DMR.summary.stats
 for file in $dirIn/DM.*limma.txt; do
@@ -99,7 +105,7 @@ enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/Fi
 for file in /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut.CEMT*.bed.gz; do
     less $file | sed 's/chr//g' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed
 done
-less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $enhancer
+less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $enhancer
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn -r $enhancer -n enhancer
 ## intersect with enhancers - homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
