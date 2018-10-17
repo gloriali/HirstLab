@@ -49,8 +49,8 @@ for vcf in $dirOut/*CEMT_[0-9][0-9].vcf; do
     $java -jar $snpEff/snpEff.jar eff GRCh37.69 $vcf -c $config > $dirOut/$name.snpEff.vcf
     $java -jar $snpEff/SnpSift.jar annotate $COSMIC $dirOut/$name.snpEff.vcf > $dirOut/$name.snpEff.cosmic64.vcf
 done
-for V in dirOut/*cosmic64.vcf; do 
-    echo $V;
+for V in $dirOut/*cosmic64.vcf; do 
+    echo $(basename $V | sed 's/.snpEff.cosmic64.vcf//');
     cat $V | grep 'NON_SYNONYMOUS_CODING' | grep 'IDH1' 
     cat $V | grep 'NON_SYNONYMOUS_CODING' | grep 'IDH2' 
 done
