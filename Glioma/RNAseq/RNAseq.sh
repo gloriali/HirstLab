@@ -106,32 +106,32 @@ rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
 
 # RPKM matrix
-> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
-cd /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/
+> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.long
+cd /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
+echo "ENSG" > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM
+less A03473.Cortex01/coverage/A03473.Cortex01.G.A.rpkm.pc | awk '{print $1}' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM
+for file in */coverage/*Cortex*.G.A.rpkm.pc */coverage/*GE*.G.A.rpkm.pc; do
+    lib=$(basename $file | cut -d'.' -f2)
+    echo -e "ENSG\tNPC.$lib" > x
+    less $file | awk '{print $1"\t"$3}' >> x
+    join /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM x | sed 's/ /\t/g' > y
+    mv y /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM
+    less $file | awk '{print "NPC_""'$lib'""\t"$1"\t"$3}' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.long
+done
+rm x
+cd /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/
 echo "ENSG" > glioma.RPKM
-less CEMT_19.G.A.rpkm.pc | awk '{print $1}' >> glioma.RPKM
+less IDHmut.CEMT_19.G.A.rpkm.pc | awk '{print $1}' >> glioma.RPKM
 for file in *.G.A.rpkm.pc; do
     lib=$(echo $file | sed 's/.G.A.rpkm.pc//g')
     echo -e "ENSG\t$lib" > x
     less $file | awk '{print $1"\t"$3}' >> x
     join glioma.RPKM x | sed 's/ /\t/g' >y
     mv y glioma.RPKM
-    less $file | awk '{print "'$lib'""."$1"\t"$3}' >> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
+    less $file | awk '{print "'$lib'""\t"$1"\t"$3}' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.long
 done
 rm x
-cd /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/
-echo "ENSG" > NPC.RPKM
-less A03473.Cortex01/coverage/A03473.Cortex01.G.A.rpkm.pc | awk '{print $1}' >> NPC.RPKM
-for file in */coverage/*.G.A.rpkm.pc; do
-    lib=$(echo $file | sed 's/\/.*//g' | sed 's/A[0-9]*.//g')
-    echo -e "ENSG\t$lib" > x
-    less $file | awk '{print $1"\t"$3}' >> x
-    join NPC.RPKM x | sed 's/ /\t/g' >y
-    mv y NPC.RPKM
-    less $file | awk '{print "NPC_""'$lib'""."$1"\t"$3}' >> /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.long
-done
-rm x
-join /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/glioma.RPKM /projects/epigenomics2/users/lli/glioma/RNAseq/NPC_RPKM/NPC.RPKM | sed 's/ /\t/g' > /projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.matrix
+join /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/glioma.RPKM /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM | sed 's/ /\t/g' > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix
 
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
