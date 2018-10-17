@@ -236,4 +236,40 @@ sample2='$sample2'; name2='$name2';
 [cc,nfup,nfdn]=DEfine(idl(ixl), r1(ixl), r2(ix), n1(ixl), n2(ix), [gl(ixl), gc(ix)], dirOut, name1, name2, out, figs, fdr, corr1, corr2, rpkm, RPKMmin, Nmin, eps, maxLim);
 " >> $dirOut/RNAseq/DEfine/DEfine.MGG.m
 done
-
+### trackHub
+chr=/projects/epigenomics2/resources/UCSC_chr/hg19.bwa2ucsc.names
+chrsize=/home/lli/hg19/hg19.chrom.sizes
+dirWig=$dirOut/RNAseq/wig/
+dirHub=/gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/RNAseqHub/hg19/
+mkdir -p $dirWig; mkdir -p $dirHub
+cp /gsc/www/bcgsc.ca/downloads/mb/BrainHubs/HistoneHub/genomes.txt /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/RNAseqHub/
+echo -e "hub VitC_gliomaHub_RNAseq
+shortLabel VitC_glioma Hub (RNAseq)
+longLabel Hub to display VitC glioma data at UCSC (RNAseq)
+genomesFile genomes.txt
+email lli@bcgsc.ca" > /gsc/www/bcgsc.ca/downloads/mb/VitC_glioma/RNAseqHub/hub.txt
+> $dirHub/trackDb.txt
+for bam in /projects/epigenomics3/epigenomics3_results/users/lli/NHA/RNAseq/bam/MGG*.bam; do
+    name=$(basename $bam | cut -d'.' -f1); echo $name
+    /home/lli/HirstLab/Pipeline/shell/RunB2W.sh $bam $dirWig -F:1028,-q:5,-n:$name,-chr:$chr,-cp
+    /home/lli/HirstLab/Pipeline/UCSC/wigToBigWig $dirWig/$name.q5.F1028.PET.wig.gz $chrsize $dirHub/$name.q5.F1028.PET.bw
+    if [[ "$name" =~ "control" ]]; then
+        color="255,0,0"
+    else
+        color="0,0,255"
+    fi
+    echo -e "
+track $name
+shortLabel $name
+longLabel RNAseq $name
+type bigWig
+visibility full
+maxHeightPixels 70:70:32
+configurable on
+autoScale on
+alwaysZero on
+priority 0.1
+bigDataUrl $name.q5.F1028.PET.bw
+color $color
+" >> $dirHub/trackDb.txt
+done
