@@ -192,6 +192,40 @@ for i in {1..50}; do
 done
 
 ########################################################
+# FindER2
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+mkdir -p $dirOut
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
+	for bam in $dirIn/$mark/*.bam; do
+		name=$mark.$(basename $bam)
+		mv $bam $dirIn/$mark/$name
+		mv $bam.bai $dirIn/$mark/$name.bai
+	done
+done
+for inp in $dirIn/Input/*.bam; do
+    sample=$(basename $inp | cut -d'.' -f2,3);
+    echo $sample
+    sig1=$(echo $dirIn/H3K27me3/H3K27me3.$sample.bam)
+    sig2=$(echo $dirIn/H3K4me3/H3K4me3.$sample.bam)
+    sig3=$(echo $dirIn/H3K4me1/H3K4me1.$sample.bam)
+    sig4=$(echo $dirIn/H3K27ac/H3K27ac.$sample.bam)
+    sig5=$(echo $dirIn/H3K36me3/H3K36me3.$sample.bam)
+    sig6=$(echo $dirIn/H3K9me3/H3K9me3.$sample.bam)
+    sig=${sig1},${sig2},${sig3},${sig4},${sig5},${sig6}
+    $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
+done
+echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_summary.txt
+for file in $dirOut/*.bed; do
+    mark=$(basename $file | cut -d'.' -f1)
+    sample=$(basename $file | cut -d'.' -f2,3)
+    echo $mark $sample
+    echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
+done
+
+########################################################
 
 # Differentially marked regions
 ## differentially marked regions from FindER peaks and wig singal files
@@ -243,6 +277,19 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
     done
 done
 less $dirIn/unique/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+mkdir -p $dirIn/unique/upSet/
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+	echo $mark
+	intervene upset -i $dirIn/unique/$mark/IDHmut.*.vs.NPC.GE04.IDHmut.*.unique --project upset.IDHmut_NPC.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique/$mark/IDHmut.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHmut.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique/$mark/IDHwt.*.vs.NPC.GE04.IDHwt.*.unique --project upset.IDHwt_NPC.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique/$mark/IDHwt.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHwt.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique/$mark/Normal*.vs.NPC.GE04.Normal*.unique --project upset.NormalAdjacent_NPC.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique/$mark/Normal*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_NormalAdjacent.$mark -o $dirIn/unique/upSet/
+done
+
 ##### outgroup for H3K36me3
 mark=H3K36me3;
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
@@ -263,7 +310,7 @@ for lib in {4..9} {25..38} {40..45} {50..68} ; do
     echo -e "$lib\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
 done
 
-#### method2: non-overlapping ER
+#### method2: non-overlapping ER -- not used
 dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
 BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
 echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique2/ER.unique.summary
