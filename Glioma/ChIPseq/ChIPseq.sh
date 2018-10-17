@@ -92,6 +92,7 @@ for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
     cd $dirOut/$mark/
     for file in *.bed.gz; do
         lib=$(echo $file | sed -e 's/.FDR_0.05.FindER.bed.gz//g')
+        less $file | sed 's/chr//g' > $dirOut/$mark/$lib.FDR_0.05.FindER.bed
         echo -e $mark"\t"$lib"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') >> $dirOut/ER.summary.stats
     done
 done
@@ -107,6 +108,13 @@ for file in *.FindER.bed.gz; do
     sample=$(echo $file | sed 's/.FDR_0.05.FindER.bed.gz//g');
     echo $sample
     $JAVA -jar -Xmx15G $RegCov -w $(ls $dirWig/$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $sample.FindER.signal > $dirOut/$sample.log
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+    echo $mark
+    intervene upset -i $dirIn/$mark/*.bed --project upSet.FindER.$mark -o $dirIn
 done
 
 ########################################################
@@ -224,6 +232,13 @@ for file in $dirOut/*.bed; do
     echo $mark $sample
     echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
 done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+    echo $mark
+    intervene upset -i $dirIn/$mark.*.bed.bed --project upSet.FindER2.$mark -o $dirIn
+done
 
 ########################################################
 
@@ -255,16 +270,16 @@ done
 ### glioma vs NPC
 #### method1: ER and signal files
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
-echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique/ER.unique.summary
+echo -e "Sample\tMark\tN_glioma\tlen_glioma\tN_NPC\tlen_NPC\tN_glioma_unique\tlen_glioma_unique\tN_NPC_unique\tlen_NPC_unique" > $dirIn/unique2/ER.unique.summary
 for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
-	IDH=$(less $dirIn/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
+    IDH=$(less $dirIn/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
     for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
         echo $IDH".CEMT_"$lib $mark
-        echo -e "\n\n"$IDH".CEMT_"$lib $mark >> $dirIn/unique/ER.unique.log
-        dirOut=$dirIn/unique/$mark/
+        echo -e "\n\n"$IDH".CEMT_"$lib $mark >> $dirIn/unique2/ER.unique.log
+        dirOut=$dirIn/unique2/$mark/
         mkdir -p $dirOut/
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/NPC.GE04.wig.gz -excl $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib >> $dirIn/unique/ER.unique.log
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/$IDH".CEMT_"$lib.wig.gz -r $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04 >> $dirIn/unique/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/NPC.GE04.wig.gz -excl $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib >> $dirIn/unique2/ER.unique.log
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/$IDH".CEMT_"$lib.wig.gz -r $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04 >> $dirIn/unique2/ER.unique.log
         N_glioma=$(less $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz | wc -l)
         len_glioma=$(less $dirIn/FindER/$mark/$IDH".CEMT_"$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
         N_NPC=$(less $dirIn/FindER/$mark/NPC.GE04.FDR_0.05.FindER.bed.gz | wc -l)
@@ -273,21 +288,43 @@ for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
         len_glioma_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib.unique | awk '{s=s+$3-$2}END{print s}')
         N_NPC_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04.unique | wc -l)
         len_NPC_unique=$(less $dirOut/$IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04.unique | awk '{s=s+$3-$2}END{print s}')
-        echo -e $IDH".CEMT_"$lib"\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique/ER.unique.summary
+        echo -e $IDH".CEMT_"$lib"\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique2/ER.unique.summary
     done
 done
-less $dirIn/unique/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique/ER.unique.cutoff
+function uniqueER {
+    sample=$1    
+    lib=$(echo $sample | cut -d'.' -f1)
+    mark=$(echo $sample | cut -d'.' -f2)
+    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
+    IDH=$(less $dirIn/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
+    echo $IDH".CEMT_"$lib $mark
+    echo -e "\n\n"$IDH".CEMT_"$lib $mark >> $dirIn/unique2/ER.unique.log
+    dirOut=$dirIn/unique2/$mark/
+    mkdir -p $dirOut/
+    /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER2/$mark.$IDH".CEMT_"$lib.FindER2.bed -w $dirIn/wig/$mark/NPC.GE04.wig.gz -excl $dirIn/FindER2/$mark.NPC.GE04.FindER2.bed -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.$IDH".CEMT_"$lib >> $dirIn/unique2/ER.unique.log
+    /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER2/$mark.$IDH".CEMT_"$lib.FindER2.bed -w $dirIn/wig/$mark/$IDH".CEMT_"$lib.wig.gz -r $dirIn/FindER2/$mark.NPC.GE04.FindER2.bed -o $dirOut/ -n $IDH".CEMT_"$lib.vs.NPC.GE04.NPC.GE04 >> $dirIn/unique2/ER.unique.log
+}
+export -f uniqueER
+> $dirIn/List.txt
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+        echo $lib"."$mark >> $dirIn/List.txt
+    done
+done
+cat $dirIn/List.txt | parallel --gnu uniqueER
+less $dirIn/unique2/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique2/ER.unique.cutoff
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-mkdir -p $dirIn/unique/upSet/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
+mkdir -p $dirIn/unique2/upSet/
 for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
 	echo $mark
-	intervene upset -i $dirIn/unique/$mark/IDHmut.*.vs.NPC.GE04.IDHmut.*.unique --project upset.IDHmut_NPC.$mark -o $dirIn/unique/upSet/
-	intervene upset -i $dirIn/unique/$mark/IDHmut.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHmut.$mark -o $dirIn/unique/upSet/
-	intervene upset -i $dirIn/unique/$mark/IDHwt.*.vs.NPC.GE04.IDHwt.*.unique --project upset.IDHwt_NPC.$mark -o $dirIn/unique/upSet/
-	intervene upset -i $dirIn/unique/$mark/IDHwt.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHwt.$mark -o $dirIn/unique/upSet/
-	intervene upset -i $dirIn/unique/$mark/Normal*.vs.NPC.GE04.Normal*.unique --project upset.NormalAdjacent_NPC.$mark -o $dirIn/unique/upSet/
-	intervene upset -i $dirIn/unique/$mark/Normal*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_NormalAdjacent.$mark -o $dirIn/unique/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDHmut.*.vs.NPC.GE04.IDHmut.*.unique --project upset.IDHmut_NPC.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDHmut.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHmut.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDHwt.*.vs.NPC.GE04.IDHwt.*.unique --project upset.IDHwt_NPC.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDHwt.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHwt.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/Normal*.vs.NPC.GE04.Normal*.unique --project upset.NormalAdjacent_NPC.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/Normal*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_NormalAdjacent.$mark -o $dirIn/unique2/upSet/
 done
 
 ##### outgroup for H3K36me3
@@ -366,22 +403,33 @@ for mark in H3K4me1 H3K4me3 H3K27me3 H3K27ac; do
 done
 
 ########################################################
+## unqiue H3K27me3
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique2/H3K27me3/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+cd $dirIn
+cat IDHmut.*.vs.NPC.GE04.IDHmut.*.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>=6){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > IDHmut_NPC.IDHmut.unique.bed
+cat IDHmut.*.vs.NPC.GE04.NPC.GE04.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>=6){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > IDHmut_NPC.NPC.unique.bed
+$BEDTOOLS/intersectBed -a IDHwt.CEMT_23.vs.NPC.GE04.IDHwt.CEMT_23.unique -b IDHwt.CEMT_74.vs.NPC.GE04.IDHwt.CEMT_74.unique | cut -d$'\t' -f1-4 > IDHwt_NPC.IDHwt.unique.bed
+$BEDTOOLS/intersectBed -a IDHwt.CEMT_23.vs.NPC.GE04.NPC.GE04.unique -b IDHwt.CEMT_74.vs.NPC.GE04.NPC.GE04.unique | cut -d$'\t' -f1-4 > IDHwt_NPC.NPC.unique.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
+/home/lli/HirstLab/Pipeline/shell/region.intersect.sh -d $dirIn -r $enhancer -n enhancer
 
+########################################################
 ## unique enhancers
 ### Homer for TFBS motifs
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
-dirIn='/projects/epigenomics2/users/lli/glioma/ChIPseq/unique/'
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique2/
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 for mark in H3K27ac H3K4me1; do
     mkdir -p $dirIn/$mark/homer/
     cd $dirIn/$mark/
-    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.CEMT_19.unique -b CEMT_22.vs.NPC_GE04.CEMT_22.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.CEMT_47.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.IDHmut.unique
-    $BEDTOOLS/intersectBed -a CEMT_19.vs.NPC_GE04.NPC_GE04.unique -b CEMT_22.vs.NPC_GE04.NPC_GE04.unique | $BEDTOOLS/intersectBed -a stdin -b CEMT_47.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > IDHmut_NPC.NPC.unique
-    less CEMT_23.vs.NPC_GE04.CEMT_23.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC.IDHwt.unique
-    less CEMT_23.vs.NPC_GE04.NPC_GE04.unique | awk '{print $1"\t"$2"\t"$3"\t"$4}' > IDHwt_NPC.NPC.unique
-    for file in *.unique; do
-        name=$(echo $file | sed -e 's/.unique//g')
+    cat IDHmut.*.vs.NPC.GE04.IDHmut.*.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>=6){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > IDHmut_NPC.IDHmut.unique.bed
+    cat IDHmut.*.vs.NPC.GE04.NPC.GE04.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>=6){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > IDHmut_NPC.NPC.unique.bed
+    $BEDTOOLS/intersectBed -a IDHwt.CEMT_23.vs.NPC.GE04.IDHwt.CEMT_23.unique -b IDHwt.CEMT_74.vs.NPC.GE04.IDHwt.CEMT_74.unique | cut -d$'\t' -f1-4 > IDHwt_NPC.IDHwt.unique.bed
+    $BEDTOOLS/intersectBed -a IDHwt.CEMT_23.vs.NPC.GE04.NPC.GE04.unique -b IDHwt.CEMT_74.vs.NPC.GE04.NPC.GE04.unique | cut -d$'\t' -f1-4 > IDHwt_NPC.NPC.unique.bed
+    for file in *.unique.bed; do
+        name=$(echo $file | sed -e 's/.unique.bed//g')
         echo "Processing "$mark $name
         dirOut=$dirIn/$mark/homer/$name/
         mkdir -p $dirOut
