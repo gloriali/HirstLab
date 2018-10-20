@@ -72,7 +72,7 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
 dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/; mkdir -p $dirBW
 bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
 for bam in $dirIn/*/*.bam; do
-    name=$(basename $bam | sed 's/\.bam//'); mark=$(echo $bam | cut -d'/' -f11); echo $mark $name
+    name=$(basename $bam | cut -d'.' -f2,3); mark=$(echo $bam | cut -d'/' -f11); echo $mark $name
 	mkdir -p $dirBW/$mark/
     $bamstats -g 2864785220 -t 8 $bam > $dirIn/$mark/$name.bamstats
     /home/lli/HirstLab/Pipeline/shell/bamstats2report.sh $dirIn/$mark/ $mark.$name $dirIn/$mark/$name.bamstats
@@ -225,19 +225,29 @@ for inp in $dirIn/Input/*.bam; do
     sig=${sig1},${sig2},${sig3},${sig4},${sig5},${sig6}
     $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$sig outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
 done
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/wig/
 echo -e "Mark\tSample\tN_region\tTotal_length\tAverage_length" > $dirOut/ER_summary.txt
 for file in $dirOut/*.bed; do
     mark=$(basename $file | cut -d'.' -f1)
     sample=$(basename $file | cut -d'.' -f2,3)
     echo $mark $sample
+    $java -jar -Xmx15G $RegCov -w $(ls $dirWig/$mark/*$sample.*wig.gz) -r $file -o $dirOut -c $chr -n $mark.$sample.FindER2.signal > $dirOut/$mark.$sample.log
     echo -e $mark"\t"$sample"\t"$(less $file | wc -l)"\t"$(less $file | awk '{s=s+$3-$2}END{print s}') | awk '{print $0"\t"$4/$3}' >> $dirOut/ER_summary.txt
+done
+echo -e "chr\tstart\tend\tsignal\tN\tmark\tsample" > $dirOut/all.coverage.bed
+for file in $dirOut/*.coverage; do
+	mark=$(basename $file | cut -d'.' -f1); sample=$(basename $file | cut -d'.' -f2,3)
+	echo $mark $sample
+	less $file | awk '{print $0"\t""'$mark'""\t""'$sample'"}' >> $dirOut/all.coverage.bed
 done
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+mkdir -p $dirOut/UpSet/
 for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
     echo $mark
-    intervene upset -i $dirIn/$mark.*.bed.bed --project upSet.FindER2.$mark -o $dirIn
+    intervene upset -i $dirOut/$mark.*.coverage --project upSet.FindER2.$mark -o $dirOut/UpSet/
 done
 
 ########################################################
@@ -319,12 +329,8 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
 mkdir -p $dirIn/unique2/upSet/
 for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
 	echo $mark
-	intervene upset -i $dirIn/unique2/$mark/IDHmut.*.vs.NPC.GE04.IDHmut.*.unique --project upset.IDHmut_NPC.$mark -o $dirIn/unique2/upSet/
-	intervene upset -i $dirIn/unique2/$mark/IDHmut.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHmut.$mark -o $dirIn/unique2/upSet/
-	intervene upset -i $dirIn/unique2/$mark/IDHwt.*.vs.NPC.GE04.IDHwt.*.unique --project upset.IDHwt_NPC.$mark -o $dirIn/unique2/upSet/
-	intervene upset -i $dirIn/unique2/$mark/IDHwt.*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDHwt.$mark -o $dirIn/unique2/upSet/
-	intervene upset -i $dirIn/unique2/$mark/Normal*.vs.NPC.GE04.Normal*.unique --project upset.NormalAdjacent_NPC.$mark -o $dirIn/unique2/upSet/
-	intervene upset -i $dirIn/unique2/$mark/Normal*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_NormalAdjacent.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDH*.vs.NPC.GE04.IDH*.unique --project upset.IDH_NPC.$mark -o $dirIn/unique2/upSet/
+	intervene upset -i $dirIn/unique2/$mark/IDH*.vs.NPC.GE04.NPC.GE04.unique --project upset.NPC_IDH.$mark -o $dirIn/unique2/upSet/
 done
 
 ##### outgroup for H3K36me3
