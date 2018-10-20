@@ -3,7 +3,7 @@
 # link files
 dirIn=/projects/edcc_new/reference_epigenomes/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGS/
-for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+for lib in 19 21 22 23 73 74 75 76 78 79 81; do
     IDH=$(less $dirOut/../samples.txt | awk '{if($1=="CEMT_""'$lib'")print $2}')
     echo $IDH $lib 
     mkdir -p $dirOut/bam/

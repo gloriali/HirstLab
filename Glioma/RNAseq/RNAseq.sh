@@ -20,15 +20,6 @@ for bam in $dirIn/*.bam; do
 done
 /home/lli/HirstLab/Pipeline/shell/bamstats2report.combine.sh $dirIn $dirIn
 
-# IDH1/2 expression
-dirOut=/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM/
-> $dirOut/IDH.RPKM
-for lib in 19 21 22 23 47; do
-    echo $lib;
-    less $dirOut/CEMT_$lib.G.A.rpkm.pc | awk '$1 ~ /ENSG00000138413/ {print $1"\tIDH1\tCEMT_""'$lib'""\t"$3}' >> $dirOut/IDH.RPKM
-    less $dirOut/CEMT_$lib.G.A.rpkm.pc | awk '$1 ~ /ENSG00000182054/ {print $1"\tIDH2\tCEMT_""'$lib'""\t"$3}' >> $dirOut/IDH.RPKM
-done
-
 # Update Fetal Brain RPKM to hg19v69
 ## re-sort bam on read names
 samtools=/gsc/software/linux-x86_64/samtools-0.1.13/samtools
@@ -104,6 +95,15 @@ rm -rf $dirOut/$name/
 name=A15299.GE04
 rm -rf $dirOut/$name/
 /home/acarles/Solexa_Shell/src/RNAseqMaster.sh $dirIn/$name/$name'_withJunctionsOnGenome_dupsFlagged.bam' $name $dirOut $ens R 0 "1,1,1,1,1" $JAVA $samtools 
+
+# IDH1/2 expression
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/
+> $dirOut/IDH.RPKM
+for lib in 19 21 22 23 47 73 74 75 76 78 79 81; do
+    echo $lib;
+    less $dirOut/*CEMT_$lib.G.A.rpkm.pc | awk '$1 ~ /ENSG00000138413/ {print $1"\tIDH1\tCEMT_""'$lib'""\t"$3}' >> $dirOut/IDH.RPKM
+    less $dirOut/*CEMT_$lib.G.A.rpkm.pc | awk '$1 ~ /ENSG00000182054/ {print $1"\tIDH2\tCEMT_""'$lib'""\t"$3}' >> $dirOut/IDH.RPKM
+done
 
 # RPKM matrix
 > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.long
