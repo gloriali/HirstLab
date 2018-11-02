@@ -52,7 +52,7 @@ QC_summary_percent <- QC_summary %>% select(Sample, Mapping_Efficiency, Percent_
 		theme(axis.text.x = element_text(angle = 90)))
 ggsave(QC_summary_percent_figure, file = "./bam/QC_summary_percent_figure.pdf", height = 10, width = 5)
 qc_5mC_coverage1 <- read.delim("/projects/epigenomics2/users/lli/glioma/WGBS/qc_5mC_coverage.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), batch = gsub("[0-9]+", "", gsub("_.*", "", gsub("IDH.*t_", "", sample))))
-qc_5mC_coverage <- read.delim("qc_5mC_coverage.txt", as.is = T) %>% mutate(category = sample, batch = "PBAL") %>% rbind(qc_5mC_coverage1)
+qc_5mC_coverage <- read.delim("qc_5mC_coverage.txt", as.is = T) %>% mutate(category = sample, batch = gsub("_.*", "", sample)) %>% rbind(qc_5mC_coverage1)
 (qc_5mC_coverage_figure <- ggplot(qc_5mC_coverage, aes(coverage, N/1e6, color = batch, group = sample)) + 
 		geom_line() + 
 		guides(color = guide_legend(title = NULL)) + 
@@ -63,8 +63,10 @@ ggsave(qc_5mC_coverage_figure, file = "qc_5mC_coverage_figure.pdf", height = 5, 
 
 ## ------- clustering ---------
 genome_5mC <- read.table("matrix_genome.5mC", sep = " ", row.names = 1, head = T)
-spearman_genome_5mC <- cor(genome_5mC, method = "spearman")
-pearson_genome_5mC <- cor(genome_5mC, method = "pearson")
+genome_5mC_CEMT <- read.table("/projects/epigenomics2/users/lli/glioma/WGBS/matrix_genome.5mC", sep = " ", head = F, row.names = 1, col.names = c("ID", "IDHmut_CEMT_19", "IDHmut_CEMT_21", "IDHmut_CEMT_22", "IDHmut_CEMT_47", "IDHmut_TCGA060128", "IDHmut_TCGA161460", "IDHmut_TCGA191788", "IDHwt_CEMT_23", "IDHwt_TCGA141401", "IDHwt_TCGA141454", "IDHwt_TCGA143477", "NPC_Cortex02", "NPC_Cortex04", "NPC_GE02", "NPC_GE04"))
+genome_5mC <- merge(genome_5mC, genome_5mC_CEMT, by = "row.names")
+spearman_genome_5mC <- cor(genome_5mC %>% select(-Row.names), method = "spearman")
+pearson_genome_5mC <- cor(genome_5mC %>% select(-Row.names), method = "pearson")
 write.table(spearman_genome_5mC, file = "cluster_spearman_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 write.table(pearson_genome_5mC, file = "cluster_pearson_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 CGI_5mC <- read.table("matrix_CGI.5mC", sep = " ", row.names = 1, head = T)
