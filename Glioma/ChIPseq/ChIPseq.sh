@@ -66,11 +66,11 @@ for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac Input; do
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/bam/$(echo $mark | sed 's/Input/input/')/*MGG_control*.bam $dirOut/bam/$mark/$mark.MGG.control.bam
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/bam/$(echo $mark | sed 's/Input/input/')/*MGG_control*.bam.bai $dirOut/bam/$mark/$mark.MGG.control.bam.bai
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/wig/$(echo $mark | sed 's/Input/input/')/*MGG_control*.wig.gz $dirOut/wig/$mark/MGG.control.wig.gz
-	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER/$mark/*MGG_control*.bed.gz $dirOut/FindER/$mark/MGG.control.FindER.bed.gz
+	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER/$mark/*MGG_control*.bed.gz $dirOut/FindER/$mark/MGG.control.FDR_0.05.FindER.bed.gz
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/bam/$(echo $mark | sed 's/Input/input/')/*MGG_vitc*.bam $dirOut/bam/$mark/$mark.MGG.vitc.bam
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/bam/$(echo $mark | sed 's/Input/input/')/*MGG_vitc*.bam.bai $dirOut/bam/$mark/$mark.MGG.vitc.bam.bai
 	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/wig/$(echo $mark | sed 's/Input/input/')/*MGG_vitc*.wig.gz $dirOut/wig/$mark/MGG.vitc.wig.gz
-	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER/$mark/*MGG_vitc*.bed.gz $dirOut/FindER/$mark/MGG.vitc.FindER.bed.gz
+	ln -s /projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER/$mark/*MGG_vitc*.bed.gz $dirOut/FindER/$mark/MGG.vitc.FDR_0.05.FindER.bed.gz
 done
 
 # summary
