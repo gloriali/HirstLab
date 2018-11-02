@@ -13,44 +13,27 @@ library(stringr)
 library(scales)
 source('~/HirstLab/Pipeline/R/enrich.R')
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
-load("/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
-setwd("/projects/epigenomics2/users/lli/glioma/ChIPseq/")
-libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47", "GE04")
+load("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
+setwd("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/")
 marks <- c("H3K27me3", "H3K9me3", "H3K27ac", "H3K4me1", "H3K4me3", "H3K36me3")
 Ensembl <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.EnsID_sorted.HUGO", as.is = T, head = F, row.names = 1)
 
 ## -------- ER summary -----------
-### adjust for differences in sequencing depth: subsampling deep sequenced bam file to the average sequence depth of all other samples
-glioma_qc <- read.delim("~/HirstLab/Glioma/GliomaLibrariesDetails.tsv", as.is = T) %>% 
-	mutate(Assay = gsub("ChIP-Seq\\/", "", Assay))
-NPC_qc <- read.delim("~/HirstLab/FetalBrain/FetalBrainLibrariesDetail.tsv", as.is = T) %>% 
-	mutate(Sample = gsub("HuFNSC", "", paste0(Cell.Type, Donor)), Sample = gsub("Primary Cell Culture Neurospheres, ", "", Sample), Sample = gsub("Ganglionic Eminence Derived", "GE", Sample))
-sequencing_depth <- data.frame(ID = c(paste0(NPC_qc$Sample, "_", NPC_qc$Library.Strategy), paste0(glioma_qc$Donor, "_", glioma_qc$Assay)), depth = c(NPC_qc$Total_Number_Of_Reads_After_Filtering, glioma_qc$Number_Uniquely_Aligned_Reads_without_Dups_and_Q_.._10))
-rownames(sequencing_depth) <- sequencing_depth$ID
-ER_adjust <- read.delim("./FindER/subsample/ER.summary.adjust", as.is = T)
-ER_adjust_summary <- ER_adjust %>% group_by(mark, sample) %>% 
-	summarise(frac = frac[1], n_original = n_original[1], len_original = len_original[1], 
-						n_adjust_ave = mean(n_adjust), n_adjust_sd = sd(n_adjust), len_adjust_ave = mean(len_adjust), len_adjust_sd = sd(len_adjust), 
-						n_intersect_ave = mean(n_intersect), n_intersect_sd = sd(n_intersect), len_intersect_ave = mean(len_intersect), len_intersect_sd = sd(len_intersect))
-rownames(ER_adjust_summary) <- paste0(ER_adjust_summary$sample, "_", ER_adjust_summary$mark)
-ER_summary <- read.delim("./FindER/ER.summary.stats", as.is = T) %>% 
-	mutate(Sample = gsub("NPC_", "", Sample), Seq_depth = sequencing_depth[paste0(Sample, "_", Mark), "depth"], N_region_adjust = N_region, Total_length_adjust = Total_length)
-rownames(ER_summary) <- paste0(ER_summary$Sample, "_", ER_summary$Mark)
-ER_summary[rownames(ER_adjust_summary), "N_region_adjust"] <- ER_adjust_summary$n_adjust_ave
-ER_summary[rownames(ER_adjust_summary), "Total_length_adjust"] <- ER_adjust_summary$len_adjust_ave
-ER_summary_tall <- ER_summary %>% melt(id = c("Mark", "Sample")) %>% mutate(sd = NA, variable = factor(variable, levels = c("N_region", "N_region_adjust", "Total_length", "Total_length_adjust", "Seq_depth")))
-rownames(ER_summary_tall) <- paste0(ER_summary_tall$Sample, "_", ER_summary_tall$Mark, "_", ER_summary_tall$variable)
-ER_summary_tall[paste0(rownames(ER_adjust_summary), "_N_region_adjust"), "sd"] <- ER_adjust_summary$n_adjust_sd
-ER_summary_tall[paste0(rownames(ER_adjust_summary), "_Total_length_adjust"), "sd"] <- ER_adjust_summary$len_adjust_sd
-(ER_summary_figure <- ggplot(ER_summary_tall %>% filter(variable %in% c("N_region", "Total_length", "Seq_depth")), aes(Mark, value, fill = Sample)) + 
+FindER2_signal <- read.delim("./FindER2/all.coverage.bed", as.is = T) %>% mutate(type = gsub("\\..*", "", sample))
+(FindER2_signal_figure <- ggplot(FindER2_signal, aes(signal, color = type, group = sample)) + 
+		stat_ecdf(geom = "step") + 
+		facet_wrap(~ mark) + 
+		coord_cartesian(xlim = c(0, 30)) + 
+		theme_bw())
+ER_summary <- read.delim("./FindER2/ER_summary.txt", as.is = T) 
+ER_summary_tall <- ER_summary %>% melt(id = c("Mark", "Sample")) %>% mutate(type = gsub("\\..*", "", Sample))
+(ER_summary_figure <- ggplot(ER_summary_tall, aes(Sample, value, fill = type)) + 
 	geom_bar(position = position_dodge(width=0.9), stat = "identity") + 
-#	geom_errorbar(aes(ymin = value - sd, ymax = value + sd), position = position_dodge(width=0.9), width=0.5) + 
-	facet_grid(variable ~ ., scales = "free_y") +
-	scale_y_continuous(label=scientific_format()) + 
+	facet_grid(variable ~ Mark, scales = "free") +
 	xlab("") + 
 	ylab("") + 
 	theme_bw())
-ggsave(ER_summary_figure, file = "./FindER/ER_summary_figure.pdf", width = 8, height = 8)
+ggsave(ER_summary_figure, file = "./FindER2/ER_summary_figure.pdf", width = 8, height = 8)
 
 for(i in 1:nrow(ER_adjust_summary)){
 	assign(paste0("Venn_adjust_N_region", rownames(ER_adjust_summary)[i]), draw.pairwise.venn(as.integer(ER_adjust_summary[i, "n_adjust_ave"]), as.integer(ER_adjust_summary[i, "n_original"]), as.integer(ER_adjust_summary[i, "n_intersect_ave"]), category = c("adjusted", "original")))
@@ -157,17 +140,17 @@ for(i in 1:10){
 dev.off()
 
 ### summary
-ER_unique_summary <- read.delim("./unique/ER.unique.summary", as.is = T) %>% 
+ER_unique_summary <- read.delim("./unique2/ER.unique.summary", as.is = T) %>% 
 	melt(id = c("Sample", "Mark")) %>% 
-	mutate(Sample = paste0("CEMT_", Sample), category = ifelse(grepl("len", variable), "Total No. of bases", "Total No. of regions"), type = ifelse(grepl("glioma", variable), "glioma", "NPC"), unique = ifelse(grepl("unique", variable), T, F), value = ifelse(type == "glioma", value, -value))
-(ER_unique_summary_figure <- ggplot(ER_unique_summary %>% filter(unique == T, Sample %in% libs), aes(Mark, value, fill = Sample)) + 
+	mutate(category = ifelse(grepl("len", variable), "Total No. of bases", "Total No. of regions"), type = gsub("\\..*", "", Sample), unique = ifelse(grepl("unique", variable), T, F), value = ifelse(grepl("glioma", variable), value, -value))
+(ER_unique_summary_figure <- ggplot(ER_unique_summary %>% filter(unique == T), aes(Sample, value, fill = type)) + 
 	geom_bar(stat = "identity", position = position_dodge()) +
 	geom_hline(yintercept = 0) + 
-	facet_grid(category ~., scales = "free_y") + 
+	facet_grid(category ~ Mark, scales = "free_y") + 
 	xlab("") + 
 	ylab("") + 
 	theme_bw())
-ggsave(ER_unique_summary_figure, file = "./unique/ER_unique_summary_figure.pdf", width = 8, height = 6)
+ggsave(ER_unique_summary_figure, file = "./unique2/ER_unique_summary_figure.pdf", width = 8, height = 4)
 H3K27me3_unique_summary <- ER_unique_summary %>% filter(Mark == "H3K27me3", variable %in% c("len_glioma_unique", "len_NPC_unique")) %>%
   mutate(Sample = ifelse(Sample == "CEMT_23", gsub("CEMT", "IDHwt_CEMT", Sample), gsub("CEMT", "IDHmut_CEMT", Sample)), value = abs(value)/10^6, type = paste0(type, "-specific"))
 (H3K27me3_unique_summary_figure <- ggplot(H3K27me3_unique_summary, aes(Sample, value, fill = type)) + 
@@ -192,8 +175,32 @@ DHM_DE <- read.delim("./unique/DHM.DE.summary", as.is = T) %>% mutate(Significan
 	theme_bw())
 ggsave(DHM_DE_figure, file = "./unique/DHM_DE_figure.pdf")
 
+### ======== unique H3K27me3 =========
+K27me3_unique_genomic_breakdown <- read.delim("./unique2/H3K27me3/intersect/genomic.breakdown.summary", as.is = T) %>% 
+	mutate(sample = gsub("_NPC", "", Name), NCpG = NULL, Name = NULL)
+K27me3_unique_genomic_breakdown_tall <- melt(K27me3_unique_genomic_breakdown, id = "sample") 
+(K27me3_unique_genomic_breakdown_figure <- ggplot(K27me3_unique_genomic_breakdown_tall, aes(variable, value)) + 
+		geom_bar(position = "identity", stat = "identity", width = 0.5) + 
+		geom_hline(yintercept = 2) + 
+		facet_wrap(~sample) + 
+		xlab("") + 
+		ylab("Fold enrichment") + 
+		coord_flip() + 
+		theme_bw())
+ggsave(K27me3_unique_genomic_breakdown_figure, file = "./unique2/H3K27me3/K27me3_unique_genomic_breakdown_figure.pdf", height = 6, width = 7)
+
 ### ======== unique enhancers =========
 #### H3K27ac
+homer_unique_K27ac_IDHmut <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.IDHmut/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K27ac_IDHmut_figure <- ggplot(homer_unique_K27ac_IDHmut, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		theme_bw())
+ggsave(homer_unique_K27ac_IDHmut_figure, file = "./unique/H3K27ac/homer_unique_K27ac_IDHmut_figure.pdf", height = 4, width = 3)
 homer_unique_K27ac_NPC_tf <- read.delim("./unique/H3K27ac/homer/IDHmut_NPC.NPC.tf", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
 	filter(Percent_with_motif >= 20) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
@@ -235,16 +242,20 @@ write.table(homer_unique_K27ac_NPC_Sox3_DN, file = "./unique/H3K27ac/homer/homer
 (homer_unique_K27ac_NPC_Sox3_DN_DAVID <- enrich("IDHmut_NPC.NPC.Sox3.annotate.closest.gene.RPKM.DN", dirIn = "./unique/H3K27ac/homer/enrich/", dirOut = "./unique/H3K27ac/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 8) + ggtitle("NPC-unique H3K27ac Sox3 DN"))
 
 #### H3K4me1
-homer_unique_K4me1_IDHmut_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf", as.is = T) %>%
+K4me1_IDHmut <- as.numeric(system("less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique2/H3K4me1/IDHmut_NPC.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
+DMR_hyper <- as.numeric(system("less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/DMR.IDHmut_NPC.s500.c3.hyper.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
+K4me1_IDHmut_DMR_hyper <- as.numeric(system("/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/intersectBed -a /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique2/H3K4me1/IDHmut_NPC.IDHmut.unique.bed -b /projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/DMR.IDHmut_NPC.s500.c3.hyper.bed | awk '{s=s+$3-$2}END{print s}'", intern = T))
+K4me1_IDHmut_DMR_hyper_venn <- draw.pairwise.venn(area1 = K4me1_IDHmut, area2 = DMR_hyper, cross.area = K4me1_IDHmut_DMR_hyper, category = c("H3K4me1 IDHmut unique", "DMR hyper"), fill = c("red", "blue"), rotation.degree = 90, cex = 2, cat.pos = c(-180, 0), cat.dist = 0.05, cat.cex = 1.5, margin = 0.1)
+homer_unique_K4me1_IDHmut <- read.delim("./unique2/H3K4me1/homer/IDHmut_NPC.IDHmut/knownResults.txt", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
-	arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
-(homer_unique_K4me1_IDHmut_tf_figure <- ggplot(homer_unique_K4me1_IDHmut_tf, aes(TF, Percent_with_motif)) + 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. <= 0.05) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K4me1_IDHmut_figure <- ggplot(homer_unique_K4me1_IDHmut, aes(TF, Percent_with_motif)) + 
 	geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
 	coord_flip() + 
 	xlab("") + 
 	ylab("Percent of enhancers with motif") + 
 	theme_bw())
-ggsave(homer_unique_K4me1_IDHmut_tf_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_IDHmut_tf_figure.pdf", height = 6, width = 6)
+ggsave(homer_unique_K4me1_IDHmut_figure, file = "./unique2/H3K4me1/homer_unique_K4me1_IDHmut_figure.pdf", height = 5, width = 6)
 homer_unique_K4me1_IDHmut_tf_RPKM <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.IDHmut.tf.RPKM", as.is = T) %>%
 	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
 	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
@@ -260,16 +271,16 @@ ggsave(homer_unique_K4me1_IDHmut_tf_RPKM_figure, file = "./unique/H3K4me1/homer/
 (homer_unique_K4me1_IDHmut_Ascl1_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.Ascl1.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 4) + ggtitle("glioma-unique H3K4me1 Ascl1 UP"))
 (homer_unique_K4me1_IDHmut_Olig2_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.Olig2.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F, height = 4) + ggtitle("glioma-unique H3K4me1 Olig2 UP"))
 (homer_unique_K4me1_IDHmut_HEB_UP_DAVID <- enrich("IDHmut_NPC.IDHmut.HEB.annotate.closest.gene.UP", dirIn = "./unique/H3K4me1/homer/enrich/", dirOut = "./unique/H3K4me1/homer/enrich/", fdr = 0.05, p = "Benjamini", erminej = F) + ggtitle("glioma-unique H3K4me1 HEB UP"))
-homer_unique_K4me1_NPC_tf <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.NPC.tf", as.is = T) %>%
+homer_unique_K4me1_NPC <- read.delim("./unique2/H3K4me1/homer/IDHmut_NPC.NPC/knownResults.txt", as.is = T) %>%
 	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
-	arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
-(homer_unique_K4me1_NPC_tf_figure <- ggplot(homer_unique_K4me1_NPC_tf, aes(TF, Percent_with_motif)) + 
+	filter(Percent_with_motif >= 20, q-value..Benjamini. <= 0.05) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_unique_K4me1_NPC_figure <- ggplot(homer_unique_K4me1_NPC, aes(TF, Percent_with_motif)) + 
 	geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
 	coord_flip() + 
 	xlab("") + 
 	ylab("Percent of enhancers with motif") + 
 	theme_bw())
-ggsave(homer_unique_K4me1_NPC_tf_figure, file = "./unique/H3K4me1/homer/homer_unique_K4me1_NPC_tf_figure.pdf", height = 6, width = 6)
+ggsave(homer_unique_K4me1_NPC_figure, file = "./unique/H3K4me1/homer_unique_K4me1_NPC_figure.pdf", height = 6, width = 6)
 homer_unique_K4me1_NPC_tf_RPKM <- read.delim("./unique/H3K4me1/homer/IDHmut_NPC.NPC.tf.RPKM", as.is = T) %>%
 	select(-Brain01, -Brain02, -CEMT_21) %>% melt(id = c("ENSG", "Motif")) %>% 
 	mutate(Type = ifelse(variable == "CEMT_23", "IDHwt", ifelse(grepl("CEMT", variable), "IDHmut", "NPCs"))) %>% 
@@ -486,6 +497,6 @@ for(mark in c("H3K27me3", "H3K36me3", "H3K9me3", "H3K27ac", "H3K4me1", "H3K4me3"
 ## ========== save ===========
 save(list = c("homer_unique_K27ac_NPC_Sox3_DN", 
 							ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "heatmap"), ls(pattern = "density2d"), ls(pattern = "hist"), ls(pattern = "DAVID"), ls(pattern = "GREAT"), ls(pattern = "venn")), 
-		 file = "/projects/epigenomics2/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
+		 file = "/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 
 
