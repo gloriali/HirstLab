@@ -11,12 +11,14 @@ library(wq)
 library(dplyr)
 library(RCircos)
 library(stringr)
+library(car)
+library(limma)
+library(pheatmap)
 source('~/HirstLab/Pipeline/R/DMR.figures.R')
 source('~/HirstLab/Pipeline/R/enrich.R')
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
-setwd("/projects/epigenomics2/users/lli/glioma/WGBS/")
-load("/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
-libs <- c("IDHmut_CEMT_19", "IDHmut_CEMT_21", "IDHmut_CEMT_22", "IDHmut_CEMT_47", "IDHmut_TCGA060128", "IDHmut_TCGA161460", "IDHmut_TCGA191788", "IDHwt_CEMT_23", "IDHwt_TCGA141401", "IDHwt_TCGA141454", "IDHwt_TCGA143477")
+setwd("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/")
+load("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/WGBS.Rdata")
 RPKM <- read.delim("/projects/epigenomics2/users/lli/glioma/RNAseq/RPKM.matrix", as.is = T)
 
 ## ------- 5mC modifiers RPKM --------
@@ -32,28 +34,28 @@ DNAme_regulators_RPKM <- read.delim("DNAme_regulators.RPKM", as.is = T) %>% sele
 ggsave(DNAme_regulators_RPKM_figure, file = "DNAme_regulators_RPKM_figure.pdf", height = 5, width = 6)
 
 ## ------- CpG coverage ---------
-qc_5mC_coverage <- read.delim("qc_5mC_coverage.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), batch = gsub("[0-9]+", "", gsub("_.*", "", gsub("IDH.*t_", "", sample))))
-(qc_5mC_coverage_figure <- ggplot(qc_5mC_coverage, aes(coverage, N/1e6, color = batch)) + 
+qc_5mC_coverage <- read.delim("qc_5mC_coverage.txt", as.is = T) %>% mutate(category = gsub("\\..*", "", sample))
+(qc_5mC_coverage_figure <- ggplot(qc_5mC_coverage, aes(coverage, N/1e6, color = category)) + 
 		geom_line(aes(group = sample)) + 
 		guides(color = guide_legend(title = NULL)) + 
 		ylab("No. of million CpGs") + 
 		coord_cartesian(xlim = c(0, 50)) + 
 		theme_bw())
-ggsave(qc_5mC_coverage_figure, file = "qc_5mC_coverage_figure.pdf", height = 5, width = 5)
+ggsave(qc_5mC_coverage_figure, file = "qc_5mC_coverage_figure.pdf", height = 5, width = 7)
 
 ## ------- 5mC distribution --------
-qc_5mC_profile <- read.delim("qc_5mC_profile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample), N = ifelse(type == "genome", N/1e6, N/1e3)) %>% filter(sample != "IDHmut_CEMT_21")
+qc_5mC_profile <- read.delim("qc_5mC_profile.txt", as.is = T) %>% mutate(category = gsub("\\..*", "", sample), N = ifelse(type == "genome", N/1e6, N/1e3)) 
 (qc_5mC_profile_figure <- ggplot(qc_5mC_profile, aes(fractional, N, color = category, group = sample)) + 
 		geom_smooth(se = F, span = 0.1, size = 0.5) + 
 		facet_grid(type ~ ., scales = "free_y") + 
 		guides(color = guide_legend(title = NULL), override.aes = list(size = 5)) + 
-		coord_cartesian(ylim = c(0, 6)) + 
+		coord_cartesian(ylim = c(0, 8)) + 
 		xlab("Fractional methylation") + 
 		ylab("No. of million CpGs                    No. of thousand CGIs") + 
 		theme_bw())
 ggsave(qc_5mC_profile_figure, file = "qc_5mC_profile_figure.pdf", height = 5, width = 6)
-qc_5mC_quantile <- read.delim("qc_5mC_quantile.txt", as.is = T) %>% mutate(category = gsub("_.*", "", sample)) %>% filter(sample != "IDHmut_CEMT_21")
-(qc_5mC_quantile_figure <- ggplot(qc_5mC_quantile, aes(x = sample, lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax, fill = category)) + 
+qc_5mC_quantile <- read.delim("qc_5mC_quantile.txt", as.is = T) %>% mutate(category = gsub("\\..*", "", sample)) 
+(qc_5mC_quantile_figure <- ggplot(qc_5mC_quantile %>% filter(!(category %in% c("NHAR", "Normal"))), aes(x = sample, lower = lower, middle = median, upper = upper, ymin = ymin, ymax = ymax, fill = category)) + 
 		geom_boxplot(stat = "identity", color = "grey") + 
 		facet_grid(type ~ .) + 
 		guides(color = guide_legend(title = NULL)) + 
@@ -61,21 +63,20 @@ qc_5mC_quantile <- read.delim("qc_5mC_quantile.txt", as.is = T) %>% mutate(categ
 		ylab("Fractional methylation") + 
 		coord_flip() + 
 		theme_bw())
-ggsave(qc_5mC_quantile_figure, file = "qc_5mC_quantile_figure.pdf", height = 7, width = 6)
+ggsave(qc_5mC_quantile_figure, file = "qc_5mC_quantile_figure.pdf", height = 7, width = 8)
 
 ## ------- clustering ---------
-setwd("/projects/epigenomics2/users/lli/glioma/WGBS/")
-genome_5mC <- read.table("matrix_genome.5mC", sep = " ", head = F, row.names = 1, col.names = c("ID", "IDHmut_CEMT_19", "IDHmut_CEMT_21", "IDHmut_CEMT_22", "IDHmut_CEMT_47", "IDHmut_TCGA060128", "IDHmut_TCGA161460", "IDHmut_TCGA191788", "IDHwt_CEMT_23", "IDHwt_TCGA141401", "IDHwt_TCGA141454", "IDHwt_TCGA143477", "NPC_Cortex02", "NPC_Cortex04", "NPC_GE02", "NPC_GE04"))
+genome_5mC <- read.table("matrix_genome.5mC", sep = " ", head = T, row.names = 1) %>% select(-contains("Normal."), -contains("NHAR"))
 spearman_genome_5mC <- cor(genome_5mC, method = "spearman")
 pearson_genome_5mC <- cor(genome_5mC, method = "pearson")
 write.table(spearman_genome_5mC, file = "cluster_spearman_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 write.table(pearson_genome_5mC, file = "cluster_pearson_genome_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
-CGI_5mC <- read.table("matrix_CGI.5mC", sep = " ", head = F, row.names = 1, col.names = c("ID", "IDHmut_CEMT_19", "IDHmut_CEMT_21", "IDHmut_CEMT_22", "IDHmut_CEMT_47", "IDHmut_TCGA060128", "IDHmut_TCGA161460", "IDHmut_TCGA191788", "IDHwt_CEMT_23", "IDHwt_TCGA141401", "IDHwt_TCGA141454", "IDHwt_TCGA143477", "NPC_Cortex02", "NPC_Cortex04", "NPC_GE02", "NPC_GE04"))
+CGI_5mC <- read.table("matrix_CGI.5mC", sep = " ", head = T, row.names = 1) %>% select(-contains("Normal."), -contains("NHAR"))
 spearman_CGI_5mC <- cor(CGI_5mC, method = "spearman")
 pearson_CGI_5mC <- cor(CGI_5mC, method = "pearson")
 write.table(spearman_CGI_5mC, file = "cluster_spearman_CGI_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
 write.table(pearson_CGI_5mC, file = "cluster_pearson_CGI_5mC.cor", sep = "\t", quote = F, row.names = T, col.names = T)
-op <- par(mar = c(5, 4, 4, 8))
+op <- par(mar = c(5, 4, 4, 10))
 spearman_genome_5mC <- read.delim("cluster_spearman_genome_5mC.cor", as.is = T)
 spearman_genome_5mC_dend <-  hclust(1 - spearman_genome_5mC %>% as.dist, method = "ward.D2") %>% as.dendrogram
 plot(spearman_genome_5mC_dend, main = "genome-wide spearman", horiz = TRUE)
@@ -90,17 +91,152 @@ pearson_CGI_5mC_dend <-  hclust(1 - pearson_CGI_5mC %>% as.dist, method = "ward.
 plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
 par(op)
 pdf("cluster.pdf", height = 5, width = 8)
-op <- par(mar = c(5, 4, 4, 8))
+op <- par(mar = c(5, 4, 4, 10))
 plot(spearman_genome_5mC_dend, main = "genome-wide spearman", horiz = TRUE)
 plot(pearson_genome_5mC_dend, main = "genome-wide pearson", horiz = TRUE)
 plot(spearman_CGI_5mC_dend, main = "CGI spearman", horiz = TRUE)
 plot(pearson_CGI_5mC_dend, main = "CGI pearson", horiz = TRUE)
 par(op)
 dev.off()
-plot(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$IDHwt_CEMT_23), xlim = c(-.6, .6))
-lines(density(genome_5mC$IDHmut_TCGA161460 - genome_5mC$IDHwt_TCGA141454), col = "red")
-lines(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$NPC_GE04), col = "blue")
-lines(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$IDHmut_CEMT_22), col = "green")
+ann <- data.frame(category = gsub("\\..*", "", row.names(pearson_genome_5mC))) 
+rownames(ann) <- row.names(pearson_genome_5mC)
+ann_color <- list(category = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[3], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[5], l = 65, c = 100)))
+names(ann_color$category) <- c("IDHmut", "IDHwt", "MGG", "NormalAdjacent", "NPC")
+pheatmap_pearson_genome_5mC <- pheatmap(pearson_genome_5mC, main = "genome-wide 5mC pearson", filename = "./heatmap_pearson_genome_5mC.pdf", height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F)
+CGI_5mC_variable <- CGI_5mC %>% mutate(id = rownames(.), sd = apply(., 1, sd)) %>% filter(sd > quantile(sd, 0.8))
+rownames(CGI_5mC_variable) <- CGI_5mC_variable$id
+pheatmap_pearson_CGI_5mC <- pheatmap(CGI_5mC_variable %>% select(-id, -sd), main = "20% variable CGI 5mC pearson", filename = "./heatmap_pearson_CGI_5mC.pdf", height = 8, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_distance_cols = "correlation", clustering_method = "ward.D2", cutree_rows = 4, cutree_cols = 5, annotation_col = ann, annotation_colors = ann_color, show_rownames = F)
+
+#plot(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$IDHwt_CEMT_23), xlim = c(-.6, .6))
+#lines(density(genome_5mC$IDHmut_TCGA161460 - genome_5mC$IDHwt_TCGA141454), col = "red")
+#lines(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$NPC_GE04), col = "blue")
+#lines(density(genome_5mC$IDHmut_CEMT_19 - genome_5mC$IDHmut_CEMT_22), col = "green")
+
+## ------- DMR limma ------------------
+cutoff <- 0.05
+IDHmut_NPC_logit <- genome_5mC %>% select(contains("IDHmut"), contains("NPC")) %>% logit(adjust = 0.0001)
+IDHmut_NPC_design <- data.frame(Group = relevel(factor(gsub("\\..*", "", colnames(IDHmut_NPC_logit))), ref = "NPC"), row.names = colnames(IDHmut_NPC_logit))
+IDHmut_NPC_DesMat <- model.matrix(~ Group, IDHmut_NPC_design)
+IDHmut_NPC_DMfit <- lmFit(IDHmut_NPC_logit, IDHmut_NPC_DesMat)
+IDHmut_NPC_DMfitEb <- eBayes(IDHmut_NPC_DMfit)
+IDHmut_NPC_DM <- topTable(IDHmut_NPC_DMfitEb, coef = 'GroupIDHmut', number = Inf, adjust.method="BH", p.value = cutoff) 
+write.table(IDHmut_NPC_DM, file = "./limma/DM.IDHmut_NPC_limma.txt", sep = "\t", quote = F, row.names = T, col.names = T)
+IDHwt_NPC_logit <- genome_5mC %>% select(contains("IDHwt"), contains("NPC")) %>% logit(adjust = 0.0001)
+IDHwt_NPC_design <- data.frame(Group = relevel(factor(gsub("\\..*", "", colnames(IDHwt_NPC_logit))), ref = "NPC"), row.names = colnames(IDHwt_NPC_logit))
+IDHwt_NPC_DesMat <- model.matrix(~ Group, IDHwt_NPC_design)
+IDHwt_NPC_DMfit <- lmFit(IDHwt_NPC_logit, IDHwt_NPC_DesMat)
+IDHwt_NPC_DMfitEb <- eBayes(IDHwt_NPC_DMfit)
+IDHwt_NPC_DM <- topTable(IDHwt_NPC_DMfitEb, coef = 'GroupIDHwt', number = Inf, adjust.method="BH", p.value = cutoff) 
+write.table(IDHwt_NPC_DM, file = "./limma/DM.IDHwt_NPC_limma.txt", sep = "\t", quote = F, row.names = T, col.names = T)
+### enhancer DMR homer 
+homer_enhancer_IDHmut_NPC_hyper <- read.delim("./homer/IDHmut_NPC.hyper/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHmut_NPC_hyper_figure <- ggplot(homer_enhancer_IDHmut_NPC_hyper, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHmut vs NPC hyper") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHmut_NPC_hyper_figure, file = "homer_enhancer_IDHmut_NPC_hyper_figure.pdf", height = 6, width = 5)
+homer_enhancer_IDHmut_NPC_hypo <- read.delim("./homer/IDHmut_NPC.hypo/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHmut_NPC_hypo_figure <- ggplot(homer_enhancer_IDHmut_NPC_hypo, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHmut vs NPC hypo") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHmut_NPC_hypo_figure, file = "homer_enhancer_IDHmut_NPC_hypo_figure.pdf", height = 6, width = 5)
+homer_enhancer_IDHwt_NPC_hyper <- read.delim("./homer/IDHwt_NPC.hyper/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHwt_NPC_hyper_figure <- ggplot(homer_enhancer_IDHwt_NPC_hyper, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHwt vs NPC hyper") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHwt_NPC_hyper_figure, file = "homer_enhancer_IDHwt_NPC_hyper_figure.pdf", height = 6, width = 5)
+homer_enhancer_IDHwt_NPC_hypo <- read.delim("./homer/IDHwt_NPC.hypo/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHwt_NPC_hypo_figure <- ggplot(homer_enhancer_IDHwt_NPC_hypo, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHwt vs NPC hypo") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHwt_NPC_hypo_figure, file = "homer_enhancer_IDHwt_NPC_hypo_figure.pdf", height = 6, width = 5)
+
+## ------- DMR NB141 ------------------
+DMR_NB141_summary <- read.delim("./NB141/DMR.summary.stats", as.is = T) %>% mutate(sample = gsub("_Normal.NB141", "", gsub("IDHmut.", "", sample))) %>% select(sample, hyper, hypo) %>% melt(id = "sample")
+(DMR_NB141_summary_figure <- ggplot(DMR_NB141_summary, aes(sample, value/1e6, fill = variable)) + 
+		geom_bar(stat = "identity", width = 0.5, position = position_dodge()) + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Total length (Mb)") + 
+		ggtitle("IDHmut vs NB141") + 
+		theme_bw())
+ggsave(DMR_NB141_summary_figure, file = "./NB141/DMR_NB141_summary_figure.pdf", height = 5, width = 5)
+### genomic breakdown
+genomic_breakdown <- read.delim("./NB141/intersect/genomic.breakdown.summary", as.is = T) %>% 
+	mutate(DM = gsub(".*\\.", "", Name), Name = gsub("_Normal.*", "", gsub("IDHmut.", "", Name)), NCpG = NULL)
+genomic_breakdown_tall <- melt(genomic_breakdown, id = c("DM", "Name")) %>% 
+	mutate(value = ifelse(DM == "hyper", value, -value))
+(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, fill = DM)) + 
+		geom_bar(position = "identity", stat = "identity", width = 0.5) + 
+		#geom_hline(yintercept = c(-2, 2)) + 
+		facet_wrap(~ Name) + 
+		xlab("") + 
+		ylab("Fold enrichment") + 
+		scale_fill_manual(name = "", values = c("red", "blue")) + 
+		coord_flip() + 
+		theme_bw())
+ggsave(genomic_breakdown_figure, file = "./NB141/genomic_breakdown_figure.pdf", height = 7, width = 9)
+### enhancer DMR homer
+homer_enhancer_IDHmut_NB141_hyper <- read.delim("./NB141/homer/IDHmut.hyper/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHmut_NB141_hyper_figure <- ggplot(homer_enhancer_IDHmut_NB141_hyper, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHmut vs NB141 hyper") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHmut_NB141_hyper_figure, file = "./NB141/homer_enhancer_IDHmut_NB141_hyper_figure.pdf", height = 6, width = 5)
+homer_enhancer_IDHmut_NB141_hypo <- read.delim("./NB141/homer/IDHmut.hypo/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_enhancer_IDHmut_NB141_hypo_figure <- ggplot(homer_enhancer_IDHmut_NB141_hypo, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHmut vs NB141 hypo") + 
+		theme_bw())
+ggsave(homer_enhancer_IDHmut_NB141_hypo_figure, file = "./NB141/homer_enhancer_IDHmut_NB141_hypo_figure.pdf", height = 6, width = 5)
+homer_IDHmut_NB141_hyper_vitC_hMeDIP <- read.delim("./NB141/homer/IDHmut.hyper.vitc_hMeDIP/knownResults.txt", as.is = T) %>%
+	mutate(TF = gsub("\\(.*", "", Motif.Name), Percent_with_motif = as.numeric(gsub("%", "", X..of.Target.Sequences.with.Motif))) %>% 
+	filter(Percent_with_motif >= 20, q.value..Benjamini. < 0.01) %>% arrange(Percent_with_motif) %>% mutate(TF = factor(TF, levels = TF))
+(homer_IDHmut_NB141_hyper_vitC_hMeDIP_figure <- ggplot(homer_IDHmut_NB141_hyper_vitC_hMeDIP, aes(TF, Percent_with_motif)) + 
+		geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+		coord_flip() + 
+		xlab("") + 
+		ylab("Percent of enhancers with motif") + 
+		ggtitle("IDHmut 5mC hyper intersect with vitC 5hmC gain") + 
+		theme_bw())
+ggsave(homer_IDHmut_NB141_hyper_vitC_hMeDIP_figure, file = "./NB141/homer_IDHmut_NB141_hyper_vitC_hMeDIP_figure.pdf", height = 6, width = 5)
 
 ## ------- changes at CGI edges -------
 CGI_edge <- read.delim("./CGI_edge/CGI.edge.profile") %>% mutate(category = gsub("_.*", "", sample), edge = revalue(edge, c("L" = "5-prime", "R" = "3-prime"))) %>% filter(sample != "IDHmut_CEMT_21")
@@ -397,22 +533,26 @@ for(lib in libs){
 	assign(paste0("DMR_", lib), read.delim(paste0("./DMR/DMR.", lib, "_NPC"), head = F, as.is = T, col.names = colname))
 	assign(paste0("DMR_", lib, "_figure"), DMR_figures(get(paste0("DMR_", lib)), lib, "NPCs", dirOut = "./DMR/", figures = c("length", "frequency", "circos"), colname = colname, hist_width = 3))
 }
+DMR_limma_IDHmut_NPC <- read.delim("DMR.IDHmut_NPC.s500.c3", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "DM", "count", "length")) %>% mutate(chr = paste0("chr", chr))
+DMR_limma_IDHmut_NPC_figure <- DMR_figures(DMR_limma_IDHmut_NPC, "IDHmut", "NPCs", figures = c("count", "length", "frequency", "circos"), hist_width = 3)
+DMR_limma_IDHwt_NPC <- read.delim("DMR.IDHwt_NPC.s500.c3", head = F, as.is = T, col.names = c("chr", "start", "end", "ID", "DM", "count", "length")) %>% mutate(chr = paste0("chr", chr))
+DMR_limma_IDHwt_NPC_figure <- DMR_figures(DMR_limma_IDHwt_NPC, "IDHwt", "NPCs", figures = c("count", "length", "frequency", "circos"), hist_width = 3)
 
 ### -------- enrichment in genomic regions ------
-genomic_breakdown <- read.delim("./DMR/intersect/genomic.breakdown.summary", as.is = T) %>% 
-	mutate(sample = gsub("_NPC.*", "", Name), DM = gsub(".*NPC\\.", "", Name), NCpG = NULL, Name = NULL)
-genomic_breakdown_tall <- melt(genomic_breakdown, id = c("sample", "DM")) %>% 
+genomic_breakdown <- read.delim("./intersect/genomic.breakdown.summary", as.is = T) %>% 
+	mutate(DM = gsub(".*\\.", "", Name), Name = gsub("\\..*", "", Name), NCpG = NULL)
+genomic_breakdown_tall <- melt(genomic_breakdown, id = c("DM", "Name")) %>% 
 	mutate(value = ifelse(DM == "hyper", value, -value))
-(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall %>% filter(sample %in% libs), aes(variable, value, fill = DM)) + 
+(genomic_breakdown_figure <- ggplot(genomic_breakdown_tall, aes(variable, value, fill = DM)) + 
 	geom_bar(position = "identity", stat = "identity", width = 0.5) + 
-	geom_hline(yintercept = c(-2, 2)) + 
-	facet_wrap(~sample) + 
+	#geom_hline(yintercept = c(-2, 2)) + 
+	facet_wrap(~ Name) + 
 	xlab("") + 
 	ylab("Fold enrichment") + 
 	scale_fill_manual(name = "", values = c("red", "blue")) + 
 	coord_flip() + 
 	theme_bw())
-ggsave(genomic_breakdown_figure, file = "./DMR/genomic_breakdown_figure.pdf", height = 6, width = 7)
+ggsave(genomic_breakdown_figure, file = "./genomic_breakdown_figure.pdf", height = 6, width = 8)
 
 ### -------- hyper CGI with K36me3 ---------
 CGI_DMR_hyper_summary <- read.delim("./DMR/CGI/CGI.DMR.hyper.summary", as.is = T)
@@ -457,6 +597,9 @@ for(lib in libs){
 (GREAT_DMR_CEMT_23_hypo_figure <- enrich_GREAT("CEMT_23_hypo", "CEMT_23_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "InterPro"), height = 8, width = 7))
 (GREAT_DMR_CEMT_47_hyper_figure <- enrich_GREAT("CEMT_47_hyper", "CEMT_47_hyper", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("GOBP", "DiseaseOntology", "GOCC"), height = 9, width = 7))
 (GREAT_DMR_CEMT_47_hypo_figure <- enrich_GREAT("CEMT_47_hypo", "CEMT_47_hypo", dirIn = "./DMR/enrich/", dirOut = "./DMR/enrich/", categories = c("MSigPerturbation"), height = 2, width = 7))
+(GREAT_DMR_IDHmut_NPC_hyper_figure <- enrich_GREAT("IDHmut_NPC_hyper", "IDHmut_NPC_hyper", dirIn = "./enrich/", dirOut = "./", height = 8, width = 7, top = 10))
+(GREAT_DMR_IDHmut_NPC_hypo_figure <- enrich_GREAT("IDHmut_NPC_hypo", "IDHmut_NPC_hypo", dirIn = "./enrich/", dirOut = "./", height = 8, width = 7, top = 10))
+(GREAT_DMR_IDHwt_NPC_hyper_figure <- enrich_GREAT("IDHwt_NPC_hyper", "IDHwt_NPC_hyper", dirIn = "./enrich/", dirOut = "./", height = 8, width = 7, top = 10))
 
 ### -------- enrichment in chromatin states --------
 DMR_ChromHMM_summary <- read.delim("./DMR/intersect/DMR.chromHMM.enrich.summary", as.is = T) 
@@ -499,6 +642,6 @@ ggsave(DMR_DE_figure, file = "./DMR/DMR_DE_figure.pdf", height = 4, width = 5)
 DMR_DE_HM_summary <- read.delim("./DMR/DE/DMR.DE.HM.summary", as.is = T)
 hyper_UP_K27ac_summary <- read.delim("./DMR/DE/hyper.UP_2FC.H2K27ac.summary", as.is = T)
 
-save(list = c(ls(pattern = "summary"), ls(pattern = "figure"), ls(pattern = "venn"), ls(pattern = "dend"), ls(pattern = "enrich")),
-		 file = "/projects/epigenomics2/users/lli/glioma/WGBS/WGBS.Rdata")
+save(list = c(ls(pattern = "DM$"), ls(pattern = "figure"), ls(pattern = "venn"), ls(pattern = "dend"), ls(pattern = "heatmap"), ls(pattern = "enrich")),
+		 file = "/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/WGBS.Rdata")
 
