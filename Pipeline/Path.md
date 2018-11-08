@@ -8,11 +8,12 @@ File paths on xhost
 * Matlab: `/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab`  
 * Bedtools: `/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/`  
 * Deeptools: `/home/lli/anaconda2/bin/deeptools` (`export PATH="/home/lli/anaconda2/bin"`)
+* Sambamba: `/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5`   
 * Samtools: `/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools`    
 * BCFtools: `/home/pubseq/BioSw/samtools/samtools-0.1.16/bcftools/bcftools`   
 * Picard: `/gsc/software/linux-x86_64-centos5/picard-tools-1.92/`   
 * BWA: `/home/pubseq/BioSw/bwa/bwa-0.7.5a/bwa`      
-* Bamstats: `/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/bwa_stats_0.1.3/bamStats.py`   
+* Bamstats: `/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats`   
 * IGV: `/gsc/software/linux-x86_64/IGV-2.3.47/igv.sh`       
 * Homer: `/home/acarles/homer/bin/`
 * ChromHMM: `/home/lli/bin/ChromHMM/ChromHMM.jar`      
