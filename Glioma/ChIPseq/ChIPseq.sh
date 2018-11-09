@@ -270,6 +270,16 @@ for mark in H3K27me3 H3K4me3; do
 done
 multiBigwigSummary BED-file -b $(ls $dirIn/../bw/H3K36me3/*.bw) --BED $gene --smartLabels -p 8 -out $dirIn/gene.H3K36me3.npz --outRawCounts $dirIn/gene.H3K36me3.signal
 
+## call super enhancer
+dirBam=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+dirOut=$dirIn/SE/; mkdir -p $dirOut
+for region in $dirIn/H3K27ac.*.bed; do
+	name=$(basename $region | cut -d'.' -f2,3)
+	echo $name
+	/home/lli/HirstLab/Pipeline/shell/SE_ROSE.sh -o $dirOut/$name/ -r $region -f $dirBam/H3K27ac/H3K27ac.$name.bam -c $dirBam/Input/Input.$name.bam -g hg19
+done
+
 ########################################################
 
 # Differentially marked regions
