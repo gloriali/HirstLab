@@ -26,10 +26,11 @@ done
 
 samtools=/gsc/software/linux-x86_64-centos5/samtools-0.1.18/bin/samtools
 sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+filename=$(basename $region | sed 's/.bed//')
 mkdir -p $dirOut
 
 # generate gff file
-less $region | sed 's/chr//g' | awk '{OFS="\t"; print "chr"$1, "chr"$1":"$2"-"$3,".",$2,$3, ".",".",".", "chr"$1":"$2"-"$3}' > $dirOut/$region.gff
+less $region | sed 's/chr//g' | awk '{OFS="\t"; print "chr"$1, "chr"$1":"$2"-"$3,".",$2,$3, ".",".",".", "chr"$1":"$2"-"$3}' > $dirOut/$filename.gff
 
 # Generating sorted bamFiles with Chr
 for bam in $file $control; do
@@ -42,8 +43,8 @@ done
 # running ROSE algorithm
 name1=$(basename $file | sed 's/.bam//'); name2=$(basename $control | sed 's/.bam//');
 cd /projects/epigenomics3/epigenomics3_results/users/alorzadeh/young_computation-rose-1a9bb86b5464/
-/home/jyzhu/anaconda2/bin/python2.7 /projects/epigenomics3/epigenomics3_results/users/alorzadeh/young_computation-rose-1a9bb86b5464/ROSE_main.py -g $genome -i $dirOut/$region.gff -r $dirOut/$name1"_chr.bam" -o $dirOut -t 2500 -c $dirOut/$name2"_chr.bam" &> $dirOut/ROSE.log
+/home/jyzhu/anaconda2/bin/python2.7 /projects/epigenomics3/epigenomics3_results/users/alorzadeh/young_computation-rose-1a9bb86b5464/ROSE_main.py -g $genome -i $dirOut/$filename.gff -r $dirOut/$name1"_chr.bam" -o $dirOut -t 2500 -c $dirOut/$name2"_chr.bam" &> $dirOut/ROSE.log
 
-rm $dirOut/$region.gff
+rm $dirOut/$filename.gff
 rm $dirOut/*chr.bam
 rm $dirOut/*bam.bai
