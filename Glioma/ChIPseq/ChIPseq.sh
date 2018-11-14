@@ -275,9 +275,15 @@ dirBam=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
 dirOut=$dirIn/SE/; mkdir -p $dirOut
 for region in $dirIn/H3K27ac.*.bed; do
-	name=$(basename $region | cut -d'.' -f2,3)
-	echo $name
-	/home/lli/HirstLab/Pipeline/shell/SE_ROSE.sh -o $dirOut/$name/ -r $region -f $dirBam/H3K27ac/H3K27ac.$name.bam -c $dirBam/Input/Input.$name.bam -g hg19
+    name=$(basename $region | cut -d'.' -f2,3)
+    echo $name
+    /home/lli/HirstLab/Pipeline/shell/SE_ROSE.sh -o $dirOut/$name/ -r $region -f $dirBam/H3K27ac/H3K27ac.$name.bam -c $dirBam/Input/Input.$name.bam -g hg19
+done
+cd ~/bin/R-3.1.1/
+for region in $dirIn/H3K27ac.*.bed; do
+    name=$(basename $region | cut -d'.' -f2,3)
+    echo $name
+    /gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R --save $dirOut/$name/ $dirOut/$name/H3K27ac_12KB_STITCHED_TSS_DISTAL_ENHANCER_REGION_MAP.txt H3K27ac.$name Input.$name'_chr.bam' < ROSE_callSuper.R
 done
 
 ########################################################
@@ -923,27 +929,35 @@ done
 ########################################################
 
 ## Differentially marked regions between IDH mut and wt
-dirIn=/projects/epigenomics2/users/lli/glioma/ChIPseq/
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
 mkdir -p $dirIn/unique_wt/
-echo -e "Sample\tMark\tN_mut\tlen_mut\tN_wt\tlen_wt\tN_mut_unique\tlen_mut_unique\tN_wt_unique\tlen_wt_unique" > $dirIn/unique_wt/ER.unique.summary
-for lib in 19 22 47; do
-    for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
-        echo "CEMT_"$lib $mark
-        echo -e "\n\nCEMT_"$lib $mark >> $dirIn/unique_wt/ER.unique.log
-        dirOut=$dirIn/unique_wt/$mark/
-        mkdir -p $dirOut/
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_23.wig.gz -excl $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz -o $dirOut/ -n CEMT_$lib.vs.wt.CEMT_$lib >> $dirIn/unique_wt/ER.unique.log
-        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz -w $dirIn/wig/$mark/CEMT_$lib.wig.gz -r $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz -o $dirOut/ -n CEMT_$lib.vs.wt.wt >> $dirIn/unique_wt/ER.unique.log
-        N_mut=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | wc -l)
-        len_mut=$(less $dirIn/FindER/$mark/CEMT_$lib.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N_wt=$(less $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz | wc -l)
-        len_wt=$(less $dirIn/FindER/$mark/CEMT_23.FDR_0.05.FindER.bed.gz | awk '{s=s+$3-$2}END{print s}')
-        N_mut_unique=$(less $dirOut/CEMT_$lib.vs.wt.CEMT_$lib.unique | wc -l)
-        len_mut_unique=$(less $dirOut/CEMT_$lib.vs.wt.CEMT_$lib.unique | awk '{s=s+$3-$2}END{print s}')
-        N_wt_unique=$(less $dirOut/CEMT_$lib.vs.wt.wt.unique | wc -l)
-        len_wt_unique=$(less $dirOut/CEMT_$lib.vs.wt.wt.unique | awk '{s=s+$3-$2}END{print s}')
-        echo -e "$lib\t$mark\t$N_mut\t$len_mut\t$N_wt\t$len_wt\t$N_mut_unique\t$len_mut_unique\t$N_wt_unique\t$len_wt_unique" >> $dirIn/unique_wt/ER.unique.summary
+echo -e "Sample1\tSample2\tMark\tN_mut\tlen_mut\tN_wt\tlen_wt\tN_mut_unique\tlen_mut_unique\tN_wt_unique\tlen_wt_unique" > $dirIn/unique_wt/ER.unique.summary
+for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
+    dirOut=$dirIn/unique_wt/$mark/; mkdir -p $dirOut/
+    for lib in 19 22 47 73 79 81; do
+        for lib2 in 23 74; do
+            echo "CEMT_"$lib "CEMT_"$lib2 $mark
+            echo -e "\n\nCEMT_"$lib "CEMT_"$lib2 $mark >> $dirIn/unique_wt/ER.unique.log
+            /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/FindER2/$mark.IDHmut.CEMT_$lib.FindER2.bed -w $dirIn/wig/$mark/IDHwt.CEMT_$lib2.wig.gz -excl $dirIn/FindER2/$mark.IDHwt.CEMT_$lib2.FindER2.bed -o $dirOut/ -n CEMT_$lib.vs.CEMT_$lib2.IDHmut >> $dirIn/unique_wt/ER.unique.log
+            /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $dirIn/FindER2/$mark.IDHmut.CEMT_$lib.FindER2.bed -w $dirIn/wig/$mark/IDHmut.CEMT_$lib.wig.gz -r $dirIn/FindER2/$mark.IDHwt.CEMT_$lib2.FindER2.bed -o $dirOut/ -n CEMT_$lib.vs.CEMT_$lib2.IDHwt >> $dirIn/unique_wt/ER.unique.log
+            N_mut=$(less $dirIn/FindER2/$mark.IDHmut.CEMT_$lib.FindER2.bed | wc -l)
+            len_mut=$(less $dirIn/FindER2/$mark.IDHmut.CEMT_$lib.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
+            N_wt=$(less $dirIn/FindER2/$mark.IDHwt.CEMT_$lib2.FindER2.bed | wc -l)
+            len_wt=$(less $dirIn/FindER2/$mark.IDHwt.CEMT_$lib2.FindER2.bed | awk '{s=s+$3-$2}END{print s}')
+            N_mut_unique=$(less $dirOut/CEMT_$lib.vs.CEMT_$lib2.IDHmut.unique | wc -l)
+            len_mut_unique=$(less $dirOut/CEMT_$lib.vs.CEMT_$lib2.IDHmut.unique | awk '{s=s+$3-$2}END{print s}')
+            N_wt_unique=$(less $dirOut/CEMT_$lib.vs.CEMT_$lib2.IDHwt.unique | wc -l)
+            len_wt_unique=$(less $dirOut/CEMT_$lib.vs.CEMT_$lib2.IDHwt.unique | awk '{s=s+$3-$2}END{print s}')
+            echo -e "$lib\t$lib2\t$mark\t$N_mut\t$len_mut\t$N_wt\t$len_wt\t$N_mut_unique\t$len_mut_unique\t$N_wt_unique\t$len_wt_unique" >> $dirIn/unique_wt/ER.unique.summary
+        done
     done
+    intervene upset -i $dirOut/*.IDHmut.unique --project $mark.IDHmut -o $dirOut
+    intervene upset -i $dirOut/*.IDHwt.unique --project $mark.IDHwt -o $dirOut
+    cat $dirOut/*.IDHmut.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>10)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.IDHmut.unique.bed
+    cat $dirOut/*.IDHwt.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>10)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.IDHwt.unique.bed
 done
 less $dirIn/unique_wt/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
 ### genomic breakdown

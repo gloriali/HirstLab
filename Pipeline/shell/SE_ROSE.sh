@@ -44,6 +44,8 @@ done
 name1=$(basename $file | sed 's/.bam//'); name2=$(basename $control | sed 's/.bam//');
 cd /projects/epigenomics3/epigenomics3_results/users/alorzadeh/young_computation-rose-1a9bb86b5464/
 /home/jyzhu/anaconda2/bin/python2.7 /projects/epigenomics3/epigenomics3_results/users/alorzadeh/young_computation-rose-1a9bb86b5464/ROSE_main.py -g $genome -i $dirOut/$filename.gff -r $dirOut/$name1"_chr.bam" -o $dirOut -t 2500 -c $dirOut/$name2"_chr.bam" &> $dirOut/ROSE.log
+cd ~/bin/R-3.1.1/
+/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R --save $dirOut $dirOut/*STITCHED_TSS_DISTAL_ENHANCER_REGION_MAP.txt $name1 $name2"_chr.bam" < ROSE_callSuper.R
 
 rm $dirOut/$filename.gff
 rm $dirOut/*chr.bam
