@@ -11,11 +11,18 @@ library(dplyr)
 library(RCircos)
 library(stringr)
 library(scales)
+library(pheatmap)
+library(preprocessCore)
+library(CREAM)
+library(pvclust)
+library(limma)
+library(ggbiplot)
 source('~/HirstLab/Pipeline/R/enrich.R')
 source('~/HirstLab/Pipeline/R/enrich_GREAT.R')
 load("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/ChIPseq.Rdata")
 setwd("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/")
-marks <- c("H3K27me3", "H3K9me3", "H3K27ac", "H3K4me1", "H3K4me3", "H3K36me3")
+marks <- c("H3K27me3", "H3K27ac", "H3K4me1", "H3K4me3", "H3K36me3", "H3K9me3")
+samples <- c("IDHmut.CEMT_19", "IDHmut.CEMT_22", "IDHmut.CEMT_47", "IDHmut.CEMT_73", "IDHmut.CEMT_79", "IDHmut.CEMT_81", "IDHwt.CEMT_23", "IDHwt.CEMT_74", "MGG.control", "MGG.vitc", "NormalAdjacent.CEMT_21", "NormalAdjacent.CEMT_75", "NormalAdjacent.CEMT_76", "NormalAdjacent.CEMT_78", "NPC.GE04")
 Ensembl <- read.delim("/projects/epigenomics/resources/Ensembl/hg19v69/hg19v69_genes.EnsID_sorted.HUGO", as.is = T, head = F, row.names = 1)
 
 ## -------- ER summary -----------
@@ -47,6 +54,92 @@ for(i in 1:nrow(ER_adjust_summary)){
 	grid.text("Total length", x = unit(0.2, "npc"), y = unit(0.48, "npc"))
 }
 dev.off()
+
+## -------- clustering -------------------------------------
+batch <- c(rep(1, times = 3), rep(2, times = 3), 1, 2, 3, 3, 1, rep(2, times = 3), 0)
+names(batch) <- samples
+top <- 0.1
+for(mark in marks){
+	print(mark)
+	assign(paste0("genome_", mark), read.delim(paste0("./FindER2/all.", mark, ".signal"), as.is = T, quote = "\'") %>% select(-X.chr, -start, -end))
+	# pvclust
+	norm <- removeBatchEffect(get(paste0("genome_", mark)), batch = batch[colnames(get(paste0("genome_", mark)))]) %>% as.matrix() %>% normalize.quantiles()
+	colnames(norm) <- colnames(get(paste0("genome_", mark)))
+	assign(paste0("pvclust_genome_", mark), pvclust(norm, method.dist = function(x){as.dist(1 - cor(x, method = "pearson"))}, method.hclust = "ward.D2", nboot=100))
+	# pheatmap
+	ann <- data.frame(category = gsub("\\..*", "", row.names(get(paste0("pearson_genome_", mark))))) 
+	rownames(ann) <- row.names(get(paste0("pearson_genome_", mark)))
+	ann_color <- list(category = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[3], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[5], l = 65, c = 100)))
+	names(ann_color$category) <- c("IDHmut", "IDHwt", "MGG", "NormalAdjacent", "NPC")
+	assign(paste0("pheatmap_pearson_genome_", mark), pheatmap(cor(get(paste0("genome_", mark)), method = "pearson"), main = paste0("genome-wide ", mark, " pearson"), filename = paste0("./cluster/heatmap_pearson_genome_", mark, ".pdf"), height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F))
+	assign(paste0("pheatmap_pearson_genome_top_", mark), pheatmap(cor(get(paste0("genome_", mark)) %>% mutate(sd = apply(., 1, sd)) %>% filter(sd > quantile(sd, 1-top)) %>% select(-sd), method = "pearson"), main = paste0("genome-wide top ", top*100, "% ", mark, " pearson"), filename = paste0("./cluster/heatmap_top_pearson_genome_", mark, ".pdf"), height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F))
+	# PCA
+	pca <- t(get(paste0("genome_", mark)))
+	rownames(pca) <- colnames(get(paste0("genome_", mark)))
+	assign(paste0("pca_genome_", mark), ggbiplot(prcomp(pca), var.axes=F, groups = gsub("\\..*", "", rownames(pca)), labels = rownames(pca)) + theme_bw() + ggtitle(paste0("PCA genome-wide ", mark)))
+	ggsave(get(paste0("pca_genome_", mark)), file = paste0("./cluster/pca_genome_", mark, ".pdf"), height = 6, width = 7)
+}
+for(mark in c("H3K4me3", "H3K27me3")){
+	assign(paste0("promoter_", mark), read.delim(paste0("./FindER2/promoter.", mark, ".signal"), as.is = T, quote = "\'") %>% select(-X.chr, -start, -end))
+	norm <- removeBatchEffect(get(paste0("promoter_", mark)), batch = batch) %>% as.matrix() %>% normalize.quantiles()
+	colnames(norm) <- colnames(get(paste0("promoter_", mark)))
+	assign(paste0("pvclust_promoter_", mark), pvclust(norm, method.dist = function(x){as.dist(1 - cor(x, method = "pearson"))}, method.hclust = "ward.D2", nboot=100))
+	ann <- data.frame(category = gsub("\\..*", "", row.names(get(paste0("pearson_promoter_", mark))))) 
+	rownames(ann) <- row.names(get(paste0("pearson_promoter_", mark)))
+	ann_color <- list(category = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), 
+																 hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), 
+																 hcl(h = seq(15, 375, length = 5 + 1)[3], l = 65, c = 100), 
+																 hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100), 
+																 hcl(h = seq(15, 375, length = 5 + 1)[5], l = 65, c = 100)))
+	names(ann_color$category) <- c("IDHmut", "IDHwt", "MGG", "NormalAdjacent", "NPC")
+	assign(paste0("pheatmap_pearson_promoter_", mark), pheatmap(cor(get(paste0("promoter_", mark)), method = "pearson"), main = paste0("promoter ", mark, " pearson"), filename = paste0("./cluster/heatmap_pearson_promoter_", mark, ".pdf"), height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F))
+	assign(paste0("pheatmap_pearson_promoter_top_", mark), pheatmap(cor(get(paste0("promoter_", mark)) %>% mutate(sd = apply(., 1, sd)) %>% filter(sd > quantile(sd, 1-top)) %>% select(-sd), method = "pearson"), main = paste0("promoter top ", top*100, "% ", mark, " pearson"), filename = paste0("./cluster/heatmap_top_pearson_promoter_", mark, ".pdf"), height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F))
+	pca <- t(get(paste0("promoter_", mark)))
+	rownames(pca) <- colnames(get(paste0("promoter_", mark)))
+	assign(paste0("pca_promoter_", mark), ggbiplot(prcomp(pca), var.axes=F, groups = gsub("\\..*", "", rownames(pca)), labels = rownames(pca)) + theme_bw() + ggtitle(paste0("PCA promoter ", mark)))
+	ggsave(get(paste0("pca_promoter_", mark)), file = paste0("./cluster/pca_promoter_", mark, ".pdf"), height = 6, width = 7)
+}
+gene_H3K36me3 <- read.delim("./FindER2/gene.H3K36me3.signal", as.is = T, quote = "\'") %>% select(-X.chr, -start, -end)
+norm <- removeBatchEffect(gene_H3K36me3, batch = batch) %>% as.matrix() %>% normalize.quantiles()
+colnames(norm) <- colnames(gene_H3K36me3)
+pvclust_gene_H3K36me3 <- pvclust(norm, method.dist = function(x){as.dist(1 - cor(x, method = "pearson"))}, method.hclust = "ward.D2", nboot=100)
+ann <- data.frame(category = gsub("\\..*", "", row.names(pearson_gene_H3K36me3))) 
+rownames(ann) <- row.names(pearson_gene_H3K36me3)
+ann_color <- list(category = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[3], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100), 
+															 hcl(h = seq(15, 375, length = 5 + 1)[5], l = 65, c = 100)))
+names(ann_color$category) <- c("IDHmut", "IDHwt", "MGG", "NormalAdjacent", "NPC")
+pheatmap_pearson_gene_H3K36me3 <- pheatmap(cor(gene_H3K36me3, method = "pearson"), main = paste0("genebody H3K36me3 pearson"), filename = "./cluster/heatmap_pearson_gene_H3K36me3.pdf", height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F)
+pheatmap_pearson_gene_top_H3K36me3 <- pheatmap(cor(gene_H3K36me3 %>% mutate(sd = apply(., 1, sd)) %>% filter(sd > quantile(sd, 1-top)) %>% select(-sd), method = "pearson"), main = paste0("genebody top ", top*100, "% H3K36me3 pearson"), filename = "./cluster/heatmap_top_pearson_gene_H3K36me3.pdf", height = 7, width = 6, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 5, cutree_rows = 5, treeheight_row = 0, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F)
+pca <- t(gene_H3K36me3)
+rownames(pca) <- colnames(gene_H3K36me3)
+pca_gene_H3K36me3 <- ggbiplot(prcomp(pca), var.axes=F, groups = gsub("\\..*", "", rownames(pca)), labels = rownames(pca)) + theme_bw() + ggtitle("PCA genebody H3K36me3")
+ggsave(pca_gene_H3K36me3, file = "./cluster/pca_gene_H3K36me3.pdf", height = 6, width = 7)
+pdf("./cluster/pvclust.pdf")
+for(p in ls(pattern = "pvclust")){
+	plot(get(p), main = p)
+}
+dev.off()
+
+## -------- CREAM H3K27me3 & H3K9me3 -----------------------
+for(file in c(list.files("./FindER2/", "H3K27me3.*.FindER2.bed$"), list.files("./FindER2/", "H3K9me3.*.FindER2.bed$"))){
+	name <- gsub(".FindER2.bed", "", file)
+	print(name)
+	assign(paste0("CREAM_", name), CREAM(paste0("./FindER2/", file), WScutoff = 1.5, MinLength = 1000, peakNumMin = 2))
+	write.table(get(paste0("CREAM_", name)), file = paste0("./FindER2/CREAM/CREAM_", name), col.names = F, row.names = F, sep = "\t", quote = F)
+}
+for(file in c(list.files("./FindER/H3K27me3/", "*.FindER.bed$", full.names = T), list.files("./FindER/H3K9me3/", "*.FindER.bed$", full.names = T))){
+	name <- gsub(".FDR_0.05.FindER.bed", "", gsub("./FindER/", "", gsub("//", ".", file)))
+	print(name)
+	assign(paste0("CREAM_", name), CREAM(file, WScutoff = 1.5, MinLength = 1000, peakNumMin = 2))
+	write.table(get(paste0("CREAM_", name)), file = paste0("./FindER/CREAM/CREAM_", name), col.names = F, row.names = F, sep = "\t", quote = F)
+}
 
 ## -------- Differentially marked regions mut vs wt --------
 ### summary
