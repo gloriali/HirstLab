@@ -269,6 +269,21 @@ for mark in H3K27me3 H3K4me3; do
 	multiBigwigSummary BED-file -b $(ls $dirIn/../bw/$mark/*.bw) --BED $promoter --smartLabels -p 8 -out $dirIn/promoter.$mark.npz --outRawCounts $dirIn/promoter.$mark.signal
 done
 multiBigwigSummary BED-file -b $(ls $dirIn/../bw/H3K36me3/*.bw) --BED $gene --smartLabels -p 8 -out $dirIn/gene.H3K36me3.npz --outRawCounts $dirIn/gene.H3K36me3.signal
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
+RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/wig/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+dirOut=$dirIn/signal/; mkdir -p $dirOut
+for file in $dirIn/all.H*.bed; do
+    mark=$(basename $file | cut -d'.' -f2)
+	dirOut=$dirIn/signal/$mark/; mkdir -p $dirOut
+	for wig in $dirWig/$mark/*.wig.gz; do
+        sample=$(basename $wig | cut -d'.' -f1,2)
+        echo $mark $sample
+        $java -jar -Xmx15G $RegCov -w $wig -r $file -o $dirOut -c $chr -n $mark.$sample.all.signal > $dirOut/$mark.$sample.log
+	done
+done
 
 ## call super enhancer
 dirBam=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bam/
@@ -279,12 +294,7 @@ for region in $dirIn/H3K27ac.*.bed; do
     echo $name
     /home/lli/HirstLab/Pipeline/shell/SE_ROSE.sh -o $dirOut/$name/ -r $region -f $dirBam/H3K27ac/H3K27ac.$name.bam -c $dirBam/Input/Input.$name.bam -g hg19
 done
-cd ~/bin/R-3.1.1/
-for region in $dirIn/H3K27ac.*.bed; do
-    name=$(basename $region | cut -d'.' -f2,3)
-    echo $name
-    /gsc/software/linux-x86_64-centos5/R-3.1.1/bin/R --save $dirOut/$name/ $dirOut/$name/H3K27ac_12KB_STITCHED_TSS_DISTAL_ENHANCER_REGION_MAP.txt H3K27ac.$name Input.$name'_chr.bam' < ROSE_callSuper.R
-done
+mv $dirOut/*/*Gateway_SuperEnhancers.bed $dirOut
 
 ########################################################
 
@@ -411,6 +421,35 @@ for lib in 19 21 22 23 47; do
         len_NPC_unique=$(less $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | awk '{s=s+$3-$2}END{print s}')
         echo -e "$lib\t$mark\t$N_glioma\t$len_glioma\t$N_NPC\t$len_NPC\t$N_glioma_unique\t$len_glioma_unique\t$N_NPC_unique\t$len_NPC_unique" >> $dirIn/unique2/ER.unique.summary
         echo -e "$lib\t$mark\t$(less $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)\t$N_glioma_unique\t$($BEDTOOLS/intersectBed -a $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique -b $dirOut/CEMT_$lib.vs.NPC_GE04.CEMT_$lib.unique | wc -l)\t$(less $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)\t$N_NPC_unique\t$($BEDTOOLS/intersectBed -a $dirIn/unique/$mark/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique -b $dirOut/CEMT_$lib.vs.NPC_GE04.NPC_GE04.unique | wc -l)" >> $dirIn/unique2/ER.unique.compare.methods
+    done
+done
+
+#### method3: DEfine
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+echo -e "%/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab
+addpath /home/mbilenky/matlab -end" > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique3/DEfine.unique_wt.m
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3; do
+	dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique3/$mark/; mkdir -p $dirOut
+    echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% $mark %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+" >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique3/DEfine.unique_wt.m
+    for file1 in $dirIn/signal/$mark/*IDH*.coverage; do
+        for file2 in $dirIn/signal/$mark/*NPC*.coverage; do
+            sample1=$(basename $file1 | cut -d'.' -f5,6)
+            sample2=$(basename $file2 | cut -d'.' -f5,6)
+            echo $mark $sample1 $sample2
+            echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%% $sample1 vs $sample2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all; close all;
+out=true; corr1=false; corr2=false; rpkm=false; figs=true; RPKMmin=0.001; Nmin=5; eps=0.0001; maxLim=3.5; fdr=0.05;
+dirOut='$dirOut'; sample1='$sample1'; sample2='$sample2'; 
+[c, s, e, id, r1, n1]=textread('$file1', '%s %d %d %s %f %f');
+[c, s, e, id, r2, n2]=textread('$file2', '%s %d %d %s %f %f');
+[cc,nfup,nfdn]=DEfine(id, r1, r2, n1, n2, [,], dirOut, sample1, sample2, out, figs, fdr, corr1, corr2, rpkm, RPKMmin, Nmin, eps, maxLim);
+" >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique3/DEfine.unique_wt.m
+        done
     done
 done
 
@@ -936,7 +975,7 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/
 mkdir -p $dirIn/unique_wt/
 echo -e "Sample1\tSample2\tMark\tN_mut\tlen_mut\tN_wt\tlen_wt\tN_mut_unique\tlen_mut_unique\tN_wt_unique\tlen_wt_unique" > $dirIn/unique_wt/ER.unique.summary
 for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
-    dirOut=$dirIn/unique_wt/$mark/; mkdir -p $dirOut/
+    dirOut=$dirIn/unique_wt/$mark/; mkdir -p $dirOut/; echo $mark
     for lib in 19 22 47 73 79 81; do
         for lib2 in 23 74; do
             echo "CEMT_"$lib "CEMT_"$lib2 $mark
@@ -954,10 +993,10 @@ for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
             echo -e "$lib\t$lib2\t$mark\t$N_mut\t$len_mut\t$N_wt\t$len_wt\t$N_mut_unique\t$len_mut_unique\t$N_wt_unique\t$len_wt_unique" >> $dirIn/unique_wt/ER.unique.summary
         done
     done
-    intervene upset -i $dirOut/*.IDHmut.unique --project $mark.IDHmut -o $dirOut
-    intervene upset -i $dirOut/*.IDHwt.unique --project $mark.IDHwt -o $dirOut
     cat $dirOut/*.IDHmut.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>10)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.IDHmut.unique.bed
     cat $dirOut/*.IDHwt.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>10)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/$mark.IDHwt.unique.bed
+    intervene upset -i $dirOut/*.IDHmut.unique --project $mark.IDHmut -o $dirOut
+    intervene upset -i $dirOut/*.IDHwt.unique --project $mark.IDHwt -o $dirOut
 done
 less $dirIn/unique_wt/ER.unique.log | awk '$1 ~ /^C/ {print $0}' ORS=' ' | sed -e 's/CEMT/\nCEMT/g' | sed -e 's/Coverage cutoff: //g' | sed -e 's/ /\t/g' > $dirIn/unique_wt/ER.unique.cutoff
 ### genomic breakdown
@@ -995,3 +1034,33 @@ for mark in H3K9me3 H3K27me3; do
         done
     done
 done
+
+### method2: DEfine
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+echo -e "%/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab
+addpath /home/mbilenky/matlab -end" > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/DEfine.unique_wt.m
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3; do
+	dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/$mark/; mkdir -p $dirOut
+    echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% $mark %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+" >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/DEfine.unique_wt.m
+    for file1 in $dirIn/signal/$mark/*IDHmut*.coverage; do
+        for file2 in $dirIn/signal/$mark/*IDHwt*.coverage; do
+            sample1=$(basename $file1 | cut -d'.' -f5,6)
+            sample2=$(basename $file2 | cut -d'.' -f5,6)
+            echo $mark $sample1 $sample2
+            echo -e "
+%%%%%%%%%%%%%%%%%%%%%%%%%% $sample1 vs $sample2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all; close all;
+out=true; corr1=false; corr2=false; rpkm=false; figs=true; RPKMmin=0.001; Nmin=5; eps=0.0001; maxLim=3.5; fdr=0.05;
+dirOut='$dirOut'; sample1='$sample1'; sample2='$sample2'; 
+[c, s, e, id, r1, n1]=textread('$file1', '%s %d %d %s %f %f');
+[c, s, e, id, r2, n2]=textread('$file2', '%s %d %d %s %f %f');
+[cc,nfup,nfdn]=DEfine(id, r1, r2, n1, n2, [,], dirOut, sample1, sample2, out, figs, fdr, corr1, corr2, rpkm, RPKMmin, Nmin, eps, maxLim);
+" >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/DEfine.unique_wt.m
+        done
+    done
+done
+
