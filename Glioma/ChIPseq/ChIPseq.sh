@@ -452,6 +452,19 @@ dirOut='$dirOut'; sample1='$sample1'; sample2='$sample2';
         done
     done
 done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique3/
+dirOut=$dirIn/upSet/; mkdir -p $dirOut
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3; do
+    echo $mark
+    for file in $dirIn/$mark/UP.* $dirIn/$mark/DN.*; do
+        name=$(basename $file | cut -d'.' -f1,2,3,4)
+        less $file | awk '{gsub(":", "\t"); gsub("-", "\t"); print $1"\t"$2"\t"$3}' > $dirIn/$mark/$name.bed
+    done
+    intervene upset -i $dirIn/$mark/UP.*.bed --project $mark.IDHmut -o $dirOut
+    intervene upset -i $dirIn/$mark/DN.*.bed --project $mark.IDHwt -o $dirOut    
+done
 
 ## intersect with DE genes
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -1062,5 +1075,18 @@ dirOut='$dirOut'; sample1='$sample1'; sample2='$sample2';
 " >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/DEfine.unique_wt.m
         done
     done
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique_wt2/
+dirOut=$dirIn/upSet/; mkdir -p $dirOut
+for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3; do
+    echo $mark
+    for file in $dirIn/$mark/UP.* $dirIn/$mark/DN.*; do
+        name=$(basename $file | cut -d'.' -f1,2,3,4)
+        less $file | awk '{gsub(":", "\t"); gsub("-", "\t"); print $1"\t"$2"\t"$3}' > $dirIn/$mark/$name.bed
+    done
+    intervene upset -i $dirIn/$mark/UP.*.bed --project $mark.IDHmut -o $dirOut
+    intervene upset -i $dirIn/$mark/DN.*.bed --project $mark.IDHwt -o $dirOut    
 done
 
