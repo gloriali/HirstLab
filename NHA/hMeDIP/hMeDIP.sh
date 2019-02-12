@@ -24,7 +24,7 @@ function qc {
     export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
     sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
     bamstats=/gsc/QA-bio/sbs-solexa/opt/linux-x86_64/sambamba-bamStats
-    chr=/projects/epigenomics/resources/UCSC_chr/hg19.bwa2ucsc.names
+    chr=/projects/epigenomics2/resources/UCSC_chr/hg19.bwa2ucsc.names
     chrsize=/home/lli/hg19/hg19.chrom.sizes
     dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bam/
     dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/hMeDIP/bw/
