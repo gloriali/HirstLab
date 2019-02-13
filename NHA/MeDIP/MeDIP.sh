@@ -117,7 +117,7 @@ for region in "CG_25_around_chr" "CG_empty_500_chr"; do
     done
 done
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/
-echo -e "addpath /home/mbilenky/matlab/dmr -end
+echo "addpath /home/mbilenky/matlab/dmr -end;
 close all; clear all;
 set(0,'defaultaxesfontsize',18,'defaultlinelinewidth',2);
 names={'MGG_control.24h','MGG_vitc.24h','MGG_vitc.48h','MGG_vitc.72h','MGG_vitc.6d'};
@@ -125,10 +125,11 @@ chrs={'chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','ch
 for i = 1:5
     name=names{1,i};
     for j = 1:24
-        chr=chrs{1,j}
-        close all; 
+        chr=chrs{1,j};
+        close all;
+        disp([name,' ',chr]);
         [l,cc] = textread(['/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/CG_25_around_chr/',name,'/',chr,'/',chr,'.',name,'.cov'],'%s %f');
-        [c,n,cn]=textread(['/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/CpG_empty_500_coverage/',name,'/',chr,'/',chr,'.gz.',name,'.covDist'],'%f %f %f');
+        [c,n,cn]=textread(['/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/CG_empty_500_chr/',name,'/',chr,'/',chr,'.gz.',name,'.covDist'],'%f %f %f');
         x=c;
         y=cn/max(cn);
         z=cc;
@@ -150,8 +151,9 @@ for i = 1:5
         end
         fclose(fileOut);
     end
-end" > $dirOut/MGG.MeDIP.fractional.m
-/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab -nodisplay -nosplash -nodesktop -r "run('/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/MGG.MeDIP.fractional.m');exit;"
+end
+exit;" > $dirOut/fractional.m
+/gsc/software/linux-x86_64-centos5/matlab-2013a/bin/matlab -nodisplay -nosplash -nodesktop -r "run('/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/fractional.m')"
 for name in "MGG_control.24h" "MGG_vitc.24h" "MGG_vitc.48h" "MGG_vitc.72h" "MGG_vitc.6d"; do
     echo $name
     cat $dirOut/CG_25_around_chr/$name/*/*.dip > $dirOut/$name.dip
