@@ -77,6 +77,25 @@ for file in $dirIn/*.bam; do
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
 
+# FindER
+java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
+sambamba=/gsc/software/linux-x86_64/sambamba-0.5.5/sambamba_v0.5.5
+FindER=/home/mbilenky/bin/Solexa_Java/FindER.0.9.3b.jar
+reg=/projects/epigenomics/nci_rt/ChIPseq_RT/FindER/chr.regions
+map=/projects/mbilenky/FindER/synthetic/hg19/PET_200/75bp/map/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/FindER/
+mkdir -p $dirOut
+echo -e "Sample\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_summary.txt
+for bam in $dirIn/*.bam; do
+    sample=$(basename $bam | sed 's/.bam//g')
+    echo $sample
+    $java -jar -Xmx10G $FindER -i $bam -r $reg -o $dirOut -v -m $map -minER 200 -info -cp > $dirOut/FindER_scan.$sample.log
+    n_all=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+    n_peak=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L <(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | sed 's/chr//g'))
+    echo -e $sample"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | wc -l)"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
+done
+
 # fractional methylation calls
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java/
