@@ -96,6 +96,23 @@ for bam in $dirIn/*.bam; do
     echo -e $sample"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | wc -l)"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
 
+# FindER2
+java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
+finder2=/home/mbilenky/bin/FindER2/finder2.jar
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/bam/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/FindER2/
+mkdir -p $dirOut
+echo -e "Sample\tN_region\tTotal_length\tTotal_reads\tReads_in_peaks\tAverage_length\tPercent_reads_in_peaks" > $dirOut/ER_summary.txt
+for bam in $dirIn/*.bam; do
+    sample=$(basename $bam | sed 's/.bam//g')
+    inp=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/bam/input/input.$(echo $sample | cut -f1 -d'.').bam
+    echo $sample $(basename $inp)
+    $java -jar -Xmx25G $finder2 inputBam:$inp signalBam:$bam outDir:$dirOut acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg19/ACGT 
+    n_all=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5")
+    n_peak=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L <(less $dirOut/$sample.FindER2.bed | sed 's/chr//g'))
+    echo -e $sample"\t"$(less $dirOut/$sample.FindER2.bed | wc -l)"\t"$(less $dirOut/$sample.FindER2.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
+done
+
 # fractional methylation calls
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 LIB=/home/mbilenky/bin/Solexa_Java/
