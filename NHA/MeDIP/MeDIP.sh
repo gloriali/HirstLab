@@ -134,6 +134,8 @@ for region in "CG_25_around_chr" "CG_empty_500_chr"; do
     done
 done
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/
+mkdir -p $dirOut/CDF_5mC_plots/
+mkdir -p $dirOut/CDF_cov_plots/
 echo "addpath /home/mbilenky/matlab/dmr -end;
 close all; clear all;
 set(0,'defaultaxesfontsize',18,'defaultlinelinewidth',2);
@@ -176,3 +178,60 @@ for name in "MGG_control.24h" "MGG_vitc.24h" "MGG_vitc.48h" "MGG_vitc.72h" "MGG_
     cat $dirOut/CG_25_around_chr/$name/*/*.dip > $dirOut/$name.dip
 done
 
+# check coverage profile and 5mC profile
+BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/
+echo -e "sample\ttype\tfractional\tN" > $dirIn/qc_5mC_profile.txt 
+echo -e "sample\ttype\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc_5mC_quantile.txt #ymin: 10% quantile; ymax: 90% quantile
+cd $dirIn
+for file in *.dip; do
+    lib=$(echo $file | sed 's/.dip//g')
+    echo "Processing" $lib
+    less $file | awk '{s[int($2*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tgenome\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{gsub("_", "\t"); print $1"\t"$2+23"\t"$2+25"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{n[$8]=n[$8]+1; c[$8]=c[$8]+$4} END{for(i in c){print c[i]/n[i]}}' | awk '{s[int($1*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tCGI\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{print $2}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
+    less $file | awk '{gsub("_", "\t"); print $1"\t"$2+23"\t"$2+25"\t"$3}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{n[$8]=n[$8]+1; c[$8]=c[$8]+$4} END{for(i in c){print c[i]/n[i]}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
+done
+
+# 5mC matrix
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/
+cd $dirIn
+less MGG_control.24h.dip | awk '{print $1}' > x
+less /home/lli/hg19/CGI.forProfiles.BED | awk '{print $4}' | sort > a
+header="ID"
+for file in *.dip; do
+    sample=$(echo $file | sed -e 's/.dip//g')
+    header=$header" "$sample
+    echo $sample
+    less $file | awk -F' ' '{print $1" "$2}' | join x - > y
+    mv y x
+    less $file | awk '{gsub("_", "\t"); print $1"\t"$2+23"\t"$2+25"\t"$3}' | $BEDTOOLS/intersectBed -a /home/lli/hg19/CGI.forProfiles.BED -b stdin -wa -wb | awk '{n[$4]++; c[$4]=c[$4]+$8} END{for(i in c){print i"\t"c[i]/n[i]}}' | sort -k1,1 | join a - > b
+    mv b a
+done
+echo -e $header | cat - x > matrix_genome.5mC
+echo -e $header | cat - a > matrix_CGI.5mC
+rm x a
+
+# DMR between vitc and control
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/fractional/
+dirOut=$dirIn/DMR/
+mkdir -p $dirOut
+echo -e "name\tm\tdelta\tdm\thyper\thypo" > $dirOut/DM.summary.stats
+echo -e "name\tsize\tcut\tlength\tcount\tdmr\thyper\thypo" > $dirOut/DMR.summary.stats
+m=0.6; delta=0.4; size=500; cut=4
+file1=$dirIn/MGG_control.24h.dip; name1=$(basename $file1 | sed -e 's/.dip//g')
+for file2 in $dirIn/MGG_vitc*.dip; do
+    name2=$(basename $file2 | sed -e 's/.dip//g'); name=$name1"_"$name2
+    echo $name1 $name2
+    paste $file1 $file2 | awk -v delta=$delta -v m=$m '{if($1!=$3)print "Bad line", $0; chr="chr"gensub("_[0-9]+", "", "g", $1); start=gensub("[0-9XY]+_", "", "g", $1)+23; end=start+2; if($2-$4 > delta && $2>m)print chr"\t"start"\t"end"\t1\t"$2"\t"$4; else if($2-$4 < -delta && $4>m)print chr"\t"start"\t"end"\t-1\t"$2"\t"$4}' | sort -k1,1 -k2,2n > $dirOut/DM.$name.m$m.d$delta.bed
+    less $dirOut/DM.$name.m$m.d$delta.bed | grep 'Bad line'
+    Ndm=($(wc -l $dirOut/DM.$name.m$m.d$delta.bed)); Nhyper=($(less $dirOut/DM.$name.m$m.d$delta.bed | awk '{if($4==1){c=c+1}} END{print c}')); Nhypo=($(less $dirOut/DM.$name.m$m.d$delta.bed | awk '{if($4==-1){c=c+1}} END{print c}'))
+    echo -e $name"\t"$m"\t"$delta"\t"$Ndm"\t"$Nhyper"\t"$Nhypo >> $dirOut/DM.summary.stats
+    /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.d$delta.bed -n $name -s $size -c $cut
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/DM.*.m$m.d$delta.bed --project upSet.DM.m$m.d$delta -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
+intervene upset -i $dirOut/DMR.*.hyper.bed --project upSet.DMR.hyper -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
+intervene upset -i $dirOut/DMR.*.hypo.bed --project upSet.DMR.hypo -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
