@@ -76,6 +76,9 @@ for file in $dirIn/*.bam; do
     n_peak=$($sambamba view $file -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L $dirOut/$sample"_peaks.narrowPeak")
     echo -e $sample"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | wc -l)"\t"$(less $dirOut/$sample"_peaks.narrowPeak" | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/*.narrowPeak --project upSet.MACS2 -o $dirOut 
 
 # FindER
 java=/home/mbilenky/jdk1.8.0_92/jre/bin/java
@@ -95,6 +98,9 @@ for bam in $dirIn/*.bam; do
     n_peak=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L <(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | sed 's/chr//g'))
     echo -e $sample"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | wc -l)"\t"$(less $dirOut/FindER_scan.$sample.pctl_0.1.FDR_0.05.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/FindER_scan.*.bed --project upSet.FindER -o $dirOut 
 
 # FindER2
 java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
@@ -112,6 +118,13 @@ for bam in $dirIn/*.bam; do
     n_peak=$($sambamba view $bam -c -F "not (unmapped or duplicate) and mapping_quality >= 5" -L <(less $dirOut/$sample.FindER2.bed | sed 's/chr//g'))
     echo -e $sample"\t"$(less $dirOut/$sample.FindER2.bed | wc -l)"\t"$(less $dirOut/$sample.FindER2.bed | awk '{s=s+$3-$2}END{print s}')"\t"$n_all"\t"$n_peak | awk '{print $0"\t"int($3/$2)"\t"$5/$4}' >> $dirOut/ER_summary.txt
 done
+for file in $dirOut/*.FindER2.bed; do
+	less $file | awk '{print $1"\t"$2"\t"$3}' > a
+	mv a $file
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/*.FindER2.bed --project upSet.FindER2 -o $dirOut 
 
 # fractional methylation calls
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
@@ -235,3 +248,35 @@ export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 intervene upset -i $dirOut/DM.*.m$m.d$delta.bed --project upSet.DM.m$m.d$delta -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
 intervene upset -i $dirOut/DMR.*.hyper.bed --project upSet.DMR.hyper -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
 intervene upset -i $dirOut/DMR.*.hypo.bed --project upSet.DMR.hypo -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
+
+# unique ER - FindER2
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/
+dirOut=$dirIn/unique/; mkdir -p $dirOut
+echo -e "Sample1\Sample2\tN_control\tlen_control\tN_vitc\tlen_vitc\tN_control_unique\tlen_control_unique\tN_vitc_unique\tlen_vitc_unique" > $dirOut/ER.unique.summary
+file1=$dirIn/FindER2/MGG_control.24h.FindER2.bed; lib1=$(basename $file1 | sed 's/.FindER2.bed//')
+for file2 in $dirIn/FindER2/MGG_vitc.*.bed; do
+    lib2=$(basename $file2 | sed 's/.FindER2.bed//')
+    echo $lib1 $lib2
+    /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $file1 -w $dirIn/wig/$lib2.q5.F1028.PET.wig.gz -excl $file2 -o $dirOut -n $lib1-$lib2.$lib1 >> $dirOut/ER.unique.log
+    /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -excl $file1 -w $dirIn/wig/$lib1.q5.F1028.PET.wig.gz -r $file2 -o $dirOut -n $lib1-$lib2.$lib2 >> $dirOut/ER.unique.log
+    less $dirOut/$lib1-$lib2.$lib1.unique | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{if($7>=3)print}' > $dirOut/$lib1-$lib2.$lib1.c3.unique
+    less $dirOut/$lib1-$lib2.$lib2.unique | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{if($7>=3)print}' > $dirOut/$lib1-$lib2.$lib2.c3.unique
+    N_control=$(less $file1 | wc -l)
+    len_control=$(less $file1 | awk '{s=s+$3-$2}END{print s}')
+    N_vitc=$(less $file2 | wc -l)
+    len_vitc=$(less $file2 | awk '{s=s+$3-$2}END{print s}')
+    N_control_unique=$(less $dirOut/$lib1-$lib2.$lib1.c3.unique | wc -l)
+    len_control_unique=$(less $dirOut/$lib1-$lib2.$lib1.c3.unique | awk '{s=s+$3-$2}END{print s}')
+    N_vitc_unique=$(less $dirOut/$lib1-$lib2.$lib2.c3.unique | wc -l)
+    len_vitc_unique=$(less $dirOut/$lib1-$lib2.$lib2.c3.unique | awk '{s=s+$3-$2}END{print s}')
+    echo -e "$lib1\t$lib2\t$N_control\t$len_control\t$N_vitc\t$len_vitc\t$N_control_unique\t$len_control_unique\t$N_vitc_unique\t$len_vitc_unique" >> $dirOut/ER.unique.summary
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/MGG_control.24h-MGG_vitc.*.MGG_control.24h.c3.unique --project upSet.MGG_control.unique -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
+intervene upset -i $dirOut/MGG_control.24h-MGG_vitc.*.MGG_vitc.*.c3.unique --project upSet.MGG_vitc.unique -o $dirOut --names=MGG_vitc.24h,MGG_vitc.48h,MGG_vitc.6d,MGG_vitc.72h
+cat $dirOut/MGG_control.24h-MGG_vitc.*.MGG_control*c3.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==4){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/MGG_control.c3.unique
+cat $dirOut/MGG_control.24h-MGG_vitc.*.MGG_vitc*c3.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==4){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/MGG_vitc.c3.unique
+intervene upset -i $dirOut/MGG_control.c3.unique $dirOut/MGG_vitc.c3.unique $dirIn/../hMeDIP/FindER2/MGG_control.unique.bed $dirIn/../hMeDIP/FindER2/MGG_vitc.unique.bed -o $dirOut --names=MeDIP.MGG_control.unique,MeDIP.MGG_vitc.unique,hMeDIP.MGG_control.unique,hMeDIP.MGG_vitc.unique
