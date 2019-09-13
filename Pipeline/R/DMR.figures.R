@@ -94,7 +94,7 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
   	data(UCSC.HG19.Human.CytoBandIdeogram);
   	cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
   	chr.exclude <- c("chrX", "chrY");
-  	num.inside <- 6;
+  	num.inside <- 4;
   	num.outside <- 0;
   	pdf(paste0(dirOut, "/DMRcircos_", sample1, "_", sample2, ".pdf"), width = width, height = height)
   	RCircos.Set.Core.Components(cyto.info, chr.exclude, num.inside, num.outside)
