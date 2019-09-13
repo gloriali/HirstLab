@@ -87,9 +87,9 @@ DMR_figures <- function(DMR, sample1, sample2, dirOut = getwd(), width = 8, heig
   }
   if("circos" %in% figures){
   	library(RCircos)
-    DMR_hyper <- DMR %>% filter(DM == 1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "red")
+    DMR_hyper <- DMR %>% filter(DM == 1, !grepl(chr, "X")) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "red")
   	colnames(DMR_hyper) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
-  	DMR_hypo <- DMR %>% filter(DM == -1) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "blue")
+  	DMR_hypo <- DMR %>% filter(DM == -1, !grepl(chr, "X")) %>% select(chr, start, end, ID) %>% mutate(data = 1, PlotColors = "blue")
   	colnames(DMR_hypo) <- c("Chromosome", "chromStart", "chromEnd", "ID", "data", "PlotColors")
   	data(UCSC.HG19.Human.CytoBandIdeogram);
   	cyto.info <- UCSC.HG19.Human.CytoBandIdeogram;
