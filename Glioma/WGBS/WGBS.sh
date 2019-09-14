@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # RPKM of 5mC modifiers
-dir5mC=/projects/epigenomics2/users/lli/glioma/WGBS/
-dirRPKM=/projects/epigenomics2/users/lli/glioma/RNAseq/
-join <(less $dir5mC/DNAme_regulators.txt | sort -k2,2) $dirRPKM/RPKM/glioma.RPKM -1 2 -2 1 | join - $dirRPKM/NPC_RPKM/NPC.RPKM | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
+dir5mC=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
+RPKM=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix
+join <(less ~/hg19/DNAme_regulators.txt | sort -k2,2) $RPKM -1 2 -2 1 | sed -e 's/ /\t/g' > $dir5mC/DNAme_regulators.RPKM
 
 # Formatting TCGA WGBS
 dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
@@ -99,17 +99,77 @@ for file in $dirIn/DM.*limma.txt; do
     less $dirIn/DM.$name.bed | awk '{if($4==1){hyper++}else{hypo++}; c++}END{print "'$name'""\t"c"\t"hyper"\t"hypo}' >> $dirIn/DM.summary.stats
     /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirIn -o $dirIn -f DM.$name.bed -n $name -s 500 -c 3
 done
+
+## upset intersect 
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirIn/DMR.*.s500.c3.hyper.bed --project DMR_hyper -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","NormalAdjacent vs NPC" --figsize 6 4 --mbcolor "#FF0000"
+intervene upset -i $dirIn/DMR.*.s500.c3.hypo.bed --project DMR_hypo -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","NormalAdjacent vs NPC" --figsize 6 4 --mbcolor "#0000FF"
+
 ## genomic enrichment
-enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer.bed
-> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed
-for file in /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut.CEMT*.bed.gz; do
-    less $file | sed 's/chr//g' >> /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed
-done
-less /projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER/H3K27ac/IDHmut_enhancer_all.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $enhancer
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn -r $enhancer -n enhancer
+less /home/lli/hg19/CGI.forProfiles.BED | awk '{print "chr"$0"\tCGI"}' > /home/lli/hg19/category.CGI.bed
+less /home/lli/hg19/CGI.2000shores.BED | awk '{print "chr"$0"\tCGI_shore"}' >> /home/lli/hg19/category.CGI.bed
+#dirEnhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+#cat $dirEnhancer/H3K27ac.IDHmut.*.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/{print $0"\t"$1":"$2"-"$3}' | $BEDTOOLS/mergeBed -i stdin -c 4 -o count | awk '{if($4>3)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.IDHmut.bed
+#cat $dirEnhancer/H3K27ac.IDHwt.*.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/{print $0"\t"$1":"$2"-"$3}' | $BEDTOOLS/mergeBed -i stdin -c 4 -o count | awk '{if($4>1)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.IDHwt.bed
+#cat $dirEnhancer/H3K27ac.NormalAdjacent.*.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/{print $0"\t"$1":"$2"-"$3}' | $BEDTOOLS/mergeBed -i stdin -c 4 -o count | awk '{if($4>2)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.NormalAdjacent.bed
+#cat $dirEnhancer/H3K27ac.NPC.*.bed | awk '{if($4>3)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.NPC.bed
+#cat $dirEnhancer/H3K27ac.MGG.*.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/{print $0"\t"$1":"$2"-"$3}' | $BEDTOOLS/mergeBed -i stdin -c 4 -o count | awk '{if($4>1)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.MGG.bed
+echo -e "sample\tDM\tDMR\tcategory" > $dirIn/intersect/DMR.CGI.category
+echo -e "sample\tDM\tDMR\tcategory" > $dirIn/intersect/DMR.enhancer.category
+for file in $dirIn/DMR.*.bed; do
+    sample=$(basename $file | cut -d'.' -f2)
+    DM=$(basename $file | cut -d'.' -f5)
+    name=$(echo $sample | sed 's/_NPC//')
+    echo $sample $DM $name
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -wa -wb | awk '{print "'$sample'""\t""'$DM'""\t"$4"\t"$9}' >> $dirIn/intersect/DMR.CGI.category
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_CGI"}' >> $dirIn/intersect/DMR.CGI.category
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tenhancer"}' >> $dirIn/intersect/DMR.enhancer.category
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_enhancer"}' >> $dirIn/intersect/DMR.enhancer.category
+done
+
+## DMR intersect with DE genes
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+R=/gsc/software/linux-x86_64-centos5/R-3.1.1/bin/Rscript
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
+dirDE=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/limma/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
+dirOut=$dirIn/DE/; mkdir -p $dirOut
+echo -e "Sample\tDM\tDE\tregion\tN_DM_region\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirOut/DMR.DE.summary
+less $tss | sed 's/chr//g' | $BEDTOOLS/closestBed -a $enhancer -b stdin -d | awk '$9<20000{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $enhancer.gene.bed
+n_total=19865 
+for dmr in $dirIn/DMR.*c3.*.bed; do
+    lib=$(basename $dmr | cut -d'.' -f2)
+    dm=$(basename $dmr | cut -d'.' -f5)
+    echo $lib $dm
+    less $dmr | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $promoter -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' | sort -k5,5 > $dirOut/DMR.$lib.$dm.promoter.bed
+    less $dmr | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $enhancer.gene.bed -wa -wb | awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$9}' | sort -k5,5 > $dirOut/DMR.$lib.$dm.enhancer.bed
+    for de in UP DN; do
+        file=$dirDE/$de.$lib"_limma.txt"
+        echo $file
+        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.promoter.bed - -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/DMR.$lib.$dm.promoter.$de
+        n_dm=$(less $dirOut/DMR.$lib.$dm.promoter.bed | cut -f5 | sort -u | wc -l)
+        n_de=$(less $file | wc -l)
+        n_intersect=$(less $dirOut/DMR.$lib.$dm.promoter.$de | cut -f1 | sort -u | wc -l)
+        p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+        echo -e "$lib\t$dm\t$de\tpromoter\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirOut/DMR.DE.summary
+        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.enhancer.bed - -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/DMR.$lib.$dm.enhancer.$de
+        n_dm=$(less $dirOut/DMR.$lib.$dm.enhancer.bed | cut -f5 | sort -u | wc -l)
+        n_de=$(less $file | wc -l)
+        n_intersect=$(less $dirOut/DMR.$lib.$dm.enhancer.$de | cut -f1 | sort -u | wc -l)
+        p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
+        echo -e "$lib\t$dm\t$de\tenhancer\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirOut/DMR.DE.summary
+    done
+done
+
 ## intersect with enhancers - homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
 mkdir -p $dirIn/homer/
 for file in $dirIn/DMR.*.bed; do
     name=$(basename $file | cut -d'.' -f2,5); echo $name
@@ -117,6 +177,7 @@ for file in $dirIn/DMR.*.bed; do
     less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.$name.enhancer.bed
     /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
 done
+
 ## intersect with vitC 5hmC
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
@@ -199,7 +260,7 @@ for f1 in IDH*.CGI.edge; do
     done
 done
 
-## enhancer vs 5mC
+# enhancer vs 5mC
 JAVA=/home/mbilenky/jdk1.8.0_92/jre/bin/java
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
