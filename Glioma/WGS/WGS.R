@@ -2,13 +2,40 @@
 
 library(ggplot2)
 library(dplyr)
+library(reshape2)
 library(ggbio)
 library(GenomicRanges)
 library(RCircos)
-load("/projects/epigenomics2/users/lli/glioma/WGS/WGS.Rdata")
-setwd("/projects/epigenomics2/users/lli/glioma/WGS/")
-libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
+setwd("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/")
 
+## ------- IDH mut rate --------------
+mut_rate <- read.delim("mut_rate.txt", as.is = T) %>% mutate(rate = rate * 100, category = gsub("\\..*", "", sample), sample = gsub(".*\\.", "", sample))
+(mut_rate_figure <- ggplot(mut_rate, aes(sample, rate, fill = category)) + 
+		geom_bar(stat = "identity") + 
+		geom_hline(yintercept = 30) + 
+		scale_fill_manual(values = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100),hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100))) + 
+		xlab("") + 
+		ylab("Ratio of mutant IDH read count") + 
+		coord_flip() + 
+		theme_bw())
+ggsave(mut_rate_figure, file = "mut_rate.pdf", height = 4, width = 5)
+
+## -------- sample genetic mutations ------
+mutation <- read.delim("mutation.txt", as.is = T) %>% melt(id = "Gene") %>% mutate(Gene = factor(Gene, levels = c("TP53", "CIC", "1p19q LOH", "IDH2", "IDH1")))
+(mutation_figure <- ggplot(mutation, aes(variable, Gene, fill = value)) +
+		geom_tile() +
+		scale_fill_manual(values = c("IDH1 R132H" = "red", "IDH2 R172K" = "dark red", "IDH2 R172M" = "dark red", "CIC R215W" = "purple", "CIC R202W" = "purple", "TP53 R273L" = "blue", "TP53 R273C" = "blue", "1p19q LOH" = "dark green", "N" = "white"), guide = "none") +
+		xlab("") +
+		ylab("") +
+		theme_bw() +
+		theme(axis.text.x = element_text(angle = 45, size = 15, hjust = 1), axis.text.y = element_text(size = 15)))
+ggsave(mutation_figure, file = "mutation.pdf", width = 8, height = 2.5)
+
+##################################################################
+
+setwd("/projects/epigenomics2/users/lli/glioma/WGS/")
+load("/projects/epigenomics2/users/lli/glioma/WGS/WGS.Rdata")
+libs <- c("CEMT_19", "CEMT_21", "CEMT_22", "CEMT_23", "CEMT_47")
 ## Common genetic variations in glioma
 glioma_mutations <- read.delim("/home/lli/HirstLab/Glioma/WGS/CEMT_gliomaMutations.tsv", as.is = T)
 IDH <- read.delim("/home/lli/HirstLab/Glioma/WGS/IDH.tsv", as.is = T)
