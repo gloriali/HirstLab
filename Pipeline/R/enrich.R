@@ -40,7 +40,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
      coord_flip() + 
 #     geom_text(aes(label = round(-log10(FDR), 2), hjust = 0)) + 
      theme_bw() +
-     ggtitle(paste0("Functional enrichment for ", name)) + 
+     ggtitle(name) + 
      xlab("") + 
      ylab(paste0("-log10 ", p)) + 
      scale_fill_manual(name = "", values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
