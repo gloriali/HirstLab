@@ -15,10 +15,10 @@ mut_rate <- read.delim("mut_rate.txt", as.is = T) %>% mutate(rate = rate * 100, 
 		geom_hline(yintercept = 30) + 
 		scale_fill_manual(values = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100),hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100))) + 
 		xlab("") + 
-		ylab("Ratio of mutant IDH read count") + 
+		ylab("Frequency of mutant IDH read count") + 
 		coord_flip() + 
 		theme_bw())
-ggsave(mut_rate_figure, file = "mut_rate.pdf", height = 4, width = 5)
+ggsave(mut_rate_figure, file = "mut_rate.pdf", height = 4, width = 7)
 
 ## -------- sample genetic mutations ------
 mutation <- read.delim("mutation.txt", as.is = T) %>% melt(id = "Gene") %>% mutate(Gene = factor(Gene, levels = c("TP53", "CIC", "1p19q LOH", "IDH2", "IDH1")))
