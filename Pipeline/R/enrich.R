@@ -1,5 +1,6 @@
-enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG_PATHWAY", "PANTHER_PATHWAY", "REACTOME_PATHWAY", "INTERPRO", "SP_PIR_KEYWORDS"), height = 6, width = 9){
+enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(getwd(), "/enrich/"), fdr = 0.01, p = "FDR", erminej = T, category = c("GOBP", "GOMF", "KEGG", "REACTOME", "INTERPRO"), height = 6, width = 9){
   library(ggplot2)
+  library(dplyr)
   DAVID <- read.delim(paste0(dirIn, name, "_DAVID.txt"), as.is=T)
   if(erminej){
     DAVID <- DAVID[!(DAVID$Category %in% c("GOTERM_MF", "GOTERM_BP")), ]
@@ -10,8 +11,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
     enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = erminej_BP$V2, FDR = erminej_BP$V10), data.frame(Category = "GOMF", Term = erminej_MF$V2, FDR = erminej_MF$V10), data.frame(Category = DAVID$Category, Term = DAVID$Term, FDR = DAVID[, p])))
   }
   else{
-    DAVID[grep("GOTERM_MF", DAVID$Category), "Category"] <- "GOMF"
-    DAVID[grep("GOTERM_BP", DAVID$Category), "Category"] <- "GOBP"
+    DAVID <- DAVID %>% mutate(Category = gsub("TERM_", "", Category), Category = gsub("_PATHWAY", "", Category))
     enrich <- na.omit(data.frame(Category = DAVID$Category, Term = DAVID$Term, FDR = DAVID[, p]))
   }
   enrich <- enrich[enrich$FDR <= fdr, ]
@@ -43,7 +43,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
      ggtitle(name) + 
      xlab("") + 
      ylab(paste0("-log10 ", p)) + 
-     scale_fill_manual(name = "", values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG_PATHWAY" = "darkgreen", "PANTHER_PATHWAY" = "darkblue", "REACTOME_PATHWAY" = "steelblue", "INTERPRO" = "lightblue", "SP_PIR_KEYWORDS" = "chocolate"))
+     scale_fill_manual(name = "", values = c("GOBP" = "blue", "GOMF" = "purple", "KEGG" = "darkgreen", "REACTOME" = "steelblue", "INTERPRO" = "lightblue"), drop = F)
   ggsave(Enrich_plot, file = paste0(dirOut, name, "_enrich.pdf"), height = height, width = width)
   return(Enrich_plot)
 }
