@@ -11,7 +11,7 @@ enrich <- function(name, dirIn = paste0(getwd(), "/enrich/"), dirOut = paste0(ge
     enrich <- na.omit(rbind(data.frame(Category = "GOBP", Term = erminej_BP$V2, FDR = erminej_BP$V10), data.frame(Category = "GOMF", Term = erminej_MF$V2, FDR = erminej_MF$V10), data.frame(Category = DAVID$Category, Term = DAVID$Term, FDR = DAVID[, p])))
   }
   else{
-    DAVID <- DAVID %>% mutate(Category = gsub("TERM_", "", Category), Category = gsub("_PATHWAY", "", Category))
+    DAVID <- DAVID %>% mutate(Category = gsub("TERM_", "", Category), Category = gsub("_5", "", Category), Category = gsub("_PATHWAY", "", Category))
     enrich <- na.omit(data.frame(Category = DAVID$Category, Term = DAVID$Term, FDR = DAVID[, p]))
   }
   enrich <- enrich[enrich$FDR <= fdr, ]
