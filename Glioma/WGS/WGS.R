@@ -31,6 +31,17 @@ mutation <- read.delim("mutation.txt", as.is = T) %>% melt(id = "Gene") %>% muta
 		theme(axis.text.x = element_text(angle = 45, size = 15, hjust = 1), axis.text.y = element_text(size = 15)))
 ggsave(mutation_figure, file = "mutation.pdf", width = 8, height = 2.5)
 
+## -------- require TCGA LGG mutation info -----------------------
+library(TCGAbiolinks)
+query.maf.hg19 <- GDCquery(project = "TCGA-LGG", 
+                           data.category = "Simple nucleotide variation", 
+                           data.type = "Simple somatic mutation",
+                           file.type = "ucsc.edu_LGG.IlluminaGA_DNASeq_automated.Level_2.1.4.0.somatic.maf", 
+                           access = "open", 
+                           legacy = TRUE)
+GDCdownload(query.maf.hg19)
+maf <- GDCprepare(query.maf.hg19) %>% filter(Hugo_Symbol %in% c("IDH1", "IDH2"), dbSNP_RS != "novel") %>% mutate(mut_rate = Tumor_Alt_Count/(Tumor_Alt_Count + Tumor_Ref_Count))
+
 ##################################################################
 
 setwd("/projects/epigenomics2/users/lli/glioma/WGS/")
