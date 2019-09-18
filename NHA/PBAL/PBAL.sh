@@ -286,3 +286,40 @@ for file in DM.*.bed; do
     less $file | awk '{if($4==1){print $1"\t"$2"\t"$3+1"\t"$4"\t"$5"\t"$6}}' > $name.hyper.bed
     less $file | awk '{if($4==-1){print $1"\t"$2"\t"$3+1"\t"$4"\t"$5"\t"$6}}' > $name.hypo.bed
 done
+
+################## WGBS from Macro Marra's lab #########################
+dirIn=/projects/sdlee_prj/wgbs_share/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/; mkdir -p $dirOut
+ln -s $dirIn/F8_rep1_novomethyl_cpg.tsv $dirOut/NHA_IDHmut_rep1.novomethyl_cpg.tsv
+ln -s $dirIn/F8_rep2_novomethyl_cpg.tsv $dirOut/NHA_IDHmut_rep2.novomethyl_cpg.tsv
+ln -s $dirIn/NHA_rep1_novomethyl_cpg.tsv $dirOut/NHA_IDHwt_rep1.novomethyl_cpg.tsv
+ln -s $dirIn/NHA_rep2_novomethyl_cpg.tsv $dirOut/NHA_IDHwt_rep2.novomethyl_cpg.tsv
+
+# combine strands
+function combine {
+    file=$1
+    dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/
+    lib=$(echo $file | sed -e 's/.novomethyl_cpg.tsv//g')
+    /home/lli/HirstLab/Pipeline/shell/WGBS.combine.sh -i $dirIn -o $dirIn -f $file -n $lib -format novo5mC
+}
+export -f combine
+cd /projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/
+ls *.novomethyl_cpg.tsv > List.txt
+cat List.txt | parallel --gnu combine 
+
+# check coverage profile and 5mC profile
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/
+echo -e "sample\tcoverage\tN" > $dirIn/qc_5mC_coverage.txt
+echo -e "sample\ttype\tfractional\tN" > $dirIn/qc_5mC_profile.txt 
+echo -e "sample\ttype\tmin\tymin\tlower\tmedian\tupper\tymax\tmax" > $dirIn/qc_5mC_quantile.txt #ymin: 10% quantile; ymax: 90% quantile
+cd $dirIn
+for file in *.combine.5mC.CpG; do
+    lib=$(echo $file | sed -e 's/.combine.5mC.CpG//g')
+    echo "Processing" $lib
+    less $file | awk '{c = $4 + $5; if(c >= 5000){s[5001]++} else {s[c]++}} END{for(i = 3; i <= 5001; i++){print "'$lib'""\t"i"\t"s[i]}}' >> $dirIn/qc_5mC_coverage.txt
+    less $file | awk '{s[int($6*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tgenome\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | awk '{s[int($1*100)]++} END{for(i = 0; i<=100; i++){print "'$lib'""\tCGI\t"i/100"\t"s[i]}}' >> $dirIn/qc_5mC_profile.txt 
+    less $file | awk '{print $6}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tgenome\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"\t"$4"\t"$5}' | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CGI.forProfiles.BED -wa -wb | awk '{t[$10]=t[$10]+$5; c[$10]=c[$10]+$6} END{for(i in c){print c[i]/(c[i]+t[i])}}' | sort -k1,1n | awk '{mC[NR]=$1} END{print "'$lib'""\tCGI\t"mC[1]"\t"mC[int(NR/10)]"\t"mC[int(NR/4)]"\t"mC[int(NR/2)]"\t"mC[NR-int(NR/4)]"\t"mC[NR-int(NR/10)]"\t"mC[NR]}' >> $dirIn/qc_5mC_quantile.txt
+done
