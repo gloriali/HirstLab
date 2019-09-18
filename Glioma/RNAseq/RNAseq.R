@@ -19,13 +19,13 @@ op <- par(mar = c(5, 4, 4, 10))
 plot(spearman_RPKM_dend, main = "pc genes spearman", horiz = TRUE)
 par(op)
 dev.off()
-ann <- data.frame(category = gsub("\\..*", "", row.names(spearman_RPKM))) 
+ann <- data.frame(category = gsub("NormalAdjacent", "IDHmut-low", gsub("\\..*", "", row.names(spearman_RPKM)))) 
 rownames(ann) <- row.names(spearman_RPKM)
 ann_color <- list(category = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), 
 															 hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), 
 															 hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100), 
 															 hcl(h = seq(15, 375, length = 5 + 1)[5], l = 65, c = 100)))
-names(ann_color$category) <- c("IDHmut", "IDHwt", "NormalAdjacent", "NPC")
+names(ann_color$category) <- c("IDHmut", "IDHwt", "IDHmut-low", "NPC")
 pheatmap_spearman_RPKM <- pheatmap(spearman_RPKM, main = "pc genes spearman", filename = "./heatmap_spearman_RPKM.pdf", height = 7, width = 7, color = colorRampPalette(c("forest green ","white","purple"))(100), clustering_method = "ward.D2", cutree_cols = 3, cutree_rows = 3, annotation_row = ann, annotation_col = ann, annotation_colors = ann_color, show_rownames = F)
 RPKM_variable <- RPKM %>% mutate(id = rownames(.), sd = apply(., 1, sd)) %>% filter(sd > quantile(sd, 0.8))
 rownames(RPKM_variable) <- RPKM_variable$id
@@ -90,7 +90,7 @@ NormalAdjacent_NPC_limma <- topTable(DE_fitEb, coef = 'NormalAdjacent - NPC', nu
 		geom_hline(yintercept = 2, color = "black", linetype = 2) + 
 		annotate("text", x = -5, y = 20, label = paste0("DN=", nrow(NormalAdjacent_NPC_DN)), color = "blue", size = 6) + 
 		annotate("text", x = 5, y = 20, label = paste0("UP=", nrow(NormalAdjacent_NPC_UP)), color = "red", size = 6) + 
-		labs(title = "NormalAdjacent vs NPC", x = "log2 FC", y = "-log10 FDR") + 
+		labs(title = "IDHmut-low vs NPC", x = "log2 FC", y = "-log10 FDR") + 
 		theme_bw())
 ggsave(NormalAdjacent_NPC_volcano, file = "./limma/NormalAdjacent_NPC_volcano.pdf", height = 5, width = 5)
 IDHwt_NPC_limma <- topTable(DE_fitEb, coef = 'IDHwt - NPC', number = Inf, adjust.method="BH") %>% mutate(ENSG = row.names(.), DE = ifelse(ENSG %in% IDHwt_NPC_UP$ENSG, "UP", ifelse(ENSG %in% IDHwt_NPC_DN$ENSG, "DN", "ST"))) 
@@ -117,11 +117,11 @@ IDHmut_IDHwt_limma <- topTable(DE_fitEb, coef = 'IDHmut - IDHwt', number = Inf, 
 ggsave(IDHmut_IDHwt_volcano, file = "./limma/IDHmut_IDHwt_volcano.pdf", height = 5, width = 5)
 
 ### ----- intersect venn ----------------------
-limma_venn_UP <- venn.diagram(list(IDHmut = IDHmut_NPC_UP$ENSG, NormalAdjacent = NormalAdjacent_NPC_UP$ENSG, IDHwt = IDHwt_NPC_UP$ENSG), filename = NULL, main = "UP compared to NPC", cat.pos = c(-30, 30, 180), fill = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100)))
+limma_venn_UP <- venn.diagram(list(IDHmut = IDHmut_NPC_UP$ENSG, IDHmut.low = NormalAdjacent_NPC_UP$ENSG, IDHwt = IDHwt_NPC_UP$ENSG), filename = NULL, main = "UP compared to NPC", cat.pos = c(-30, 30, 180), fill = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100)))
 pdf("./limma/limma_venn_UP.pdf", height = 4, width = 4)
 grid.draw(limma_venn_UP)
 dev.off()
-limma_venn_DN <- venn.diagram(list(IDHmut = IDHmut_NPC_DN$ENSG, NormalAdjacent = NormalAdjacent_NPC_DN$ENSG, IDHwt = IDHwt_NPC_DN$ENSG), filename = NULL, main = "DN compared to NPC", cat.pos = c(-30, 30, 180), fill = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100)))
+limma_venn_DN <- venn.diagram(list(IDHmut = IDHmut_NPC_DN$ENSG, IDHmut.low = NormalAdjacent_NPC_DN$ENSG, IDHwt = IDHwt_NPC_DN$ENSG), filename = NULL, main = "DN compared to NPC", cat.pos = c(-30, 30, 180), fill = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100)))
 pdf("./limma/limma_venn_DN.pdf", height = 4, width = 4)
 grid.draw(limma_venn_DN)
 dev.off()
@@ -137,8 +137,8 @@ write.table(DN_common, file = "./limma/DN.limma_NPC_common.txt", sep = "\t", quo
 ### ----- DAVID ----------------------
 (NPC_common_UP_DAVID <- enrich(name = "UP.NPC_common", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-10, p = "FDR", erminej = F, height = 7, width = 6))
 (NPC_common_DN_DAVID <- enrich(name = "DN.NPC_common", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-2, p = "FDR", erminej = F, height = 7, width = 6))
-(IDHmut_IDHwt_UP_DAVID <- enrich(name = "UP.IDHmut_IDHwt", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-2, p = "FDR", erminej = F, height = 3, width = 6))
-(IDHmut_IDHwt_DN_DAVID <- enrich(name = "DN.IDHmut_IDHwt", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-2, p = "FDR", erminej = F, height = 6, width = 6))
+(IDHmut_IDHwt_UP_DAVID <- enrich(name = "UP.IDHmut_IDHwt", dirIn = "./limma/enrich/", dirOut = "./limma/", fdr = 1e-2, p = "FDR", erminej = F, height = 4, width = 5))
+(IDHmut_IDHwt_DN_DAVID <- enrich(name = "DN.IDHmut_IDHwt", dirIn = "./limma/enrich/", dirOut = "./limma/", fdr = 1e-4, p = "FDR", erminej = F, height = 4, width = 6))
 (IDHmut_IDHwt_UP_TCGA_LGG_DAVID <- enrich(name = "UP.IDHmut_IDHwt.TCGA_LGG", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-2, p = "FDR", erminej = F, height = 2, width = 6))
 (IDHmut_IDHwt_DN_TCGA_LGG_DAVID <- enrich(name = "DN.IDHmut_IDHwt.TCGA_LGG", dirIn = "./limma/enrich/", dirOut = "./limma/enrich/", fdr = 1e-2, p = "FDR", erminej = F, height = 6, width = 7))
 
@@ -254,6 +254,6 @@ for(lib in libs){
 	assign(paste0("DAVID_DN_", lib, "_figure"), enrich(paste0("DN.", lib, "_NPC"), dirIn = "./DEfine/enrich/", dirOut = "./DEfine/enrich/", erminej = F))
 }
 
-save(list = c("RPKM", "RPKM_variable", "spearman_RPKM", "spearman_RPKM_dend", ls(pattern = "heatmap"), ls(pattern = "ann"), ls(pattern = "DE_fitEb"), 
+save(list = c("RPKM", "RPKM_variable", ls(pattern = "spearman"), "spearman_RPKM_dend", ls(pattern = "heatmap"), ls(pattern = "ann"), ls(pattern = "DE_fitEb"), 
 							ls(pattern = "DE"), ls(pattern = "UP"), ls(pattern = "DN"), ls(pattern = "limma"), ls(pattern = "volcano"), ls(pattern = "venn"), ls(pattern = "DAVID")), 
 		 file = "/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RNAseq.Rdata")

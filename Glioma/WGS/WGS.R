@@ -9,11 +9,11 @@ library(RCircos)
 setwd("/projects/epigenomics3/epigenomics3_results/users/lli/glioma/")
 
 ## ------- IDH mut rate --------------
-mut_rate <- read.delim("mut_rate.txt", as.is = T) %>% mutate(rate = rate * 100, category = gsub("\\..*", "", sample), sample = gsub(".*\\.", "", sample))
+mut_rate <- read.delim("mut_rate.txt", as.is = T) %>% mutate(rate = rate * 100, category = gsub("NormalAdjacent", "IDHmut-low", gsub("\\..*", "", sample)), sample = gsub(".*\\.", "", sample))
 (mut_rate_figure <- ggplot(mut_rate, aes(sample, rate, fill = category)) + 
 		geom_bar(stat = "identity") + 
 		geom_hline(yintercept = 30) + 
-		scale_fill_manual(values = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100),hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100))) + 
+		scale_fill_manual(values = c(hcl(h = seq(15, 375, length = 5 + 1)[1], l = 65, c = 100), hcl(h = seq(15, 375, length = 5 + 1)[4], l = 65, c = 100),hcl(h = seq(15, 375, length = 5 + 1)[2], l = 65, c = 100))) + 
 		xlab("") + 
 		ylab("Frequency of mutant IDH read count") + 
 		coord_flip() + 
