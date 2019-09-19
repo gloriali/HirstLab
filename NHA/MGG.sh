@@ -273,3 +273,24 @@ bigDataUrl $name.q5.F1028.PET.bw
 color $color
 " >> $dirHub/trackDb.txt
 done
+
+################## Time course ############################
+# RNAseq
+dirIn=/projects/epigenomics3/epigenomics3_results/users/eglseq/UEX000360_PX1184/hg19/QC/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/RNAseq/time/; mkdir -p $dirOut
+for file in $dirIn/*/coverage/*.G.A.rpkm.pc; do
+    id=$(basename $file | cut -d'_' -f2)
+    lib=$(less $dirOut/sample_key.txt | awk '$2 ~ "'$id'"{print $1}')
+    echo $lib $id
+    ln -s $file $dirOut/$lib.G.A.rpkm.pc
+done
+echo "ENSG" > $dirOut/MGG_time.RPKM
+less $dirOut/MGG_control_24h.G.A.rpkm.pc | awk '{print $1}' >> $dirOut/MGG_time.RPKM
+for file in $dirOut/*.G.A.rpkm.pc; do
+    lib=$(basename $file | sed 's/.G.A.rpkm.pc//g')
+    echo -e "ENSG\t$lib" > x
+    less $file | awk '{print $1"\t"$3}' >> x
+    join $dirOut/MGG_time.RPKM x | sed 's/ /\t/g' >y
+    mv y $dirOut/MGG_time.RPKM
+done
+rm x
