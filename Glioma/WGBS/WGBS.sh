@@ -103,11 +103,12 @@ done
 ## upset intersect 
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-intervene upset -i $dirIn/DMR.*.s500.c3.hyper.bed --project DMR_hyper -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","NormalAdjacent vs NPC" --figsize 6 4 --mbcolor "#FF0000"
-intervene upset -i $dirIn/DMR.*.s500.c3.hypo.bed --project DMR_hypo -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","NormalAdjacent vs NPC" --figsize 6 4 --mbcolor "#0000FF"
+intervene upset -i $dirIn/DMR.*.s500.c3.hyper.bed --project DMR_hyper -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","IDHmut-low vs NPC" --figsize 6 4 --mbcolor "#FF0000"
+intervene upset -i $dirIn/DMR.*.s500.c3.hypo.bed --project DMR_hypo -o $dirIn --names="IDHmut vs NPC","IDHwt vs NPC","IDHmut-low vs NPC" --figsize 6 4 --mbcolor "#0000FF"
 
 ## genomic enrichment
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirIn -r $enhancer -n enhancer
 less /home/lli/hg19/CGI.forProfiles.BED | awk '{print "chr"$0"\tCGI"}' > /home/lli/hg19/category.CGI.bed
 less /home/lli/hg19/CGI.2000shores.BED | awk '{print "chr"$0"\tCGI_shore"}' >> /home/lli/hg19/category.CGI.bed
@@ -119,15 +120,16 @@ less /home/lli/hg19/CGI.2000shores.BED | awk '{print "chr"$0"\tCGI_shore"}' >> /
 #cat $dirEnhancer/H3K27ac.MGG.*.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/{print $0"\t"$1":"$2"-"$3}' | $BEDTOOLS/mergeBed -i stdin -c 4 -o count | awk '{if($4>1)print "chr"$1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirEnhancer/H3K27ac.MGG.bed
 echo -e "sample\tDM\tDMR\tcategory" > $dirIn/intersect/DMR.CGI.category
 echo -e "sample\tDM\tDMR\tcategory" > $dirIn/intersect/DMR.enhancer.category
-for file in $dirIn/DMR.*.bed; do
+for file in $dirIn/DMR.*s500.c3*.bed; do
     sample=$(basename $file | cut -d'.' -f2)
     DM=$(basename $file | cut -d'.' -f5)
     name=$(echo $sample | sed 's/_NPC//')
     echo $sample $DM $name
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -wa -wb | awk '{print "'$sample'""\t""'$DM'""\t"$4"\t"$9}' >> $dirIn/intersect/DMR.CGI.category
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_CGI"}' >> $dirIn/intersect/DMR.CGI.category
-    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tenhancer"}' >> $dirIn/intersect/DMR.enhancer.category
-    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_enhancer"}' >> $dirIn/intersect/DMR.enhancer.category
+    less $file | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tpromoter_enhancer"}' >> $dirIn/intersect/DMR.enhancer.category
+    less $file | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tdistal_enhancer"}' >> $dirIn/intersect/DMR.enhancer.category
+    less $file | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $enhancer -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_enhancer"}' >> $dirIn/intersect/DMR.enhancer.category
 done
 
 ## DMR intersect with DE genes
