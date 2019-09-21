@@ -171,6 +171,7 @@ done
 ## intersect with enhancers - homer
 PATH=$PATH:/home/lli/bin/homer/.//bin/
 PATH=$PATH:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
 mkdir -p $dirIn/homer/
 for file in $dirIn/DMR.*.bed; do
@@ -178,6 +179,24 @@ for file in $dirIn/DMR.*.bed; do
     mkdir -p $dirIn/homer/$name/
     less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.$name.enhancer.bed
     /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
+done
+### IDHmut_NPC hype: LhX3 and NKX6.1
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 -m $dirIn/homer/IDHmut_NPC.hyper/knownResults/known3.motif | awk -F "\t" '$22!=""&&NR>1{print $2"\t"$3"\t"$4"\t"$1"\t"$10"\t"$15"\t"$19"\t"$20"\t"$22}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.LHX3.bed
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 -m $dirIn/homer/IDHmut_NPC.hyper/knownResults/known4.motif | awk -F "\t" '$22!=""&&NR>1{print $2"\t"$3"\t"$4"\t"$1"\t"$10"\t"$15"\t"$19"\t"$20"\t"$22}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.NKX6-1.bed
+for file in $dirIn/homer/DMR.*.bed; do
+    name=$(basename $file | sed s/.bed//); echo $name
+    less $file | awk '$7 ~ "protein-coding" {if(sqrt($5*$5)<20000){print $1"\t"$2"\t"$3"\t"$4"\t"$6}}' | awk 'NR==1{print "chr\tstart\tend\tID\tENSG\n"$0}{print $0}' | sort -k5,5 | join - /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -1 5 -2 1 | sed 's/ /\t/g' > $dirIn/homer/$name.RPKM
+    colname="ID"
+    less $file | awk '{print $4}' | sort > x
+    for methyl in $dirIn/../*CEMT*.combine.5mC.CpG $dirIn/../*NPC*.combine.5mC.CpG; do
+        sample=$(basename $methyl | cut -d'.' -f1,2); echo $sample
+        colname=$colname"\t$sample"
+        less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$4}' | $BEDTOOLS/intersectBed -a stdin -b $methyl -wa -wb | awk '{chr[$4]=$1; start[$4]=$2; end[$4]=$3; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9}END{for(i in chr){if(c[i]+t[i]>0){print i" "c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join x - > y
+        mv y x
+    done
+    echo -e $colname > $dirIn/homer/$name.5mC
+    less x | sed 's/ /\t/g' >> $dirIn/homer/$name.5mC
+    rm x y
 done
 
 ## intersect with vitC 5hmC
