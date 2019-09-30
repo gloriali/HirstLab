@@ -61,7 +61,7 @@ legend(\"bottomright\", c(\"Sample1 ER\", \"Sample2 ER\", \"Sample2 background\"
 dev.off()
 " > $dirOut/$name.R
 $R CMD BATCH $dirOut/$name.R
-cutoff=$(less $dirOut/*.$name.background.coverage | awk '{print $5}' | sort -k1,1n | awk '{c[NR]=$1} END{print c[int(NR*'"$quant"')]}')
+cutoff=$(less $dirOut/*.$name.background.coverage | awk '{print $5}' | sort -k1,1n -T /projects/epigenomics3/temp/lli/ | awk '{c[NR]=$1} END{print c[int(NR*'"$quant"')]}')
 echo "Coverage cutoff: $cutoff"
 
 ## output
