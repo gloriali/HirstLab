@@ -169,29 +169,42 @@ for dmr in $dirIn/DMR.*c3.*.bed; do
 done
 
 ## intersect with enhancers - homer
-PATH=$PATH:/home/lli/bin/homer/.//bin/
+PATH=$PATH:/home/lli/bin/homer/bin/
 PATH=$PATH:/home/acarles/weblogo/
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
+motif=/home/lli/hg19/jaspar.motifs 
+less /projects/epigenomics3/epigenomics3_results/users/alorzadeh/jaspar.motifs | awk '{if($1~/>/){print $1"\t"$2"\t20"}else{s=$1+$2+$3+$4; print $1/s"\t"$2/s"\t"$3/s"\t"$4/s}}' > $motif
 mkdir -p $dirIn/homer/
-for file in $dirIn/DMR.*.bed; do
+for file in $dirIn/DMR.*c3.*.bed; do
     name=$(basename $file | cut -d'.' -f2,5); echo $name
-    mkdir -p $dirIn/homer/$name/
-    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u > $dirIn/DMR.$name.enhancer.bed
-    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -len 8
+    mkdir -p $dirIn/homer2/$name/
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u -f 0.5 > $dirIn/DMR.$name.enhancer.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -p 12 -h -len 10
 done
+$BEDTOOLS/intersectBed -a $dirIn/DMR.IDHmut_NPC.s500.c3.hyper.bed -b $dirIn/DMR.IDHwt_NPC.s500.c3.hyper.bed -v > $dirIn/DMR.IDHmut.hyper.bed
+less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $dirIn/DMR.IDHmut.hyper.bed -b stdin -u -f 0.5 > $dirIn/DMR.IDHmut.hyper.enhancer.bed
+$BEDTOOLS/intersectBed -a $dirIn/DMR.IDHmut_NPC.s500.c3.hypo.bed -b $dirIn/DMR.IDHwt_NPC.s500.c3.hypo.bed -v > $dirIn/DMR.IDHmut.hypo.bed
+less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $dirIn/DMR.IDHmut.hypo.bed -b stdin -u -f 0.5 > $dirIn/DMR.IDHmut.hypo.enhancer.bed
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper/ -size 200 -p 12 -h -len 10
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut.hypo.enhancer.bed hg19 $dirIn/homer/IDHmut.hypo/ -size 200 -p 12 -h -len 10
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper_enhancer/ -bg <(less $enhancer | awk '{print "chr"$0}') -size 200 -p 12 -h -len 10
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper_IDHwt.hyper/ -bg $dirIn/DMR.IDHwt_NPC.s500.c3.hyper.bed -size 200 -p 12 -h -len 10
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hypo.enhancer.bed hg19 $dirIn/homer/IDHmut.hypo_IDHwt.hypo/ -bg $dirIn/DMR.IDHwt_NPC.s500.c3.hypo.bed -size 200 -p 12 -h -len 10
 ### IDHmut_NPC hype: LhX3 and NKX6.1
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 -m $dirIn/homer/IDHmut_NPC.hyper/knownResults/known3.motif | awk -F "\t" '$22!=""&&NR>1{gsub("chr", ""); print $2"\t"$3"\t"$4"\t"$1"\t"$10"\t"$15"\t"$19"\t"$20"\t"$22}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.LHX3.bed
-/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 -m $dirIn/homer/IDHmut_NPC.hyper/knownResults/known4.motif | awk -F "\t" '$22!=""&&NR>1{gsub("chr", ""); print $2"\t"$3"\t"$4"\t"$1"\t"$10"\t"$15"\t"$19"\t"$20"\t"$22}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.NKX6-1.bed
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut_NPC.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut_NPC.hyper/knownResults/known3.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.LHX3.bed
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut_NPC.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut_NPC.hyper/knownResults/known4.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.NKX6-1.bed
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/H3K27ac/
+dirNHA=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/
 for file in $dirIn/homer/DMR.*.bed; do
     name=$(basename $file | sed s/.bed//); echo $name
-    less $file | awk '$7 ~ "protein-coding" {if(sqrt($5*$5)<20000){print $1"\t"$2"\t"$3"\t"$4"\t"$6}}' | awk 'NR==1{print "chr\tstart\tend\tID\tENSG\n"$0}{print $0}' | sort -k5,5 | join - /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -1 5 -2 1 | sed 's/ /\t/g' > $dirIn/homer/$name.RPKM
+    less $tss | sed 's/chr//g' | $BEDTOOLS/closestBed -a $file -b stdin -d | awk '{if($10<20000){print $1"\t"$2"\t"$3"\t"$4"\t"$9}}' | awk 'NR==1{print "chr\tstart\tend\tID\tENSG\n"$0}{print $0}' | sort -k5,5 | join - /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -1 5 -2 1 | sed 's/ /\t/g' > $dirIn/homer/$name.RPKM
     colname="ID"
     less $file | awk '{print $4}' | sort > x
-    for methyl in $dirIn/../*CEMT*.combine.5mC.CpG $dirIn/../*NPC*.combine.5mC.CpG; do
+    for methyl in $dirIn/../*CEMT*.combine.5mC.CpG $dirIn/../*NPC*.combine.5mC.CpG $dirNHA/*.combine.5mC.CpG; do
         sample=$(basename $methyl | cut -d'.' -f1,2); echo $sample
         colname=$colname"\t$sample"
         less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' | $BEDTOOLS/intersectBed -a stdin -b $methyl -wa -wb | awk '{chr[$4]=$1; start[$4]=$2; end[$4]=$3; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9}END{for(i in chr){if(c[i]+t[i]>0){print i" "c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join x - > y
