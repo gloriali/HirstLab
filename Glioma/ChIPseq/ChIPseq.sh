@@ -1090,3 +1090,42 @@ for mark in H3K27ac H3K27me3 H3K36me3 H3K4me1 H3K4me3 H3K9me3; do
     intervene upset -i $dirIn/$mark/DN.*.bed --project $mark.IDHwt -o $dirOut    
 done
 
+########################################################
+
+## Differentially marked regions between IDH mut / wt and NPC
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique4/; mkdir -p $dirOut
+dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/wig/
+> $dirOut/ER.unique.log
+echo -e "Mark\tUnique\tN_region\tTotal_length" > $dirOut/ER.unique.summary
+for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
+    echo $mark; mkdir -p $dirOut/$mark/; mkdir -p $dirOut/$mark/intermediate/
+    cat $dirIn/$mark.IDHmut.CEMT*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '$1 !~ /GL/ {if($4>1&&($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/$mark.IDHmut.bed
+    cat $dirIn/$mark.IDHwt.CEMT*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '$1 !~ /GL/ {if($4>1&&($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/$mark.IDHwt.bed
+    cat $dirIn/$mark.NormalAdjacent.CEMT*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '$1 !~ /GL/ {if($4>1&&($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/$mark.NormalAdjacent.bed
+    cat $dirIn/$mark.NPC.*.FindER2.bed | sort -k1,1 -k2,2n | awk '$1 !~ /GL/ {if(($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/$mark.NPC.bed
+    # IDHmut specific
+    for f2 in $dirIn/$mark.IDHwt.CEMT*.FindER2.bed $dirIn/$mark.NPC.*.FindER2.bed; do
+        s2=$(basename $f2 | cut -d'.' -f2,3); echo "IDHmut vs" $s2
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.IDHmut.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n IDHmut_$s2 >> $dirOut/ER.unique.log
+    done
+    cat $dirOut/$mark/intermediate/IDHmut_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==3){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHmut.unique.bed
+    # IDHwt specific
+    for f2 in $dirIn/$mark.IDHmut.CEMT*.FindER2.bed $dirIn/$mark.NormalAdjacent.CEMT*.FindER2.bed $dirIn/$mark.NPC.*.FindER2.bed; do
+        s2=$(basename $f2 | cut -d'.' -f2,3); echo "IDHwt vs" $s2
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.IDHwt.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n IDHwt_$s2 >> $dirOut/ER.unique.log
+    done
+    cat $dirOut/$mark/intermediate/IDHwt_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==11){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHwt.unique.bed
+    # NPC specific
+    for f2 in $dirIn/$mark.*.CEMT*.FindER2.bed; do
+        s2=$(basename $f2 | cut -d'.' -f2,3); echo "NPC vs" $s2
+        /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.NPC.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n NPC_$s2 >> $dirOut/ER.unique.log
+    done
+    cat $dirOut/$mark/intermediate/NPC_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==12){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.NPC.unique.bed
+    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
+    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
+    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
+done
+
+
