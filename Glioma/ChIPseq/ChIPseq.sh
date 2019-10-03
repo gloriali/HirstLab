@@ -1093,10 +1093,13 @@ done
 ########################################################
 
 ## Differentially marked regions between IDH mut / wt and NPC
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique4/; mkdir -p $dirOut
 dirWig=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/wig/
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/
 > $dirOut/ER.unique.log
 echo -e "Mark\tUnique\tN_region\tTotal_length" > $dirOut/ER.unique.summary
 for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
@@ -1110,22 +1113,74 @@ for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
         s2=$(basename $f2 | cut -d'.' -f2,3); echo "IDHmut vs" $s2
         /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.IDHmut.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n IDHmut_$s2 >> $dirOut/ER.unique.log
     done
-    cat $dirOut/$mark/intermediate/IDHmut_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==3){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHmut.unique.bed
+    cat $dirOut/$mark/intermediate/IDHmut_*.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==3){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHmut.unique.bed
     # IDHwt specific
     for f2 in $dirIn/$mark.IDHmut.CEMT*.FindER2.bed $dirIn/$mark.NormalAdjacent.CEMT*.FindER2.bed $dirIn/$mark.NPC.*.FindER2.bed; do
         s2=$(basename $f2 | cut -d'.' -f2,3); echo "IDHwt vs" $s2
         /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.IDHwt.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n IDHwt_$s2 >> $dirOut/ER.unique.log
     done
-    cat $dirOut/$mark/intermediate/IDHwt_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==11){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHwt.unique.bed
+    cat $dirOut/$mark/intermediate/IDHwt_*.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==11){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.IDHwt.unique.bed
     # NPC specific
     for f2 in $dirIn/$mark.*.CEMT*.FindER2.bed; do
         s2=$(basename $f2 | cut -d'.' -f2,3); echo "NPC vs" $s2
         /home/lli/HirstLab/Pipeline/shell/ER.unique.sh -r $dirIn/$mark.NPC.bed -w $dirWig/$mark/$s2.wig.gz -excl $f2 -o $dirOut/$mark/intermediate/ -n NPC_$s2 >> $dirOut/ER.unique.log
     done
-    cat $dirOut/$mark/intermediate/NPC_*.unique | sed 's/chr//g' | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==12){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.NPC.unique.bed
-    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
-    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
-    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" > $dirOut/ER.unique.summary
+    cat $dirOut/$mark/intermediate/NPC_*.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==12){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/$mark/$mark.NPC.unique.bed
+    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    computeMatrix scale-regions -R $dirOut/$mark/$mark.IDHmut.unique.bed $dirOut/$mark/$mark.IDHwt.unique.bed $dirOut/$mark/$mark.NPC.unique.bed -S $(ls $dirBW/$mark/*.bw) -out $dirOut/$mark/$mark.unique.gz -bs 20
+    plotHeatmap -m $dirOut/$mark/$mark.unique.gz -out $dirOut/$mark/$mark.unique.png --colorMap coolwarm --xAxisLabel "$mark unique ER (bp)" --startLabel start --endLabel end --regionsLabel IDHmut IDHwt NPC
 done
 
+########################################################
+
+## Differentially marked regions between IDH mut / wt and NPC
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+R=/gsc/software/linux-x86_64-centos6/R-3.3.1/bin/R
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/unique5/; mkdir -p $dirOut
+dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/
+chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
+> $dirOut/ER.unique.log
+echo -e "Mark\tUnique\tN_region\tTotal_length" > $dirOut/ER.unique.summary
+for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
+    echo $mark; mkdir -p $dirOut/$mark/; 
+    cat $dirIn/$mark.*CEMT*.FindER2.bed $dirIn/$mark.*NPC*.FindER2.bed | sort -k1,1 -k2,2n -T /projects/epigenomics3/temp/lli/ | $BEDTOOLS/mergeBed -i stdin | awk '$1 !~ /GL/ {if(($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/all.$mark.bed
+    multiBigwigSummary BED-file -b $(ls $dirBW/$mark/*CEMT*.bw $dirBW/$mark/*NPC*.bw) --BED $dirIn/all.$mark.bed --smartLabels -p 8 -out $dirIn/all.$mark.npz --outRawCounts $dirIn/all.$mark.signal
+    $BEDTOOLS/shuffleBed -i $dirIn/all.$mark.bed -g <(less $chr | sed 's/chr//g') -excl $dirIn/all.$mark.bed | awk '{print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirIn/all.$mark.background.bed
+    multiBigwigSummary BED-file -b $(ls $dirBW/$mark/*CEMT*.bw $dirBW/$mark/*NPC*.bw) --BED $dirIn/all.$mark.background.bed --smartLabels -p 8 -out $dirIn/all.$mark.background.npz --outRawCounts $dirIn/all.$mark.background
+    $BEDTOOLS/intersectBed -a $dirIn/all.$mark.bed -b $(ls $dirIn/$mark.*CEMT*.FindER2.bed $dirIn/$mark.*NPC*.FindER2.bed) -filenames -wa -wb | sed 's/.FindER2.bed.*//g' | sed "s/\/.*$mark.//g" > $dirIn/all.$mark.sample.bed
+    echo "library(dplyr)
+library(reshape2)
+library(ggplot2)
+ER <- read.delim(\"$(ls $dirIn/all.$mark.sample.bed)\", as.is = T, head = F, col.names = c(\"chr\", \"start\", \"end\", \"ID\", \"sample\")) %>% mutate(i = paste0(ID, \"|\", sample))
+background <- read.delim(\"$(ls $dirIn/all.$mark.background)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".$\", \"\", variable)), i = paste0(ID, \"|\", variable))
+signal <- read.delim(\"$(ls $dirIn/all.$mark.signal)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".$\", \"\", variable)), i = paste0(ID, \"|\", variable), ER = ifelse(i %in% ER$i, T, F))
+signal_ecdf <- ggplot(signal %>% filter(ER == T), aes(value, color = variable)) + stat_ecdf(geom = \"step\") + coord_cartesian(xlim = c(0, 50))
+ggsave(signal_ecdf, file = \"$dirOut/$mark/signal_ecdf.pdf\", height = 7, width = 7)
+background_ecdf <- ggplot(background, aes(value, color = variable)) + stat_ecdf(geom = \"step\") + coord_cartesian(xlim = c(0, 50))
+ggsave(background_ecdf, file = \"$dirOut/$mark/background_ecdf.pdf\", height = 7, width = 7)
+signal_cut <- signal %>% filter(ER == T) %>% group_by(variable) %>% summarize(cut = quantile(value, probs = 0.1)) %>% as.data.frame()
+rownames(signal_cut) <- signal_cut\$variable
+background_cut <- background %>% group_by(variable) %>% summarize(cut = quantile(value, probs = 0.8)) %>% as.data.frame()
+rownames(background_cut) <- background_cut\$variable
+signal <- signal %>% mutate(category = gsub(\"\\\\..*\", \"\", variable), s_cut = signal_cut[variable, \"cut\"], b_cut = background_cut[variable, \"cut\"], signal = ifelse(value >= s_cut, T, F), backgound = ifelse(value <= b_cut, T, F), enrich = ER & signal)
+unique <- signal %>% group_by(ID, category) %>% summarize(enrich = sum(enrich), background = sum(backgound))
+IDHmut_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", enrich >= 3) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", background >= 2) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", background >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+write.table(IDHmut_unique, file = \"$dirOut/$mark/$mark.IDHmut.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
+IDHwt_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", background >= 6) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", enrich >= 1) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", background >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+write.table(IDHwt_unique, file = \"$dirOut/$mark/$mark.IDHwt.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
+NPC_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", background >= 6) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", background >= 2) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", enrich >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+write.table(NPC_unique, file = \"$dirOut/$mark/$mark.NPC.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
+" > $dirOut/$mark/ER.unique.R
+    $R CMD BATCH $dirOut/$mark/ER.unique.R
+    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    computeMatrix scale-regions -R $dirOut/$mark/$mark.IDHmut.unique.bed $dirOut/$mark/$mark.IDHwt.unique.bed $dirOut/$mark/$mark.NPC.unique.bed -S $(ls $dirBW/$mark/*.bw) -out $dirOut/$mark/$mark.unique.gz -bs 20
+    plotHeatmap -m $dirOut/$mark/$mark.unique.gz -out $dirOut/$mark/$mark.unique.png --colorMap coolwarm --xAxisLabel "$mark unique ER (bp)" --startLabel start --endLabel end --regionsLabel IDHmut IDHwt NPC
+done
 
