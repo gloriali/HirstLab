@@ -1145,7 +1145,7 @@ dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/uniq
 dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
 > $dirOut/ER.unique.log
-echo -e "Mark\tUnique\tN_region\tTotal_length" > $dirOut/ER.unique.summary
+echo -e "Mark\tUnique\tN_region\tTotal_length\tAverage_length" > $dirOut/ER.unique.summary
 for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
     echo $mark; mkdir -p $dirOut/$mark/; 
     cat $dirIn/$mark.*CEMT*.FindER2.bed $dirIn/$mark.*NPC*.FindER2.bed | sort -k1,1 -k2,2n -T /projects/epigenomics3/temp/lli/ | $BEDTOOLS/mergeBed -i stdin | awk '$1 !~ /GL/ {if(($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/all.$mark.bed
@@ -1157,8 +1157,8 @@ for mark in H3K27ac H3K4me1 H3K4me3 H3K27me3 H3K36me3 H3K9me3; do
 library(reshape2)
 library(ggplot2)
 ER <- read.delim(\"$(ls $dirIn/all.$mark.sample.bed)\", as.is = T, head = F, col.names = c(\"chr\", \"start\", \"end\", \"ID\", \"sample\")) %>% mutate(i = paste0(ID, \"|\", sample))
-background <- read.delim(\"$(ls $dirIn/all.$mark.background)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".$\", \"\", variable)), i = paste0(ID, \"|\", variable))
-signal <- read.delim(\"$(ls $dirIn/all.$mark.signal)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".$\", \"\", variable)), i = paste0(ID, \"|\", variable), ER = ifelse(i %in% ER$i, T, F))
+background <- read.delim(\"$(ls $dirIn/all.$mark.background)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".\$\", \"\", variable)), i = paste0(ID, \"|\", variable))
+signal <- read.delim(\"$(ls $dirIn/all.$mark.signal)\", as.is = T) %>% mutate(ID = paste0(X..chr., \":\", X.start., \"-\", X.end.)) %>% select(-X..chr., -X.start., -X.end.) %>% melt(id = \"ID\") %>% mutate(variable = gsub(\"X.\", \"\", gsub(\".$\", \"\", variable)), i = paste0(ID, \"|\", variable), ER = ifelse(i %in% ER\$i, T, F))
 signal_ecdf <- ggplot(signal %>% filter(ER == T), aes(value, color = variable)) + stat_ecdf(geom = \"step\") + coord_cartesian(xlim = c(0, 50))
 ggsave(signal_ecdf, file = \"$dirOut/$mark/signal_ecdf.pdf\", height = 7, width = 7)
 background_ecdf <- ggplot(background, aes(value, color = variable)) + stat_ecdf(geom = \"step\") + coord_cartesian(xlim = c(0, 50))
@@ -1169,17 +1169,18 @@ background_cut <- background %>% group_by(variable) %>% summarize(cut = quantile
 rownames(background_cut) <- background_cut\$variable
 signal <- signal %>% mutate(category = gsub(\"\\\\..*\", \"\", variable), s_cut = signal_cut[variable, \"cut\"], b_cut = background_cut[variable, \"cut\"], signal = ifelse(value >= s_cut, T, F), backgound = ifelse(value <= b_cut, T, F), enrich = ER & signal)
 unique <- signal %>% group_by(ID, category) %>% summarize(enrich = sum(enrich), background = sum(backgound))
-IDHmut_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", enrich >= 3) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", background >= 2) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", background >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+write.table(unique, file = \"$dirOut/$mark/$mark.unique\", sep = \"\\t\", quote = F, row.names = F, col.names = T)
+IDHmut_unique <- data.frame(ID = intersect(intersect((unique %>% filter(category == \"IDHmut\", enrich >= 2))\$ID, (unique %>% filter(category == \"IDHwt\", background >= 1, enrich == 0))\$ID), (unique %>% filter(category == \"NPC\", enrich == 0))\$ID)) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID)
 write.table(IDHmut_unique, file = \"$dirOut/$mark/$mark.IDHmut.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
-IDHwt_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", background >= 6) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", enrich >= 1) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", background >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+IDHwt_unique <- data.frame(ID = intersect(intersect((unique %>% filter(category == \"IDHmut\", enrich == 0, background >= 3))\$ID, (unique %>% filter(category == \"IDHwt\", enrich >= 1, background == 0))\$ID), (unique %>% filter(category == \"NPC\", background >= 1))\$ID)) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID)
 write.table(IDHwt_unique, file = \"$dirOut/$mark/$mark.IDHwt.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
-NPC_unique <- data.frame(ID = intersect(intersect(as.character(unique %>% filter(category == \"IDHmut\", background >= 6) %>% select(ID)), as.character(unique %>% filter(category == \"IDHwt\", background >= 2) %>% select(ID))), as.character(unique %>% filter(category == \"NPC\", enrich >= 1) %>% select(ID)))) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID))
+NPC_unique <- data.frame(ID = intersect(intersect((unique %>% filter(category == \"IDHmut\", enrich == 0, background >= 3))\$ID, (unique %>% filter(category == \"IDHwt\", background >= 1, enrich == 0))\$ID), (unique %>% filter(category == \"NPC\", enrich == 1))\$ID)) %>% mutate(chr = gsub(\":.*\", \"\", ID), start = gsub(\".*:\", \"\", gsub(\"-.*\", \"\", ID)), end = gsub(\".*-\", \"\", ID)) %>% select(chr, start, end, ID)
 write.table(NPC_unique, file = \"$dirOut/$mark/$mark.NPC.unique.bed\", sep = \"\\t\", quote = F, row.names = F, col.names = F)
 " > $dirOut/$mark/ER.unique.R
     $R CMD BATCH $dirOut/$mark/ER.unique.R
-    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
-    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
-    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" >> $dirOut/ER.unique.summary
+    echo -e "$mark\tIDHmut\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHmut.unique.bed | awk '{s=s+$3-$2}END{print s}')" | awk '{print $0"\t"$4/$3}' >> $dirOut/ER.unique.summary
+    echo -e "$mark\tIDHwt\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.IDHwt.unique.bed | awk '{s=s+$3-$2}END{print s}')" | awk '{print $0"\t"$4/$3}' >> $dirOut/ER.unique.summary
+    echo -e "$mark\tNPC\t$(less $dirOut/$mark/$mark.NPC.unique.bed | wc -l)\t$(less $dirOut/$mark/$mark.NPC.unique.bed | awk '{s=s+$3-$2}END{print s}')" | awk '{print $0"\t"$4/$3}' >> $dirOut/ER.unique.summary
     computeMatrix scale-regions -R $dirOut/$mark/$mark.IDHmut.unique.bed $dirOut/$mark/$mark.IDHwt.unique.bed $dirOut/$mark/$mark.NPC.unique.bed -S $(ls $dirBW/$mark/*.bw) -out $dirOut/$mark/$mark.unique.gz -bs 20
     plotHeatmap -m $dirOut/$mark/$mark.unique.gz -out $dirOut/$mark/$mark.unique.png --colorMap coolwarm --xAxisLabel "$mark unique ER (bp)" --startLabel start --endLabel end --regionsLabel IDHmut IDHwt NPC
 done
