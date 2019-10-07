@@ -258,17 +258,26 @@ export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
 gene=/home/lli/hg19/hg19v69_genes.bed
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/
 for mark in H3K27ac H3K27me3 H3K4me1 H3K4me3 H3K36me3 H3K9me3; do
     echo $mark
-	cat $dirIn/$mark.*.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin | awk '{print $0"\t"$1":"$2"-"$3}' > $dirIn/all.$mark.bed
-	multiBigwigSummary BED-file -b $(ls $dirIn/../bw/$mark/*.bw) --BED $dirIn/all.$mark.bed --smartLabels -p 8 -out $dirIn/all.$mark.npz --outRawCounts $dirIn/all.$mark.signal
+    cat $dirIn/$mark.*CEMT*.FindER2.bed $dirIn/$mark.*NPC*.FindER2.bed | sort -k1,1 -k2,2n -T /projects/epigenomics3/temp/lli/ | $BEDTOOLS/mergeBed -i stdin | awk '$1 !~ /GL/ {if(($3-$2)>200){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirIn/all.$mark.bed
+    multiBigwigSummary BED-file -b $(ls $dirBW/$mark/*CEMT*.bw $dirBW/$mark/*NPC*.bw) --BED $dirIn/all.$mark.bed --smartLabels -p 8 -out $dirIn/all.$mark.npz --outRawCounts $dirIn/all.$mark.signal
+    plotPCA -in $dirIn/all.$mark.npz -o $dirIn/PCA.$mark.pdf -T $mark --colors "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#A3A500" "#A3A500" "#00B0F6" "#00B0F6" "#00B0F6" "#00B0F6" "#E76BF3" --plotWidth 8
+    plotCorrelation -in $dirIn/all.$mark.npz -o $dirIn/heatmap.$mark.pdf -c pearson -p heatmap -T $mark" all ERs pearson" --outFileCorMatrix $dirIn/all.$mark.cor --colorMap PRGn --removeOutliers --skipZeros --plotHeight 9 --plotWidth 10
 done
-for mark in H3K27me3 H3K4me3; do
+for mark in H3K27me3 H3K4me3 H3K27ac; do
     echo $mark
-	multiBigwigSummary BED-file -b $(ls $dirIn/../bw/$mark/*.bw) --BED $promoter --smartLabels -p 8 -out $dirIn/promoter.$mark.npz --outRawCounts $dirIn/promoter.$mark.signal
+    multiBigwigSummary BED-file -b $(ls $dirIn/../bw/$mark/*.bw) --BED $promoter --smartLabels -p 8 -out $dirIn/promoter.$mark.npz --outRawCounts $dirIn/promoter.$mark.signal
+    plotPCA -in $dirIn/promoter.$mark.npz -o $dirIn/PCA.$mark.promoter.pdf -T $mark" promoter" --colors "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#A3A500" "#A3A500" "#00BF7D" "#00BF7D" "#00B0F6" "#00B0F6" "#00B0F6" "#00B0F6" "#E76BF3" --plotWidth 8
+    plotCorrelation -in $dirIn/promoter.$mark.npz -o $dirIn/heatmap.$mark.promoter.pdf -c pearson -p heatmap -T $mark" promoter pearson" --outFileCorMatrix $dirIn/promoter.$mark.cor --colorMap PRGn --removeOutliers --skipZeros --plotHeight 9 --plotWidth 10
+    computeMatrix reference-point -S $(ls $dirIn/../bw/$mark/*.bw) -R $tss -a 3000 -b 3000 --smartLabels -p 8 -out $dirIn/TSS.$mark.npz --outFileNameMatrix $dirIn/TSS.$mark.signal -bs 20
+    plotProfile -m $dirIn/TSS.$mark.npz -o $dirIn/TSS.$mark.pdf -T $mark" TSS profile" --perGroup --colors "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#A3A500" "#A3A500" "#00BF7D" "#00BF7D" "#00B0F6" "#00B0F6" "#00B0F6" "#00B0F6" "#E76BF3"
 done
 multiBigwigSummary BED-file -b $(ls $dirIn/../bw/H3K36me3/*.bw) --BED $gene --smartLabels -p 8 -out $dirIn/gene.H3K36me3.npz --outRawCounts $dirIn/gene.H3K36me3.signal
+plotPCA -in $dirIn/gene.H3K36me3.npz -o $dirIn/PCA.H3K36me3.gene.pdf -T "H3K36me3 genebody" --colors "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#F8766D" "#A3A500" "#A3A500" "#00BF7D" "#00BF7D" "#00B0F6" "#00B0F6" "#00B0F6" "#00B0F6" "#E76BF3" --plotWidth 8
+plotCorrelation -in $dirIn/gene.H3K36me3.npz -o $dirIn/heatmap.H3K36me3.gene.pdf -c pearson -p heatmap -T "H3K36me3 genebody pearson" --outFileCorMatrix $dirIn/gene.H3K36me3.cor --colorMap PRGn --removeOutliers --skipZeros --plotHeight 9 --plotWidth 10
 java=/gsc/software/linux-x86_64-centos6/jdk1.8.0_162/jre/bin/java
 RegCov=/home/mbilenky/bin/Solexa_Java/RegionsCoverageFromWigCalculator.jar
 chr=/home/mbilenky/UCSC_chr/hg19_auto_XY.chrom.sizes
