@@ -140,7 +140,7 @@ enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/Fi
 tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
 dirDE=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/limma/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
-dirOut=$dirIn/DE/; mkdir -p $dirOut
+dirOut=$dirIn/DE/; mkdir -p $dirOut; 
 echo -e "Sample\tDM\tDE\tregion\tN_DM_region\tN_DE\tN_intersect\tp_Fisher\tPercent_intersect" > $dirOut/DMR.DE.summary
 less $tss | sed 's/chr//g' | $BEDTOOLS/closestBed -a $enhancer -b stdin -d | awk '$9<20000{print $1"\t"$2"\t"$3"\t"$4"\t"$8}' > $enhancer.gene.bed
 n_total=19865 
@@ -153,19 +153,26 @@ for dmr in $dirIn/DMR.*c3.*.bed; do
     for de in UP DN; do
         file=$dirDE/$de.$lib"_limma.txt"
         echo $file
-        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.promoter.bed - -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/DMR.$lib.$dm.promoter.$de
+        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.promoter.bed - -1 5 -2 1 | sed 's/ /\t/g' | awk '{print "chr"$2"\t"$3"\t"$4"\tchr"$5"\t"$1"\t"$6}' > $dirOut/DMR.$lib.$dm.promoter.$de
         n_dm=$(less $dirOut/DMR.$lib.$dm.promoter.bed | cut -f5 | sort -u | wc -l)
         n_de=$(less $file | wc -l)
         n_intersect=$(less $dirOut/DMR.$lib.$dm.promoter.$de | cut -f1 | sort -u | wc -l)
         p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
         echo -e "$lib\t$dm\t$de\tpromoter\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirOut/DMR.DE.summary
-        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.enhancer.bed - -1 5 -2 1 | sed 's/ /\t/g' > $dirOut/DMR.$lib.$dm.enhancer.$de
+        less $file | sort -k1,1 | join $dirOut/DMR.$lib.$dm.enhancer.bed - -1 5 -2 1 | sed 's/ /\t/g' | awk '{print "chr"$2"\t"$3"\t"$4"\tchr"$5"\t"$1"\t"$6}' > $dirOut/DMR.$lib.$dm.enhancer.$de
         n_dm=$(less $dirOut/DMR.$lib.$dm.enhancer.bed | cut -f5 | sort -u | wc -l)
         n_de=$(less $file | wc -l)
         n_intersect=$(less $dirOut/DMR.$lib.$dm.enhancer.$de | cut -f1 | sort -u | wc -l)
         p=$(echo "phyper($n_intersect, $n_dm, $n_total - $n_dm, $n_de, lower.tail = F)" | $R - | sed -e 's/\[1\] //g')
         echo -e "$lib\t$dm\t$de\tenhancer\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirOut/DMR.DE.summary
     done
+done
+PATH=$PATH:/home/lli/bin/homer/bin/
+PATH=$PATH:/home/acarles/weblogo/
+mkdir -p $dirOut/homer/
+for file in $dirOut/DMR.IDHmut_NPC.hyper.enhancer.UP $dirOut/DMR.IDHmut_NPC.hyper.enhancer.DN; do
+    name=$(basename $file); mkdir -p $dirOut/homer/$name/; echo $name; 
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -p 12 -h -len 6,10,15,20
 done
 
 ## intersect with enhancers - homer
@@ -179,7 +186,7 @@ less /projects/epigenomics3/epigenomics3_results/users/alorzadeh/jaspar.motifs |
 mkdir -p $dirIn/homer/
 for file in $dirIn/DMR.*c3.*.bed; do
     name=$(basename $file | cut -d'.' -f2,5); echo $name
-    mkdir -p $dirIn/homer2/$name/
+    mkdir -p $dirIn/homer/$name/
     less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u -f 0.5 > $dirIn/DMR.$name.enhancer.bed
     /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.$name.enhancer.bed hg19 $dirIn/homer/$name/ -size 200 -p 12 -h -len 10
 done
@@ -193,29 +200,32 @@ less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $dirIn/DMR.ID
 /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper_IDHwt.hyper/ -bg $dirIn/DMR.IDHwt_NPC.s500.c3.hyper.bed -size 200 -p 12 -h -len 10
 /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hypo.enhancer.bed hg19 $dirIn/homer/IDHmut.hypo_IDHwt.hypo/ -bg $dirIn/DMR.IDHwt_NPC.s500.c3.hypo.bed -size 200 -p 12 -h -len 10
 ### IDHmut_NPC hype: LhX3 and NKX6.1
-/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut_NPC.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut_NPC.hyper/knownResults/known3.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.LHX3.bed
-/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut_NPC.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut_NPC.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut_NPC.hyper/knownResults/known4.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut_NPC.hyper.enhancer.NKX6-1.bed
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut.hyper/knownResults/known2.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut.hyper.enhancer.LHX3.bed
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DMR.IDHmut.hyper.enhancer.bed hg19 $dirIn/homer/IDHmut.hyper/ -size 200 -len 8 -p 6 -find $dirIn/homer/IDHmut.hyper/knownResults/known5.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print "chr"chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirIn/homer/DMR.IDHmut.hyper.enhancer.NKX6.1.bed
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/homer/DMR.IDHmut.hyper.enhancer.LHX3.bed hg19 -m $dirIn/homer/IDHmut.hyper/knownResults/known2.motif -mbed $dirIn/homer/DMR.IDHmut.hyper.enhancer.LHX3.BS.1.bed
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirIn/homer/DMR.IDHmut.hyper.enhancer.NKX6.1.bed hg19 -m $dirIn/homer/IDHmut.hyper/knownResults/known5.motif -mbed $dirIn/homer/DMR.IDHmut.hyper.enhancer.NKX6.1.BS.1.bed
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 dirBW=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/bw/H3K27ac/
-dirNHA=/projects/epigenomics3/epigenomics3_results/users/lli/NHA/Marra/
-for file in $dirIn/homer/DMR.*.bed; do
-    name=$(basename $file | sed s/.bed//); echo $name
-    less $tss | sed 's/chr//g' | $BEDTOOLS/closestBed -a $file -b stdin -d | awk '{if($10<20000){print $1"\t"$2"\t"$3"\t"$4"\t"$9}}' | awk 'NR==1{print "chr\tstart\tend\tID\tENSG\n"$0}{print $0}' | sort -k5,5 | join - /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -1 5 -2 1 | sed 's/ /\t/g' > $dirIn/homer/$name.RPKM
+de=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/limma/DE.IDHmut_NPC_limma.txt
+for file in $dirIn/homer/DMR.*.BS.1.bed; do
+    name=$(basename $file | sed s/.BS.1.bed//); echo $name
+    less $file | awk 'NR>1 {gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | sort -k1,1 -k2,2n > $dirIn/homer/$name.BS.bed
+    less $tss | awk '{gsub("chr", ""); print $0}' | $BEDTOOLS/closestBed -a $dirIn/homer/$name.BS.bed -b stdin -d | awk '{if($9<20000){print $1"\t"$2"\t"$3"\t"$4"\t"$8}}' | awk 'NR==1{print "chr\tstart\tend\tID\tENSG\n"$0}{print $0}' | sort -k5,5 | join - /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -1 5 -2 1 | sed 's/ /\t/g' > $dirIn/homer/$name.RPKM
     colname="ID"
-    less $file | awk '{print $4}' | sort > x
-    for methyl in $dirIn/../*CEMT*.combine.5mC.CpG $dirIn/../*NPC*.combine.5mC.CpG $dirNHA/*.combine.5mC.CpG; do
+    less $dirIn/homer/$name.BS.bed | awk '{print $4}' | sort > x
+    for methyl in $dirIn/../*CEMT*.combine.5mC.CpG $dirIn/../*NPC*.combine.5mC.CpG; do
         sample=$(basename $methyl | cut -d'.' -f1,2); echo $sample
         colname=$colname"\t$sample"
-        less $file | awk '{print $1"\t"$2"\t"$3"\t"$4}' | $BEDTOOLS/intersectBed -a stdin -b $methyl -wa -wb | awk '{chr[$4]=$1; start[$4]=$2; end[$4]=$3; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9}END{for(i in chr){if(c[i]+t[i]>0){print i" "c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join x - > y
+        less $dirIn/homer/$name.BS.bed | $BEDTOOLS/intersectBed -a stdin -b $methyl -wa -wb | awk '{chr[$4]=$1; start[$4]=$2; end[$4]=$3; t[$4]=t[$4]+$8; c[$4]=c[$4]+$9}END{for(i in chr){if(c[i]+t[i]>0){print i" "c[i]/(c[i]+t[i])}}}' | sort -k1,1 | join x - > y
         mv y x
     done
     echo -e $colname > $dirIn/homer/$name.5mC
     less x | sed 's/ /\t/g' >> $dirIn/homer/$name.5mC
     rm x
-    multiBigwigSummary BED-file -b $(ls $dirBW/*CEMT*.bw $dirBW/*NPC*.bw) --BED $file --smartLabels -p 8 -out $dirIn/homer/$name.H3K27ac.npz --outRawCounts $dirIn/homer/$name.H3K27ac.signal
-    computeMatrix scale-regions -R $file -S $(ls $dirBW/*CEMT*.bw $dirBW/*NPC*.bw) -out $dirIn/homer/$name.H3K27ac.gz -bs 20
-    plotHeatmap -m $dirIn/homer/$name.H3K27ac.gz -out $dirIn/homer/$name.H3K27ac.png --colorMap coolwarm --xAxisLabel "hyper enhancers (bp)" --startLabel start --endLabel end 
+    less $dirIn/homer/$name.5mC | awk 'NR>1{gsub(":", "\t"); gsub("-", "\t"); print "chr"$1"\t"$2"\t"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b $tss -d | awk '{if($8<20000){print $1"\t"$2"\t"$3"\t"$7}}' | sort -k4,4 | join - <(less $de | sort -k1,1) -1 4 -2 1 > $dirIn/homer/$name.5mC.DE
+    computeMatrix reference-point -R $dirIn/homer/$name.BS.bed -S $(ls $dirBW/*CEMT*.bw $dirBW/*NPC*.bw) -a 2000 -b 2000 --referencePoint center -out $dirIn/homer/$name.H3K27ac.gz -p 8
+    plotHeatmap -m $dirIn/homer/$name.H3K27ac.gz -out $dirIn/homer/$name.H3K27ac.png --colorMap coolwarm --xAxisLabel "hyper enhancers (bp)" --refPointLabel BS -T $name.H3K27ac
 done
 
 ## intersect with vitC 5hmC
