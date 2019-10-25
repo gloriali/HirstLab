@@ -273,30 +273,22 @@ mkdir -p $dirOut/homer/IDHmut.hyper.vitc_hMeDIP/
 /home/lli/bin/homer/bin/findMotifsGenome.pl $dirOut/DMR.IDHmut_Normal.NB141.hyper.vitc_hMeDIP.bed hg19 $dirOut/homer/IDHmut.hyper.vitc_hMeDIP/ -size 200 -len 8
 
 # methylation profile around CGI edges
-BEDTOOLS='/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/'
-dirIn='/projects/epigenomics2/users/lli/glioma/WGBS/'
-dirOut=$dirIn/CGI_edge/
-mkdir -p $dirOut
-cd $dirIn
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/
+dirOut=$dirIn/CGI_edge/; mkdir -p $dirOut
 echo -e "sample\tedge\tdistance\tfractional" > $dirOut/CGI.edge.profile
-for file in *.combine.5mC.CpG; do
-    name=$(echo $file | sed -e 's/.5mC.CpG//g' | sed 's/.combine//g')
-    echo $name
-    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /L/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-1000)&&($12<=2000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.L
-    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /R/ {print $0}' | $BEDTOOLS/closestBed -a $dirIn/$file -b stdin -D a | awk '{if(($12>=-2000)&&($12<=1000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.R
-    less $dirOut/$name.CGI.edge.L | awk '{s[int($8/50)] = s[int($8/50)] + $5; c[int($8/50)]++} END{for(i in c){print "'$name'""\tL\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3n >> $dirOut/CGI.edge.profile
-    less $dirOut/$name.CGI.edge.R | awk '{s[int($8/50)] = s[int($8/50)] + $5; c[int($8/50)]++} END{for(i in c){print "'$name'""\tR\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3n >> $dirOut/CGI.edge.profile
+echo -e "sample1\tsample2\tedge\tdistance\tdelta" > $dirOut/CGI.edge.delta.profile
+for file in $dirIn/*CEMT*.combine.5mC.CpG $dirIn/*NPC*.combine.5mC.CpG; do
+    name=$(basename $file | sed -e 's/.combine.5mC.CpG//g'); echo $name
+    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /L/ {print $0}' | $BEDTOOLS/closestBed -a $file -b stdin -D a | awk '{if(($12>=-1000)&&($12<=2000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.L
+    less /home/lli/hg19/CGI.edges.bed | awk '$5 ~ /R/ {print $0}' | $BEDTOOLS/closestBed -a $file -b stdin -D a | awk '{if(($12>=-2000)&&($12<=1000)&&($1!="Y")){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"\t"$6"\t"$10"\t"$11"\t"$12"\t""'$name'"}}' > $dirOut/$name.CGI.edge.R
     cat $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R > $dirOut/$name.CGI.edge
     rm $dirOut/$name.CGI.edge.L $dirOut/$name.CGI.edge.R 
 done
-cd $dirOut
-echo -e "sample1\tsample2\tedge\tdistance\tdelta" > $dirOut/CGI.edge.delta.profile
-for f1 in IDH*.CGI.edge; do
-    for f2 in NPC*.CGI.edge; do
-        s1=$(echo $f1 | sed 's/.CGI.edge//g'); s2=$(echo $f2 | sed 's/.CGI.edge//g');
-        echo $s1 $s2;
-        join <(less $f1 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) <(less $f2 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) | awk -F' ' '{gsub("+", "\t"); print $1"\t"$2"\t"$3"\t"$5"\t"$4-$6"\t""'$s1'""\t""'$s1'""-""'$s2'"}' > $dirOut/$s1.$s2.CGI.edge.delta
-        less $dirOut/$s1.$s2.CGI.edge.delta | awk '{s[int($4/50)] = s[int($4/50)] + $5; c[int($4/50)]++; edge[int($4/50)]=$3} END{for(i in c){print "'$s1'""\t""'$s2'""\t"edge[i]"\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3 -k4,4n >> $dirOut/CGI.edge.delta.profile
+for f1 in $dirOut/*CEMT*.CGI.edge; do
+    for f2 in $dirOut/*NPC*.CGI.edge; do
+        s1=$(basename $f1 | sed 's/.CGI.edge//g'); s2=$(basename $f2 | sed 's/.CGI.edge//g'); echo $s1 $s2;
+        join <(less $f1 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) <(less $f2 | awk '{print $4"+"$6"+"$7"\t"$5"\t"$8}' | sort -k1,1) | awk -F' ' '{gsub("+", "\t"); print $1"\t"$2"\t"$3"\t"$5"\t"$4-$6"\t""'$s1'""\t""'$s1'""-""'$s2'"}' | awk '{s[int($4/50)] = s[int($4/50)] + $5; c[int($4/50)]++; edge[int($4/50)]=$3} END{for(i in c){print "'$s1'""\t""'$s2'""\t"edge[i]"\t"i*50"\t"s[i]/c[i]}}' | sort -k3,3 -k4,4n >> $dirOut/CGI.edge.delta.profile
     done
 done
 
