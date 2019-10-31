@@ -167,17 +167,18 @@ for dmr in $dirIn/DMR.*c3.*.bed; do
         echo -e "$lib\t$dm\t$de\tenhancer\t$n_dm\t$n_de\t$n_intersect\t$p" | awk '{print $0"\t"$7/$6}' >> $dirOut/DMR.DE.summary
     done
 done
-PATH=$PATH:/home/lli/bin/homer/bin/
-PATH=$PATH:/home/acarles/weblogo/
+PATH=$PATH:/home/lli/bin/homer/bin/:/home/acarles/weblogo/
 mkdir -p $dirOut/homer/
 for file in $dirOut/DMR.IDHmut_NPC.hyper.enhancer.UP $dirOut/DMR.IDHmut_NPC.hyper.enhancer.DN; do
     name=$(basename $file); mkdir -p $dirOut/homer/$name/; echo $name; 
     /home/lli/bin/homer/bin/findMotifsGenome.pl $file hg19 $dirOut/homer/$name/ -size 200 -p 12 -h -len 6,10,15,20
 done
+/home/lli/bin/homer/bin/findMotifsGenome.pl $dirOut/DMR.IDHmut_NPC.hyper.enhancer.UP hg19 $dirOut/homer/ -size 200 -p 12 -h -find $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP/knownResults/known10.motif | awk 'NR>1{i=$1; n[i]=n[i]+1; chr[i]=gensub(":.*", "", "g", $1); gsub(".*:", "", $1); start[i]=gensub("-.*", "", "g", $1); end[i]=gensub(".*-", "", "g", $1)}END{for(i in chr){print chr[i]"\t"start[i]"\t"end[i]"\t"i"\t"n[i]}}' | sort -k1,1 -k2,2n > $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP.NKX6.1.bed
+/home/lli/bin/homer/bin/annotatePeaks.pl $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP.NKX6.1.bed hg19 -m $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP/knownResults/known10.motif -mbed $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP.NKX6.1.BS.bed
+less $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP.NKX6.1.BS.bed | awk 'NR>1 {gsub("chr", ""); print $1"\t"$2"\t"$3"\tchr"$1":"$2"-"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/intersectBed -a stdin -b /home/lli/hg19/CG.BED -u | awk '{print "chr"$0}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b /home/lli/hg19/hg19v69_genes.TSS.pc.bed -d > $dirOut/homer/DMR.IDHmut_NPC.hyper.enhancer.UP.NKX6.1.BS.CG.bed
 
 ## intersect with enhancers - homer
-PATH=$PATH:/home/lli/bin/homer/bin/
-PATH=$PATH:/home/acarles/weblogo/
+PATH=$PATH:/home/lli/bin/homer/bin/:/home/acarles/weblogo/
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/all.H3K27ac.bed
@@ -226,6 +227,51 @@ for file in $dirIn/homer/DMR.*.BS.1.bed; do
     less $dirIn/homer/$name.5mC | awk 'NR>1{gsub(":", "\t"); gsub("-", "\t"); print "chr"$1"\t"$2"\t"$3}' | sort -k1,1 -k2,2n | $BEDTOOLS/closestBed -a stdin -b $tss -d | awk '{if($8<20000){print $1"\t"$2"\t"$3"\t"$7}}' | sort -k4,4 | join - <(less $de | sort -k1,1) -1 4 -2 1 > $dirIn/homer/$name.5mC.DE
     computeMatrix reference-point -R $dirIn/homer/$name.BS.bed -S $(ls $dirBW/*CEMT*.bw $dirBW/*NPC*.bw) -a 2000 -b 2000 --referencePoint center -out $dirIn/homer/$name.H3K27ac.gz -p 8
     plotHeatmap -m $dirIn/homer/$name.H3K27ac.gz -out $dirIn/homer/$name.H3K27ac.png --colorMap coolwarm --xAxisLabel "hyper enhancers (bp)" --refPointLabel BS -T $name.H3K27ac
+done
+
+## enhancers intersect with DMRs - homer
+PATH=$PATH:/home/lli/bin/homer/bin/:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/H3K27ac.IDHmut.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
+mkdir -p $dirIn/homer2/
+for file in $dirIn/DMR.IDH*c3.*.bed; do
+    name=$(basename $file | cut -d'.' -f2,5); echo $name
+    mkdir -p $dirIn/homer2/$name/
+    less $enhancer | awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a stdin -b $file > $dirIn/enhancer.DMR.$name.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/enhancer.DMR.$name.bed hg19 $dirIn/homer2/$name/ -size 200 -p 12 -len 6,10,15
+done
+
+## enhancers intersect with DM CpG +/- 20bp - homer
+PATH=$PATH:/home/lli/bin/homer/bin/:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/H3K27ac.IDHmut.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
+mkdir -p $dirIn/homer3/
+for file in $dirIn/DM.IDH*.bed; do
+    name=$(basename $file | cut -d'.' -f2); echo $name
+    less $file | awk '$4==1 {print $1"\t"$2-20"\t"$3+20}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u | awk '{print "chr"$0"\t"$1":"$2"-"$3}' > $dirIn/DM.$name.hyper.enhancer.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DM.$name.hyper.enhancer.bed hg19 $dirIn/homer3/$name.hyper/ -size given -p 12 -len 6,10,15
+    less $file | awk '$4==-1 {print $1"\t"$2-20"\t"$3+20}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u | awk '{print "chr"$0"\t"$1":"$2"-"$3}' > $dirIn/DM.$name.hypo.enhancer.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/DM.$name.hypo.enhancer.bed hg19 $dirIn/homer3/$name.hypo/ -size given -p 12 -len 6,10,15
+done
+
+## enhancers intersect with DMRs - MEME
+export PATH=$PATH:/home/lli/bin/meme-5.1.0/bin:/home/lli/bin/meme-5.1.0/libexec/meme-5.1.0
+dirMotif=/home/lli/bin/meme-5.1.0/db/motif_databases/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+hg19=/projects/alignment_references/9606/hg19a/genome/bwa_32/hg19a.fa
+tss=/home/lli/hg19/hg19v69_genes.TSS.pc.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/ChIPseq/FindER2/H3K27ac.IDHmut.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
+mkdir -p $dirIn/ame/
+for file in $dirIn/enhancer.DMR.*.bed; do
+    name=$(basename $file | cut -d'.' -f3,4); echo $name
+    dirOut=$dirIn/ame/$name/
+    less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/enhancer.DMR.$name.fa
+    ame --oc $dirOut --control --shuffle-- $dirIn/enhancer.DMR.$name.fa $dirMotif/JASPAR/JASPAR2018_CORE_non-redundant.meme $dirMotif/METHYLCYTOSINE/yin2017.meme 
 done
 
 ## intersect with vitC 5hmC
