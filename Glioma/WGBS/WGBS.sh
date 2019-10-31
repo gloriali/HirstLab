@@ -271,7 +271,7 @@ for file in $dirIn/enhancer.DMR.*.bed; do
     name=$(basename $file | cut -d'.' -f3,4); echo $name
     dirOut=$dirIn/ame/$name/
     less $file | awk '{gsub("chr", ""); print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/enhancer.DMR.$name.fa
-    ame --oc $dirOut --control --shuffle-- $dirIn/enhancer.DMR.$name.fa $dirMotif/JASPAR/JASPAR2018_CORE_non-redundant.meme $dirMotif/METHYLCYTOSINE/yin2017.meme 
+    ame --oc $dirOut --control --shuffle-- $dirIn/enhancer.DMR.$name.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.meme 
 done
 
 ## intersect with vitC 5hmC
