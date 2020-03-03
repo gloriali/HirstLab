@@ -280,3 +280,32 @@ intervene upset -i $dirOut/MGG_control.24h-MGG_vitc.*.MGG_vitc.*.c3.unique --pro
 cat $dirOut/MGG_control.24h-MGG_vitc.*.MGG_control*c3.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==4){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/MGG_control.c3.unique
 cat $dirOut/MGG_control.24h-MGG_vitc.*.MGG_vitc*c3.unique | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4==4){print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}}' > $dirOut/MGG_vitc.c3.unique
 intervene upset -i $dirOut/MGG_control.c3.unique $dirOut/MGG_vitc.c3.unique $dirIn/../hMeDIP/FindER2/MGG_control.unique.bed $dirIn/../hMeDIP/FindER2/MGG_vitc.unique.bed -o $dirOut --names=MeDIP.MGG_control.unique,MeDIP.MGG_vitc.unique,hMeDIP.MGG_control.unique,hMeDIP.MGG_vitc.unique
+## enhancer/CGI
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER2/H3K27ac.MGG.union.bed
+promoter=/home/lli/hg19/hg19v69_genes_TSS_2000.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/unique/
+echo -e "unique\tDMR\tcategory" > $dirIn/DMR.CGI.category
+echo -e "unique\tDMR\tcategory" > $dirIn/DMR.enhancer.category
+for file in $dirIn/MGG_vitc.c3.unique $dirIn/MGG_control.c3.unique; do
+    DM=$(basename $file | cut -d'.' -f1)
+    name=$(echo $sample)
+    echo $DM $name
+    less /home/lli/hg19/category.CGI.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $file -b stdin -wa -wb | awk '{print "'$DM'""\t"$4"\t"$9}' >> $dirIn/DMR.CGI.category
+    less /home/lli/hg19/category.CGI.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$DM'""\t"$4"\tnon_CGI"}' >> $dirIn/DMR.CGI.category
+    $BEDTOOLS/intersectBed -a $file -b $enhancer -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -u | awk '{print "'$DM'""\t"$4"\tpromoter_enhancer"}' >> $dirIn/DMR.enhancer.category
+    $BEDTOOLS/intersectBed -a $file -b $enhancer -u | $BEDTOOLS/intersectBed -a stdin -b $promoter -v | awk '{print "'$DM'""\t"$4"\tdistal_enhancer"}' >> $dirIn/DMR.enhancer.category
+    $BEDTOOLS/intersectBed -a $file -b $enhancer -v | awk '{print "'$DM'""\t"$4"\tnon_enhancer"}' >> $dirIn/DMR.enhancer.category
+done
+## homer
+PATH=$PATH:/home/lli/bin/homer/bin/:/home/acarles/weblogo/
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/ChIPseq/FindER2/H3K27ac.MGG.union.bed
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/MGG/MeDIP/unique/
+mkdir -p $dirIn/homer/
+for file in $dirIn/MGG_vitc.c3.unique $dirIn/MGG_control.c3.unique; do
+    name=$(basename $file); echo $name
+    mkdir -p $dirIn/homer/$name/
+    $BEDTOOLS/intersectBed -a $enhancer -b $file | awk '{print "chr"$0"\t"$1":"$2"-"$3}' > $dirIn/enhancer.$name.bed
+    /home/lli/bin/homer/bin/findMotifsGenome.pl $dirIn/enhancer.$name.bed hg19 $dirIn/homer/$name/ -size 200 -p 12 -len 8
+done
