@@ -132,6 +132,7 @@ for file in *.G.A.rpkm.pc; do
 done
 rm x
 join /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/glioma.RPKM /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/NPC.RPKM | sed 's/ /\t/g' > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix
+join /home/lli/hg19/hg19v69_genes.EnsID_sorted.HUGO /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix -j 1 | cut -d" " -f2- | sed 's/ /\t/g' > /projects/epigenomics3/epigenomics3_results/users/lli/glioma/RNAseq/RPKM/RPKM.matrix.HUGO
 
 # DE between glioma and NPCs
 ## generate matlab code for DEfine
