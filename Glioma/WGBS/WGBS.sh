@@ -274,7 +274,7 @@ for file in $dirIn/enhancer.DMR.*.bed; do
     ame --oc $dirOut --control --shuffle-- $dirIn/enhancer.DMR.$name.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
 done
 
-## enhancers intersect with DM CpG +/- 50bp - MEME
+## enhancers intersect with DM CpG +/- 15bp - MEME
 export PATH=$PATH:/home/lli/bin/meme-5.1.0/bin:/home/lli/bin/meme-5.1.0/libexec/meme-5.1.0
 dirMotif=/home/lli/bin/meme-5.1.0/db/motif_databases/
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -287,15 +287,15 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/glioma/WGBS/limma/
 mkdir -p $dirIn/ame2/
 for file in $dirIn/DM.IDH*_NPC.bed; do
     name=$(basename $file | cut -d'.' -f2); echo $name
-    less $file | awk '$4==1 {print $1"\t"$2-50"\t"$3+50}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | awk '$8<20000 {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"_"$7}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.$name.hyper.enhancer.fa
-    ame --oc $dirIn/ame2/$name.hyper/ --control --shuffle-- $dirIn/DM.$name.hyper.enhancer.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
-    less $file | awk '$4==-1 {print $1"\t"$2-50"\t"$3+50}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | awk '$8<20000 {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"_"$7}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.$name.hypo.enhancer.fa
-    ame --oc $dirIn/ame2/$name.hypo/ --control --shuffle-- $dirIn/DM.$name.hypo.enhancer.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
+    less $file | awk '$4==1 {print $1"\t"$2-15"\t"$3+15}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | awk '$8<20000 {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"_"$7}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.$name.hyper.enhancer.fa
+    ame --oc $dirIn/ame2/$name.hyper/ --control --shuffle-- $dirIn/DM.$name.hyper.enhancer.fa $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
+    less $file | awk '$4==-1 {print $1"\t"$2-15"\t"$3+15}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | awk '$8<20000 {print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3"_"$7}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.$name.hypo.enhancer.fa
+    ame --oc $dirIn/ame2/$name.hypo/ --control --shuffle-- $dirIn/DM.$name.hypo.enhancer.fa $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
 done
-less $dirIn/DM.IDHmut_NPC.bed | awk '$4==1 {print $1"\t"$2-50"\t"$3+50}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/DM.IDHwt_NPC.bed | awk '$4==1 {print $0}') -v | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | sort -k7,7 | join - <(less $up_NPC | sort -k1,1) -1 7 -2 1 | awk -F" " '$8<20000 {print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4"_"$1}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.IDHmut.hyper.enhancer.UP_NPC.fa
-ame --oc $dirIn/ame2/IDHmut.hyper.enhancer.UP_NPC/ --control --shuffle-- $dirIn/DM.IDHmut.hyper.enhancer.UP_NPC.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
-less $dirIn/DM.IDHmut_NPC.bed | awk '$4==1 {print $1"\t"$2-50"\t"$3+50}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/DM.IDHwt_NPC.bed | awk '$4==1 {print $0}') -v | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | sort -k7,7 | join - <(less $up_wt | sort -k1,1) -1 7 -2 1 | awk -F" " '$8<20000 {print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4"_"$1}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.IDHmut.hyper.enhancer.UP_wt.fa
-ame --oc $dirIn/ame2/IDHmut.hyper.enhancer.UP_wt/ --control --shuffle-- $dirIn/DM.IDHmut.hyper.enhancer.UP_wt.fa $dirMotif/JASPAR/JASPAR2020_CORE_vertebrates_non-redundant_pfms_meme.txt $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
+less $dirIn/DM.IDHmut_NPC.bed | awk '$4==1 {print $1"\t"$2-15"\t"$3+15}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/DM.IDHwt_NPC.bed | awk '$4==1 {print $0}') -v | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | sort -k7,7 | join - <(less $up_NPC | sort -k1,1) -1 7 -2 1 | awk -F" " '$8<20000 {print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4"_"$1}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.IDHmut.hyper.enhancer.UP_NPC.fa
+ame --oc $dirIn/ame2/IDHmut.hyper.enhancer.UP_NPC/ --control --shuffle-- $dirIn/DM.IDHmut.hyper.enhancer.UP_NPC.fa $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
+less $dirIn/DM.IDHmut_NPC.bed | awk '$4==1 {print $1"\t"$2-15"\t"$3+15}' | $BEDTOOLS/mergeBed -i stdin | $BEDTOOLS/intersectBed -a stdin -b $enhancer -u -f 1 | $BEDTOOLS/intersectBed -a stdin -b <(less $dirIn/DM.IDHwt_NPC.bed | awk '$4==1 {print $0}') -v | $BEDTOOLS/closestBed -a stdin -b <(less $tss | sed 's/chr//g') -d | sort -k7,7 | join - <(less $up_wt | sort -k1,1) -1 7 -2 1 | awk -F" " '$8<20000 {print $2"\t"$3"\t"$4"\t"$2":"$3"-"$4"_"$1}' | $BEDTOOLS/bedtools getfasta -fi $hg19 -bed stdin -name -fo $dirIn/DM.IDHmut.hyper.enhancer.UP_wt.fa
+ame --oc $dirIn/ame2/IDHmut.hyper.enhancer.UP_wt/ --control --shuffle-- $dirIn/DM.IDHmut.hyper.enhancer.UP_wt.fa $dirMotif/METHYLCYTOSINE/yin2017.name.meme 
 
 ## intersect with vitC 5hmC
 export PATH=/home/lli/anaconda2/bin/:$PATH
