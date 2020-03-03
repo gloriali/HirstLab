@@ -1,6 +1,6 @@
 CEMT Glioma Project
 ========
-Project directory: `/projects/epigenomics2/users/lli/glioma/`
+Project directory: `/projects/epigenomics3/epigenomics3_results/users/lli/glioma/`
 
 * [GliomaLibraries.tsv](./GliomaLibraries.tsv): Libraries and samples information for CEMT glioma samples.          
 * [WGS](./WGS/WGS.md): genetic variation analysis.      

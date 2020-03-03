@@ -6,6 +6,7 @@ Code and summary results in Hirst Lab
 * [Pipeline](./Pipeline): Analysis pipelines and instructions for tools
 * [FetalBrain](./FetalBrain): REMC Fetal Brain data analysis
 * [Glioma](./Glioma): CEMT Glioma data analysis
+* [AML](./AML): Cord blood and AML data analysis
 * [NHA](./NHA): VitC treatment on IDH mut and IDH wt NHA cell line      
 * [Breast](./Breast): REMC Breast data analysis
 * [Others](./Others): General analysis related to thesis or commands for others

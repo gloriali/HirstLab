@@ -251,6 +251,7 @@ for mark in H3K4me1 H3K4me3 H3K9me3 H3K27me3 H3K36me3 H3K27ac; do
     echo $mark
     intervene upset -i $dirOut/$mark.*.coverage --project upSet.FindER2.$mark -o $dirOut/UpSet/
 done
+intervene upset -i $dirOut/SE/*.bed --project upSet.FindER2.SE -o $dirOut/UpSet/
 
 ## clustering
 export PATH=/home/lli/anaconda2/bin/:$PATH
