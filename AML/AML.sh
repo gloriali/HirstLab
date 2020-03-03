@@ -38,26 +38,28 @@ echo -e $header | cat - x > matrix_genome.5mC
 echo -e $header | cat - a > matrix_CGI.5mC
 rm x a
 
-## DMR between AML and Erythroid
+## DMR between AML and HDC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/AML/DNAme/
 dirOut=$dirIn/DMR/; mkdir -p $dirOut
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
 echo -e "sample\tsize\tcut\tmedian_length\tmedian_N_CpG\ttotal\thyper\thypo" > $dirOut/DMR.summary.stats
 pth=0.0005; delta=0.6; m=0.75; cov=3; size=500; cut=3
-file2=PX0681_TATAAT.Normal_Erythroid.combine.5mC.CpG; lib2=Normal_Erythroid
 cd $dirIn
-for file1 in *AML*.combine.5mC.CpG; do
-    lib1=$(echo $file1 | sed -e 's/.combine.5mC.CpG//g')
-    name=$lib1'-'$lib2
-    echo $lib1 $name
-    /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
-    /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+for file2 in CB_HDC*.combine.5mC.CpG; do
+    lib2=$(echo $file2 | sed -e 's/.combine.5mC.CpG//g')
+    for file1 in AML*.combine.5mC.CpG; do
+        lib1=$(echo $file1 | sed -e 's/.combine.5mC.CpG//g')
+        name=$lib1'-'$lib2
+        echo $name
+        /home/lli/HirstLab/Pipeline/shell/methyl_diff.sh -i $dirIn -o $dirOut -f1 $file1 -f2 $file2 -n $name -p $pth -d $delta -m $m -c $cov
+        /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
+    done
 done
-cat $dirOut/DMR.*IDH*R*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.Normal_Erythroid.hyper.bed
-cat $dirOut/DMR.*IDH*R*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.Normal_Erythroid.hypo.bed
-cat $dirOut/DMR.*IDHwt*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>1)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.Normal_Erythroid.hyper.bed
-cat $dirOut/DMR.*IDHwt*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>1)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.Normal_Erythroid.hypo.bed
+cat $dirOut/DMR.*IDH*R*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.CB_HDC.hyper.bed
+cat $dirOut/DMR.*IDH*R*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.CB_HDC.hypo.bed
+cat $dirOut/DMR.*IDHwt*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.CB_HDC.hyper.bed
+cat $dirOut/DMR.*IDHwt*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.CB_HDC.hypo.bed
 ### genomic enrichment
 enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/H3K27ac.IDHmut.bed
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n enhancer
@@ -69,14 +71,38 @@ intervene upset -i $dirOut/DMR.*.s500.c3.hypo.bed --project DMR.AML_Erythroid.hy
 
 
 # ============= ChIPseq =============
+## bam
+dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/bam/
+
+## super enhancers
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/SE/
+dirAli=/projects/epigenomics3/epigenomics3_results/users/alorzadeh/AML/SuperEnhancersMACS2/
+ID=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ID.tsv
+for file in $dirAli/IDH*_Super_*.bed; do
+    sample=$(basename $file | sed 's/Super_//' | sed 's/.bed//' | sed 's/rep//')
+    name=$(less $ID | awk '$2 ~ "'$sample'" {print $1}')
+    echo $sample $name
+    ln -s $file $dirOut/$name.SE.bed
+done
+less $dirOut/AllSuperCordBlood_Oct2018.bed | awk 'NR>1 {print $2"\t"$3"\t"$4"\t"$5"\t"$1"\t"$11 >> "'$dirOut'""/"$19".CB.bed"}'
+rm $dirOut/B.CB.bed $dirOut/T.CB.bed
+for file in $dirOut/*.CB.bed; do
+    sample=$(basename $file | sed 's/.CB.bed//')
+    name=$(less $ID | awk '$2 ~ "'$sample'" {print $1}')
+    echo $sample $name
+    mv $file $dirOut/$name.SE.bed
+done
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/*.SE.bed --project super_enhancer -o $dirOut
 
 ## FindER2
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/bam/
 dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/
 dirAli=/projects/epigenomics3/epigenomics3_results/users/alorzadeh/Finder2.0/Finder2_2019/
 ID=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ID.tsv
-for file in $dirAli/*[0-9]-[0-9]*.FindER2.bed $dirAli/*[0-9]_[0-9]*_[AB]*.FindER2.bed; do
+for file in $dirAli/*[0-9]-[0-9]*.FindER2.bed $dirAli/*[0-9]_[0-9][0-9]_[ABH]*.FindER2.bed; do
     sample=$(basename $file | sed 's/_H.*.bed//' | sed 's/B0[1-6]_//' | sed 's/_A.*//' | sed 's/_B.*//' | sed 's/-AML//')
     mark=$(basename $file | sed 's/.*_H/H/' | sed 's/.FindER2.bed//')
     name=$(less $ID | awk '$3 ~ "'$sample'" {print $1}')
