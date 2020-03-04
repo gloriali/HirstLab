@@ -40,6 +40,7 @@ rm x a
 
 ## DMR between AML and HDC
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+CG=/home/lli/hg19/CG.BED
 dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/AML/DNAme/
 dirOut=$dirIn/DMR/; mkdir -p $dirOut
 echo -e "sample\tp-value\tdelta\tm\ttotal\thyper\thypo" > $dirOut/DM.summary.stats
@@ -56,18 +57,35 @@ for file2 in CB_HDC*.combine.5mC.CpG; do
         /home/lli/HirstLab/Pipeline/shell/DMR.dynamic.sh -i $dirOut -o $dirOut -f DM.$name.m$m.p$pth.d$delta.bed -n $name -s $size -c $cut
     done
 done
+### DMR upSet
+export PATH=/home/lli/anaconda2/bin/:$PATH
+export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
+intervene upset -i $dirOut/DMR.*.s500.c3.hyper.bed --project DMR.AML_HDC.hyper -o $dirOut
+intervene upset -i $dirOut/DMR.*.s500.c3.hypo.bed --project DMR.AML_HDC.hypo -o $dirOut
 cat $dirOut/DMR.*IDH*R*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.CB_HDC.hyper.bed
 cat $dirOut/DMR.*IDH*R*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>5)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHmut.CB_HDC.hypo.bed
 cat $dirOut/DMR.*IDHwt*.s500.c3.hyper.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.CB_HDC.hyper.bed
 cat $dirOut/DMR.*IDHwt*.s500.c3.hypo.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/DMR.AML_IDHwt.CB_HDC.hypo.bed
+less $dirOut/DMR.AML_IDHmut.CB_HDC.hyper.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t1\t"$5"\t"$3-$2}' > $dirOut/DMR.AML_IDHmut.CB_HDC.s500.c3
+less $dirOut/DMR.AML_IDHmut.CB_HDC.hypo.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t-1\t"$5"\t"$3-$2}' >> $dirOut/DMR.AML_IDHmut.CB_HDC.s500.c3
+less $dirOut/DMR.AML_IDHwt.CB_HDC.hyper.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t1\t"$5"\t"$3-$2}' > $dirOut/DMR.AML_IDHwt.CB_HDC.s500.c3
+less $dirOut/DMR.AML_IDHwt.CB_HDC.hypo.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t-1\t"$5"\t"$3-$2}' >> $dirOut/DMR.AML_IDHwt.CB_HDC.s500.c3
 ### genomic enrichment
-enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/H3K27ac.IDHmut.bed
+enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/H3K27ac.AML.all.bed
+SE=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/SE/AML.SE.bed
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n enhancer
-### DMR upSet
-export PATH=/home/lli/anaconda2/bin/:$PATH
-export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
-intervene upset -i $dirOut/DMR.*.s500.c3.hyper.bed --project DMR.AML_Erythroid.hyper -o $dirOut
-intervene upset -i $dirOut/DMR.*.s500.c3.hypo.bed --project DMR.AML_Erythroid.hypo -o $dirOut
+echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.CGI.category
+echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.enhancer.category
+for file in $dirOut/DMR.*s500.c3*.bed; do
+    sample=$(basename $file | cut -d'.' -f2,3,4)
+    DM=$(basename $file | cut -d'.' -f7)
+    echo $sample $DM
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -wa -wb | awk '{print "'$sample'""\t""'$DM'""\t"$4"\t"$9}' >> $dirOut/DMR.CGI.category
+    $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_CGI"}' >> $dirOut/DMR.CGI.category
+    $BEDTOOLS/intersectBed -a $file -b $SE -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tsuper_enhancer"}' >> $dirOut/DMR.enhancer.category
+    less $enhancer| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | $BEDTOOLS/intersectBed -a stdin -b $SE -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tregular_enhancer"}' >> $dirOut/DMR.enhancer.category
+    less $enhancer| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | $BEDTOOLS/intersectBed -a stdin -b $SE -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_enhancer"}' >> $dirOut/DMR.enhancer.category
+done
 
 
 # ============= ChIPseq =============
@@ -96,6 +114,7 @@ done
 export PATH=/home/lli/anaconda2/bin/:$PATH
 export PYTHONPATH=/home/lli/anaconda2/lib/python2.7/site-packages
 intervene upset -i $dirOut/*.SE.bed --project super_enhancer -o $dirOut
+cat $dirOut/AML*.SE.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>4)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/AML.SE.bed
 
 ## FindER2
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
@@ -110,4 +129,4 @@ for file in $dirAli/*[0-9]-[0-9]*.FindER2.bed $dirAli/*[0-9]_[0-9][0-9]_[ABH]*.F
     ln -s $file $dirOut/$mark.$name.FindER2.bed
 done
 cat $dirOut/H3K27ac.*AML_IDH*R*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K27ac.IDHmut.bed
-
+cat $dirOut/H3K27ac.*AML_*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/H3K27ac.AML.all.bed
