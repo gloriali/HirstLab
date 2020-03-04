@@ -99,7 +99,7 @@ for file in $dirOut/DMR.*s500.c3*.bed; do
     less $H3K27me3| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tH3K27me3"}' >> $dirOut/DMR.H3K27me3.category
     less $H3K27me3| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_H3K27me3"}' >> $dirOut/DMR.H3K27me3.category
     $BEDTOOLS/intersectBed -a $file -b $ChromHMM -f 0.5 -wa -wb > $dirOut/intersect/DMR.$sample.s500.c3.$DM.ChromHMM.bed
-    awk 'FNR==NR {t[$4]=t[$4]+$3-$2; g=g+$3-$2; next} {s[$8]=s[$8]+$3-$2; d=d+$3-$2} END{for(i in s){print "'$sample'""\t""'$DM'""\t"i"\t"s[i]"\t"t[i]"\t"d"\t"g"\t"(s[i]/t[i])/(d/g)}}' $ChromHMM $dirOut/intersect/DMR.$sample.s500.c3.$DM.ChromHMM.bed | sort -k1,1 >> $dirOut/DMR.ChromHMM.category
+    awk 'FNR==NR {t[$4]=t[$4]+$3-$2; g=g+$3-$2; next} {s[$8]=s[$8]+$3-$2; d=d+$3-$2} END{for(i in t){print "'$sample'""\t""'$DM'""\t"i"\t"s[i]"\t"t[i]"\t"d"\t"g"\t"(s[i]/t[i])/(d/g)}}' $ChromHMM $dirOut/intersect/DMR.$sample.s500.c3.$DM.ChromHMM.bed | sort -k1,1 >> $dirOut/DMR.ChromHMM.category
 done
 
 
