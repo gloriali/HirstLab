@@ -71,20 +71,35 @@ less $dirOut/DMR.AML_IDHmut.CB_HDC.hypo.bed | sed 's/chr//g' | $BEDTOOLS/interse
 less $dirOut/DMR.AML_IDHwt.CB_HDC.hyper.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t1\t"$5"\t"$3-$2}' > $dirOut/DMR.AML_IDHwt.CB_HDC.s500.c3
 less $dirOut/DMR.AML_IDHwt.CB_HDC.hypo.bed | sed 's/chr//g' | $BEDTOOLS/intersectBed -a stdin -b $CG -c | awk '{print "chr"$1"\t"$2"\t"$3"\t"$4"\t-1\t"$5"\t"$3-$2}' >> $dirOut/DMR.AML_IDHwt.CB_HDC.s500.c3
 ### genomic enrichment
-enhancer=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/H3K27ac.AML.all.bed
-SE=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/SE/AML.SE.bed
+dirHM=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/
+enhancer=$dirHM/FindER2/H3K27ac.IDHmut.bed
 /home/lli/HirstLab/Pipeline/shell/DMR.intersect.sh -d $dirOut -r $enhancer -n enhancer
 echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.CGI.category
 echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.enhancer.category
+echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.H3K4me1.category
+echo -e "sample\tDM\tDMR\tcategory" > $dirOut/DMR.H3K27me3.category
+echo -e "sample\tDM\tstate\tDMR_state\tstate\tDMR\tgenome\tFC" > $dirOut/DMR.ChromHMM.category
 for file in $dirOut/DMR.*s500.c3*.bed; do
     sample=$(basename $file | cut -d'.' -f2,3,4)
     DM=$(basename $file | cut -d'.' -f7)
-    echo $sample $DM
+    name=$(echo $sample | sed 's/-.*//')
+    echo $sample $DM $name
+    enhancer=$dirHM/FindER2/H3K27ac.$name.FindER2.bed
+    SE=$dirHM/SE/$name.SE.bed
+    H3K4me1=$dirHM/FindER2/H3K4me1.$name.FindER2.bed
+    H3K27me3=$dirHM/FindER2/H3K27me3.$name.FindER2.bed
+    ChromHMM=$dirHM/ChromHMM/$name.18_segments.bed
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -wa -wb | awk '{print "'$sample'""\t""'$DM'""\t"$4"\t"$9}' >> $dirOut/DMR.CGI.category
     $BEDTOOLS/intersectBed -a $file -b /home/lli/hg19/category.CGI.bed -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_CGI"}' >> $dirOut/DMR.CGI.category
     $BEDTOOLS/intersectBed -a $file -b $SE -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tsuper_enhancer"}' >> $dirOut/DMR.enhancer.category
     less $enhancer| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | $BEDTOOLS/intersectBed -a stdin -b $SE -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tregular_enhancer"}' >> $dirOut/DMR.enhancer.category
     less $enhancer| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | $BEDTOOLS/intersectBed -a stdin -b $SE -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_enhancer"}' >> $dirOut/DMR.enhancer.category
+    less $H3K4me1| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tH3K4me1"}' >> $dirOut/DMR.H3K4me1.category
+    less $H3K4me1| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_H3K4me1"}' >> $dirOut/DMR.H3K4me1.category
+    less $H3K27me3| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -u | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tH3K27me3"}' >> $dirOut/DMR.H3K27me3.category
+    less $H3K27me3| awk '{print "chr"$0}' | $BEDTOOLS/intersectBed -a $file -b stdin -v | awk '{print "'$sample'""\t""'$DM'""\t"$4"\tnon_H3K27me3"}' >> $dirOut/DMR.H3K27me3.category
+    $BEDTOOLS/intersectBed -a $file -b $ChromHMM -f 0.5 -wa -wb > $dirOut/intersect/DMR.$sample.s500.c3.$DM.ChromHMM.bed
+    awk 'FNR==NR {t[$4]=t[$4]+$3-$2; g=g+$3-$2; next} {s[$8]=s[$8]+$3-$2; d=d+$3-$2} END{for(i in s){print "'$sample'""\t""'$DM'""\t"i"\t"s[i]"\t"t[i]"\t"d"\t"g"\t"(s[i]/t[i])/(d/g)}}' $ChromHMM $dirOut/intersect/DMR.$sample.s500.c3.$DM.ChromHMM.bed | sort -k1,1 >> $dirOut/DMR.ChromHMM.category
 done
 
 
@@ -94,7 +109,7 @@ dirIn=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/bam/
 
 ## super enhancers
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/SE/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/SE/; mkdir -p $dirOut
 dirAli=/projects/epigenomics3/epigenomics3_results/users/alorzadeh/AML/SuperEnhancersMACS2/
 ID=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ID.tsv
 for file in $dirAli/IDH*_Super_*.bed; do
@@ -118,7 +133,7 @@ cat $dirOut/AML*.SE.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -
 
 ## FindER2
 BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
-dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/FindER2/; mkdir -p $dirOut
 dirAli=/projects/epigenomics3/epigenomics3_results/users/alorzadeh/Finder2.0/Finder2_2019/
 ID=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ID.tsv
 for file in $dirAli/*[0-9]-[0-9]*.FindER2.bed $dirAli/*[0-9]_[0-9][0-9]_[ABH]*.FindER2.bed; do
@@ -130,3 +145,16 @@ for file in $dirAli/*[0-9]-[0-9]*.FindER2.bed $dirAli/*[0-9]_[0-9][0-9]_[ABH]*.F
 done
 cat $dirOut/H3K27ac.*AML_IDH*R*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin -c 1 -o count | awk '{if($4>2)print $1"\t"$2"\t"$3"\t"$1":"$2"-"$3}' > $dirOut/H3K27ac.IDHmut.bed
 cat $dirOut/H3K27ac.*AML_*.FindER2.bed | sort -k1,1 -k2,2n | $BEDTOOLS/mergeBed -i stdin > $dirOut/H3K27ac.AML.all.bed
+
+## ChromHMM
+BEDTOOLS=/gsc/software/linux-x86_64-centos5/bedtools/bedtools-2.25.0/bin/
+dirOut=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ChromHMM/; mkdir -p $dirOut
+dirAli=/projects/epigenomics3/epigenomics3_results/users/alorzadeh/AML/MACS2_Peaks/PeakFilesWithChr/ChromHMM/
+ID=/projects/epigenomics3/epigenomics3_results/users/lli/AML/ChIPseq/ID.tsv
+for file in $dirAli/IDH*segments.bed; do
+    sample=$(basename $file | sed 's/_18_segments.bed//')
+    name=$(less $ID | awk '$2 ~ "'$sample'" {print $1}')
+    echo $sample $name
+    ln -s $file $dirOut/$name.18_segments.bed
+done
+cp $(ls $dirAli/trans* $dirAli/emission* $dirAli/*.html) $dirOut 
